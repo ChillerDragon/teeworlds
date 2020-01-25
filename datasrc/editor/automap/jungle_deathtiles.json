@@ -146,6 +146,42 @@
 					{"x": 1, "y": -2, "value": "empty"},
 					{"x": 0, "y": -3, "value": "empty"}
 				]
+			},
+
+
+
+
+			{
+				"comment": "^ left bottom spike edge case dead fork",
+				"index": 5,
+				"condition": [
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+
+					{"x": 0, "y": 2, "value": "full"},
+					{"x": 1, "y": 2, "value": "full"},
+					{"x": -1, "y": 2, "value": "empty"},
+					{"x": 0, "y": 3, "value": "empty"}
+				],
+				"vflip": 1
+			},
+			{
+				"comment": "^ right bottom spike edge case dead fork",
+				"index": 5,
+				"condition": [
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+
+					{"x": 0, "y": 2, "value": "full"},
+					{"x": -1, "y": 2, "value": "full"},
+					{"x": 1, "y": 2, "value": "empty"},
+					{"x": 0, "y": 3, "value": "empty"}
+				],
+				"vflip": 1
 			}]
 		}
 	}]
