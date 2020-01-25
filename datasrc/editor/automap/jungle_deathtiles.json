@@ -341,6 +341,16 @@
 					{"x": 0, "y": 3, "value": "empty"}
 				],
 				"vflip": 1
+			},
+			{
+				"comment": "red warning on invalid tiles",
+				"index": 149,
+				"condition": [
+					{"x": 0, "y": 1, "value": "empty"},
+					{"x": 0, "y": -1, "value": "empty"},
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"}
+				]
 			}]
 		}
 	}]
