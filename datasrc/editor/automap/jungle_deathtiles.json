@@ -78,6 +78,7 @@
 					{"x": 0, "y": -1, "value": "empty"},
 					{"x": 0, "y": 1, "value": "full"},
 					{"x": -1, "y": 0, "value": "full"},
+					{"x": -1, "y": -1, "value": "full"},
 					{"x": -1, "y": 1, "value": "empty"},
 					{"x": 1, "y": 1, "value": "empty"}
 				]
@@ -89,6 +90,7 @@
 					{"x": 0, "y": -1, "value": "empty"},
 					{"x": 0, "y": 1, "value": "full"},
 					{"x": 1, "y": 0, "value": "full"},
+					{"x": 1, "y": -1, "value": "full"},
 					{"x": 1, "y": 1, "value": "empty"},
 					{"x": -1, "y": 1, "value": "empty"}
 				]
@@ -100,6 +102,7 @@
 					{"x": 0, "y": -1, "value": "full"},
 					{"x": 0, "y": 1, "value": "empty"},
 					{"x": -1, "y": 0, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"},
 					{"x": -1, "y": -1, "value": "empty"},
 					{"x": 1, "y": -1, "value": "empty"}
 				],
@@ -112,10 +115,42 @@
 					{"x": 0, "y": -1, "value": "full"},
 					{"x": 0, "y": 1, "value": "empty"},
 					{"x": 1, "y": 0, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"},
 					{"x": -1, "y": -1, "value": "empty"},
 					{"x": 1, "y": -1, "value": "empty"}
 				],
 				"vflip": 1
+			},
+			{
+				"comment": "v bottom spike edge case dead fork simple T",
+				"index": 5,
+				"condition": [
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": -1, "y": 1, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 0, "y": 2, "value": "empty"},
+					{"x": 1, "y": 2, "value": "empty"},
+					{"x": -1, "y": 2, "value": "empty"},
+				],
+				"vflip": 1
+			},
+			{
+				"comment": "^ top spike edge case dead fork simple T",
+				"index": 5,
+				"condition": [
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": -1, "y": -1, "value": "full"},
+					{"x": 1, "y": -1, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": 0, "y": -2, "value": "empty"},
+					{"x": 1, "y": -2, "value": "empty"},
+					{"x": -1, "y": -2, "value": "empty"},
+				]
 			},
 			{
 				"comment": "^ left top spike edge case dead fork false cross",
