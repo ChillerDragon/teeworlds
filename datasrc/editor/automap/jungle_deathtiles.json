@@ -118,7 +118,7 @@
 				"vflip": 1
 			},
 			{
-				"comment": "^ left top spike edge case dead fork",
+				"comment": "^ left top spike edge case dead fork false cross",
 				"index": 5,
 				"condition": [
 					{"x": 0, "y": -1, "value": "full"},
@@ -135,7 +135,7 @@
 				]
 			},
 			{
-				"comment": "^ right top spike edge case dead fork",
+				"comment": "^ right top spike edge case dead fork false cross",
 				"index": 5,
 				"condition": [
 					{"x": 0, "y": -1, "value": "full"},
@@ -152,7 +152,7 @@
 				]
 			},
 			{
-				"comment": "v left bottom spike edge case dead fork",
+				"comment": "v left bottom spike edge case dead fork false cross",
 				"index": 5,
 				"condition": [
 					{"x": 0, "y": 1, "value": "full"},
@@ -170,8 +170,8 @@
 				"vflip": 1
 			},
 			{
-				"comment": "v right bottom spike edge case dead fork",
-				"index": 1,
+				"comment": "v right bottom spike edge case dead fork false cross",
+				"index": 5,
 				"condition": [
 					{"x": 0, "y": 1, "value": "full"},
 					{"x": 1, "y": 1, "value": "full"},
