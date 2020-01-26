@@ -308,6 +308,7 @@
 					{"x": -2, "y": -1, "value": "empty"},
 					{"x": 2, "y": 0, "value": "empty"},
 					{"x": -1, "y": 1, "value": "empty"},
+					{"x": 1, "y": -1, "value": "empty"},
 
 					{"x": -1, "y": 0, "value": "full"},
 					{"x": 1, "y": 0, "value": "full"},
