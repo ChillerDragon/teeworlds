@@ -508,7 +508,6 @@
 				],
 				"hflip": 1
 			},
-
 			{
 				"comment": "> right spike edge case corner top right (ver)",
 				"0": "   ---     ",
@@ -532,8 +531,77 @@
 				],
 				"hflip": 1
 			},
+			{
+				"comment": "> right spike edge case corner top right (ver)",
+				"0": "   ---     ",
+				"1": "   321012  ",
+				"2": " -1   <=>  ",
+				"3": "  0  <X^   ",
+				"4": "  1    v   ",
+				"5": "  2        ",
+				"6": "  y        ",
+				"index": 37,
+				"condition": [
+					{"x": 2, "y": 0, "value": "empty"},
+					{"x": -2, "y": 0, "value": "empty"},
+					{"x": 0, "y": 1, "value": "empty"},
+					{"x": 2, "y": 1, "value": "empty"},
 
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": 1, "y": -1, "value": "full"},
+					{"x": 2, "y": -1, "value": "full"},
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"}
+				],
+				"hflip": 1
+			},
+			{
+				"comment": "^ top spike edge case corner top right (ver)",
+				"0": "   ----    ",
+				"1": "   4321012 ",
+				"2": " -1        ",
+				"3": "  0  <>X   ",
+				"4": "  1    v   ",
+				"5": "  2        ",
+				"6": "  y        ",
+				"index": 5,
+				"condition": [
+					{"x": -3, "y": 0, "value": "empty"},
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": 0, "y": -1, "value": "empty"},
+					{"x": 1, "y": 1, "value": "empty"},
+					{"x": -1, "y": 1, "value": "empty"},
 
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": -2, "y": 0, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"}
+				]
+			},
+			{
+				"comment": "^ top spike edge case corner top right (ver)",
+				"0": "   ----    ",
+				"1": "   4321012 ",
+				"2": " -1   <=>  ",
+				"3": "  0  <>X   ",
+				"4": "  1    v   ",
+				"5": "  2        ",
+				"6": "  y        ",
+				"index": 5,
+				"condition": [
+					{"x": -3, "y": 0, "value": "empty"},
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": 1, "y": 1, "value": "empty"},
+					{"x": -1, "y": 1, "value": "empty"},
+
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": -1, "y": -1, "value": "full"},
+					{"x": 1, "y": -1, "value": "full"},
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": -2, "y": 0, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"}
+				]
+			},
 
 
 			{
