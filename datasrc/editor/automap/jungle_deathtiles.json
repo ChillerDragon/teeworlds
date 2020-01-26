@@ -294,7 +294,7 @@
 				"vflip": 1
 			},
 			{
-				"comment": "< left spike edge case corner bottom left (hor)",
+				"comment": "< left spike edge case corner bottom left (ver)",
 				"0": "   ---    ",
 				"1": "   321012 ",
 				"2": " -2       ",
@@ -316,14 +316,14 @@
 				]
 			},
 			{
-				"comment": "v bottom spike edge case corner bottom left (ver)",
+				"comment": "v bottom spike edge case corner bottom left (hor)",
 				"0": "   --    ",
 				"1": "   21012 ",
 				"2": " -2       ",
 				"3": " -1  ^    ",
 				"4": "  0  X    ",
 				"5": "  1  <>   ",
-				"6": " -2       ",
+				"6": "  2       ",
 				"7": "  y       ",
 				"index": 5,
 				"condition": [
@@ -336,6 +336,33 @@
 					{"x": 0, "y": -1, "value": "full"},
 					{"x": 0, "y": 1, "value": "full"},
 					{"x": 1, "y": 1, "value": "full"}
+				],
+				"vflip": 1
+			},
+			{
+				"comment": "v bottom spike edge case big corner bottom left (ver)",
+				"0": "   --    ",
+				"1": "   21012 ",
+				"2": " -2  |    ",
+				"3": " -1  |    ",
+				"4": "  0  X    ",
+				"5": "  1  <==  ",
+				"6": "  2       ",
+				"7": "  y       ",
+				"index": 5,
+				"condition": [
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": -1, "y": -1, "value": "empty"},
+					{"x": 1, "y": -1, "value": "empty"},
+					{"x": 0, "y": 2, "value": "empty"},
+					{"x": 1, "y": 2, "value": "empty"},
+
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": 0, "y": -2, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"},
+					{"x": 2, "y": 1, "value": "full"}
 				],
 				"vflip": 1
 			},
