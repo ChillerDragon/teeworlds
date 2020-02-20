@@ -1090,7 +1090,57 @@
 				],
 				"vflip": 1
 			},
+			{
+				"comment": "v bottom spike edge case stair /",
+				"0": "   ----     ",
+				"1": "   4321012x ",
+				"2": " -3         ",
+				"3": " -2     ^   ",
+				"4": " -1    ^v   ",
+				"5": "  0   ^X    ",
+				"6": "  1   v     ",
+				"index": 5,
+				"condition": [
+					{"x": 0, "y": 1, "value": "empty"},
+					{"x": 0, "y": -2, "value": "empty"},
+					{"x": -2, "y": 0, "value": "empty"},
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": -2, "y": 1, "value": "empty"},
+					{"x": 2, "y": -2, "value": "empty"},
 
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"},
+					{"x": 1, "y": -1, "value": "full"},
+					{"x": 1, "y": -2, "value": "full"}
+				],
+				"vflip": 1
+			},
+			{
+				"comment": "^ top spike edge case stair /",
+				"0": "   ----     ",
+				"1": "   4321012x ",
+				"2": " -2         ",
+				"3": " -1     ^   ",
+				"4": "  0    Xv   ",
+				"5": "  1   ^v    ",
+				"6": "  2   v     ",
+				"index": 5,
+				"condition": [
+					{"x": 0, "y": 2, "value": "empty"},
+					{"x": 0, "y": -1, "value": "empty"},
+					{"x": -2, "y": 1, "value": "empty"},
+					{"x": 1, "y": 1, "value": "empty"},
+					{"x": -2, "y": 2, "value": "empty"},
+					{"x": 2, "y": -1, "value": "empty"},
+
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"},
+					{"x": -1, "y": 2, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": 1, "y": -1, "value": "full"}
+				]
+			},
 
 
 			{
