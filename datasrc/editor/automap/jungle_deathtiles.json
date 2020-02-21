@@ -1492,6 +1492,85 @@
 					{"x": 0, "y": 2, "value": "full"}
 				]
 			},
+			{
+				"comment": "v bottom spike edge case round edge top left ver",
+				"0": "   ---      ",
+				"1": "   3210123x ",
+				"2": " -2         ",
+				"3": " -1   ^<>   ",
+				"4": "  0  ^X     ",
+				"5": "  1  v      ",
+				"6": "  2         ",
+				"index": 5,
+				"condition": [
+					{"x": -1, "y": -1, "value": "empty"},
+					{"x": -2, "y": 0, "value": "empty"},
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": -2, "y": 1, "value": "empty"},
+					{"x": 1, "y": 1, "value": "empty"},
+					{"x": -1, "y": 2, "value": "empty"},
+					{"x": 3, "y": -1, "value": "empty"},
+
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": 1, "y": -1, "value": "full"},
+					{"x": 2, "y": -1, "value": "full"},
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"}
+				],
+				"vflip": 5
+			},
+			{
+				"comment": "^ top spike edge case round edge top left ver",
+				"0": "   ---      ",
+				"1": "   3210123x ",
+				"2": " -1         ",
+				"3": "  0   X<>   ",
+				"4": "  1  ^v     ",
+				"5": "  2  v      ",
+				"6": "  3         ",
+				"index": 5,
+				"condition": [
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": -2, "y": 1, "value": "empty"},
+					{"x": 1, "y": 1, "value": "empty"},
+					{"x": -2, "y": 2, "value": "empty"},
+					{"x": 1, "y": 2, "value": "empty"},
+					{"x": -1, "y": 3, "value": "empty"},
+					{"x": 3, "y": 0, "value": "empty"},
+
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": 2, "y": 0, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"},
+					{"x": -1, "y": 2, "value": "full"}
+				]
+			},
+			{
+				"comment": "< left spike edge case round edge top left ver",
+				"0": "   ----     ",
+				"1": "   4321012x ",
+				"2": " -1         ",
+				"3": "  0   ^X>   ",
+				"4": "  1  ^v     ",
+				"5": "  2  v      ",
+				"6": "  3         ",
+				"index": 37,
+				"condition": [
+					{"x": -2, "y": 0, "value": "empty"},
+					{"x": -3, "y": 1, "value": "empty"},
+					{"x": 0, "y": 1, "value": "empty"},
+					{"x": -3, "y": 2, "value": "empty"},
+					{"x": 0, "y": 2, "value": "empty"},
+					{"x": -2, "y": 3, "value": "empty"},
+					{"x": 2, "y": 0, "value": "empty"},
+
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"},
+					{"x": -2, "y": 1, "value": "full"},
+					{"x": -2, "y": 2, "value": "full"}
+				]
+			},
 
 			{
 				"comment": "red warning on invalid tiles",
