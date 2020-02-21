@@ -152,11 +152,6 @@
 					{"x": -1, "y": -2, "value": "empty"}
 				]
 			},
-
-
-
-
-
 			{
 				"comment": "^ top spike edge case corner top left (ver)",
 				"0": "   --     ",
