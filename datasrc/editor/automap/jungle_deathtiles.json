@@ -1764,6 +1764,39 @@
 					{"x": 1, "y": 3, "value": "full"}
 				]
 			},
+			{
+				"TODO": "remove FIX FIXES and implement better fixes further up",
+				"comment": "v bottom FIX FIX complex stair",
+				"0": "   ---       ",
+				"1": "   3210123x  ",
+				"2": " -3          ",
+				"3": " -2 #<>      ",
+				"4": " -1  #^#     ",
+				"5": "  0  #X^#    ",
+				"6": "  1   #v#    ",
+				"7": "  2    <>#   ",
+				"8": "  3          ",
+				"index": 5,
+				"condition": [
+					{"x": -2, "y": -2, "value": "empty"},
+					{"x": -1, "y": -1, "value": "empty"},
+					{"x": 1, "y": -1, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": 2, "y": 0, "value": "empty"},
+					{"x": 0, "y": 1, "value": "empty"},
+					{"x": 2, "y": 1, "value": "empty"},
+					{"x": 3, "y": 2, "value": "empty"},
+
+					{"x": -1, "y": -2, "value": "full"},
+					{"x": 0, "y": -2, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"},
+					{"x": 1, "y": 2, "value": "full"},
+					{"x": 2, "y": 2, "value": "full"}
+				],
+				"vflip": 1
+			},
 
 			{
 				"comment": "red warning on invalid tiles",
