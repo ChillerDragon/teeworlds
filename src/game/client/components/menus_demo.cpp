@@ -173,6 +173,16 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 
 	bool IncreaseDemoSpeed = false, DecreaseDemoSpeed = false;
 
+	if(Input()->KeyPress(KEY_R))
+		Config()->m_ClRecDemo ^= true;
+
+	if(Config()->m_ClRecDemo)
+	{
+		if(pInfo->m_Paused)
+			DemoPlayer()->Unpause();
+		Graphics()->TakeScreenshot("test/test");
+	}
+
 	//add spacebar for toggling Play/Pause
 	if(Input()->KeyPress(KEY_SPACE))
 	{
@@ -241,6 +251,11 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 		static CButtonContainer s_ExitButton;
 		if(DoButton_DemoPlayer(&s_ExitButton, Localize("Close"), &Button))
 			Client()->Disconnect();
+
+		ButtonBar.VSplitRight(ButtonbarHeight*3, &ButtonBar, &Button);
+		static CButtonContainer s_RecButton;
+		if(DoButton_DemoPlayer(&s_RecButton, "rec", &Button))
+			Config()->m_ClRecDemo ^= true;
 
 		// demo name
 		char aDemoName[64] = {0};
@@ -517,6 +532,7 @@ void CMenus::RenderDemoList(CUIRect MainView)
 			}
 			else // file
 			{
+				Config()->m_ClRecDemo = false;
 				char aBuf[IO_MAX_PATH_LENGTH];
 				str_format(aBuf, sizeof(aBuf), "%s/%s", m_aCurrentDemoFolder, m_lDemos[m_DemolistSelectedIndex].m_aFilename);
 				const char *pError = Client()->DemoPlayer_Play(aBuf, m_lDemos[m_DemolistSelectedIndex].m_StorageType);

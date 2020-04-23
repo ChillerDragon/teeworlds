@@ -4,6 +4,7 @@
 #define GAME_VARIABLES_H
 #undef GAME_VARIABLES_H // this file will be included several times
 
+MACRO_CONFIG_INT(ClRecDemo, cl_rec_demo, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "yeet")
 
 // client
 MACRO_CONFIG_INT(ClPredict, cl_predict, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Predict client movements")

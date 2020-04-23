@@ -944,7 +944,11 @@ void CGraphics_Threaded::TakeScreenshot(const char *pFilename)
 	// TODO: screenshot support
 	char aDate[20];
 	str_timestamp(aDate, sizeof(aDate));
-	str_format(m_aScreenshotName, sizeof(m_aScreenshotName), "screenshots/%s_%s.png", pFilename?pFilename:"screenshot", aDate);
+	static int FrameNum = 0;
+	FrameNum++;
+	if(FrameNum > 5000)
+		return;
+	str_format(m_aScreenshotName, sizeof(m_aScreenshotName), "screenshots/%s_%05d.png", pFilename?pFilename:"screenshot", FrameNum);
 	m_DoScreenshot = true;
 }
 
