@@ -2046,7 +2046,9 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 						if(UI()->MouseButton(1))
 							m_Brush.Clear();
 
-						if(UI()->MouseButton(0) && s_Operation == OP_NONE)
+						// ChillerDragon crack editor
+						// place tiles using keyboard D = DRAW
+						if((Input()->KeyIsPressed(KEY_D) || UI()->MouseButton(0)) && s_Operation == OP_NONE)
 						{
 							UI()->SetActiveItem(s_pEditorID);
 
@@ -2245,7 +2247,7 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 			}
 
 			// release mouse
-			if(!UI()->MouseButton(0))
+			if(!UI()->MouseButton(0) && !(Input()->KeyIsPressed(KEY_D)))
 			{
 				s_Operation = OP_NONE;
 				UI()->SetActiveItem(0);
@@ -2253,7 +2255,7 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 		}
 
 		// ChillerDragon - pan using keypress CrackEditor
-		float PanSpeed = 100.0f;
+		float PanSpeed = 64.0f;
 		if(Input()->KeyIsPressed(KEY_LSHIFT) || Input()->KeyIsPressed(KEY_RSHIFT))
 			PanSpeed *= 2.5;
 		if(Input()->KeyPress(KEY_LEFT))
