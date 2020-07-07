@@ -1823,8 +1823,6 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 
 	static void *s_pEditorID = (void *)&s_pEditorID;
 	bool Inside = UI()->MouseInside(&View);
-	if(m_InsideKeyState)
-		Inside = m_InsideKeyState == KS_INSIDE;
 
 
 	// fetch mouse position
@@ -1836,6 +1834,43 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 	// TODO: ChillerDragon crack editor add mouse support again
 	// static float s_StartWx = 0;
 	// static float s_StartWy = 0;
+	if (!Inside)
+	{
+		// TODO: use brain and revert this
+		// * (1-ZoomFactor)
+
+		// wx += 400 * (+m_ZoomLevel);
+		// wy += 400 * (+m_ZoomLevel);
+		if (m_ZoomLevel < 51)
+		{
+			wx += 400;
+			wy += 200;
+		}
+		else if (m_ZoomLevel < 101)
+		{
+			wx += 800;
+			wy += 400;
+		}
+		else if (m_ZoomLevel < 151)
+		{
+			wx += 1200;
+			wy += 600;
+		}
+		else if (m_ZoomLevel < 201)
+		{
+			wx += 1600;
+			wy += 800;
+		}
+		else
+		{
+			wx += 2000;
+			wy += 1000;
+		}
+		// dbg_msg("remapp", "inside wx=%.2f wy=%.2f level=%d", wx, wy, m_ZoomLevel);
+	}
+
+	if(m_InsideKeyState)
+		Inside = m_InsideKeyState == KS_INSIDE;
 
 	enum
 	{
