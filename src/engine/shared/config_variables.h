@@ -7,6 +7,8 @@
 // TODO: remove this
 #include "././game/variables.h"
 
+// ChillerDragon crack editor
+MACRO_CONFIG_STR(EdLastMap, ed_last_map, 512, "", CFGFLAG_SAVE|CFGFLAG_CLIENT, "last opend map path in editor")
 
 MACRO_CONFIG_STR(PlayerName, player_name, 16, "nameless tee", CFGFLAG_SAVE|CFGFLAG_CLIENT, "Name of the player")
 MACRO_CONFIG_STR(PlayerClan, player_clan, 12, "", CFGFLAG_SAVE|CFGFLAG_CLIENT, "Clan of the player")

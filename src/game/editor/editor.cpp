@@ -804,6 +804,7 @@ void CEditor::CallbackOpenMap(const char *pFileName, int StorageType, void *pUse
 		pEditor->SortImages();
 		pEditor->m_Dialog = DIALOG_NONE;
 		pEditor->m_Map.m_Modified = false;
+		str_copy(pEditor->m_pConfig->m_EdLastMap, pFileName, sizeof(m_pConfig->m_EdLastMap));
 	}
 	else
 	{
@@ -4561,6 +4562,14 @@ void CEditor::Init()
 
 	Reset();
 	m_Map.m_Modified = false;
+
+	// ChillerDragon crack load last map
+	if(m_pConfig->m_EdLastMap[0])
+	{
+		char aBuf[512];
+		str_copy(aBuf, m_pConfig->m_EdLastMap, sizeof(aBuf));
+		CallbackOpenMap(aBuf, IStorage::TYPE_ALL, this);
+	}
 
 #ifdef CONF_DEBUG
 	m_pConsole->Register("map_magic", "i", CFGFLAG_CLIENT, ConMapMagic, this, "1-grass_doodads, 2-winter_main, 3-both");
