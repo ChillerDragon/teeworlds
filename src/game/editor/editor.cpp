@@ -1833,8 +1833,9 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 	float mx = UI()->MouseX();
 	float my = UI()->MouseY();
 
-	static float s_StartWx = 0;
-	static float s_StartWy = 0;
+	// TODO: ChillerDragon crack editor add mouse support again
+	// static float s_StartWx = 0;
+	// static float s_StartWy = 0;
 
 	enum
 	{
@@ -1972,8 +1973,9 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 		// do global operations like pan and zoom
 		if(UI()->CheckActiveItem(0) && (UI()->MouseButton(0) || UI()->MouseButton(2)))
 		{
-			s_StartWx = wx;
-			s_StartWy = wy;
+			// TODO: ChillerDragon crack editor add mouse support again
+			// s_StartWx = wx;
+			// s_StartWy = wy;
 
 			if(Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL) || UI()->MouseButton(2))
 			{
@@ -2314,11 +2316,24 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 			}
 		}
 
+
 		// ChillerDragon crack select groups
-		if(Input()->KeyPress(KEY_UP) && m_SelectedGroup > 0)
-			m_SelectedGroup--;
-		else if(Input()->KeyPress(KEY_DOWN) && m_SelectedGroup < m_Map.m_lGroups.size() - 1)
-			m_SelectedGroup++;
+		int ls = m_Map.m_lGroups[m_SelectedGroup]->m_lLayers.size() - 1;
+		int gs = m_Map.m_lGroups.size() - 1;
+		if(Input()->KeyPress(KEY_UP))
+		{
+			if (m_SelectedLayer > 0)
+				m_SelectedLayer--;
+			else if (m_SelectedGroup > 0)
+				m_SelectedGroup--;
+		}
+		else if(Input()->KeyPress(KEY_DOWN))
+		{
+			if (m_SelectedLayer < ls)
+				m_SelectedLayer++;
+			else if (m_SelectedGroup < gs)
+				m_SelectedGroup++;
+		}
 		else if(Input()->KeyPress(KEY_RETURN))
 			m_InsideKeyState = KS_INSIDE;
 	}
