@@ -870,6 +870,8 @@ public:
 		KS_OUTSIDE
 	};
 	int m_InsideKeyState;
+	int m_CrackSelectX;
+	int m_CrackSelectY;
 };
 
 // make sure to inline this function

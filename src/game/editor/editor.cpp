@@ -1940,6 +1940,31 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 		}
 	}
 
+	// ChillerDragon crack editor arrow key select tiles in space menu
+	if(m_ShowTilePicker)
+	{
+		CUIRect r;
+		// r.x = s_StartWx;
+		// r.y = s_StartWy;
+		// r.w = wx-s_StartWx;
+		// r.h = wy-s_StartWy;
+
+		r.x = m_CrackSelectX;
+		r.y = m_CrackSelectY;
+		r.w = 1;
+		r.h = 1;
+		if (Input()->KeyPress(KEY_RIGHT))
+			m_CrackSelectX+=32.0f;
+		else if (Input()->KeyPress(KEY_LEFT))
+			m_CrackSelectX-=32.0f;
+		if (Input()->KeyPress(KEY_UP))
+			m_CrackSelectY-=32.0f;
+		else if (Input()->KeyPress(KEY_DOWN))
+			m_CrackSelectY+=32.0f;
+		for(int k = 0; k < NumEditLayers; k++)
+			pEditLayers[k]->BrushSelecting(r);
+	}
+
 	if(Inside)
 	{
 		UI()->SetHotItem(s_pEditorID);
@@ -1968,17 +1993,23 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 				{
 					// brush editing
 					if(m_Brush.IsEmpty())
-						m_pTooltip = "Use left mouse button to drag and create a brush.";
+						m_pTooltip = "[D] Use left mouse button to drag and create a brush.";
 					else
-						m_pTooltip = "Use left mouse button to paint with the brush. Right button clears the brush.";
+						m_pTooltip = "[D] Use left mouse button to paint with the brush. [X] Right button clears the brush.";
 
 					if(UI()->CheckActiveItem(s_pEditorID))
 					{
 						CUIRect r;
-						r.x = s_StartWx;
-						r.y = s_StartWy;
-						r.w = wx-s_StartWx;
-						r.h = wy-s_StartWy;
+						// r.x = s_StartWx;
+						// r.y = s_StartWy;
+						// r.w = wx-s_StartWx;
+						// r.h = wy-s_StartWy;
+
+						r.x = m_CrackSelectX;
+						r.y = m_CrackSelectY;
+						r.w = 1;
+						r.h = 1;
+
 						if(r.w < 0)
 						{
 							r.x += r.w;
@@ -2043,7 +2074,7 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 					}
 					else
 					{
-						if(UI()->MouseButton(1))
+						if(UI()->MouseButton(1) || Input()->KeyPress(KEY_X))
 							m_Brush.Clear();
 
 						// ChillerDragon crack editor
@@ -4192,6 +4223,8 @@ void CEditor::Render()
 
 	CUIRect MenuBar, CModeBar, ToolBar, StatusBar, EnvelopeEditor, ToolBox;
 	m_ShowTilePicker = Input()->KeyIsPressed(KEY_SPACE) != 0 && m_Dialog == DIALOG_NONE;
+	if(Input()->KeyPress(KEY_SPACE))
+		m_Brush.Clear();
 
 	if(m_GuiActive)
 	{
