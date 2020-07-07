@@ -939,8 +939,8 @@ void CEditor::DoToolbar(CUIRect ToolBar)
 	static int s_ZoomNormalButton = 0;
 	if(DoButton_Ex(&s_ZoomNormalButton, "1:1", 0, &Button, 0, "[NumPad*] Zoom to normal and remove editor offset", 0))
 	{
-		m_EditorOffsetX = 0;
-		m_EditorOffsetY = 0;
+		m_EditorOffsetX = 800.0f;
+		m_EditorOffsetY = 600.0f;
 		m_ZoomLevel = 100;
 	}
 
@@ -1822,6 +1822,9 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 
 	static void *s_pEditorID = (void *)&s_pEditorID;
 	bool Inside = UI()->MouseInside(&View);
+	if(m_InsideKeyState)
+		Inside = m_InsideKeyState == KS_INSIDE;
+
 
 	// fetch mouse position
 	float wx = UI()->MouseWorldX();
@@ -2247,15 +2250,43 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 				UI()->SetActiveItem(0);
 			}
 		}
+
+		// ChillerDragon - pan using keypress CrackEditor
+		float PanSpeed = 100.0f;
+		if(Input()->KeyIsPressed(KEY_LSHIFT) || Input()->KeyIsPressed(KEY_RSHIFT))
+			PanSpeed *= 2.5;
+		if(Input()->KeyPress(KEY_LEFT))
+			m_EditorOffsetX -= PanSpeed*m_WorldZoom;
+		else if(Input()->KeyPress(KEY_RIGHT))
+			m_EditorOffsetX += PanSpeed*m_WorldZoom;
+
+		if(Input()->KeyPress(KEY_UP))
+			m_EditorOffsetY -= PanSpeed*m_WorldZoom;
+		else if(Input()->KeyPress(KEY_DOWN))
+			m_EditorOffsetY += PanSpeed*m_WorldZoom;
+
+		if(Input()->KeyPress(KEY_ESCAPE))
+			m_InsideKeyState = KS_OUTSIDE;
 	}
-	else if(UI()->CheckActiveItem(s_pEditorID))
+	else
 	{
-		// release mouse
-		if(!UI()->MouseButton(0))
+		if(UI()->CheckActiveItem(s_pEditorID))
 		{
-			s_Operation = OP_NONE;
-			UI()->SetActiveItem(0);
+			// release mouse
+			if(!UI()->MouseButton(0))
+			{
+				s_Operation = OP_NONE;
+				UI()->SetActiveItem(0);
+			}
 		}
+
+		// ChillerDragon crack select groups
+		if(Input()->KeyPress(KEY_UP) && m_SelectedGroup > 0)
+			m_SelectedGroup--;
+		else if(Input()->KeyPress(KEY_DOWN) && m_SelectedGroup < m_Map.m_lGroups.size() - 1)
+			m_SelectedGroup++;
+		else if(Input()->KeyPress(KEY_RETURN))
+			m_InsideKeyState = KS_INSIDE;
 	}
 
 	if(!m_ShowTilePicker && GetSelectedGroup() && GetSelectedGroup()->m_UseClipping)
@@ -4183,15 +4214,15 @@ void CEditor::Render()
 		DoMapEditor(View, ToolBar);
 
 	// do zooming
-	if(Input()->KeyPress(KEY_KP_MINUS))
+	if(Input()->KeyPress(KEY_KP_MINUS) || (Input()->KeyPress(KEY_MINUS) && (Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL))))
 		m_ZoomLevel += 50;
-	if(Input()->KeyPress(KEY_KP_PLUS))
+	if(Input()->KeyPress(KEY_KP_PLUS) || (Input()->KeyPress(KEY_PLUS) && (Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL))))
 		m_ZoomLevel -= 50;
-	if(Input()->KeyPress(KEY_KP_MULTIPLY))
+	if(Input()->KeyPress(KEY_KP_MULTIPLY) || (Input()->KeyPress(KEY_0) && (Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL))))
 	{
-		m_EditorOffsetX = 0;
-		m_EditorOffsetY = 0;
-		m_ZoomLevel = 100;
+		m_EditorOffsetX = 800.0f;
+		m_EditorOffsetY = 600.0f;
+		m_ZoomLevel = 200;
 	}
 	if(m_Dialog == DIALOG_NONE && UI()->MouseInside(&View))
 	{
@@ -4346,8 +4377,8 @@ void CEditor::Reset(bool CreateDefault)
 
 	m_WorldOffsetX = 0;
 	m_WorldOffsetY = 0;
-	m_EditorOffsetX = 0.0f;
-	m_EditorOffsetY = 0.0f;
+	m_EditorOffsetX = 800.0f;
+	m_EditorOffsetY = 600.0f;
 
 	m_WorldZoom = 1.0f;
 	m_ZoomLevel = 200;
@@ -4360,6 +4391,9 @@ void CEditor::Reset(bool CreateDefault)
 	m_Map.m_Modified = false;
 
 	m_ShowEnvelopePreview = SHOWENV_NONE;
+
+	// ChillerDragon crack editor
+	m_InsideKeyState = 0;
 }
 
 int CEditor::GetLineDistance() const
@@ -4720,6 +4754,19 @@ void CEditor::UpdateAndRender()
 
 	UI()->FinishCheck();
 	Input()->Clear();
+}
+
+// ChillerDragon
+
+void CEditor::InitGroupSelection()
+{
+	for(int g = m_Map.m_lGroups.size() - 1; g > 0; g--)
+		for(int i = 0; i < m_Map.m_lGroups[g]->m_lLayers.size(); i++)
+		{
+			m_SelectedLayer = i;
+			m_SelectedGroup = g;
+			return;
+		}
 }
 
 IEditor *CreateEditor() { return new CEditor; }

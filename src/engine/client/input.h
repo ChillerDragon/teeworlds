@@ -63,6 +63,9 @@ public:
 	virtual void SetClipboardText(const char *pText);
 
 	virtual int Update();
+
+	// ChillerDragon crack editor
+	void SetMousePos(int x, int y);
 };
 
 #endif

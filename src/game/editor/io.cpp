@@ -250,7 +250,10 @@ int CEditorMap::Save(class IStorage *pStorage, const char *pFileName)
 int CEditor::Load(const char *pFileName, int StorageType)
 {
 	Reset();
-	return m_Map.Load(Kernel()->RequestInterface<IStorage>(), pFileName, StorageType);
+	int r = m_Map.Load(Kernel()->RequestInterface<IStorage>(), pFileName, StorageType);
+	if (r)
+		InitGroupSelection();
+	return r;
 }
 
 void CEditor::LoadCurrentMap()

@@ -466,5 +466,12 @@ int CInput::Update()
 	return 0;
 }
 
+// ChillerDragon
+
+void CInput::SetMousePos(int x, int y)
+{
+	// does not work ¯\_(ツ)_/¯
+	SDL_WarpMouseGlobal(x, y);
+}
 
 IEngineInput *CreateEngineInput() { return new CInput; }

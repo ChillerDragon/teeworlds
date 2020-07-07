@@ -561,8 +561,8 @@ public:
 
 		m_WorldOffsetX = 0;
 		m_WorldOffsetY = 0;
-		m_EditorOffsetX = 0.0f;
-		m_EditorOffsetY = 0.0f;
+		m_EditorOffsetX = 800.0f;
+		m_EditorOffsetY = 600.0f;
 
 		m_WorldZoom = 1.0f;
 		m_ZoomLevel = 200;
@@ -863,6 +863,13 @@ public:
 	// ChillerDragon
 
 	void DoAutomap(CEditor *pEditor);
+	void InitGroupSelection();
+	enum {
+		KS_OFF,
+		KS_INSIDE,
+		KS_OUTSIDE
+	};
+	int m_InsideKeyState;
 };
 
 // make sure to inline this function
