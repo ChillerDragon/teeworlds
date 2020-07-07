@@ -4691,6 +4691,11 @@ void CEditor::UpdateAndRender()
 		UI()->Update(mx,my,Mwx,Mwy,Buttons);
 	}
 
+	if(Input()->KeyPress(KEY_F5))
+	{
+		DoAutomap(this);
+	}
+
 	// toggle gui
 	if(Input()->KeyPress(KEY_TAB))
 		m_GuiActive = !m_GuiActive;

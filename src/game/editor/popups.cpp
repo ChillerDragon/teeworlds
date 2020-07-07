@@ -1340,3 +1340,26 @@ int CEditor::PopupMenuFile(CEditor *pEditor, CUIRect View)
 
 	return 0;
 }
+
+// ChillerDragon
+
+void CEditor::DoAutomap(CEditor *pEditor)
+{
+	for(int i = 0; i < pEditor->m_Map.m_pGameGroup->m_lLayers.size(); ++i)
+	{
+		CLayerTiles *pLayer = static_cast<CLayerTiles*>(pEditor->m_Map.m_pGameGroup->m_lLayers[i]);
+		if(pLayer && pLayer->m_Image >= 0 && pLayer->m_Image < m_Map.m_lImages.size() &&
+			m_Map.m_lImages[pLayer->m_Image]->m_pAutoMapper->RuleSetNum())
+		{
+			for(int i = 0; i < pLayer->m_pEditor->m_Map.m_lImages[pLayer->m_Image]->m_pAutoMapper->RuleSetNum(); ++i)
+			{
+				pLayer->m_SelectedRuleSet = i;
+				if(!pLayer->m_LiveAutoMap)
+					s_AutoMapProceedOrder = true;
+				RECTi r = {0, 0, pLayer->m_Width, pLayer->m_Height};
+				pEditor->m_Map.m_lImages[pLayer->m_Image]->m_pAutoMapper->Proceed(pLayer, pLayer->m_SelectedRuleSet, r);
+				return;
+			}
+		}
+	}
+}

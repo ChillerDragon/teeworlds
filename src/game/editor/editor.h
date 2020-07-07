@@ -859,6 +859,10 @@ public:
 
 	int GetLineDistance() const;
 	void ZoomMouseTarget(float ZoomFactor);
+
+	// ChillerDragon
+
+	void DoAutomap(CEditor *pEditor);
 };
 
 // make sure to inline this function
