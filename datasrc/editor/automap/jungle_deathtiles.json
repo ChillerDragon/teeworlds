@@ -1933,7 +1933,7 @@
 					{"x": 0, "y": -2, "value": "full"},
 					{"x": -1, "y": -2, "value": "full"},
 					{"x": -1, "y": 0, "value": "full"},
-					{"x": 0, "y": 0, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
 					{"x": 1, "y": 0, "value": "full"}
 				]
 			},
@@ -1988,9 +1988,113 @@
 				]
 			},
 			{
+				"comment": "^ top spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 3/4)",
+				"rule_index": 80,
+				"0": "   ---     ",
+				"1": "   321012x ",
+				"2": " -2    <>   ",
+				"3": " -1  <=>   ",
+				"4": "  0   X    ",
+				"5": "  1   v    ",
+				"6": "  y        ",
+				"index": 5,
+				"condition": [
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": 0, "y": -2, "value": "empty"},
+					{"x": -1, "y": -2, "value": "empty"},
+
+					{"x": 2, "y": -2, "value": "full"},
+					{"x": 1, "y": -2, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": -1, "y": -1, "value": "full"},
+					{"x": 1, "y": -1, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"}
+				]
+			},
+			{
+				"comment": "= horizontal spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 3/4)",
+				"rule_index": 81,
+				"0": "   ---     ",
+				"1": "   321012x ",
+				"2": " -2        ",
+				"3": " -1    <>   ",
+				"4": "  0  <X>   ",
+				"5": "  1   ^    ",
+				"6": "  2   v    ",
+				"7": "  y        ",
+				"index": 38,
+				"condition": [
+					{"x": 1, "y": 1, "value": "empty"},
+					{"x": -1, "y": 1, "value": "empty"},
+					{"x": 0, "y": -1, "value": "empty"},
+					{"x": -1, "y": -1, "value": "empty"},
+					{"x": 2, "y": -2, "value": "empty"},
+
+					{"x": 2, "y": -1, "value": "full"},
+					{"x": 1, "y": -1, "value": "full"},
+					{"x": 0, "y": 2, "value": "full"},
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"}
+				]
+			},
+			{
+				"comment": "^ top spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 4/4)",
+				"rule_index": 82,
+				"0": "   ---     ",
+				"1": "   321012x ",
+				"2": " -2 <>     ",
+				"3": " -1  <=>   ",
+				"4": "  0   X    ",
+				"5": "  1   v    ",
+				"6": "  y        ",
+				"index": 5,
+				"condition": [
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": 0, "y": -2, "value": "empty"},
+					{"x": 1, "y": -2, "value": "empty"},
+					
+					{"x": -2, "y": -2, "value": "full"},
+					{"x": -1, "y": -2, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": -1, "y": -1, "value": "full"},
+					{"x": 1, "y": -1, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"}
+				]
+			},
+			{
+				"comment": "= horizontal spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 4/4)",
+				"rule_index": 83,
+				"0": "   ---     ",
+				"1": "   321012x ",
+				"2": " -3        ",
+				"3": " -1 <>     ",
+				"4": "  0  <X>   ",
+				"5": "  1   ^    ",
+				"6": "  2   v    ",
+				"7": "  y        ",
+				"index": 38,
+				"condition": [
+					{"x": 1, "y": 1, "value": "empty"},
+					{"x": -1, "y": 1, "value": "empty"},
+					{"x": 0, "y": -1, "value": "empty"},
+					{"x": 1, "y": -1, "value": "empty"},
+					{"x": -2, "y": -2, "value": "empty"},
+					
+					{"x": -2, "y": -1, "value": "full"},
+					{"x": -1, "y": -1, "value": "full"},
+					{"x": 0, "y": 2, "value": "full"},
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"}
+				]
+			},
+			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "< left spike FIX FIX simple step towards top right",
-				"rule_index": 80,
+				"rule_index": 84,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -1      ?  ",
@@ -2016,7 +2120,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom spike FIX FIX simple step towards top right rot 45",
-				"rule_index": 81,
+				"rule_index": 85,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -3  ?      ",
@@ -2050,7 +2154,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "|| vertical FIX FIX simple step towards top right rot 45",
-				"rule_index": 82,
+				"rule_index": 86,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -2  ?      ",
@@ -2083,7 +2187,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom FIX FIX complex stair",
-				"rule_index": 83,
+				"rule_index": 87,
 				"0": "   ---       ",
 				"1": "   3210123x  ",
 				"2": " -3          ",
@@ -2117,7 +2221,7 @@
 
 			{
 				"comment": "red warning on invalid tiles",
-				"rule_index": 84,
+				"rule_index": 88,
 				"index": 149,
 				"condition": [
 					{"x": 0, "y": 1, "value": "empty"},
