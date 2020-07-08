@@ -499,7 +499,7 @@ void CRenderTools::RenderAutomapOverlay(CTile *pTiles, int w, int h, float Scale
 				char aBuf[16];
 				str_format(aBuf, sizeof(aBuf), "%d", AutomapRule);
 				UI()->TextRender()->TextColor(1.0f, 1.0f, 1.0f, Alpha);
-				UI()->TextRender()->Text(0, mx*Scale - 3.f, my*Scale, Scale - 5.f, aBuf, -1);
+				UI()->TextRender()->Text(0, mx*Scale - 3.f, my*Scale, Scale / 2, aBuf, -1);
 				UI()->TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 			}
 		}
