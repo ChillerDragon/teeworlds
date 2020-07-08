@@ -371,8 +371,6 @@
 					{"x": -1, "y": 0, "value": "empty"},
 					{"x": 1, "y": -2, "value": "empty"},
 					{"x": -1, "y": 1, "value": "empty"},
-					{"x": -1, "y": -1, "value": "empty"},
-					{"x": 1, "y": -1, "value": "empty"},
 
 					{"x": 0, "y": -1, "value": "full"},
 					{"x": 0, "y": 1, "value": "full"},
@@ -1772,6 +1770,163 @@
 					{"x": 0, "y": 1, "value": "full"},
 					{"x": 1, "y": 1, "value": "full"},
 					{"x": 2, "y": 1, "value": "full"}
+				]
+			},
+			{
+				"comment": "^ top spike FIX FIX edge case corner bottom left (hor) 1/4",
+				"rule_index": 20,
+				"0": "   --     ",
+				"1": "   21012x ",
+				"2": " -2       ",
+				"3": " -1 <>    ",
+				"4": "  0  X    ",
+				"5": "  1  v^   ",
+				"6": "  2   V   ",
+				"7": "  y       ",
+				"index": 5,
+				"condition": [
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": 1, "y": -2, "value": "empty"},
+					{"x": 0, "y": -2, "value": "empty"},
+					{"x": -1, "y": 1, "value": "empty"},
+
+					{"x": -1, "y": -1, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"},
+					{"x": 1, "y": 2, "value": "full"}
+				]
+			},
+			{
+				"comment": "^ top spike FIX FIX edge case corner bottom left (hor) 1/4",
+				"rule_index": 20,
+				"0": "   --     ",
+				"1": "   21012x ",
+				"2": " -2       ",
+				"3": " -1  <>   ",
+				"4": "  0  X    ",
+				"5": "  1  v^   ",
+				"6": "  2   V   ",
+				"7": "  y       ",
+				"index": 5,
+				"condition": [
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": 1, "y": -2, "value": "empty"},
+					{"x": 0, "y": -2, "value": "empty"},
+					{"x": -1, "y": 1, "value": "empty"},
+
+					{"x": 1, "y": -1, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"},
+					{"x": 1, "y": 2, "value": "full"}
+				]
+			},
+			{
+				"comment": "^ top spike FIX FIX edge case corner bottom left (hor) 3/4",
+				"rule_index": 20,
+				"0": "   --     ",
+				"1": "   21012x ",
+				"2": " -2       ",
+				"3": " -1 <>    ",
+				"4": "  0  X    ",
+				"5": "  1  v<>  ",
+				"6": "  2       ",
+				"7": "  y       ",
+				"index": 5,
+				"condition": [
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": 1, "y": -2, "value": "empty"},
+					{"x": 0, "y": -2, "value": "empty"},
+					{"x": -1, "y": 1, "value": "empty"},
+
+					{"x": -1, "y": -1, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"},
+					{"x": 2, "y": 1, "value": "full"}
+				]
+			},
+			{
+				"comment": "^ top spike FIX FIX edge case corner bottom left (hor) 4/4",
+				"rule_index": 20,
+				"0": "   --     ",
+				"1": "   21012x ",
+				"2": " -2       ",
+				"3": " -1  <>   ",
+				"4": "  0  X    ",
+				"5": "  1  v<>  ",
+				"6": "  2       ",
+				"7": "  y       ",
+				"index": 5,
+				"condition": [
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": 1, "y": -2, "value": "empty"},
+					{"x": 0, "y": -2, "value": "empty"},
+					{"x": -1, "y": 1, "value": "empty"},
+
+					{"x": 1, "y": -1, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"},
+					{"x": 2, "y": 1, "value": "full"}
+				]
+			},
+			{
+				"comment": "v bottom spike FIX FIX edge case corner bottom left (hor)",
+				"rule_index": 20,
+				"0": "   --     ",
+				"1": "   21012x ",
+				"2": " -3       ",
+				"3": " -2  <>   ",
+				"4": " -1  ^    ",
+				"5": "  0  X<>  ",
+				"6": "  1       ",
+				"7": "  y       ",
+				"index": 5,
+				"condition": [
+					{"x": 1, "y": -1, "value": "empty"},
+					{"x": -1, "y": -1, "value": "empty"},
+					{"x": 1, "y": -3, "value": "empty"},
+					{"x": 0, "y": -3, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"},
+
+					{"x": 1, "y": -2, "value": "full"},
+					{"x": 0, "y": -2, "value": "full"},
+					{"x": 0, "y": 0, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": 2, "y": 0, "value": "full"}
+				],
+				"vflip": 1
+			},
+			{
+				"comment": "< left spike FIX FIX edge case corner bottom left (hor)",
+				"rule_index": 20,
+				"0": "   ---    ",
+				"1": "   321012x",
+				"2": " -3       ",
+				"3": " -2  <>   ",
+				"4": " -1  ^    ",
+				"5": "  0  vX>  ",
+				"6": "  1       ",
+				"7": "  y       ",
+				"index": 37,
+				"condition": [
+					{"x": 0, "y": -1, "value": "empty"},
+					{"x": -2, "y": -1, "value": "empty"},
+					{"x": 0, "y": -3, "value": "empty"},
+					{"x": -1, "y": -3, "value": "empty"},
+					{"x": -2, "y": 0, "value": "empty"},
+
+					{"x": 0, "y": -2, "value": "full"},
+					{"x": -1, "y": -2, "value": "full"},
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": 0, "y": 0, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"}
 				]
 			},
 			{
