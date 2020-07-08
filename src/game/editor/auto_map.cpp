@@ -181,6 +181,8 @@ void CTilesetMapper::Proceed(CLayerTiles *pLayer, int ConfigID, RECTi Area)
 						pTile->m_Flags ^= pTile->m_Flags&TILEFLAG_ROTATE ? TILEFLAG_HFLIP : TILEFLAG_VFLIP;
 					if(pConf->m_aRules[i].m_VFlip)
 						pTile->m_Flags ^= pTile->m_Flags&TILEFLAG_ROTATE ? TILEFLAG_VFLIP : TILEFLAG_HFLIP;
+
+					pTile->m_Reserved = i;
 				}
 			}
 		}

@@ -4,6 +4,8 @@
 #include <base/math.h>
 #include <base/tl/base.h>
 #include <engine/graphics.h>
+#include <engine/shared/config.h>
+#include <engine/textrender.h>
 
 #include "render.h"
 
@@ -454,5 +456,53 @@ void CRenderTools::RenderTilemap(CTile *pTiles, int w, int h, float Scale, vec4 
 		}
 
 	Graphics()->QuadsEnd();
+	Graphics()->MapScreen(ScreenX0, ScreenY0, ScreenX1, ScreenY1);
+}
+
+void CRenderTools::RenderAutomapOverlay(CTile *pTiles, int w, int h, float Scale, float Alpha)
+{
+	if(!m_pConfig->m_ClTextEntities)
+	  return;
+
+	float ScreenX0, ScreenY0, ScreenX1, ScreenY1;
+	Graphics()->GetScreen(&ScreenX0, &ScreenY0, &ScreenX1, &ScreenY1);
+
+	int StartY = (int)(ScreenY0/Scale)-1;
+	int StartX = (int)(ScreenX0/Scale)-1;
+	int EndY = (int)(ScreenY1/Scale)+1;
+	int EndX = (int)(ScreenX1/Scale)+1;
+
+	if(EndX - StartX > Graphics()->ScreenWidth() / m_pConfig->m_GfxTextOverlay || EndY - StartY > Graphics()->ScreenHeight() / m_pConfig->m_GfxTextOverlay)
+		return; // its useless to render text at this distance
+
+	for(int y = StartY; y < EndY; y++)
+		for(int x = StartX; x < EndX; x++)
+		{
+			int mx = x;
+			int my = y;
+
+
+			if(mx<0)
+				continue; // mx = 0;
+			if(mx>=w)
+				continue; // mx = w-1;
+			if(my<0)
+				continue; // my = 0;
+			if(my>=h)
+				continue; // my = h-1;
+
+			int c = mx + my*w;
+
+			unsigned char AutomapRule = pTiles[c].m_Reserved;
+			if(AutomapRule)
+			{
+				char aBuf[16];
+				str_format(aBuf, sizeof(aBuf), "%d", AutomapRule);
+				UI()->TextRender()->TextColor(1.0f, 1.0f, 1.0f, Alpha);
+				UI()->TextRender()->Text(0, mx*Scale - 3.f, my*Scale, Scale - 5.f, aBuf, -1);
+				UI()->TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+			}
+		}
+
 	Graphics()->MapScreen(ScreenX0, ScreenY0, ScreenX1, ScreenY1);
 }

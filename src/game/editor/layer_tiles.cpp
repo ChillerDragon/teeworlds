@@ -167,6 +167,7 @@ void CLayerTiles::Render()
 	Graphics()->BlendNormal();
 	m_pEditor->RenderTools()->RenderTilemap(m_pTiles, m_Width, m_Height, 32.0f, Color, LAYERRENDERFLAG_TRANSPARENT,
 												m_pEditor->EnvelopeEval, m_pEditor, m_ColorEnv, m_ColorEnvOffset);
+	m_pEditor->RenderTools()->RenderAutomapOverlay(m_pTiles, m_Width, m_Height, 32.0f, 1.0f);
 }
 
 int CLayerTiles::ConvertX(float x) const { return (int)(x/32.0f); }

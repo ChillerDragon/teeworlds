@@ -4826,9 +4826,14 @@ void CEditor::UpdateAndRender()
 		UI()->Update(mx,my,Mwx,Mwy,Buttons);
 	}
 
+	// ChillerDragon crack editor hotkeys
 	if(Input()->KeyPress(KEY_F5))
 	{
 		DoAutomap(this);
+	}
+	if(Input()->KeyPress(KEY_D) && (Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL)))
+	{
+		Config()->m_ClTextEntities ^= 1;
 	}
 
 	// toggle gui
