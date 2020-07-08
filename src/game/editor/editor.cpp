@@ -2353,24 +2353,27 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 
 
 		// ChillerDragon crack select groups
-		int ls = m_Map.m_lGroups[m_SelectedGroup]->m_lLayers.size() - 1;
-		int gs = m_Map.m_lGroups.size() - 1;
-		if(Input()->KeyPress(KEY_UP))
+		if (!m_ShowTilePicker)
 		{
-			if (m_SelectedLayer > 0)
-				m_SelectedLayer--;
-			else if (m_SelectedGroup > 0)
-				m_SelectedGroup--;
+			int ls = m_Map.m_lGroups[m_SelectedGroup]->m_lLayers.size() - 1;
+			int gs = m_Map.m_lGroups.size() - 1;
+			if(Input()->KeyPress(KEY_UP))
+			{
+				if (m_SelectedLayer > 0)
+					m_SelectedLayer--;
+				else if (m_SelectedGroup > 0)
+					m_SelectedGroup--;
+			}
+			else if(Input()->KeyPress(KEY_DOWN))
+			{
+				if (m_SelectedLayer < ls)
+					m_SelectedLayer++;
+				else if (m_SelectedGroup < gs)
+					m_SelectedGroup++;
+			}
+			else if(Input()->KeyPress(KEY_RETURN))
+				m_InsideKeyState = KS_INSIDE;
 		}
-		else if(Input()->KeyPress(KEY_DOWN))
-		{
-			if (m_SelectedLayer < ls)
-				m_SelectedLayer++;
-			else if (m_SelectedGroup < gs)
-				m_SelectedGroup++;
-		}
-		else if(Input()->KeyPress(KEY_RETURN))
-			m_InsideKeyState = KS_INSIDE;
 	}
 
 	if(!m_ShowTilePicker && GetSelectedGroup() && GetSelectedGroup()->m_UseClipping)
