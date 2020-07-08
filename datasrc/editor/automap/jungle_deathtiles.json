@@ -1774,7 +1774,7 @@
 			},
 			{
 				"comment": "^ top spike FIX FIX edge case corner bottom left (hor) 1/4",
-				"rule_index": 20,
+				"rule_index": 72,
 				"0": "   --     ",
 				"1": "   21012x ",
 				"2": " -2       ",
@@ -1800,7 +1800,7 @@
 			},
 			{
 				"comment": "^ top spike FIX FIX edge case corner bottom left (hor) 1/4",
-				"rule_index": 20,
+				"rule_index": 73,
 				"0": "   --     ",
 				"1": "   21012x ",
 				"2": " -2       ",
@@ -1826,7 +1826,7 @@
 			},
 			{
 				"comment": "^ top spike FIX FIX edge case corner bottom left (hor) 3/4",
-				"rule_index": 20,
+				"rule_index": 74,
 				"0": "   --     ",
 				"1": "   21012x ",
 				"2": " -2       ",
@@ -1852,7 +1852,7 @@
 			},
 			{
 				"comment": "^ top spike FIX FIX edge case corner bottom left (hor) 4/4",
-				"rule_index": 20,
+				"rule_index": 75,
 				"0": "   --     ",
 				"1": "   21012x ",
 				"2": " -2       ",
@@ -1878,7 +1878,7 @@
 			},
 			{
 				"comment": "v bottom spike FIX FIX edge case corner bottom left (hor)",
-				"rule_index": 20,
+				"rule_index": 76,
 				"0": "   --     ",
 				"1": "   21012x ",
 				"2": " -3       ",
@@ -1905,7 +1905,7 @@
 			},
 			{
 				"comment": "< left spike FIX FIX edge case corner bottom left (hor)",
-				"rule_index": 20,
+				"rule_index": 77,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -3       ",
@@ -1932,7 +1932,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "< left spike FIX FIX simple step towards top right",
-				"rule_index": 72,
+				"rule_index": 78,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -1      ?  ",
@@ -1958,7 +1958,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom spike FIX FIX simple step towards top right rot 45",
-				"rule_index": 73,
+				"rule_index": 79,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -3  ?      ",
@@ -1992,7 +1992,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "|| vertical FIX FIX simple step towards top right rot 45",
-				"rule_index": 74,
+				"rule_index": 80,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -2  ?      ",
@@ -2025,7 +2025,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom FIX FIX complex stair",
-				"rule_index": 75,
+				"rule_index": 81,
 				"0": "   ---       ",
 				"1": "   3210123x  ",
 				"2": " -3          ",
@@ -2059,7 +2059,7 @@
 
 			{
 				"comment": "red warning on invalid tiles",
-				"rule_index": 76,
+				"rule_index": 82,
 				"index": 149,
 				"condition": [
 					{"x": 0, "y": 1, "value": "empty"},
