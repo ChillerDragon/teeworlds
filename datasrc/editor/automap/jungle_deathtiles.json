@@ -2191,7 +2191,7 @@
 					{"x": -2, "y": 2, "value": "empty"},
 					{"x": -1, "y": 0, "value": "empty"},
 					{"x": 0, "y": -2, "value": "empty"},
-					{"x": -1, "y": 1, "value": "empty"},
+					{"x": -1, "y": 2, "value": "empty"},
 
 					{"x": -1, "y": 1, "value": "full"},
 					{"x": 1, "y": 2, "value": "full"},
@@ -2282,7 +2282,7 @@
 			},
 			{
 				"comment": "^ top spike two-pronged",
-				"rule_index": 88,
+				"rule_index": 91,
 				"0":  "'#' = empty   'X' = placed  ",
 				"2":  "'^v<=>' = full              ",
 				"3":  "   ---           ---        ",
@@ -2311,7 +2311,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "< left spike FIX FIX simple step towards top right",
-				"rule_index": 91,
+				"rule_index": 92,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -1      ?  ",
@@ -2337,7 +2337,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom spike FIX FIX simple step towards top right rot 45",
-				"rule_index": 92,
+				"rule_index": 93,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -3  ?      ",
@@ -2371,7 +2371,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "|| vertical FIX FIX simple step towards top right rot 45",
-				"rule_index": 93,
+				"rule_index": 94,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -2  ?      ",
@@ -2404,7 +2404,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom FIX FIX complex stair",
-				"rule_index": 94,
+				"rule_index": 95,
 				"0": "   ---       ",
 				"1": "   3210123x  ",
 				"2": " -3          ",
@@ -2438,7 +2438,7 @@
 
 			{
 				"comment": "red warning on invalid tiles",
-				"rule_index": 95,
+				"rule_index": 96,
 				"index": 149,
 				"condition": [
 					{"x": 0, "y": 1, "value": "empty"},
