@@ -2365,7 +2365,7 @@
 			},
 			{
 				"comment": "|| vertical spike the thing TODO: FIND A NAME (top right)",
-				"rule_index": 93,
+				"rule_index": 94,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -2394,7 +2394,7 @@
 			},
 			{
 				"comment": "^ top spike the thing TODO: FIND A NAME (top right)",
-				"rule_index": 93,
+				"rule_index": 95,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -2423,7 +2423,7 @@
 			},
 			{
 				"comment": "v bottom spike the thing TODO: FIND A NAME (top right)",
-				"rule_index": 93,
+				"rule_index": 96,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -2453,7 +2453,7 @@
 			},
 			{
 				"comment": "v bottom spike the thing TODO: FIND A NAME (top right)",
-				"rule_index": 93,
+				"rule_index": 97,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -2482,9 +2482,127 @@
 				"vflip": 1
 			},
 			{
+				"comment": "|| vertical spike the thing TODO: FIND A NAME (top left)",
+				"rule_index": 98,
+				"0":  "'#' = empty   'X' = placed ",
+				"2":  "'^v<=>' = full             ",
+				"3":  "   --           --         ",
+				"4":  "   21012x       21012x     ",
+				"5":  " -2           -2  #        ",
+				"6":  " -1  ^        -1 #^#       ",
+				"7":  "  0  X^        0 #X^#      ",
+				"8":  "  1  vv        1 #vv#      ",
+				"9":  "  2            2           ",
+				"10": "  y            y           ",
+				"index": 21,
+				"condition": [
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": -1, "y": 1, "value": "empty"},
+					{"x": 2, "y": 0, "value": "empty"},
+					{"x": 2, "y": 1, "value": "empty"},
+					{"x": 1, "y": -1, "value": "empty"},
+					{"x": -1, "y": -1, "value": "empty"},
+					{"x": 0, "y": -2, "value": "empty"},
+
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"}
+				]
+			},
+			{
+				"comment": "^ top spike the thing TODO: FIND A NAME (top left)",
+				"rule_index": 99,
+				"0":  "'#' = empty   'X' = placed ",
+				"2":  "'^v<=>' = full             ",
+				"3":  "   ---          ---        ",
+				"4":  "   321012x      321012x    ",
+				"5":  " -2           -2  #        ",
+				"6":  " -1  ^        -1 #^#       ",
+				"7":  "  0  |X        0 #|X#      ",
+				"8":  "  1  vv        1 #vv#      ",
+				"9":  "  2            2           ",
+				"10": "  y            y           ",
+				"index": 5,
+				"condition": [
+					{"x": -2, "y": 0, "value": "empty"},
+					{"x": -2, "y": 1, "value": "empty"},
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": 1, "y": 1, "value": "empty"},
+					{"x": 0, "y": -1, "value": "empty"},
+					{"x": -2, "y": -1, "value": "empty"},
+					{"x": -1, "y": -2, "value": "empty"},
+
+					{"x": -1, "y": 1, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": -1, "y": -1, "value": "full"}
+				]
+			},
+			{
+				"comment": "v bottom spike the thing TODO: FIND A NAME (top left)",
+				"rule_index": 100,
+				"0":  "'#' = empty   'X' = placed ",
+				"2":  "'^v<=>' = full             ",
+				"3":  "   ---          ---        ",
+				"4":  "   321012x      321012x    ",
+				"5":  " -3           -3  #        ",
+				"6":  " -2  ^        -2 #^#       ",
+				"7":  " -1  |^       -1 #|^#      ",
+				"8":  "  0  vX        0 #vX#      ",
+				"9":  "  1            1           ",
+				"10": "  y            y           ",
+				"index": 5,
+				"condition": [
+					{"x": -2, "y": -1, "value": "empty"},
+					{"x": -2, "y": 0, "value": "empty"},
+					{"x": 1, "y": -1, "value": "empty"},
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": 0, "y": -2, "value": "empty"},
+					{"x": -2, "y": -2, "value": "empty"},
+					{"x": -1, "y": -3, "value": "empty"},
+
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": -1, "y": -1, "value": "full"},
+					{"x": -1, "y": -2, "value": "full"}
+				],
+				"vflip": 1
+			},
+			{
+				"comment": "v bottom spike the thing TODO: FIND A NAME (top left)",
+				"rule_index": 101,
+				"0":  "'#' = empty   'X' = placed ",
+				"2":  "'^v<=>' = full             ",
+				"3":  "   --           --         ",
+				"4":  "   21012x       21012x     ",
+				"5":  " -3           -3  #        ",
+				"6":  " -2  ^        -2 #^#       ",
+				"7":  " -1  |^       -1 #|^#      ",
+				"8":  "  0  Xv        0 #Xv#      ",
+				"9":  "  1            1           ",
+				"10": "  y            y           ",
+				"index": 5,
+				"condition": [
+					{"x": -1, "y": -1, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": 2, "y": -1, "value": "empty"},
+					{"x": 2, "y": 0, "value": "empty"},
+					{"x": 1, "y": -2, "value": "empty"},
+					{"x": -1, "y": -2, "value": "empty"},
+					{"x": 0, "y": -3, "value": "empty"},
+
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": 1, "y": -1, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": 0, "y": -2, "value": "full"}
+				],
+				"vflip": 1
+			},
+			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "< left spike FIX FIX simple step towards top right",
-				"rule_index": 94,
+				"rule_index": 102,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -1      ?  ",
@@ -2510,7 +2628,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom spike FIX FIX simple step towards top right rot 45",
-				"rule_index": 95,
+				"rule_index": 103,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -3  ?      ",
@@ -2544,7 +2662,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "|| vertical FIX FIX simple step towards top right rot 45",
-				"rule_index": 96,
+				"rule_index": 104,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -2  ?      ",
@@ -2577,7 +2695,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom FIX FIX complex stair",
-				"rule_index": 97,
+				"rule_index": 105,
 				"0": "   ---       ",
 				"1": "   3210123x  ",
 				"2": " -3          ",
@@ -2611,7 +2729,7 @@
 
 			{
 				"comment": "red warning on invalid tiles",
-				"rule_index": 98,
+				"rule_index": 106,
 				"index": 149,
 				"condition": [
 					{"x": 0, "y": 1, "value": "empty"},
