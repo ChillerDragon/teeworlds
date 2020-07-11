@@ -341,8 +341,32 @@
 				"vflip": 1
 			},
 			{
-				"comment": "< left spike edge case corner bottom left (ver)",
+				"comment": "< left spike two-pronged",
 				"rule_index": 19,
+				"0":  "'#' = empty   'X' = placed  ",
+				"2":  "'^v<=>' = full              ",
+				"3":  "   ---           ---        ",
+				"4":  "   3210123x      3210123x   ",
+				"5":  " -2            -2           ",
+				"6":  " -1  <>        -1  <>       ",
+				"7":  "  0   X>        0   #X>     ",
+				"8":  "  1  <>         1  <>       ",
+				"9":  "  2             2           ",
+				"10": "  y             y           ",
+				"index": 37,
+				"condition": [
+					{"x": -1, "y": 0, "value": "empty"},
+
+					{"x": -1, "y": -1, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"}
+				]
+			},
+			{
+				"comment": "< left spike edge case corner bottom left (ver)",
+				"rule_index": 20,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -2  #     ",
@@ -364,7 +388,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case corner bottom left (hor)",
-				"rule_index": 20,
+				"rule_index": 21,
 				"0": "   --     ",
 				"1": "   21012x ",
 				"2": " -2       ",
@@ -388,7 +412,7 @@
 			},
 			{
 				"comment": "< left spike edge case corner bottom left (hor) 1/2",
-				"rule_index": 21,
+				"rule_index": 22,
 				"0": "   --     ",
 				"1": "   21012x ",
 				"2": " -3       ",
@@ -412,7 +436,7 @@
 			},
 			{
 				"comment": "< left spike edge case corner bottom left (hor) 2/2",
-				"rule_index": 22,
+				"rule_index": 23,
 				"0": "   --     ",
 				"1": "   21012x ",
 				"2": " -3       ",
@@ -438,7 +462,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case big corner bottom left (hor)",
-				"rule_index": 23,
+				"rule_index": 24,
 				"0": "   --      ",
 				"1": "   210123x ",
 				"2": " -2  |     ",
@@ -467,7 +491,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case corner bottom right (hor)",
-				"rule_index": 24,
+				"rule_index": 25,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -2        ",
@@ -492,7 +516,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case corner bottom right (ver)",
-				"rule_index": 25,
+				"rule_index": 26,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -2    #    ",
@@ -516,7 +540,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case corner bottom right (ver)",
-				"rule_index": 26,
+				"rule_index": 27,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -2   <=>   ",
@@ -542,7 +566,7 @@
 			},
 			{
 				"comment": "> right spike edge case corner bottom right (ver)",
-				"rule_index": 27,
+				"rule_index": 28,
 				"0": "   ---      ",
 				"1": "   3210123x ",
 				"2": " -2         ",
@@ -566,7 +590,7 @@
 			},
 			{
 				"comment": "> right spike edge case corner bottom right (ver)",
-				"rule_index": 28,
+				"rule_index": 29,
 				"0": "   ---      ",
 				"1": "   3210123x ",
 				"2": " -2   <=>   ",
@@ -592,7 +616,7 @@
 			},
 			{
 				"comment": "> right spike edge case corner top right (ver)",
-				"rule_index": 29,
+				"rule_index": 30,
 				"0": "   ---      ",
 				"1": "   3210123x ",
 				"2": " -1         ",
@@ -616,7 +640,7 @@
 			},
 			{
 				"comment": "> right spike edge case corner top right (ver)",
-				"rule_index": 30,
+				"rule_index": 31,
 				"0": "   ---      ",
 				"1": "   3210123x ",
 				"2": " -1   <=>   ",
@@ -642,7 +666,7 @@
 			},
 			{
 				"comment": "^ top spike edge case corner top right (ver)",
-				"rule_index": 31,
+				"rule_index": 32,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -1         ",
@@ -665,7 +689,7 @@
 			},
 			{
 				"comment": "^ top spike edge case corner top right (ver)",
-				"rule_index": 32,
+				"rule_index": 33,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -1   <=>   ",
@@ -690,7 +714,7 @@
 			},
 			{
 				"comment": "^ top spike edge case corner top right (hor)",
-				"rule_index": 33,
+				"rule_index": 34,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -2         ",
@@ -714,7 +738,7 @@
 			},
 			{
 				"comment": "^ top spike edge case corner top right (hor)",
-				"rule_index": 34,
+				"rule_index": 35,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -2   <>    ",
@@ -738,7 +762,7 @@
 			},
 			{
 				"comment": "^ top spike edge case stair right",
-				"rule_index": 35,
+				"rule_index": 36,
 				"0": "   ---      ",
 				"1": "   3210123x ",
 				"2": " -1         ",
@@ -771,7 +795,7 @@
 			},
 			{
 				"comment": "< left spike edge case stair right",
-				"rule_index": 36,
+				"rule_index": 37,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -1         ",
@@ -804,7 +828,7 @@
 			},
 			{
 				"comment": "< left spike edge case stair right",
-				"rule_index": 37,
+				"rule_index": 38,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -3         ",
@@ -831,7 +855,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case stair right",
-				"rule_index": 38,
+				"rule_index": 39,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -3   #    ",
@@ -858,7 +882,7 @@
 			},
 			{
 				"comment": "^ left top spike edge case dead fork false cross",
-				"rule_index": 39,
+				"rule_index": 40,
 				"index": 5,
 				"condition": [
 					{"x": 0, "y": -1, "value": "full"},
@@ -876,7 +900,7 @@
 			},
 			{
 				"comment": "^ right top spike edge case dead fork false cross",
-				"rule_index": 40,
+				"rule_index": 41,
 				"index": 5,
 				"condition": [
 					{"x": 0, "y": -1, "value": "full"},
@@ -894,7 +918,7 @@
 			},
 			{
 				"comment": "v left bottom spike edge case dead fork false cross",
-				"rule_index": 41,
+				"rule_index": 42,
 				"index": 5,
 				"condition": [
 					{"x": 0, "y": 1, "value": "full"},
@@ -913,7 +937,7 @@
 			},
 			{
 				"comment": "v right bottom spike edge case dead fork false cross",
-				"rule_index": 42,
+				"rule_index": 43,
 				"index": 5,
 				"condition": [
 					{"x": 0, "y": 1, "value": "full"},
@@ -932,7 +956,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case NO NAME YET (top left)",
-				"rule_index": 43,
+				"rule_index": 44,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -2        ",
@@ -966,7 +990,7 @@
 			},
 			{
 				"comment": "= horizontal edge case NO NAME YET (top left)",
-				"rule_index": 44,
+				"rule_index": 45,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -3        ",
@@ -999,7 +1023,7 @@
 			},
 			{
 				"comment": "= horizontal edge case NO NAME YET (top left)",
-				"rule_index": 45,
+				"rule_index": 46,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -3         ",
@@ -1032,7 +1056,7 @@
 			},
 			{
 				"comment": "^ top spike edge case NO NAME YET (top left)",
-				"rule_index": 46,
+				"rule_index": 47,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -4         ",
@@ -1065,7 +1089,7 @@
 			},
 			{
 				"comment": "^ top spike edge case NO NAME YET (top right)",
-				"rule_index": 47,
+				"rule_index": 48,
 				"0": "   ---      ",
 				"1": "   321012x  ",
 				"2": " -4         ",
@@ -1098,7 +1122,7 @@
 			},
 			{
 				"comment": "= horizontal edge case NO NAME YET (top right)",
-				"rule_index": 48,
+				"rule_index": 49,
 				"0": "   ---      ",
 				"1": "   321012x  ",
 				"2": " -3         ",
@@ -1131,7 +1155,7 @@
 			},
 			{
 				"comment": "= horizontal edge case NO NAME YET (top right)",
-				"rule_index": 49,
+				"rule_index": 50,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -3         ",
@@ -1164,7 +1188,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case NO NAME YET (top right)",
-				"rule_index": 50,
+				"rule_index": 51,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -2         ",
@@ -1198,7 +1222,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case stair /",
-				"rule_index": 51,
+				"rule_index": 52,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -3         ",
@@ -1225,7 +1249,7 @@
 			},
 			{
 				"comment": "^ top spike edge case stair /",
-				"rule_index": 52,
+				"rule_index": 53,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -2         ",
@@ -1251,7 +1275,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case stair \\",
-				"rule_index": 53,
+				"rule_index": 54,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -3         ",
@@ -1278,7 +1302,7 @@
 			},
 			{
 				"comment": "^ top spike edge case stair \\",
-				"rule_index": 54,
+				"rule_index": 55,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -2         ",
@@ -1304,7 +1328,7 @@
 			},
 			{
 				"comment": "> right spike edge case round edge bottom right hor",
-				"rule_index": 55,
+				"rule_index": 56,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -3    ?    ",
@@ -1332,7 +1356,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case round edge bottom right hor",
-				"rule_index": 56,
+				"rule_index": 57,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -2    ?    ",
@@ -1360,7 +1384,7 @@
 			},
 			{
 				"comment": "^ top spike edge case round edge bottom right ver",
-				"rule_index": 57,
+				"rule_index": 58,
 				"0": "   ---      ",
 				"1": "   3210123x  ",
 				"2": " -2         ",
@@ -1388,7 +1412,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case round edge bottom right ver",
-				"rule_index": 58,
+				"rule_index": 59,
 				"0": "   ---      ",
 				"1": "   3210123x ",
 				"2": " -3         ",
@@ -1417,7 +1441,7 @@
 			},
 			{
 				"comment": "> right spike edge case round edge bottom right ver",
-				"rule_index": 59,
+				"rule_index": 60,
 				"0": "   --       ",
 				"1": "   2101234x ",
 				"2": " -3         ",
@@ -1446,7 +1470,7 @@
 			},
 			{
 				"comment": "> right spike edge case round edge top right hor",
-				"rule_index": 60,
+				"rule_index": 61,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -2         ",
@@ -1475,7 +1499,7 @@
 			},
 			{
 				"comment": "^ top spike edge case round edge top right hor",
-				"rule_index": 61,
+				"rule_index": 62,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -3         ",
@@ -1503,7 +1527,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case round edge top right ver",
-				"rule_index": 62,
+				"rule_index": 63,
 				"0": "   ---      ",
 				"1": "   321012x  ",
 				"2": " -2         ",
@@ -1532,7 +1556,7 @@
 			},
 			{
 				"comment": "^ top spike edge case round edge top right ver",
-				"rule_index": 63,
+				"rule_index": 64,
 				"0": "   ---      ",
 				"1": "   321012x  ",
 				"2": " -1         ",
@@ -1560,7 +1584,7 @@
 			},
 			{
 				"comment": "> right spike edge case round edge top right ver",
-				"rule_index": 64,
+				"rule_index": 65,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -1         ",
@@ -1589,7 +1613,7 @@
 			},
 			{
 				"comment": "< left spike edge case round edge top left hor",
-				"rule_index": 65,
+				"rule_index": 66,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -2         ",
@@ -1615,7 +1639,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case round edge top left ver",
-				"rule_index": 66,
+				"rule_index": 67,
 				"0": "   ---      ",
 				"1": "   3210123x ",
 				"2": " -2         ",
@@ -1643,7 +1667,7 @@
 			},
 			{
 				"comment": "^ top spike edge case round edge top left ver",
-				"rule_index": 67,
+				"rule_index": 68,
 				"0": "   ---      ",
 				"1": "   3210123x ",
 				"2": " -1         ",
@@ -1670,7 +1694,7 @@
 			},
 			{
 				"comment": "< left spike edge case round edge top left ver",
-				"rule_index": 68,
+				"rule_index": 69,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -1         ",
@@ -1697,7 +1721,7 @@
 			},
 			{
 				"comment": "< left spike edge case round edge bottom left ver",
-				"rule_index": 69,
+				"rule_index": 70,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -3         ",
@@ -1725,7 +1749,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case round edge bottom left ver",
-				"rule_index": 70,
+				"rule_index": 71,
 				"0": "   ---      ",
 				"1": "   321012x  ",
 				"2": " -3         ",
@@ -1754,7 +1778,7 @@
 			},
 			{
 				"comment": "^ top spike edge case round edge bottom left ver",
-				"rule_index": 71,
+				"rule_index": 72,
 				"0": "   ---      ",
 				"1": "   321012x  ",
 				"2": " -2         ",
@@ -1782,7 +1806,7 @@
 			},
 			{
 				"comment": "^ top spike FIX FIX edge case corner bottom left (hor) 1/4",
-				"rule_index": 72,
+				"rule_index": 73,
 				"0": "   --     ",
 				"1": "   21012x ",
 				"2": " -2       ",
@@ -1808,7 +1832,7 @@
 			},
 			{
 				"comment": "^ top spike FIX FIX edge case corner bottom left (hor) 1/4",
-				"rule_index": 73,
+				"rule_index": 74,
 				"0": "   --     ",
 				"1": "   21012x ",
 				"2": " -2       ",
@@ -1834,7 +1858,7 @@
 			},
 			{
 				"comment": "^ top spike FIX FIX edge case corner bottom left (hor) 3/4",
-				"rule_index": 74,
+				"rule_index": 75,
 				"0": "   --     ",
 				"1": "   21012x ",
 				"2": " -2       ",
@@ -1860,7 +1884,7 @@
 			},
 			{
 				"comment": "^ top spike FIX FIX edge case corner bottom left (hor) 4/4",
-				"rule_index": 75,
+				"rule_index": 76,
 				"0": "   --     ",
 				"1": "   21012x ",
 				"2": " -2       ",
@@ -1886,7 +1910,7 @@
 			},
 			{
 				"comment": "v bottom spike FIX FIX edge case corner bottom left (hor)",
-				"rule_index": 76,
+				"rule_index": 77,
 				"0": "   --     ",
 				"1": "   21012x ",
 				"2": " -3       ",
@@ -1913,7 +1937,7 @@
 			},
 			{
 				"comment": "< left spike FIX FIX edge case corner bottom left (hor)",
-				"rule_index": 77,
+				"rule_index": 78,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -3       ",
@@ -1939,7 +1963,7 @@
 			},
 			{
 				"comment": "^ top spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 1/8)",
-				"rule_index": 78,
+				"rule_index": 79,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -2    ^   ",
@@ -1964,7 +1988,7 @@
 			},
 			{
 				"comment": "^ top spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 2/8)",
-				"rule_index": 79,
+				"rule_index": 80,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -2  ^     ",
@@ -1989,7 +2013,7 @@
 			},
 			{
 				"comment": "^ top spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 3/8)",
-				"rule_index": 80,
+				"rule_index": 81,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -2    <>   ",
@@ -2014,7 +2038,7 @@
 			},
 			{
 				"comment": "= horizontal spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 3/8)",
-				"rule_index": 81,
+				"rule_index": 82,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -2        ",
@@ -2041,7 +2065,7 @@
 			},
 			{
 				"comment": "^ top spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 4/8)",
-				"rule_index": 82,
+				"rule_index": 83,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -2 <>     ",
@@ -2066,7 +2090,7 @@
 			},
 			{
 				"comment": "= horizontal spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 4/8)",
-				"rule_index": 83,
+				"rule_index": 84,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -3        ",
@@ -2093,7 +2117,7 @@
 			},
 			{
 				"comment": "< left spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 5/8)",
-				"rule_index": 84,
+				"rule_index": 85,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -3       ",
@@ -2120,7 +2144,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 5/8)",
-				"rule_index": 85,
+				"rule_index": 86,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -2       ",
@@ -2148,7 +2172,7 @@
 			},
 			{
 				"comment": "> right spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 6/8)",
-				"rule_index": 86,
+				"rule_index": 87,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -3       ",
@@ -2175,7 +2199,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 6/8)",
-				"rule_index": 87,
+				"rule_index": 88,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -2       ",
@@ -2203,7 +2227,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 7/8)",
-				"rule_index": 88,
+				"rule_index": 89,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -2       ",
@@ -2230,7 +2254,7 @@
 			},
 			{
 				"comment": "= horizontal spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 7/8)",
-				"rule_index": 89,
+				"rule_index": 90,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -3       ",
@@ -2256,7 +2280,7 @@
 			},
 			{
 				"comment": "= horizontal spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 8/8)",
-				"rule_index": 90,
+				"rule_index": 91,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -3       ",
@@ -2282,7 +2306,7 @@
 			},
 			{
 				"comment": "^ top spike two-pronged",
-				"rule_index": 91,
+				"rule_index": 92,
 				"0":  "'#' = empty   'X' = placed  ",
 				"2":  "'^v<=>' = full              ",
 				"3":  "   ---           ---        ",
@@ -2310,7 +2334,7 @@
 			},
 			{
 				"comment": "|| vertical spike two-pronged",
-				"rule_index": 92,
+				"rule_index": 93,
 				"0":  "'#' = empty   'X' = placed  ",
 				"2":  "'^v<=>' = full              ",
 				"3":  "   --            --         ",
@@ -2344,7 +2368,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "< left spike FIX FIX simple step towards top right",
-				"rule_index": 93,
+				"rule_index": 94,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -1      ?  ",
@@ -2370,7 +2394,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom spike FIX FIX simple step towards top right rot 45",
-				"rule_index": 94,
+				"rule_index": 95,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -3  ?      ",
@@ -2404,7 +2428,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "|| vertical FIX FIX simple step towards top right rot 45",
-				"rule_index": 95,
+				"rule_index": 96,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -2  ?      ",
@@ -2437,7 +2461,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom FIX FIX complex stair",
-				"rule_index": 96,
+				"rule_index": 97,
 				"0": "   ---       ",
 				"1": "   3210123x  ",
 				"2": " -3          ",
@@ -2471,7 +2495,7 @@
 
 			{
 				"comment": "red warning on invalid tiles",
-				"rule_index": 97,
+				"rule_index": 98,
 				"index": 149,
 				"condition": [
 					{"x": 0, "y": 1, "value": "empty"},
