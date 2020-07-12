@@ -18,6 +18,9 @@
 #undef KEYS_INCLUDE
 
 // support older SDL version (pre 2.0.6)
+#ifndef SDL_JOYSTICK_AXIS_MIN
+	#define SDL_JOYSTICK_AXIS_MIN -32768
+#endif
 #ifndef SDL_JOYSTICK_AXIS_MAX
 	#define SDL_JOYSTICK_AXIS_MAX 32767
 #endif
@@ -42,8 +45,12 @@ CInput::CInput()
 	mem_zero(m_aInputCount, sizeof(m_aInputCount));
 	mem_zero(m_aInputState, sizeof(m_aInputState));
 
+	m_pConfig = 0;
+	m_pConsole = 0;
+	m_pGraphics = 0;
+
 	m_InputCounter = 1;
-	m_InputGrabbed = 0;
+	m_MouseInputRelative = false;
 	m_pClipboardText = 0;
 
 	m_SelectedJoystickIndex = -1;
@@ -68,6 +75,7 @@ CInput::~CInput()
 void CInput::Init()
 {
 	m_pGraphics = Kernel()->RequestInterface<IEngineGraphics>();
+	m_pConfig = Kernel()->RequestInterface<IConfigManager>()->Values();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	// FIXME: unicode handling: use SDL_StartTextInput/SDL_StopTextInput on inputs
 
@@ -95,10 +103,10 @@ void CInput::InitJoysticks()
 		for(int i = 0; i < NumJoysticks; i++)
 		{
 			SDL_Joystick *pJoystick = SDL_JoystickOpen(i);
-
-			if(!pJoystick) {
+			if(!pJoystick)
+			{
 				dbg_msg("joystick", "Could not open joystick %d: %s", i, SDL_GetError());
-				return;
+				continue;
 			}
 			m_apJoysticks.add(pJoystick);
 
@@ -121,7 +129,7 @@ SDL_Joystick* CInput::GetActiveJoystick()
 	{
 		return NULL;
 	}
-	if(m_aSelectedJoystickGUID[0] && str_comp(m_aSelectedJoystickGUID, g_Config.m_JoystickGUID) != 0)
+	if(m_aSelectedJoystickGUID[0] && str_comp(m_aSelectedJoystickGUID, m_pConfig->m_JoystickGUID) != 0)
 	{
 		// Refresh if cached GUID differs from configured GUID
 		m_SelectedJoystickIndex = -1;
@@ -132,10 +140,10 @@ SDL_Joystick* CInput::GetActiveJoystick()
 		{
 			char aGUID[sizeof(m_aSelectedJoystickGUID)];
 			SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(m_apJoysticks[i]), aGUID, sizeof(aGUID));
-			if(str_comp(g_Config.m_JoystickGUID, aGUID) == 0)
+			if(str_comp(m_pConfig->m_JoystickGUID, aGUID) == 0)
 			{
 				m_SelectedJoystickIndex = i;
-				str_copy(m_aSelectedJoystickGUID, g_Config.m_JoystickGUID, sizeof(m_aSelectedJoystickGUID));
+				str_copy(m_aSelectedJoystickGUID, m_pConfig->m_JoystickGUID, sizeof(m_aSelectedJoystickGUID));
 				break;
 			}
 		}
@@ -143,8 +151,8 @@ SDL_Joystick* CInput::GetActiveJoystick()
 		if(m_SelectedJoystickIndex == -1)
 		{
 			m_SelectedJoystickIndex = 0;
-			SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(m_apJoysticks[0]), g_Config.m_JoystickGUID, sizeof(g_Config.m_JoystickGUID));
-			str_copy(m_aSelectedJoystickGUID, g_Config.m_JoystickGUID, sizeof(m_aSelectedJoystickGUID));
+			SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(m_apJoysticks[0]), m_pConfig->m_JoystickGUID, sizeof(m_pConfig->m_JoystickGUID));
+			str_copy(m_aSelectedJoystickGUID, m_pConfig->m_JoystickGUID, sizeof(m_aSelectedJoystickGUID));
 		}
 	}
 	return m_apJoysticks[m_SelectedJoystickIndex];
@@ -168,7 +176,7 @@ void CInput::SelectNextJoystick()
 	if(Num > 1)
 	{
 		const int NextIndex = (m_SelectedJoystickIndex + 1) % Num;
-		SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(m_apJoysticks[NextIndex]), g_Config.m_JoystickGUID, sizeof(g_Config.m_JoystickGUID));
+		SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(m_apJoysticks[NextIndex]), m_pConfig->m_JoystickGUID, sizeof(m_pConfig->m_JoystickGUID));
 	}
 }
 
@@ -183,7 +191,7 @@ float CInput::GetJoystickAxisValue(int Axis)
 {
 	SDL_Joystick* pJoystick = GetActiveJoystick();
 	dbg_assert((bool)pJoystick, "Requesting joystick axis value, but no joysticks were initialized");
-	return static_cast<float>(SDL_JoystickGetAxis(pJoystick, Axis)) / (float)(SDL_JOYSTICK_AXIS_MAX+1);
+	return (SDL_JoystickGetAxis(pJoystick, Axis)-SDL_JOYSTICK_AXIS_MIN)/float(SDL_JOYSTICK_AXIS_MAX-SDL_JOYSTICK_AXIS_MIN)*2.0f - 1.0f;
 }
 
 int CInput::GetJoystickNumAxes()
@@ -195,43 +203,36 @@ int CInput::GetJoystickNumAxes()
 
 void CInput::MouseRelative(float *x, float *y)
 {
-	if(!m_InputGrabbed)
+	if(!m_MouseInputRelative)
 		return;
 
-	int nx = 0, ny = 0;
-	float MouseSens = g_Config.m_InpMousesens/100.0f;
-	float JoystickSens = g_Config.m_JoystickSens/100.0f;
+	int MouseX = 0, MouseY = 0;
+	SDL_GetRelativeMouseState(&MouseX, &MouseY);
 
-	SDL_GetRelativeMouseState(&nx,&ny);
-
-	vec2 j = vec2(0.0f, 0.0f);
-
-	if(g_Config.m_JoystickEnable && GetActiveJoystick())
+	vec2 JoystickPos = vec2(0.0f, 0.0f);
+	if(m_pConfig->m_JoystickEnable && GetActiveJoystick())
 	{
-		const float Max = 50.0f;
-		j = vec2(GetJoystickAxisValue(g_Config.m_JoystickX), GetJoystickAxisValue(g_Config.m_JoystickY)) * Max;
-		const float Len = length(j);
-
-		if(Len/sqrtf(2.0f) <= g_Config.m_JoystickTolerance)
+		const vec2 RawJoystickPos = vec2(GetJoystickAxisValue(m_pConfig->m_JoystickX), GetJoystickAxisValue(m_pConfig->m_JoystickY));
+		const float Len = length(RawJoystickPos);
+		const float DeadZone = m_pConfig->m_JoystickTolerance/50.0f;
+		const float JoystickSens = m_pConfig->m_JoystickSens/100.0f;
+		if(Len >= DeadZone) // >= to allow max tolerance value
 		{
-			j = vec2(0.0f, 0.0f);
-		}
-		else
-		{
-			const vec2 nj = Len > 0.0f ? j / Len : vec2(0.0f, 0.0f);
-			j = nj * min(Len, Max) - nj * g_Config.m_JoystickTolerance;
+			JoystickPos = RawJoystickPos * (JoystickSens * max(Len - DeadZone, 0.001f) / Len);
 		}
 	}
 
-	*x = nx*MouseSens + j.x*JoystickSens;
-	*y = ny*MouseSens + j.y*JoystickSens;
+	const float MouseSens = m_pConfig->m_InpMousesens/100.0f;
+
+	*x = MouseX * MouseSens + JoystickPos.x;
+	*y = MouseY * MouseSens + JoystickPos.y;
 }
 
 void CInput::MouseModeAbsolute()
 {
-	if(m_InputGrabbed)
+	if(m_MouseInputRelative)
 	{
-		m_InputGrabbed = 0;
+		m_MouseInputRelative = false;
 		SDL_ShowCursor(SDL_ENABLE);
 		SDL_SetRelativeMouseMode(SDL_FALSE);
 	}
@@ -239,11 +240,11 @@ void CInput::MouseModeAbsolute()
 
 void CInput::MouseModeRelative()
 {
-	if(!m_InputGrabbed)
+	if(!m_MouseInputRelative)
 	{
-		m_InputGrabbed = 1;
+		m_MouseInputRelative = true;
 		SDL_ShowCursor(SDL_DISABLE);
-		if(SDL_SetHintWithPriority(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, g_Config.m_InpGrab ? "0" : "1", SDL_HINT_OVERRIDE) == SDL_FALSE)
+		if(SDL_SetHintWithPriority(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, m_pConfig->m_InpGrab ? "0" : "1", SDL_HINT_OVERRIDE) == SDL_FALSE)
 		{
 			m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "input", "unable to switch relative mouse mode");
 		}

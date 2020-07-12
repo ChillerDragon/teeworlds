@@ -8,6 +8,7 @@
 class CInput : public IEngineInput
 {
 	IEngineGraphics *m_pGraphics;
+	CConfig *m_pConfig;
 	IConsole *m_pConsole;
 
 	sorted_array<SDL_Joystick*> m_apJoysticks;
@@ -17,7 +18,7 @@ class CInput : public IEngineInput
 	void InitJoysticks();
 	void CloseJoysticks();
 
-	int m_InputGrabbed;
+	bool m_MouseInputRelative;
 	char *m_pClipboardText;
 
 	int m_PreviousHat;
