@@ -2999,9 +2999,173 @@
 				"vflip": 1
 			},
 			{
+				"comment": "^ top spike vertical half sandwhich bottom",
+				"rule_index": 116,
+				"0":  "'#' = empty   'X' = placed ",
+				"2":  "'^v<=>' = full             ",
+				"3":  "   --           --         ",
+				"4":  "   2101234x     2101234x   ",
+				"5":  " -1           -1   #       ",
+				"6":  "  0  X^^       0  X^^      ",
+				"7":  "  1  v|v       1  v|v      ",
+				"8":  "  2   v        2  #v#      ",
+				"9":  "  3            3           ",
+				"10": "  y            y           ",
+				"index": 5,
+				"condition": [
+					{"x": 1, "y": -1, "value": "empty"},
+					{"x": 0, "y": 2, "value": "empty"},
+					{"x": 2, "y": 2, "value": "empty"},
+
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": 2, "y": 0, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"},
+					{"x": 2, "y": 1, "value": "full"},
+					{"x": 1, "y": 2, "value": "full"}
+				]
+			},
+			{
+				"comment": "^ top spike vertical half sandwhich bottom",
+				"rule_index": 117,
+				"0":  "'#' = empty   'X' = placed ",
+				"2":  "'^v<=>' = full             ",
+				"3":  "   ---          ---        ",
+				"4":  "   3210123x     3210123x   ",
+				"5":  " -1           -1   #       ",
+				"6":  "  0  ^X^       0  ^X^      ",
+				"7":  "  1  v|v       1  v|v      ",
+				"8":  "  2   v        2  #v#      ",
+				"9":  "  3            3           ",
+				"10": "  y            y           ",
+				"index": 5,
+				"condition": [
+					{"x": 0, "y": -1, "value": "empty"},
+					{"x": -1, "y": 2, "value": "empty"},
+					{"x": 1, "y": 2, "value": "empty"},
+
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"},
+					{"x": 0, "y": 2, "value": "full"}
+				]
+			},
+			{
+				"comment": "^ top spike vertical half sandwhich bottom",
+				"rule_index": 118,
+				"0":  "'#' = empty   'X' = placed ",
+				"2":  "'^v<=>' = full             ",
+				"3":  "   ----         ----       ",
+				"4":  "   4321012x     4321012x   ",
+				"5":  " -1           -1   #       ",
+				"6":  "  0  ^^X       0  ^^X      ",
+				"7":  "  1  v|v       1  v|v      ",
+				"8":  "  2   v        2  #v#      ",
+				"9":  "  3            3           ",
+				"10": "  y            y           ",
+				"index": 5,
+				"condition": [
+					{"x": -1, "y": -1, "value": "empty"},
+					{"x": -2, "y": 2, "value": "empty"},
+					{"x": 0, "y": 2, "value": "empty"},
+
+					{"x": -2, "y": 0, "value": "full"},
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": -2, "y": 1, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": -1, "y": 2, "value": "full"}
+				]
+			},
+			{
+				"comment": "v bottom spike vertical half sandwhich bottom",
+				"rule_index": 119,
+				"0":  "'#' = empty   'X' = placed ",
+				"2":  "'^v<=>' = full             ",
+				"3":  "   ----         ----       ",
+				"4":  "   4321012x     4321012x   ",
+				"5":  " -2           -2   #       ",
+				"6":  " -1  ^^^      -1  ^^^      ",
+				"7":  "  0  v|X       0  v|X      ",
+				"8":  "  1   v        1  #v#      ",
+				"9":  "  2            2           ",
+				"10": "  y            y           ",
+				"index": 5,
+				"condition": [
+					{"x": -1, "y": -2, "value": "empty"},
+					{"x": -2, "y": 1, "value": "empty"},
+					{"x": 0, "y": 1, "value": "empty"},
+
+					{"x": -2, "y": -1, "value": "full"},
+					{"x": -1, "y": -1, "value": "full"},
+					{"x": -2, "y": 0, "value": "full"},
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"}
+				],
+				"vflip": 5
+			},
+			{
+				"comment": "|| vertical spike vertical half sandwhich bottom",
+				"rule_index": 120,
+				"0":  "'#' = empty   'X' = placed ",
+				"2":  "'^v<=>' = full             ",
+				"3":  "   ---          ---        ",
+				"4":  "   3210123x     3210123x   ",
+				"5":  " -2           -2   #       ",
+				"6":  " -1  ^^^      -1  ^^^      ",
+				"7":  "  0  vXv       0  vXv      ",
+				"8":  "  1   v        1  #v#      ",
+				"9":  "  2            2           ",
+				"10": "  y            y           ",
+				"index": 21,
+				"condition": [
+					{"x": 0, "y": -2, "value": "empty"},
+					{"x": -1, "y": 1, "value": "empty"},
+					{"x": 1, "y": 1, "value": "empty"},
+
+					{"x": -1, "y": -1, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": -1, "y": 0, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": 1, "y": -1, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"}
+				]
+			},
+			{
+				"comment": "v bottom spike vertical half sandwhich bottom",
+				"rule_index": 121,
+				"0":  "'#' = empty   'X' = placed ",
+				"2":  "'^v<=>' = full             ",
+				"3":  "   --           --         ",
+				"4":  "   2101234x     2101234x   ",
+				"5":  " -2           -2   #       ",
+				"6":  " -1  ^^^      -1  ^^^      ",
+				"7":  "  0  X|v       0  X|v      ",
+				"8":  "  1   v        1  #v#      ",
+				"9":  "  2            2           ",
+				"10": "  y            y           ",
+				"index": 5,
+				"condition": [
+					{"x": 1, "y": -2, "value": "empty"},
+					{"x": 0, "y": 1, "value": "empty"},
+					{"x": 2, "y": 1, "value": "empty"},
+
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": 1, "y": -1, "value": "full"},
+					{"x": 1, "y": 0, "value": "full"},
+					{"x": 2, "y": 0, "value": "full"},
+					{"x": 2, "y": -1, "value": "full"},
+					{"x": 1, "y": 1, "value": "full"}
+				],
+				"vflip": 1
+			},
+			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "< left spike FIX FIX simple step towards top right",
-				"rule_index": 116,
+				"rule_index": 122,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -1      ?  ",
@@ -3027,7 +3191,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom spike FIX FIX simple step towards top right rot 45",
-				"rule_index": 117,
+				"rule_index": 123,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -3  ?      ",
@@ -3061,7 +3225,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "|| vertical FIX FIX simple step towards top right rot 45",
-				"rule_index": 118,
+				"rule_index": 124,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -2  ?      ",
@@ -3094,7 +3258,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom FIX FIX complex stair",
-				"rule_index": 119,
+				"rule_index": 125,
 				"0": "   ---       ",
 				"1": "   3210123x  ",
 				"2": " -3          ",
@@ -3128,7 +3292,7 @@
 
 			{
 				"comment": "red warning on invalid tiles",
-				"rule_index": 120,
+				"rule_index": 126,
 				"index": 149,
 				"condition": [
 					{"x": 0, "y": 1, "value": "empty"},
