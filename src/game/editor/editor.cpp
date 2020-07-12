@@ -1831,9 +1831,8 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 	float mx = UI()->MouseX();
 	float my = UI()->MouseY();
 
-	// TODO: ChillerDragon crack editor add mouse support again
-	// static float s_StartWx = 0;
-	// static float s_StartWy = 0;
+	static float s_StartWx = 0;
+	static float s_StartWy = 0;
 	if (!Inside)
 	{
 		// TODO: use brain and revert this
@@ -2008,9 +2007,8 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 		// do global operations like pan and zoom
 		if(UI()->CheckActiveItem(0) && (UI()->MouseButton(0) || UI()->MouseButton(2)))
 		{
-			// TODO: ChillerDragon crack editor add mouse support again
-			// s_StartWx = wx;
-			// s_StartWy = wy;
+			s_StartWx = wx;
+			s_StartWy = wy;
 
 			if(Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL) || UI()->MouseButton(2))
 			{
@@ -2037,15 +2035,20 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 					if(UI()->CheckActiveItem(s_pEditorID))
 					{
 						CUIRect r;
-						// r.x = s_StartWx;
-						// r.y = s_StartWy;
-						// r.w = wx-s_StartWx;
-						// r.h = wy-s_StartWy;
-
-						r.x = m_CrackSelectX;
-						r.y = m_CrackSelectY;
-						r.w = 1;
-						r.h = 1;
+						if(m_ShowTilePicker)
+						{
+							r.x = m_CrackSelectX;
+							r.y = m_CrackSelectY;
+							r.w = 1;
+							r.h = 1;
+						}
+						else
+						{
+							r.x = s_StartWx;
+							r.y = s_StartWy;
+							r.w = wx-s_StartWx;
+							r.h = wy-s_StartWy;
+						}
 
 						if(r.w < 0)
 						{
