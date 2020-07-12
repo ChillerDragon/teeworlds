@@ -1979,15 +1979,20 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 	if(m_ShowTilePicker)
 	{
 		CUIRect r;
-		// r.x = s_StartWx;
-		// r.y = s_StartWy;
-		// r.w = wx-s_StartWx;
-		// r.h = wy-s_StartWy;
-
-		r.x = m_CrackSelectX;
-		r.y = m_CrackSelectY;
-		r.w = 1;
-		r.h = 1;
+		if(m_IsCrackKeyboard)
+		{
+			r.x = m_CrackSelectX;
+			r.y = m_CrackSelectY;
+			r.w = 1;
+			r.h = 1;
+		}
+		else
+		{
+			r.x = s_StartWx;
+			r.y = s_StartWy;
+			r.w = wx-s_StartWx;
+			r.h = wy-s_StartWy;
+		}
 		if (Input()->KeyPress(KEY_RIGHT))
 			m_CrackSelectX+=32.0f;
 		else if (Input()->KeyPress(KEY_LEFT))
@@ -1996,8 +2001,9 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 			m_CrackSelectY-=32.0f;
 		else if (Input()->KeyPress(KEY_DOWN))
 			m_CrackSelectY+=32.0f;
-		for(int k = 0; k < NumEditLayers; k++)
-			pEditLayers[k]->BrushSelecting(r);
+		if(m_IsCrackKeyboard)
+			for(int k = 0; k < NumEditLayers; k++)
+				pEditLayers[k]->BrushSelecting(r);
 	}
 
 	if(Inside)
@@ -2035,7 +2041,7 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 					if(UI()->CheckActiveItem(s_pEditorID))
 					{
 						CUIRect r;
-						if(m_ShowTilePicker)
+						if(m_ShowTilePicker && m_IsCrackKeyboard)
 						{
 							r.x = m_CrackSelectX;
 							r.y = m_CrackSelectY;
@@ -4486,6 +4492,7 @@ void CEditor::Reset(bool CreateDefault)
 
 	// ChillerDragon crack editor
 	m_InsideKeyState = 0;
+	m_IsCrackKeyboard = true;
 }
 
 int CEditor::GetLineDistance() const
@@ -4841,6 +4848,10 @@ void CEditor::UpdateAndRender()
 	{
 		Config()->m_ClTextEntities ^= 1;
 	}
+	if(Input()->KeyPress(KEY_LEFT) || Input()->KeyPress(KEY_RIGHT) || Input()->KeyPress(KEY_UP) || Input()->KeyPress(KEY_DOWN))
+		m_IsCrackKeyboard = true;
+	if(UI()->MouseButton(0) || UI()->MouseButton(1))
+		m_IsCrackKeyboard = false;
 
 	// toggle gui
 	if(Input()->KeyPress(KEY_TAB))

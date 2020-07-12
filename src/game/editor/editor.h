@@ -869,6 +869,7 @@ public:
 		KS_INSIDE,
 		KS_OUTSIDE
 	};
+	bool m_IsCrackKeyboard;
 	int m_InsideKeyState;
 	int m_CrackSelectX;
 	int m_CrackSelectY;
