@@ -1811,7 +1811,7 @@
 				"3": " -1 <>    ",
 				"4": "  0  X    ",
 				"5": "  1  v^   ",
-				"6": "  2   V   ",
+				"6": "  2   v   ",
 				"7": "  y       ",
 				"index": 5,
 				"condition": [
@@ -1837,7 +1837,7 @@
 				"3": " -1  <>   ",
 				"4": "  0  X    ",
 				"5": "  1  v^   ",
-				"6": "  2   V   ",
+				"6": "  2   v   ",
 				"7": "  y       ",
 				"index": 5,
 				"condition": [
@@ -1960,12 +1960,39 @@
 				]
 			},
 			{
-				"comment": "^ top spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 1/8)",
+				"comment": "|| vertical spike half long zipper",
 				"rule_index": 79,
+				"0":  "'#' = empty   'X' = placed  ",
+				"2":  "'^v<=>' = full              ",
+				"3":  "   ---           ---        ",
+				"4":  "   3210123x      3210123x   ",
+				"5":  " -2            -2           ",
+				"6":  " -1   ^        -1   ^       ",
+				"7":  "  0   X         0  #X#      ",
+				"8":  "  1  ^v         1 #^v#      ",
+				"9":  "  2  v          2  v        ",
+				"10": "  3             3           ",
+				"11": "  y             y           ",
+				"index": 21,
+				"condition": [
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": 1, "y": 1, "value": "empty"},
+					{"x": -2, "y": 1, "value": "empty"},
+
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"},
+					{"x": -1, "y": 2, "value": "full"}
+				]
+			},
+			{
+				"comment": "^ top spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 1/8)",
+				"rule_index": 80,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -2    ^   ",
-				"3": " -1  <>V   ",
+				"3": " -1  <>v   ",
 				"4": "  0   X    ",
 				"5": "  1   v    ",
 				"6": "  y        ",
@@ -1986,7 +2013,7 @@
 			},
 			{
 				"comment": "^ top spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 2/8)",
-				"rule_index": 80,
+				"rule_index": 81,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -2  ^     ",
@@ -2011,7 +2038,7 @@
 			},
 			{
 				"comment": "^ top spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 3/8)",
-				"rule_index": 81,
+				"rule_index": 82,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -2    <>   ",
@@ -2036,7 +2063,7 @@
 			},
 			{
 				"comment": "= horizontal spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 3/8)",
-				"rule_index": 82,
+				"rule_index": 83,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -2        ",
@@ -2063,7 +2090,7 @@
 			},
 			{
 				"comment": "^ top spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 4/8)",
-				"rule_index": 83,
+				"rule_index": 84,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -2 <>     ",
@@ -2088,7 +2115,7 @@
 			},
 			{
 				"comment": "= horizontal spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 4/8)",
-				"rule_index": 84,
+				"rule_index": 85,
 				"0": "   ---     ",
 				"1": "   321012x ",
 				"2": " -3        ",
@@ -2115,7 +2142,7 @@
 			},
 			{
 				"comment": "< left spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 5/8)",
-				"rule_index": 85,
+				"rule_index": 86,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -3       ",
@@ -2142,7 +2169,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 5/8)",
-				"rule_index": 86,
+				"rule_index": 87,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -2       ",
@@ -2170,7 +2197,7 @@
 			},
 			{
 				"comment": "> right spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 6/8)",
-				"rule_index": 87,
+				"rule_index": 88,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -3       ",
@@ -2197,7 +2224,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 6/8)",
-				"rule_index": 88,
+				"rule_index": 89,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -2       ",
@@ -2225,7 +2252,7 @@
 			},
 			{
 				"comment": "v bottom spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 7/8)",
-				"rule_index": 89,
+				"rule_index": 90,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -2       ",
@@ -2252,7 +2279,7 @@
 			},
 			{
 				"comment": "= horizontal spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 7/8)",
-				"rule_index": 90,
+				"rule_index": 91,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -3       ",
@@ -2278,7 +2305,7 @@
 			},
 			{
 				"comment": "= horizontal spike edge case broken fork T EDGE CASES OF NOT A SIMPLE T FORK (shape 8/8)",
-				"rule_index": 91,
+				"rule_index": 92,
 				"0": "   ---    ",
 				"1": "   321012x",
 				"2": " -3       ",
@@ -2304,7 +2331,7 @@
 			},
 			{
 				"comment": "^ top spike two-pronged",
-				"rule_index": 92,
+				"rule_index": 93,
 				"0":  "'#' = empty   'X' = placed  ",
 				"2":  "'^v<=>' = full              ",
 				"3":  "   ---           ---        ",
@@ -2331,8 +2358,8 @@
 				]
 			},
 			{
-				"comment": "|| vertical spike two-pronged",
-				"rule_index": 93,
+				"comment": "|| vertical spike left two-pronged",
+				"rule_index": 94,
 				"0":  "'#' = empty   'X' = placed  ",
 				"2":  "'^v<=>' = full              ",
 				"3":  "   --            --         ",
@@ -2364,8 +2391,41 @@
 				]
 			},
 			{
+				"comment": "|| vertical spike right two-pronged",
+				"rule_index": 95,
+				"0":  "'#' = empty   'X' = placed  ",
+				"2":  "'^v<=>' = full              ",
+				"3":  "   ----          ----       ",
+				"4":  "   43210123x     432101x    ",
+				"5":  " -2            -2           ",
+				"6":  " -1  ^ ^       -1 #^#^#     ",
+				"7":  "  0  | X        0 #|#X#     ",
+				"8":  "  1  v^v        1  v^v      ",
+				"9":  "  2   v         2  #v#      ",
+				"10": "  y             y           ",
+				"index": 21,
+				"condition": [
+					{"x": -3, "y": 0, "value": "empty"},
+					{"x": -1, "y": 0, "value": "empty"},
+					{"x": 1, "y": 0, "value": "empty"},
+					{"x": -3, "y": -1, "value": "empty"},
+					{"x": -1, "y": -1, "value": "empty"},
+					{"x": 1, "y": -1, "value": "empty"},
+					{"x": -2, "y": 2, "value": "empty"},
+					{"x": 0, "y": 2, "value": "empty"},
+
+					{"x": -2, "y": -1, "value": "full"},
+					{"x": 0, "y": -1, "value": "full"},
+					{"x": -2, "y": 0, "value": "full"},
+					{"x": -2, "y": 1, "value": "full"},
+					{"x": -1, "y": 1, "value": "full"},
+					{"x": 0, "y": 1, "value": "full"},
+					{"x": -1, "y": 2, "value": "full"}
+				]
+			},
+			{
 				"comment": "|| vertical spike the thing TODO: FIND A NAME (top right)",
-				"rule_index": 94,
+				"rule_index": 96,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -2394,7 +2454,7 @@
 			},
 			{
 				"comment": "^ top spike the thing TODO: FIND A NAME (top right)",
-				"rule_index": 95,
+				"rule_index": 97,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -2423,7 +2483,7 @@
 			},
 			{
 				"comment": "v bottom spike the thing TODO: FIND A NAME (top right)",
-				"rule_index": 96,
+				"rule_index": 98,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -2453,7 +2513,7 @@
 			},
 			{
 				"comment": "v bottom spike the thing TODO: FIND A NAME (top right)",
-				"rule_index": 97,
+				"rule_index": 99,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -2483,7 +2543,7 @@
 			},
 			{
 				"comment": "|| vertical spike the thing TODO: FIND A NAME (top left)",
-				"rule_index": 98,
+				"rule_index": 100,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -2512,7 +2572,7 @@
 			},
 			{
 				"comment": "^ top spike the thing TODO: FIND A NAME (top left)",
-				"rule_index": 99,
+				"rule_index": 101,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -2541,7 +2601,7 @@
 			},
 			{
 				"comment": "v bottom spike the thing TODO: FIND A NAME (top left)",
-				"rule_index": 100,
+				"rule_index": 102,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -2571,7 +2631,7 @@
 			},
 			{
 				"comment": "v bottom spike the thing TODO: FIND A NAME (top left)",
-				"rule_index": 101,
+				"rule_index": 103,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -2601,7 +2661,7 @@
 			},
 			{
 				"comment": "|| vertical spike the thing TODO: FIND A NAME (bottom right)",
-				"rule_index": 102,
+				"rule_index": 104,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -2630,7 +2690,7 @@
 			},
 			{
 				"comment": "v bottom spike the thing TODO: FIND A NAME (bottom right)",
-				"rule_index": 103,
+				"rule_index": 105,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -2660,7 +2720,7 @@
 			},
 			{
 				"comment": "^ top spike the thing TODO: FIND A NAME (bottom right)",
-				"rule_index": 104,
+				"rule_index": 106,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -2689,7 +2749,7 @@
 			},
 			{
 				"comment": "^ top spike the thing TODO: FIND A NAME (bottom right)",
-				"rule_index": 105,
+				"rule_index": 107,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -2718,7 +2778,7 @@
 			},
 			{
 				"comment": "|| vertical spike the thing TODO: FIND A NAME (bottom left)",
-				"rule_index": 106,
+				"rule_index": 108,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -2747,7 +2807,7 @@
 			},
 			{
 				"comment": "v bottom spike the thing TODO: FIND A NAME (bottom left)",
-				"rule_index": 107,
+				"rule_index": 109,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -2777,7 +2837,7 @@
 			},
 			{
 				"comment": "^ top spike the thing TODO: FIND A NAME (bottom left)",
-				"rule_index": 108,
+				"rule_index": 110,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -2806,7 +2866,7 @@
 			},
 			{
 				"comment": "^ top spike the thing TODO: FIND A NAME (bottom left)",
-				"rule_index": 109,
+				"rule_index": 111,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -2835,7 +2895,7 @@
 			},
 			{
 				"comment": "^ top spike vertical half sandwhich top",
-				"rule_index": 110,
+				"rule_index": 112,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -2862,7 +2922,7 @@
 			},
 			{
 				"comment": "|| vertical spike vertical half sandwhich top",
-				"rule_index": 111,
+				"rule_index": 113,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -2889,7 +2949,7 @@
 			},
 			{
 				"comment": "^ top spike vertical half sandwhich top",
-				"rule_index": 112,
+				"rule_index": 114,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ----         ----     ",
@@ -2916,7 +2976,7 @@
 			},
 			{
 				"comment": "v bottom spike vertical half sandwhich top",
-				"rule_index": 113,
+				"rule_index": 115,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ----         ----       ",
@@ -2944,7 +3004,7 @@
 			},
 			{
 				"comment": "v bottom spike vertical half sandwhich top",
-				"rule_index": 114,
+				"rule_index": 116,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -2972,7 +3032,7 @@
 			},
 			{
 				"comment": "v bottom spike vertical half sandwhich top",
-				"rule_index": 115,
+				"rule_index": 117,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -3000,7 +3060,7 @@
 			},
 			{
 				"comment": "^ top spike vertical half sandwhich bottom",
-				"rule_index": 116,
+				"rule_index": 118,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -3027,7 +3087,7 @@
 			},
 			{
 				"comment": "^ top spike vertical half sandwhich bottom",
-				"rule_index": 117,
+				"rule_index": 119,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -3054,7 +3114,7 @@
 			},
 			{
 				"comment": "^ top spike vertical half sandwhich bottom",
-				"rule_index": 118,
+				"rule_index": 120,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ----         ----       ",
@@ -3081,7 +3141,7 @@
 			},
 			{
 				"comment": "v bottom spike vertical half sandwhich bottom",
-				"rule_index": 119,
+				"rule_index": 121,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ----         ----       ",
@@ -3109,7 +3169,7 @@
 			},
 			{
 				"comment": "|| vertical spike vertical half sandwhich bottom",
-				"rule_index": 120,
+				"rule_index": 122,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -3136,7 +3196,7 @@
 			},
 			{
 				"comment": "v bottom spike vertical half sandwhich bottom",
-				"rule_index": 121,
+				"rule_index": 123,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -3164,7 +3224,7 @@
 			},
 			{
 				"comment": "^ top spike vertical long half sandwhich top",
-				"rule_index": 122,
+				"rule_index": 124,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -3193,7 +3253,7 @@
 			},
 			{
 				"comment": "|| vertical spike vertical long half sandwhich top",
-				"rule_index": 123,
+				"rule_index": 125,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -3222,7 +3282,7 @@
 			},
 			{
 				"comment": "^ top spike vertical long half sandwhich top",
-				"rule_index": 124,
+				"rule_index": 126,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ----         ----     ",
@@ -3251,7 +3311,7 @@
 			},
 			{
 				"comment": "v bottom spike vertical long half sandwhich top",
-				"rule_index": 125,
+				"rule_index": 127,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ----         ----       ",
@@ -3281,7 +3341,7 @@
 			},
 			{
 				"comment": "v bottom spike vertical long half sandwhich top",
-				"rule_index": 126,
+				"rule_index": 128,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -3311,7 +3371,7 @@
 			},
 			{
 				"comment": "v bottom spike vertical long half sandwhich top",
-				"rule_index": 127,
+				"rule_index": 129,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -3341,7 +3401,7 @@
 			},
 			{
 				"comment": "^ top spike vertical long half sandwhich bottom",
-				"rule_index": 128,
+				"rule_index": 130,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -3370,7 +3430,7 @@
 			},
 			{
 				"comment": "^ top spike vertical long half sandwhich bottom",
-				"rule_index": 129,
+				"rule_index": 131,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -3399,7 +3459,7 @@
 			},
 			{
 				"comment": "^ top spike vertical long half sandwhich bottom",
-				"rule_index": 130,
+				"rule_index": 132,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ----         ----       ",
@@ -3428,7 +3488,7 @@
 			},
 			{
 				"comment": "v bottom spike vertical long half sandwhich bottom",
-				"rule_index": 131,
+				"rule_index": 133,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ----         ----       ",
@@ -3458,7 +3518,7 @@
 			},
 			{
 				"comment": "|| vertical spike vertical long half sandwhich bottom",
-				"rule_index": 132,
+				"rule_index": 134,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   ---          ---        ",
@@ -3487,7 +3547,7 @@
 			},
 			{
 				"comment": "v bottom spike vertical long half sandwhich bottom",
-				"rule_index": 133,
+				"rule_index": 135,
 				"0":  "'#' = empty   'X' = placed ",
 				"2":  "'^v<=>' = full             ",
 				"3":  "   --           --         ",
@@ -3517,7 +3577,7 @@
 			},
 			{
 				"comment": "# connector cross vertical sandwhich length=2 (crossmode)",
-				"rule_index": 134,
+				"rule_index": 136,
 				"0":  "'%' = empty   'X' = placed ",
 				"2":  "'^v<=>#' = full             ",
 				"3":  "   ---          ---        ",
@@ -3546,7 +3606,7 @@
 			},
 			{
 				"comment": "# connector cross vertical sandwhich length=2 (crossmode)",
-				"rule_index": 135,
+				"rule_index": 137,
 				"0":  "'%' = empty   'X' = placed ",
 				"2":  "'^v<=>#' = full             ",
 				"3":  "   ---          ---        ",
@@ -3575,7 +3635,7 @@
 			},
 			{
 				"comment": "< left spike vertical sandwhich length=3 (crossmode)",
-				"rule_index": 136,
+				"rule_index": 138,
 				"0":  "'%' = empty   'X' = placed ",
 				"2":  "'^v<=>#' = full            ",
 				"3":  "   --           --         ",
@@ -3609,7 +3669,7 @@
 			},
 			{
 				"comment": "# connector cross vertical sandwhich length=3 (crossmode)",
-				"rule_index": 137,
+				"rule_index": 139,
 				"0":  "'%' = empty   'X' = placed ",
 				"2":  "'^v<=>#' = full            ",
 				"3":  "   ---          ---        ",
@@ -3642,7 +3702,7 @@
 			},
 			{
 				"comment": "> right spike vertical sandwhich length=3 (crossmode)",
-				"rule_index": 138,
+				"rule_index": 140,
 				"0":  "'%' = empty   'X' = placed ",
 				"2":  "'^v<=>#' = full            ",
 				"3":  "   ----         ----       ",
@@ -3677,7 +3737,7 @@
 			},
 			{
 				"comment": "> right spike vertical sandwhich length=3 (crossmode)",
-				"rule_index": 139,
+				"rule_index": 141,
 				"0":  "'%' = empty   'X' = placed ",
 				"2":  "'^v<=>#' = full            ",
 				"3":  "   ----         ----       ",
@@ -3712,7 +3772,7 @@
 			},
 			{
 				"comment": "> right spike vertical sandwhich length=3 (crossmode)",
-				"rule_index": 140,
+				"rule_index": 142,
 				"0":  "'%' = empty   'X' = placed ",
 				"2":  "'^v<=>#' = full            ",
 				"3":  "   ----         ----       ",
@@ -3747,7 +3807,7 @@
 			},
 			{
 				"comment": "# connector cross vertical sandwhich length=3 (crossmode)",
-				"rule_index": 141,
+				"rule_index": 143,
 				"0":  "'%' = empty   'X' = placed ",
 				"2":  "'^v<=>#' = full            ",
 				"3":  "   ---          ---        ",
@@ -3781,7 +3841,7 @@
 			},
 			{
 				"comment": "# connector cross vertical sandwhich length=3 (crossmode)",
-				"rule_index": 142,
+				"rule_index": 144,
 				"0":  "'%' = empty   'X' = placed ",
 				"2":  "'^v<=>#' = full            ",
 				"3":  "   ---          ---        ",
@@ -3815,7 +3875,7 @@
 			},
 			{
 				"comment": "< left spike vertical sandwhich length=3 (crossmode)",
-				"rule_index": 143,
+				"rule_index": 145,
 				"0":  "'%' = empty   'X' = placed ",
 				"2":  "'^v<=>#' = full            ",
 				"3":  "   --           --         ",
@@ -3849,7 +3909,7 @@
 			},
 			{
 				"comment": "< left spike vertical sandwhich length=3 (crossmode)",
-				"rule_index": 144,
+				"rule_index": 146,
 				"0":  "'%' = empty   'X' = placed ",
 				"2":  "'^v<=>#' = full            ",
 				"3":  "   --           --         ",
@@ -3884,7 +3944,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "< left spike FIX FIX simple step towards top right",
-				"rule_index": 145,
+				"rule_index": 147,
 				"0": "   ----     ",
 				"1": "   4321012x ",
 				"2": " -1      ?  ",
@@ -3910,7 +3970,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom spike FIX FIX simple step towards top right rot 45",
-				"rule_index": 146,
+				"rule_index": 148,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -3  ?      ",
@@ -3918,7 +3978,7 @@
 				"4": " -1  |      ",
 				"5": "  0  X^     ",
 				"6": "  1   |     ",
-				"7": "  2   V     ",
+				"7": "  2   v     ",
 				"8": "  3   ?     ",
 				"index": 5,
 				"condition": [
@@ -3944,7 +4004,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "|| vertical FIX FIX simple step towards top right rot 45",
-				"rule_index": 147,
+				"rule_index": 149,
 				"0": "   --       ",
 				"1": "   210123x  ",
 				"2": " -2  ?      ",
@@ -3952,7 +4012,7 @@
 				"4": "  0  X      ",
 				"5": "  1  v^     ",
 				"6": "  2   |     ",
-				"7": "  3   V     ",
+				"7": "  3   v     ",
 				"8": "  4   ?     ",
 				"index": 21,
 				"condition": [
@@ -3977,7 +4037,7 @@
 			{
 				"TODO": "remove FIX FIXES and implement better fixes further up",
 				"comment": "v bottom FIX FIX complex stair",
-				"rule_index": 148,
+				"rule_index": 150,
 				"0": "   ---       ",
 				"1": "   3210123x  ",
 				"2": " -3          ",
@@ -4011,7 +4071,7 @@
 
 			{
 				"comment": "red warning on invalid tiles",
-				"rule_index": 149,
+				"rule_index": 151,
 				"index": 149,
 				"condition": [
 					{"x": 0, "y": 1, "value": "empty"},
