@@ -166,18 +166,18 @@ int Load(class IStorage *pStorage, const char *pFileName, int StorageType)
 
 int main(int argc, const char **argv)
 {
-	if(argc != 3)
-	{
-		dbg_msg("error", "usage: <input> <output>");
-		return -1;
-	}
-
 	char aInFileName[1024];
 	char aOutFileName[1024];
 	IKernel *pKernel = IKernel::Create();
 	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_BASIC, argc, argv);
 	IEngine *pEngine = CreateEngine("Teeworlds");
 	IEngineMap *pEngineMap = CreateEngineMap();
+
+	if(argc != 3)
+	{
+		dbg_msg("error", "usage: <input> <output>");
+		return -1;
+	}
 
 	{
 		bool RegisterFail = false;
