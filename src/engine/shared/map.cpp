@@ -27,7 +27,6 @@ public:
 
 	virtual bool Load(const char *pMapName, IStorage *pStorage)
 	{
-		dbg_msg("yeer", "yeer");
 		if(!pStorage)
 			pStorage = Kernel()->RequestInterface<IStorage>();
 		if(!pStorage)
