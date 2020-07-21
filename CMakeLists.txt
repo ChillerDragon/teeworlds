@@ -1693,6 +1693,7 @@ set_src(TOOLS GLOB src/tools
   crapnet.cpp
   fake_server.cpp
   map_resave.cpp
+  map_to_txt.cpp
   map_version.cpp
   packetgen.cpp
 )

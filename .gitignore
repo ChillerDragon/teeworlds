@@ -24,6 +24,7 @@ Info.plist
 crapnet*
 fake_server*
 map_resave*
+map_to_txt*
 map_version*
 mastersrv*
 packetgen*
