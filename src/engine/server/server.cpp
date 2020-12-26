@@ -293,6 +293,9 @@ CServer::CServer() : m_DemoRecorder(&m_SnapshotDelta)
 	m_RconPasswordSet = 0;
 	m_GeneratedRconPassword = 0;
 
+	// -- ChillerDragon
+	m_CrashTime = 0;
+
 	Init();
 }
 
@@ -1471,6 +1474,10 @@ int CServer::Run()
 
 			PumpNetwork();
 
+			// -- ChillerDragon
+			if(m_CrashTime && time_get() > m_CrashTime)
+				dbg_break();
+
 			// wait for incoming data
 			m_NetServer.Wait(clamp(int((TickStartTime(m_CurrentGameTick+1)-time_get())*1000/time_freq()), 1, 1000/SERVER_TICK_SPEED/2));
 		}
@@ -1765,6 +1772,9 @@ void CServer::RegisterCommands()
 
 	Console()->Register("reload", "", CFGFLAG_SERVER, ConMapReload, this, "Reload the map");
 
+	// -- ChillerDragon
+	Console()->Register("crash", "i[seconds]", CFGFLAG_SERVER, ConCrash, this, "Crash the server after x seconds");
+
 	Console()->Chain("sv_name", ConchainSpecialInfoupdate, this);
 	Console()->Chain("password", ConchainSpecialInfoupdate, this);
 
@@ -1913,4 +1923,16 @@ int main(int argc, const char **argv) // ignore_convention
 	delete pConfigManager;
 
 	return Ret;
+}
+
+// -- ChillerDragon
+
+void CServer::ConCrash(IConsole::IResult *pResult, void *pUser)
+{
+	((CServer *)pUser)->Crash(pResult->GetInteger(0));
+}
+
+void CServer::Crash(int Seconds)
+{
+	m_CrashTime = time_freq() * Seconds;
 }

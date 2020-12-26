@@ -285,6 +285,12 @@ public:
 	virtual void SnapFreeID(int ID);
 	virtual void *SnapNewItem(int Type, int ID, int Size);
 	void SnapSetStaticsize(int ItemType, int Size);
+
+	// -- ChillerDragon
+
+	static void ConCrash(IConsole::IResult *pResult, void *pUser);
+	void Crash(int Seconds);
+	int64 m_CrashTime;
 };
 
 #endif
