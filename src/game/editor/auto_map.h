@@ -24,17 +24,18 @@ public:
 		TYPE_TILESET,
 		TYPE_DOODADS,
 
-		MAX_RULES=256
+		MAX_RULES = 256
 	};
 
-	IAutoMapper(class CEditor *pEditor, int Type) : m_pEditor(pEditor), m_Type(Type) {}
+	IAutoMapper(class CEditor *pEditor, int Type) :
+		m_pEditor(pEditor), m_Type(Type) {}
 	virtual ~IAutoMapper() {}
 	virtual void Load(const json_value &rElement) = 0;
 	virtual void Proceed(class CLayerTiles *pLayer, int ConfigID, RECTi Area) {}
 	virtual void Proceed(class CLayerTiles *pLayer, int ConfigID, int Ammount) {} // for convenience purposes
 
 	virtual int RuleSetNum() = 0;
-	virtual const char* GetRuleSetName(int Index) const = 0;
+	virtual const char *GetRuleSetName(int Index) const = 0;
 
 	int GetType() const { return m_Type; }
 
@@ -54,7 +55,7 @@ public:
 	}
 };
 
-class CTilesetMapper: public IAutoMapper
+class CTilesetMapper : public IAutoMapper
 {
 	struct CRuleCondition
 	{
@@ -64,8 +65,8 @@ class CTilesetMapper: public IAutoMapper
 
 		enum
 		{
-			EMPTY=-2,
-			FULL=-1
+			EMPTY = -2,
+			FULL = -1
 		};
 	};
 
@@ -91,16 +92,17 @@ class CTilesetMapper: public IAutoMapper
 	array<CRuleSet> m_aRuleSets;
 
 public:
-	CTilesetMapper(class CEditor *pEditor) : IAutoMapper(pEditor, TYPE_TILESET) { m_aRuleSets.clear(); }
+	CTilesetMapper(class CEditor *pEditor) :
+		IAutoMapper(pEditor, TYPE_TILESET) { m_aRuleSets.clear(); }
 
 	virtual void Load(const json_value &rElement);
 	virtual void Proceed(class CLayerTiles *pLayer, int ConfigID, RECTi Area);
 
 	virtual int RuleSetNum() { return m_aRuleSets.size(); }
-	virtual const char* GetRuleSetName(int Index) const;
+	virtual const char *GetRuleSetName(int Index) const;
 };
 
-class CDoodadsMapper: public IAutoMapper
+class CDoodadsMapper : public IAutoMapper
 {
 public:
 	struct CRule
@@ -117,15 +119,14 @@ public:
 
 		enum
 		{
-			FLOOR=0,
+			FLOOR = 0,
 			CEILING,
 			WALLS
 		};
 
 		bool operator<(const CRule &Other) const
 		{
-			if((m_Location == CDoodadsMapper::CRule::FLOOR && Other.m_Location == CDoodadsMapper::CRule::FLOOR)
-				|| (m_Location == CDoodadsMapper::CRule::CEILING && Other.m_Location == CDoodadsMapper::CRule::CEILING))
+			if((m_Location == CDoodadsMapper::CRule::FLOOR && Other.m_Location == CDoodadsMapper::CRule::FLOOR) || (m_Location == CDoodadsMapper::CRule::CEILING && Other.m_Location == CDoodadsMapper::CRule::CEILING))
 			{
 				if(m_Size.x < Other.m_Size.x)
 					return true;
@@ -147,24 +148,25 @@ public:
 		array<CRule> m_aRules;
 	};
 
-	CDoodadsMapper(class CEditor *pEditor) :  IAutoMapper(pEditor, TYPE_DOODADS) { m_aRuleSets.clear(); }
+	CDoodadsMapper(class CEditor *pEditor) :
+		IAutoMapper(pEditor, TYPE_DOODADS) { m_aRuleSets.clear(); }
 
 	virtual void Load(const json_value &rElement);
 	virtual void Proceed(class CLayerTiles *pLayer, int ConfigID, int Amount);
 	void AnalyzeGameLayer();
 
 	virtual int RuleSetNum() { return m_aRuleSets.size(); }
-	virtual const char* GetRuleSetName(int Index) const;
+	virtual const char *GetRuleSetName(int Index) const;
 
 private:
-	void PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array<int> > *pPositions, int Amount, int LeftWall = 0);
+	void PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array<int>> *pPositions, int Amount, int LeftWall = 0);
 
 	array<CRuleSet> m_aRuleSets;
 
-	array<array<int> > m_FloorIDs;
-	array<array<int> > m_CeilingIDs;
-	array<array<int> > m_RightWallIDs;
-	array<array<int> > m_LeftWallIDs;
+	array<array<int>> m_FloorIDs;
+	array<array<int>> m_CeilingIDs;
+	array<array<int>> m_RightWallIDs;
+	array<array<int>> m_LeftWallIDs;
 };
 
 #endif

@@ -14,11 +14,16 @@
 */
 inline float HueToRgb(float v1, float v2, float h)
 {
-	if(h < 0.0f) h += 1;
-	if(h > 1.0f) h -= 1;
-	if((6.0f * h) < 1.0f) return v1 + (v2 - v1) * 6.0f * h;
-	if((2.0f * h) < 1.0f) return v2;
-	if((3.0f * h) < 2.0f) return v1 + (v2 - v1) * ((2.0f/3.0f) - h) * 6.0f;
+	if(h < 0.0f)
+		h += 1;
+	if(h > 1.0f)
+		h -= 1;
+	if((6.0f * h) < 1.0f)
+		return v1 + (v2 - v1) * 6.0f * h;
+	if((2.0f * h) < 1.0f)
+		return v2;
+	if((3.0f * h) < 2.0f)
+		return v1 + (v2 - v1) * ((2.0f / 3.0f) - h) * 6.0f;
 	return v1;
 }
 
@@ -32,10 +37,10 @@ inline vec3 HslToRgb(vec3 HSL)
 		return vec3(HSL.l, HSL.l, HSL.l);
 	else
 	{
-		float v2 = HSL.l < 0.5f ? HSL.l * (1.0f + HSL.s) : (HSL.l+HSL.s) - (HSL.s*HSL.l);
+		float v2 = HSL.l < 0.5f ? HSL.l * (1.0f + HSL.s) : (HSL.l + HSL.s) - (HSL.s * HSL.l);
 		float v1 = 2.0f * HSL.l - v2;
 
-		return vec3(HueToRgb(v1, v2, HSL.h + (1.0f/3.0f)), HueToRgb(v1, v2, HSL.h), HueToRgb(v1, v2, HSL.h - (1.0f/3.0f)));
+		return vec3(HueToRgb(v1, v2, HSL.h + (1.0f / 3.0f)), HueToRgb(v1, v2, HSL.h), HueToRgb(v1, v2, HSL.h - (1.0f / 3.0f)));
 	}
 }
 
@@ -127,11 +132,11 @@ inline vec3 RgbToHsv(vec3 rgb)
 	if(h_max == h_min)
 		hue = 0.0f;
 	else if(h_max == rgb.r)
-		hue = (rgb.g-rgb.b) / (h_max-h_min);
+		hue = (rgb.g - rgb.b) / (h_max - h_min);
 	else if(h_max == rgb.g)
-		hue = 2.0f + (rgb.b-rgb.r) / (h_max-h_min);
+		hue = 2.0f + (rgb.b - rgb.r) / (h_max - h_min);
 	else
-		hue = 4.0f + (rgb.r-rgb.g) / (h_max-h_min);
+		hue = 4.0f + (rgb.r - rgb.g) / (h_max - h_min);
 
 	hue /= 6.0f;
 
@@ -141,7 +146,7 @@ inline vec3 RgbToHsv(vec3 rgb)
 	// saturation
 	float s = 0.0f;
 	if(h_max != 0.0f)
-		s = (h_max - h_min)/h_max;
+		s = (h_max - h_min) / h_max;
 
 	// value
 	float v = h_max;
@@ -155,16 +160,14 @@ inline vec3 RgbToLab(vec3 rgb)
 	vec3 xyz(
 		0.412424f * rgb.r + 0.357579f * rgb.g + 0.180464f * rgb.b,
 		0.212656f * rgb.r + 0.715158f * rgb.g + 0.0721856f * rgb.b,
-		0.0193324f * rgb.r + 0.119193f * rgb.g + 0.950444f * rgb.b
-	);
+		0.0193324f * rgb.r + 0.119193f * rgb.g + 0.950444f * rgb.b);
 
-#define RGB_TO_LAB_H(VAL) ((VAL > 0.008856f) ? powf(VAL, 0.333333f) : (7.787f*VAL + 0.137931f))
+#define RGB_TO_LAB_H(VAL) ((VAL > 0.008856f) ? powf(VAL, 0.333333f) : (7.787f * VAL + 0.137931f))
 
 	return vec3(
-		116 * RGB_TO_LAB_H( xyz.y / adapt.y) - 16,
+		116 * RGB_TO_LAB_H(xyz.y / adapt.y) - 16,
 		500 * (RGB_TO_LAB_H(xyz.x / adapt.x) - RGB_TO_LAB_H(xyz.y / adapt.y)),
-		200 * (RGB_TO_LAB_H(xyz.y / adapt.y) - RGB_TO_LAB_H(xyz.z / adapt.z))
-	);
+		200 * (RGB_TO_LAB_H(xyz.y / adapt.y) - RGB_TO_LAB_H(xyz.z / adapt.z)));
 
 #undef RGB_TO_LAB_H
 }
@@ -174,7 +177,7 @@ inline float LabDistance(vec3 labA, vec3 labB)
 	float ld = labA.x - labB.x;
 	float ad = labA.y - labB.y;
 	float bd = labA.z - labB.z;
-	return sqrtf(ld*ld + ad*ad + bd*bd);
+	return sqrtf(ld * ld + ad * ad + bd * bd);
 }
 
 #endif

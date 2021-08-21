@@ -2,12 +2,12 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/system.h>
 
-#include <engine/shared/config.h>
-#include <engine/graphics.h>
-#include <engine/textrender.h>
-#include <engine/keys.h>
-#include <engine/input.h>
 #include "ui.h"
+#include <engine/graphics.h>
+#include <engine/input.h>
+#include <engine/keys.h>
+#include <engine/shared/config.h>
+#include <engine/textrender.h>
 
 /********************************************************
  UI
@@ -45,9 +45,12 @@ void CUI::Update(float MouseX, float MouseY, float MouseWorldX, float MouseWorld
 	unsigned MouseButtons = 0;
 	if(Enabled())
 	{
-		if(Input()->KeyIsPressed(KEY_MOUSE_1)) MouseButtons |= 1;
-		if(Input()->KeyIsPressed(KEY_MOUSE_2)) MouseButtons |= 2;
-		if(Input()->KeyIsPressed(KEY_MOUSE_3)) MouseButtons |= 4;
+		if(Input()->KeyIsPressed(KEY_MOUSE_1))
+			MouseButtons |= 1;
+		if(Input()->KeyIsPressed(KEY_MOUSE_2))
+			MouseButtons |= 2;
+		if(Input()->KeyIsPressed(KEY_MOUSE_3))
+			MouseButtons |= 4;
 	}
 
 	m_MouseX = MouseX;
@@ -77,12 +80,12 @@ void CUI::ConvertCursorMove(float *pX, float *pY, int CursorType) const
 	float Factor = 1.0f;
 	switch(CursorType)
 	{
-		case IInput::CURSOR_MOUSE:
-			Factor = Config()->m_UiMousesens/100.0f;
-			break;
-		case IInput::CURSOR_JOYSTICK:
-			Factor = Config()->m_UiJoystickSens/100.0f;
-			break;
+	case IInput::CURSOR_MOUSE:
+		Factor = Config()->m_UiMousesens / 100.0f;
+		break;
+	case IInput::CURSOR_JOYSTICK:
+		Factor = Config()->m_UiJoystickSens / 100.0f;
+		break;
 	}
 	*pX *= Factor;
 	*pY *= Factor;
@@ -97,7 +100,7 @@ const CUIRect *CUI::Screen()
 
 float CUI::PixelSize()
 {
-	return Screen()->w/Graphics()->ScreenWidth();
+	return Screen()->w / Graphics()->ScreenWidth();
 }
 
 void CUI::MapScreen()
@@ -115,8 +118,8 @@ void CUI::ClipEnable(const CUIRect *pRect)
 		CUIRect Intersection;
 		Intersection.x = max(pRect->x, pOldRect->x);
 		Intersection.y = max(pRect->y, pOldRect->y);
-		Intersection.w = min(pRect->x+pRect->w, pOldRect->x+pOldRect->w) - pRect->x;
-		Intersection.h = min(pRect->y+pRect->h, pOldRect->y+pOldRect->h) - pRect->y;
+		Intersection.w = min(pRect->x + pRect->w, pOldRect->x + pOldRect->w) - pRect->x;
+		Intersection.h = min(pRect->y + pRect->h, pOldRect->y + pOldRect->h) - pRect->y;
 		m_aClips[m_NumClips] = Intersection;
 	}
 	else
@@ -145,9 +148,9 @@ void CUI::UpdateClipping()
 	if(IsClipped())
 	{
 		const CUIRect *pRect = ClipArea();
-		const float XScale = Graphics()->ScreenWidth()/Screen()->w;
-		const float YScale = Graphics()->ScreenHeight()/Screen()->h;
-		Graphics()->ClipEnable((int)(pRect->x*XScale), (int)(pRect->y*YScale), (int)(pRect->w*XScale), (int)(pRect->h*YScale));
+		const float XScale = Graphics()->ScreenWidth() / Screen()->w;
+		const float YScale = Graphics()->ScreenHeight() / Screen()->h;
+		Graphics()->ClipEnable((int)(pRect->x * XScale), (int)(pRect->y * YScale), (int)(pRect->w * XScale), (int)(pRect->h * YScale));
 	}
 	else
 	{
@@ -158,8 +161,8 @@ void CUI::UpdateClipping()
 void CUIRect::HSplitMid(CUIRect *pTop, CUIRect *pBottom, float Spacing) const
 {
 	CUIRect r = *this;
-	const float Cut = r.h/2;
-	const float HalfSpacing = Spacing/2;
+	const float Cut = r.h / 2;
+	const float HalfSpacing = Spacing / 2;
 
 	if(pTop)
 	{
@@ -182,7 +185,7 @@ void CUIRect::HSplitTop(float Cut, CUIRect *pTop, CUIRect *pBottom) const
 {
 	CUIRect r = *this;
 
-	if (pTop)
+	if(pTop)
 	{
 		pTop->x = r.x;
 		pTop->y = r.y;
@@ -190,7 +193,7 @@ void CUIRect::HSplitTop(float Cut, CUIRect *pTop, CUIRect *pBottom) const
 		pTop->h = Cut;
 	}
 
-	if (pBottom)
+	if(pBottom)
 	{
 		pBottom->x = r.x;
 		pBottom->y = r.y + Cut;
@@ -203,7 +206,7 @@ void CUIRect::HSplitBottom(float Cut, CUIRect *pTop, CUIRect *pBottom) const
 {
 	CUIRect r = *this;
 
-	if (pTop)
+	if(pTop)
 	{
 		pTop->x = r.x;
 		pTop->y = r.y;
@@ -211,7 +214,7 @@ void CUIRect::HSplitBottom(float Cut, CUIRect *pTop, CUIRect *pBottom) const
 		pTop->h = r.h - Cut;
 	}
 
-	if (pBottom)
+	if(pBottom)
 	{
 		pBottom->x = r.x;
 		pBottom->y = r.y + r.h - Cut;
@@ -220,14 +223,13 @@ void CUIRect::HSplitBottom(float Cut, CUIRect *pTop, CUIRect *pBottom) const
 	}
 }
 
-
 void CUIRect::VSplitMid(CUIRect *pLeft, CUIRect *pRight, float Spacing) const
 {
 	CUIRect r = *this;
-	const float Cut = r.w/2;
-	const float HalfSpacing = Spacing/2;
+	const float Cut = r.w / 2;
+	const float HalfSpacing = Spacing / 2;
 
-	if (pLeft)
+	if(pLeft)
 	{
 		pLeft->x = r.x;
 		pLeft->y = r.y;
@@ -235,7 +237,7 @@ void CUIRect::VSplitMid(CUIRect *pLeft, CUIRect *pRight, float Spacing) const
 		pLeft->h = r.h;
 	}
 
-	if (pRight)
+	if(pRight)
 	{
 		pRight->x = r.x + Cut + HalfSpacing;
 		pRight->y = r.y;
@@ -248,7 +250,7 @@ void CUIRect::VSplitLeft(float Cut, CUIRect *pLeft, CUIRect *pRight) const
 {
 	CUIRect r = *this;
 
-	if (pLeft)
+	if(pLeft)
 	{
 		pLeft->x = r.x;
 		pLeft->y = r.y;
@@ -256,7 +258,7 @@ void CUIRect::VSplitLeft(float Cut, CUIRect *pLeft, CUIRect *pRight) const
 		pLeft->h = r.h;
 	}
 
-	if (pRight)
+	if(pRight)
 	{
 		pRight->x = r.x + Cut;
 		pRight->y = r.y;
@@ -269,7 +271,7 @@ void CUIRect::VSplitRight(float Cut, CUIRect *pLeft, CUIRect *pRight) const
 {
 	CUIRect r = *this;
 
-	if (pLeft)
+	if(pLeft)
 	{
 		pLeft->x = r.x;
 		pLeft->y = r.y;
@@ -277,7 +279,7 @@ void CUIRect::VSplitRight(float Cut, CUIRect *pLeft, CUIRect *pRight) const
 		pLeft->h = r.h;
 	}
 
-	if (pRight)
+	if(pRight)
 	{
 		pRight->x = r.x + r.w - Cut;
 		pRight->y = r.y;
@@ -292,8 +294,8 @@ void CUIRect::Margin(float Cut, CUIRect *pOtherRect) const
 
 	pOtherRect->x = r.x + Cut;
 	pOtherRect->y = r.y + Cut;
-	pOtherRect->w = r.w - 2*Cut;
-	pOtherRect->h = r.h - 2*Cut;
+	pOtherRect->w = r.w - 2 * Cut;
+	pOtherRect->h = r.h - 2 * Cut;
 }
 
 void CUIRect::VMargin(float Cut, CUIRect *pOtherRect) const
@@ -302,7 +304,7 @@ void CUIRect::VMargin(float Cut, CUIRect *pOtherRect) const
 
 	pOtherRect->x = r.x + Cut;
 	pOtherRect->y = r.y;
-	pOtherRect->w = r.w - 2*Cut;
+	pOtherRect->w = r.w - 2 * Cut;
 	pOtherRect->h = r.h;
 }
 
@@ -313,15 +315,12 @@ void CUIRect::HMargin(float Cut, CUIRect *pOtherRect) const
 	pOtherRect->x = r.x;
 	pOtherRect->y = r.y + Cut;
 	pOtherRect->w = r.w;
-	pOtherRect->h = r.h - 2*Cut;
+	pOtherRect->h = r.h - 2 * Cut;
 }
 
 bool CUIRect::Inside(float x, float y) const
 {
-	return x >= this->x
-		&& x < this->x + this->w
-		&& y >= this->y
-		&& y < this->y + this->h;
+	return x >= this->x && x < this->x + this->w && y >= this->y && y < this->y + this->h;
 }
 
 bool CUI::DoButtonLogic(const void *pID, const CUIRect *pRect, int Button)

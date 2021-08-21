@@ -2,8 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include "mod.h"
 
-CGameControllerMOD::CGameControllerMOD(class CGameContext *pGameServer)
-: IGameController(pGameServer)
+CGameControllerMOD::CGameControllerMOD(class CGameContext *pGameServer) :
+	IGameController(pGameServer)
 {
 	// Exchange this to a string that identifies your game mode.
 	// DM, TDM and CTF are reserved for teeworlds original modes.

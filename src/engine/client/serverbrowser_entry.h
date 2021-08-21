@@ -3,12 +3,14 @@
 #ifndef ENGINE_CLIENT_SERVERBROWSER_ENTRY_H
 #define ENGINE_CLIENT_SERVERBROWSER_ENTRY_H
 
+#include <engine/serverbrowser.h>
+
 class CServerEntry
 {
 public:
 	enum
 	{
-		STATE_INVALID=0,
+		STATE_INVALID = 0,
 		STATE_PENDING,
 		STATE_READY,
 	};
@@ -16,7 +18,7 @@ public:
 	NETADDR m_Addr;
 	int64 m_RequestTime;
 	int m_InfoState;
-	int m_CurrentToken;	// the token is to keep server refresh separated from each other
+	int m_CurrentToken; // the token is to keep server refresh separated from each other
 	int m_TrackID;
 	class CServerInfo m_Info;
 

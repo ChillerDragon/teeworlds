@@ -3,6 +3,8 @@
 #ifndef GAME_CLIENT_UI_H
 #define GAME_CLIENT_UI_H
 
+#include <base/vmath.h>
+
 class CUIRect
 {
 public:
@@ -61,7 +63,13 @@ public:
 	static const vec4 ms_TransparentTextColor;
 
 	// TODO: Refactor: Fill this in
-	void Init(class CConfig *pConfig, class IGraphics *pGraphics, class IInput *pInput, class ITextRender *pTextRender) { m_pConfig = pConfig; m_pGraphics = pGraphics; m_pInput = pInput; m_pTextRender = pTextRender; }
+	void Init(class CConfig *pConfig, class IGraphics *pGraphics, class IInput *pInput, class ITextRender *pTextRender)
+	{
+		m_pConfig = pConfig;
+		m_pGraphics = pGraphics;
+		m_pInput = pInput;
+		m_pTextRender = pTextRender;
+	}
 	class CConfig *Config() const { return m_pConfig; }
 	class IGraphics *Graphics() const { return m_pGraphics; }
 	class IInput *Input() const { return m_pInput; }
@@ -71,28 +79,28 @@ public:
 
 	enum
 	{
-		CORNER_NONE=0,
-		CORNER_TL=1,
-		CORNER_TR=2,
-		CORNER_BL=4,
-		CORNER_BR=8,
-		CORNER_ITL=16,
-		CORNER_ITR=32,
-		CORNER_IBL=64,
-		CORNER_IBR=128,
+		CORNER_NONE = 0,
+		CORNER_TL = 1,
+		CORNER_TR = 2,
+		CORNER_BL = 4,
+		CORNER_BR = 8,
+		CORNER_ITL = 16,
+		CORNER_ITR = 32,
+		CORNER_IBL = 64,
+		CORNER_IBR = 128,
 
-		CORNER_T=CORNER_TL|CORNER_TR,
-		CORNER_B=CORNER_BL|CORNER_BR,
-		CORNER_R=CORNER_TR|CORNER_BR,
-		CORNER_L=CORNER_TL|CORNER_BL,
+		CORNER_T = CORNER_TL | CORNER_TR,
+		CORNER_B = CORNER_BL | CORNER_BR,
+		CORNER_R = CORNER_TR | CORNER_BR,
+		CORNER_L = CORNER_TL | CORNER_BL,
 
-		CORNER_IT=CORNER_ITL|CORNER_ITR,
-		CORNER_IB=CORNER_IBL|CORNER_IBR,
-		CORNER_IR=CORNER_ITR|CORNER_IBR,
-		CORNER_IL=CORNER_ITL|CORNER_IBL,
+		CORNER_IT = CORNER_ITL | CORNER_ITR,
+		CORNER_IB = CORNER_IBL | CORNER_IBR,
+		CORNER_IR = CORNER_ITR | CORNER_IBR,
+		CORNER_IL = CORNER_ITL | CORNER_IBL,
 
-		CORNER_ALL=CORNER_T|CORNER_B,
-		CORNER_INV_ALL=CORNER_IT|CORNER_IB
+		CORNER_ALL = CORNER_T | CORNER_B,
+		CORNER_INV_ALL = CORNER_IT | CORNER_IB
 	};
 
 	enum EAlignment
@@ -110,12 +118,26 @@ public:
 	float MouseY() const { return m_MouseY; }
 	float MouseWorldX() const { return m_MouseWorldX; }
 	float MouseWorldY() const { return m_MouseWorldY; }
-	bool MouseButton(int Index) const { return (m_MouseButtons>>Index)&1; }
-	bool MouseButtonClicked(int Index) const { return MouseButton(Index) && !((m_LastMouseButtons>>Index)&1) ; }
+	bool MouseButton(int Index) const { return (m_MouseButtons >> Index) & 1; }
+	bool MouseButtonClicked(int Index) const { return MouseButton(Index) && !((m_LastMouseButtons >> Index) & 1); }
 
 	void SetHotItem(const void *pID) { m_pBecommingHotItem = pID; }
-	void SetActiveItem(const void *pID) { m_ActiveItemValid = true; m_pActiveItem = pID; if (pID) m_pLastActiveItem = pID; }
-	bool CheckActiveItem(const void *pID) { if(m_pActiveItem == pID) { m_ActiveItemValid = true; return true; } return false; }
+	void SetActiveItem(const void *pID)
+	{
+		m_ActiveItemValid = true;
+		m_pActiveItem = pID;
+		if(pID)
+			m_pLastActiveItem = pID;
+	}
+	bool CheckActiveItem(const void *pID)
+	{
+		if(m_pActiveItem == pID)
+		{
+			m_ActiveItemValid = true;
+			return true;
+		}
+		return false;
+	}
 	void ClearLastActiveItem() { m_pLastActiveItem = 0; }
 	const void *HotItem() const { return m_pHotItem; }
 	const void *NextHotItem() const { return m_pBecommingHotItem; }
@@ -123,7 +145,11 @@ public:
 	const void *LastActiveItem() const { return m_pLastActiveItem; }
 
 	void StartCheck() { m_ActiveItemValid = false; }
-	void FinishCheck() { if(!m_ActiveItemValid) SetActiveItem(0); }
+	void FinishCheck()
+	{
+		if(!m_ActiveItemValid)
+			SetActiveItem(0);
+	}
 
 	bool MouseInside(const CUIRect *pRect) const { return pRect->Inside(m_MouseX, m_MouseY); }
 	bool MouseInsideClip() const { return !IsClipped() || MouseInside(ClipArea()); }
@@ -148,6 +174,5 @@ public:
 	void DoLabel(const CUIRect *pRect, const char *pText, float FontSize, EAlignment Align, float LineWidth = -1.0f, bool MultiLine = true);
 	void DoLabelHighlighted(const CUIRect *pRect, const char *pText, const char *pHighlighted, float FontSize, const vec4 &TextColor, const vec4 &HighlightColor);
 };
-
 
 #endif

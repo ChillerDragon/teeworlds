@@ -4,12 +4,14 @@
 #define ENGINE_CLIENT_CLIENT_H
 
 #include <base/hash.h>
+#include <engine/client/contacts.h>
+#include <engine/client/serverbrowser.h>
 
 class CGraph
 {
 	enum
 	{
-		MAX_VALUES=128,
+		MAX_VALUES = 128,
 	};
 
 	float m_Min, m_Max;
@@ -25,7 +27,6 @@ public:
 	void Add(float v, float r, float g, float b);
 	void Render(IGraphics *pGraphics, IGraphics::CTextureHandle FontTexture, float x, float y, float w, float h, const char *pDescription);
 };
-
 
 class CSmoothTime
 {
@@ -50,7 +51,6 @@ public:
 	void Update(CGraph *pGraph, int64 Target, int TimeLeft, int AdjustDirection);
 };
 
-
 class CClient : public IClient, public CDemoPlayer::IListener
 {
 	// needed interfaces
@@ -70,8 +70,8 @@ class CClient : public IClient, public CDemoPlayer::IListener
 
 	enum
 	{
-		NUM_SNAPSHOT_TYPES=2,
-		PREDICTION_MARGIN=1000/50/2, // magic network prediction value
+		NUM_SNAPSHOT_TYPES = 2,
+		PREDICTION_MARGIN = 1000 / 50 / 2, // magic network prediction value
 	};
 
 	class CNetClient m_NetClient;
@@ -181,7 +181,7 @@ class CClient : public IClient, public CDemoPlayer::IListener
 	{
 		enum
 		{
-			STATE_INIT=0,
+			STATE_INIT = 0,
 			STATE_START,
 			STATE_READY,
 			STATE_ERROR,
@@ -244,7 +244,6 @@ public:
 	void DisconnectWithReason(const char *pReason);
 	virtual void Disconnect();
 	const char *ServerAddress() const { return m_aServerAddressStr; }
-
 
 	virtual void GetServerInfo(CServerInfo *pServerInfo);
 

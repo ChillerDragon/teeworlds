@@ -6,22 +6,22 @@
 
 #include <base/system.h>
 
-#include <engine/shared/ringbuffer.h>
-#include <engine/shared/config.h>
-#include <engine/graphics.h>
-#include <engine/textrender.h>
-#include <engine/storage.h>
-#include <engine/keys.h>
 #include <engine/console.h>
+#include <engine/graphics.h>
+#include <engine/keys.h>
+#include <engine/shared/config.h>
+#include <engine/shared/ringbuffer.h>
+#include <engine/storage.h>
+#include <engine/textrender.h>
 
 #include <game/client/ui.h>
 
 #include <game/version.h>
 
-#include <game/client/lineinput.h>
-#include <game/client/render.h>
 #include <game/client/components/controls.h>
 #include <game/client/components/menus.h>
+#include <game/client/lineinput.h>
+#include <game/client/render.h>
 
 #include "console.h"
 
@@ -104,7 +104,7 @@ void CGameConsole::CInstance::PossibleMapsCompleteCallback(int Index, const char
 	if(pInstance->m_CompletionMapChosen == Index)
 	{
 		// get command
-		char aBuf[512] = { 0 };
+		char aBuf[512] = {0};
 		const char *pSrc = pInstance->GetString();
 		unsigned i = 0;
 		for(; i < sizeof(aBuf) - 2 && *pSrc && *pSrc != ' '; i++, pSrc++)
@@ -122,7 +122,7 @@ void CGameConsole::CInstance::OnInput(IInput::CEvent Event)
 {
 	bool Handled = false;
 
-	if(Event.m_Flags&IInput::FLAG_PRESS)
+	if(Event.m_Flags & IInput::FLAG_PRESS)
 	{
 		if(Event.m_Key == KEY_RETURN || Event.m_Key == KEY_KP_ENTER)
 		{
@@ -130,8 +130,8 @@ void CGameConsole::CInstance::OnInput(IInput::CEvent Event)
 			{
 				if(m_Type == CONSOLETYPE_LOCAL || m_pGameConsole->Client()->RconAuthed())
 				{
-					char *pEntry = m_History.Allocate(m_Input.GetLength()+1);
-					mem_copy(pEntry, m_Input.GetString(), m_Input.GetLength()+1);
+					char *pEntry = m_History.Allocate(m_Input.GetLength() + 1);
+					mem_copy(pEntry, m_Input.GetString(), m_Input.GetLength() + 1);
 				}
 				ExecuteLine(m_Input.GetString());
 				m_Input.Clear();
@@ -213,7 +213,7 @@ void CGameConsole::CInstance::OnInput(IInput::CEvent Event)
 	if(!Handled)
 		m_Input.ProcessInput(Event);
 
-	if(Event.m_Flags&(IInput::FLAG_PRESS|IInput::FLAG_TEXT))
+	if(Event.m_Flags & (IInput::FLAG_PRESS | IInput::FLAG_TEXT))
 	{
 		if(Event.m_Key != KEY_TAB && Event.m_Key != KEY_LSHIFT && Event.m_Key != KEY_RSHIFT)
 		{
@@ -232,7 +232,7 @@ void CGameConsole::CInstance::OnInput(IInput::CEvent Event)
 			char aBuf[64] = {0};
 			const char *pSrc = GetString();
 			int i = 0;
-			for(; i < (int)sizeof(aBuf)-1 && *pSrc && *pSrc != ' '; i++, pSrc++)
+			for(; i < (int)sizeof(aBuf) - 1 && *pSrc && *pSrc != ' '; i++, pSrc++)
 				aBuf[i] = *pSrc;
 			aBuf[i] = 0;
 
@@ -258,15 +258,15 @@ void CGameConsole::CInstance::PrintLine(const char *pLine, bool Highlighted)
 	if(Len > 255)
 		Len = 255;
 
-	CBacklogEntry *pEntry = m_Backlog.Allocate(sizeof(CBacklogEntry)+Len);
+	CBacklogEntry *pEntry = m_Backlog.Allocate(sizeof(CBacklogEntry) + Len);
 	pEntry->m_YOffset = -1.0f;
 	pEntry->m_Highlighted = Highlighted;
 	mem_copy(pEntry->m_aText, pLine, Len);
 	pEntry->m_aText[Len] = 0;
 }
 
-CGameConsole::CGameConsole()
-: m_LocalConsole(CONSOLETYPE_LOCAL), m_RemoteConsole(CONSOLETYPE_REMOTE)
+CGameConsole::CGameConsole() :
+	m_LocalConsole(CONSOLETYPE_LOCAL), m_RemoteConsole(CONSOLETYPE_REMOTE)
 {
 	m_ConsoleType = CONSOLETYPE_LOCAL;
 	m_ConsoleState = CONSOLE_CLOSED;
@@ -277,7 +277,7 @@ CGameConsole::CGameConsole()
 float CGameConsole::TimeNow()
 {
 	static long long s_TimeStart = time_get();
-	return float(time_get()-s_TimeStart)/float(time_freq());
+	return float(time_get() - s_TimeStart) / float(time_freq());
 }
 
 CGameConsole::CInstance *CGameConsole::CurrentConsole()
@@ -296,7 +296,7 @@ void CGameConsole::OnReset()
 static float ConsoleScaleFunc(float t)
 {
 	//return t;
-	return sinf(acosf(1.0f-t));
+	return sinf(acosf(1.0f - t));
 }
 
 struct CRenderInfo
@@ -316,19 +316,19 @@ void CGameConsole::PossibleCommandsRenderCallback(int Index, const char *pStr, v
 
 	if(pInfo->m_EnumCount == pInfo->m_WantedCompletion)
 	{
-		pInfo->m_pSelf->TextRender()->TextColor(0.05f, 0.05f, 0.05f,1);
+		pInfo->m_pSelf->TextRender()->TextColor(0.05f, 0.05f, 0.05f, 1);
 		const float BeginX = pInfo->m_pCursor->AdvancePosition().x - pInfo->m_Offset;
 		pInfo->m_pSelf->TextRender()->TextDeferred(pInfo->m_pCursor, pStr, -1);
 		CTextBoundingBox Box = pInfo->m_pCursor->BoundingBox();
 		CUIRect Rect = {Box.x - 5 + BeginX, Box.y, Box.w + 8 - BeginX, Box.h};
 
-		pInfo->m_pSelf->RenderTools()->DrawRoundRect(&Rect, vec4(229.0f/255.0f,185.0f/255.0f,4.0f/255.0f,0.85f), pInfo->m_pCursor->m_FontSize/3);
+		pInfo->m_pSelf->RenderTools()->DrawRoundRect(&Rect, vec4(229.0f / 255.0f, 185.0f / 255.0f, 4.0f / 255.0f, 0.85f), pInfo->m_pCursor->m_FontSize / 3);
 
 		// scroll when out of sight
 		if(Rect.x < 0.0f)
-			pInfo->m_Offset += pInfo->m_Width/2;
+			pInfo->m_Offset += pInfo->m_Width / 2;
 		else if(Rect.x + Rect.w > pInfo->m_Width)
-			pInfo->m_Offset -= pInfo->m_Width/2;
+			pInfo->m_Offset -= pInfo->m_Width / 2;
 	}
 	else
 	{
@@ -336,16 +336,16 @@ void CGameConsole::PossibleCommandsRenderCallback(int Index, const char *pStr, v
 
 		if(pMatchStart)
 		{
-			pInfo->m_pSelf->TextRender()->TextColor(0.5f,0.5f,0.5f,1);
-			pInfo->m_pSelf->TextRender()->TextDeferred(pInfo->m_pCursor, pStr, pMatchStart-pStr);
-			pInfo->m_pSelf->TextRender()->TextColor(229.0f/255.0f,185.0f/255.0f,4.0f/255.0f,1);
+			pInfo->m_pSelf->TextRender()->TextColor(0.5f, 0.5f, 0.5f, 1);
+			pInfo->m_pSelf->TextRender()->TextDeferred(pInfo->m_pCursor, pStr, pMatchStart - pStr);
+			pInfo->m_pSelf->TextRender()->TextColor(229.0f / 255.0f, 185.0f / 255.0f, 4.0f / 255.0f, 1);
 			pInfo->m_pSelf->TextRender()->TextDeferred(pInfo->m_pCursor, pMatchStart, str_length(pInfo->m_pCurrentCmd));
-			pInfo->m_pSelf->TextRender()->TextColor(0.5f,0.5f,0.5f,1);
-			pInfo->m_pSelf->TextRender()->TextDeferred(pInfo->m_pCursor, pMatchStart+str_length(pInfo->m_pCurrentCmd), -1);
+			pInfo->m_pSelf->TextRender()->TextColor(0.5f, 0.5f, 0.5f, 1);
+			pInfo->m_pSelf->TextRender()->TextDeferred(pInfo->m_pCursor, pMatchStart + str_length(pInfo->m_pCurrentCmd), -1);
 		}
 		else
 		{
-			pInfo->m_pSelf->TextRender()->TextColor(0.75f,0.75f,0.75f,1);
+			pInfo->m_pSelf->TextRender()->TextColor(0.75f, 0.75f, 0.75f, 1);
 			pInfo->m_pSelf->TextRender()->TextDeferred(pInfo->m_pCursor, pStr, -1);
 		}
 	}
@@ -357,10 +357,10 @@ void CGameConsole::PossibleCommandsRenderCallback(int Index, const char *pStr, v
 void CGameConsole::OnRender()
 {
 	CUIRect Screen = *UI()->Screen();
-	float ConsoleMaxHeight = Screen.h*3/5.0f;
+	float ConsoleMaxHeight = Screen.h * 3 / 5.0f;
 	float ConsoleHeight;
 
-	float Progress = (TimeNow()-(m_StateChangeEnd-m_StateChangeDuration))/float(m_StateChangeDuration);
+	float Progress = (TimeNow() - (m_StateChangeEnd - m_StateChangeDuration)) / float(m_StateChangeDuration);
 
 	if(Progress >= 1.0f)
 	{
@@ -386,11 +386,11 @@ void CGameConsole::OnRender()
 	if(m_ConsoleState == CONSOLE_OPENING)
 		ConsoleHeightScale = ConsoleScaleFunc(Progress);
 	else if(m_ConsoleState == CONSOLE_CLOSING)
-		ConsoleHeightScale = ConsoleScaleFunc(1.0f-Progress);
+		ConsoleHeightScale = ConsoleScaleFunc(1.0f - Progress);
 	else //if(console_state == CONSOLE_OPEN)
 		ConsoleHeightScale = ConsoleScaleFunc(1.0f);
 
-	ConsoleHeight = ConsoleHeightScale*ConsoleMaxHeight;
+	ConsoleHeight = ConsoleHeightScale * ConsoleMaxHeight;
 
 	Graphics()->MapScreen(Screen.x, Screen.y, Screen.w, Screen.h);
 
@@ -398,10 +398,10 @@ void CGameConsole::OnRender()
 	Graphics()->TextureClear();
 	Graphics()->QuadsBegin();
 	IGraphics::CColorVertex Array[4] = {
-		IGraphics::CColorVertex(0, 0,0,0, 0.5f),
-		IGraphics::CColorVertex(1, 0,0,0, 0.5f),
-		IGraphics::CColorVertex(2, 0,0,0, 0.0f),
-		IGraphics::CColorVertex(3, 0,0,0, 0.0f)};
+		IGraphics::CColorVertex(0, 0, 0, 0, 0.5f),
+		IGraphics::CColorVertex(1, 0, 0, 0, 0.5f),
+		IGraphics::CColorVertex(2, 0, 0, 0, 0.0f),
+		IGraphics::CColorVertex(3, 0, 0, 0, 0.0f)};
 	Graphics()->SetColorVertex(Array, 4);
 	IGraphics::CQuadItem QuadItem(0, ConsoleHeight, Screen.w, 10.0f);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
@@ -410,10 +410,10 @@ void CGameConsole::OnRender()
 	// do background
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CONSOLE_BG].m_Id);
 	Graphics()->QuadsBegin();
-	Graphics()->SetColor(0.2f, 0.2f, 0.2f,0.9f);
+	Graphics()->SetColor(0.2f, 0.2f, 0.2f, 0.9f);
 	if(m_ConsoleType == CONSOLETYPE_REMOTE)
-		Graphics()->SetColor(0.4f, 0.2f, 0.2f,0.9f);
-	Graphics()->QuadsSetSubset(0,-ConsoleHeight*0.075f,Screen.w*0.075f*0.5f,0);
+		Graphics()->SetColor(0.4f, 0.2f, 0.2f, 0.9f);
+	Graphics()->QuadsSetSubset(0, -ConsoleHeight * 0.075f, Screen.w * 0.075f * 0.5f, 0);
 	QuadItem = IGraphics::CQuadItem(0, 0, Screen.w, ConsoleHeight);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
@@ -421,12 +421,12 @@ void CGameConsole::OnRender()
 	// do small bar shadow
 	Graphics()->TextureClear();
 	Graphics()->QuadsBegin();
-	Array[0] = IGraphics::CColorVertex(0, 0,0,0, 0.0f);
-	Array[1] = IGraphics::CColorVertex(1, 0,0,0, 0.0f);
-	Array[2] = IGraphics::CColorVertex(2, 0,0,0, 0.25f);
-	Array[3] = IGraphics::CColorVertex(3, 0,0,0, 0.25f);
+	Array[0] = IGraphics::CColorVertex(0, 0, 0, 0, 0.0f);
+	Array[1] = IGraphics::CColorVertex(1, 0, 0, 0, 0.0f);
+	Array[2] = IGraphics::CColorVertex(2, 0, 0, 0, 0.25f);
+	Array[3] = IGraphics::CColorVertex(3, 0, 0, 0, 0.25f);
 	Graphics()->SetColorVertex(Array, 4);
-	QuadItem = IGraphics::CQuadItem(0, ConsoleHeight-20, Screen.w, 10);
+	QuadItem = IGraphics::CQuadItem(0, ConsoleHeight - 20, Screen.w, 10);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
 
@@ -434,8 +434,8 @@ void CGameConsole::OnRender()
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CONSOLE_BAR].m_Id);
 	Graphics()->QuadsBegin();
 	Graphics()->SetColor(1.0f, 1.0f, 1.0f, 0.9f);
-	Graphics()->QuadsSetSubset(0,0.1f,Screen.w*0.015f,1-0.1f);
-	QuadItem = IGraphics::CQuadItem(0,ConsoleHeight-10.0f,Screen.w,10.0f);
+	Graphics()->QuadsSetSubset(0, 0.1f, Screen.w * 0.015f, 1 - 0.1f);
+	QuadItem = IGraphics::CQuadItem(0, ConsoleHeight - 10.0f, Screen.w, 10.0f);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
 
@@ -445,7 +445,7 @@ void CGameConsole::OnRender()
 
 	{
 		float FontSize = 10.0f;
-		float RowHeight = FontSize*1.25f;
+		float RowHeight = FontSize * 1.25f;
 		float x = 3;
 		float y = ConsoleHeight - RowHeight - 5.0f;
 
@@ -459,7 +459,7 @@ void CGameConsole::OnRender()
 
 		static CTextCursor s_InfoCursor;
 		s_InfoCursor.Reset();
-		s_InfoCursor.MoveTo(x+Info.m_Offset, y+RowHeight+2.0f);
+		s_InfoCursor.MoveTo(x + Info.m_Offset, y + RowHeight + 2.0f);
 		s_InfoCursor.m_FontSize = FontSize;
 		s_InfoCursor.m_MaxWidth = -1.0f;
 		Info.m_pCursor = &s_InfoCursor;
@@ -501,7 +501,7 @@ void CGameConsole::OnRender()
 		s_Cursor.m_MaxWidth = Screen.w - 10.0f - x;
 		TextRender()->TextDeferred(&s_Cursor, aInputString, -1);
 		int Lines = s_Cursor.LineCount();
-		
+
 		y -= (Lines - 1) * FontSize;
 		s_Cursor.MoveTo(x, y);
 
@@ -521,8 +521,7 @@ void CGameConsole::OnRender()
 		{
 			if(pConsole->m_Input.GetString()[0] != 0)
 			{
-				m_pConsole->PossibleCommands(pConsole->m_aCompletionBuffer, pConsole->m_CompletionFlagmask, m_ConsoleType != CGameConsole::CONSOLETYPE_LOCAL &&
-					Client()->RconAuthed() && Client()->UseTempRconCommands(), PossibleCommandsRenderCallback, &Info);
+				m_pConsole->PossibleCommands(pConsole->m_aCompletionBuffer, pConsole->m_CompletionFlagmask, m_ConsoleType != CGameConsole::CONSOLETYPE_LOCAL && Client()->RconAuthed() && Client()->UseTempRconCommands(), PossibleCommandsRenderCallback, &Info);
 				pConsole->m_CompletionRenderOffset = Info.m_Offset;
 
 				if(Info.m_EnumCount <= 0 && pConsole->m_IsCommand)
@@ -539,39 +538,39 @@ void CGameConsole::OnRender()
 
 		TextRender()->DrawTextOutlined(Info.m_pCursor);
 
-		TextRender()->TextColor(1,1,1,1);
+		TextRender()->TextColor(1, 1, 1, 1);
 
 		//	render log (actual page, wrap lines)
 
 		CInstance::CBacklogEntry *pEntry = pConsole->m_Backlog.Last();
 		float OffsetY = 0.0f;
 		float LineOffset = 1.0f;
-		s_Cursor.m_MaxWidth = Screen.w-10;
+		s_Cursor.m_MaxWidth = Screen.w - 10;
 		for(int Page = 0; Page <= pConsole->m_BacklogActPage; ++Page, OffsetY = 0.0f)
 		{
 			while(pEntry)
 			{
 				s_Cursor.Reset();
 				if(pEntry->m_Highlighted)
-					TextRender()->TextColor(1,0.75,0.75,1);
+					TextRender()->TextColor(1, 0.75, 0.75, 1);
 				TextRender()->TextDeferred(&s_Cursor, pEntry->m_aText, -1);
-				TextRender()->TextColor(1,1,1,1);
+				TextRender()->TextColor(1, 1, 1, 1);
 
 				// get y offset (calculate it if we haven't yet)
 				if(pEntry->m_YOffset < 0.0f)
 				{
-					pEntry->m_YOffset = s_Cursor.BaseLineY()+LineOffset;
+					pEntry->m_YOffset = s_Cursor.BaseLineY() + LineOffset;
 				}
 				OffsetY += pEntry->m_YOffset;
 
 				//	next page when lines reach the top
-				if(y-OffsetY <= RowHeight)
+				if(y - OffsetY <= RowHeight)
 					break;
 
 				//	just render output from actual backlog page (render bottom up)
 				if(Page == pConsole->m_BacklogActPage)
 				{
-					s_Cursor.MoveTo(0.0f, y-OffsetY);
+					s_Cursor.MoveTo(0.0f, y - OffsetY);
 					TextRender()->DrawTextOutlined(&s_Cursor);
 				}
 				pEntry = pConsole->m_Backlog.Prev(pEntry);
@@ -585,7 +584,7 @@ void CGameConsole::OnRender()
 				while(OffsetY > 0.0f && pEntry)
 				{
 					s_Cursor.Reset();
-					s_Cursor.MoveTo(0.0f, y-OffsetY);
+					s_Cursor.MoveTo(0.0f, y - OffsetY);
 					TextRender()->TextOutlined(&s_Cursor, pEntry->m_aText, -1);
 					OffsetY -= pEntry->m_YOffset;
 					pEntry = pConsole->m_Backlog.Next(pEntry);
@@ -598,14 +597,14 @@ void CGameConsole::OnRender()
 		s_Cursor.m_MaxWidth = -1;
 		// render page
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), Localize("-Page %d-"), pConsole->m_BacklogActPage+1);
+		str_format(aBuf, sizeof(aBuf), Localize("-Page %d-"), pConsole->m_BacklogActPage + 1);
 		s_Cursor.MoveTo(10.0f, 0.0f);
 		TextRender()->TextOutlined(&s_Cursor, aBuf, -1.0f);
 
 		// render version
 		str_format(aBuf, sizeof(aBuf), "v%s", GAME_RELEASE_VERSION);
 		s_Cursor.Reset();
-		s_Cursor.MoveTo(Screen.w-10.0f, 0.0f);
+		s_Cursor.MoveTo(Screen.w - 10.0f, 0.0f);
 		s_Cursor.m_Align = TEXTALIGN_RIGHT;
 		TextRender()->TextOutlined(&s_Cursor, aBuf, -1.0f);
 		s_Cursor.m_Align = TEXTALIGN_LEFT;
@@ -619,7 +618,7 @@ bool CGameConsole::OnInput(IInput::CEvent Event)
 	if((Event.m_Key >= KEY_F1 && Event.m_Key <= KEY_F12) || (Event.m_Key >= KEY_F13 && Event.m_Key <= KEY_F24))
 		return false;
 
-	if(Event.m_Key == KEY_ESCAPE && (Event.m_Flags&IInput::FLAG_PRESS))
+	if(Event.m_Key == KEY_ESCAPE && (Event.m_Flags & IInput::FLAG_PRESS))
 		Toggle(m_ConsoleType);
 	else
 		CurrentConsole()->OnInput(Event);
@@ -637,14 +636,14 @@ void CGameConsole::Toggle(int Type)
 	{
 		if(m_ConsoleState == CONSOLE_CLOSED || m_ConsoleState == CONSOLE_OPEN)
 		{
-			m_StateChangeEnd = TimeNow()+m_StateChangeDuration;
+			m_StateChangeEnd = TimeNow() + m_StateChangeDuration;
 		}
 		else
 		{
-			float Progress = m_StateChangeEnd-TimeNow();
-			float ReversedProgress = m_StateChangeDuration-Progress;
+			float Progress = m_StateChangeEnd - TimeNow();
+			float ReversedProgress = m_StateChangeDuration - Progress;
 
-			m_StateChangeEnd = TimeNow()+ReversedProgress;
+			m_StateChangeEnd = TimeNow() + ReversedProgress;
 		}
 
 		if(m_ConsoleState == CONSOLE_CLOSED || m_ConsoleState == CONSOLE_CLOSING)

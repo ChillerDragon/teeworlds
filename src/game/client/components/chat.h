@@ -39,7 +39,7 @@ class CChat : public CComponent
 	// chat sounds
 	enum
 	{
-		CHAT_SERVER=0,
+		CHAT_SERVER = 0,
 		CHAT_HIGHLIGHT,
 		CHAT_CLIENT,
 		CHAT_NUM,
@@ -72,7 +72,7 @@ class CChat : public CComponent
 		char m_aText[1];
 	};
 	CHistoryEntry *m_pHistoryEntry;
-	TStaticRingBuffer<CHistoryEntry, 64*1024, CRingBufferBase::FLAG_RECYCLE> m_History;
+	TStaticRingBuffer<CHistoryEntry, 64 * 1024, CRingBufferBase::FLAG_RECYCLE> m_History;
 	int m_PendingChatCounter;
 	int64 m_LastChatSend;
 	int64 m_aLastSoundPlayed[CHAT_NUM];
@@ -127,10 +127,10 @@ public:
 
 	bool IsActive() const { return m_Mode != CHAT_NONE; }
 	void AddLine(const char *pLine, int ClientID = SERVER_MSG, int Mode = CHAT_NONE, int TargetID = -1);
-	void EnableMode(int Mode, const char* pText = NULL);
+	void EnableMode(int Mode, const char *pText = NULL);
 	void Say(int Mode, const char *pLine);
 	void ClearChatBuffer();
-	const char* GetCommandName(int Mode) const;
+	const char *GetCommandName(int Mode) const;
 
 	virtual void OnInit();
 	virtual void OnReset();

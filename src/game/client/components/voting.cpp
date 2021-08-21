@@ -10,7 +10,6 @@
 #include "chat.h"
 #include "voting.h"
 
-
 void CVoting::ConVote(IConsole::IResult *pResult, void *pUserData)
 {
 	CVoting *pSelf = (CVoting *)pUserData;
@@ -67,7 +66,7 @@ void CVoting::RconRemoveVoteOption(int OptionID)
 	{
 		if(OptionID == 0)
 		{
-			char aBuf[VOTE_DESC_LENGTH+32];
+			char aBuf[VOTE_DESC_LENGTH + 32];
 			str_format(aBuf, sizeof(aBuf), "remove_vote \"%s\"", pOption->m_aDescription);
 			Client()->Rcon(aBuf);
 			break;
@@ -80,14 +79,14 @@ void CVoting::RconRemoveVoteOption(int OptionID)
 
 void CVoting::RconAddVoteOption(const char *pDescription, const char *pCommand)
 {
-	char aBuf[VOTE_DESC_LENGTH+VOTE_CMD_LENGTH+32];
+	char aBuf[VOTE_DESC_LENGTH + VOTE_CMD_LENGTH + 32];
 	str_format(aBuf, sizeof(aBuf), "add_vote \"%s\" \"%s\"", pDescription, pCommand);
 	Client()->Rcon(aBuf);
 }
 
 void CVoting::Vote(int Choice)
 {
-	CNetMsg_Cl_Vote Msg = { Choice };
+	CNetMsg_Cl_Vote Msg = {Choice};
 	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
 }
 
@@ -121,7 +120,8 @@ void CVoting::AddOption(const char *pDescription)
 		m_pFirst = pOption;
 
 	int Depth = 0;
-	for(;*pDescription == '#'; pDescription++, Depth++);
+	for(; *pDescription == '#'; pDescription++, Depth++)
+		;
 	pOption->m_Depth = Depth ? Depth : pOption->m_pPrev ? pOption->m_pPrev->m_Depth : 0;
 
 	pOption->m_IsSubheader = Depth;
@@ -161,7 +161,7 @@ void CVoting::ClearOptions()
 
 void CVoting::OnReset()
 {
-	if(Client()->State() == IClient::STATE_LOADING)	// do not reset active vote while connecting
+	if(Client()->State() == IClient::STATE_LOADING) // do not reset active vote while connecting
 		return;
 
 	Clear();
@@ -202,27 +202,27 @@ void CVoting::OnMessage(int MsgType, void *pRawMsg)
 					m_pClient->m_pChat->AddLine(aBuf);
 					break;
 				case VOTE_START_KICK:
-					{
-						char aName[4];
-						if(!Config()->m_ClShowsocial)
-							str_copy(aName, pMsg->m_pDescription, sizeof(aName));
-						str_format(aBuf, sizeof(aBuf), Localize("'%s' called for vote to kick '%s' (%s)"), aLabel, Config()->m_ClShowsocial ? pMsg->m_pDescription : aName, pMsg->m_pReason);
-						str_format(m_aDescription, sizeof(m_aDescription), "Kick '%s'", Config()->m_ClShowsocial ? pMsg->m_pDescription : aName);
-						m_pClient->m_pChat->AddLine(aBuf);
-						break;
-					}
+				{
+					char aName[4];
+					if(!Config()->m_ClShowsocial)
+						str_copy(aName, pMsg->m_pDescription, sizeof(aName));
+					str_format(aBuf, sizeof(aBuf), Localize("'%s' called for vote to kick '%s' (%s)"), aLabel, Config()->m_ClShowsocial ? pMsg->m_pDescription : aName, pMsg->m_pReason);
+					str_format(m_aDescription, sizeof(m_aDescription), "Kick '%s'", Config()->m_ClShowsocial ? pMsg->m_pDescription : aName);
+					m_pClient->m_pChat->AddLine(aBuf);
+					break;
+				}
 				case VOTE_START_SPEC:
-					{
-						char aName[4];
-						if(!Config()->m_ClShowsocial)
-							str_copy(aName, pMsg->m_pDescription, sizeof(aName));
-						str_format(aBuf, sizeof(aBuf), Localize("'%s' called for vote to move '%s' to spectators (%s)"), aLabel, Config()->m_ClShowsocial ? pMsg->m_pDescription : aName, pMsg->m_pReason);
-						str_format(m_aDescription, sizeof(m_aDescription), "Move '%s' to spectators", Config()->m_ClShowsocial ? pMsg->m_pDescription : aName);
-						m_pClient->m_pChat->AddLine(aBuf);
-					}
+				{
+					char aName[4];
+					if(!Config()->m_ClShowsocial)
+						str_copy(aName, pMsg->m_pDescription, sizeof(aName));
+					str_format(aBuf, sizeof(aBuf), Localize("'%s' called for vote to move '%s' to spectators (%s)"), aLabel, Config()->m_ClShowsocial ? pMsg->m_pDescription : aName, pMsg->m_pReason);
+					str_format(m_aDescription, sizeof(m_aDescription), "Move '%s' to spectators", Config()->m_ClShowsocial ? pMsg->m_pDescription : aName);
+					m_pClient->m_pChat->AddLine(aBuf);
+				}
 				}
 				if(pMsg->m_ClientID == m_pClient->m_LocalClientID)
-					m_CallvoteBlockTick = Client()->GameTick()+Client()->GameTickSpeed()*VOTE_COOLDOWN;
+					m_CallvoteBlockTick = Client()->GameTick() + Client()->GameTickSpeed() * VOTE_COOLDOWN;
 			}
 		}
 		else
@@ -305,13 +305,13 @@ void CVoting::OnMessage(int MsgType, void *pRawMsg)
 
 void CVoting::RenderBars(CUIRect Bars)
 {
-	RenderTools()->DrawUIRect(&Bars, vec4(0.8f,0.8f,0.8f,0.5f), CUI::CORNER_ALL, Bars.h/3);
+	RenderTools()->DrawUIRect(&Bars, vec4(0.8f, 0.8f, 0.8f, 0.5f), CUI::CORNER_ALL, Bars.h / 3);
 
 	CUIRect Splitter = Bars;
-	Splitter.x = Splitter.x+Splitter.w/2;
-	Splitter.w = Splitter.h/2.0f;
-	Splitter.x -= Splitter.w/2;
-	RenderTools()->DrawUIRect(&Splitter, vec4(0.4f,0.4f,0.4f,0.5f), CUI::CORNER_ALL, Splitter.h/4);
+	Splitter.x = Splitter.x + Splitter.w / 2;
+	Splitter.w = Splitter.h / 2.0f;
+	Splitter.x -= Splitter.w / 2;
+	RenderTools()->DrawUIRect(&Splitter, vec4(0.4f, 0.4f, 0.4f, 0.5f), CUI::CORNER_ALL, Splitter.h / 4);
 
 	if(m_Total)
 	{
@@ -319,8 +319,8 @@ void CVoting::RenderBars(CUIRect Bars)
 		if(m_Yes)
 		{
 			CUIRect YesArea = Bars;
-			YesArea.w *= m_Yes/(float)m_Total;
-			RenderTools()->DrawUIRect(&YesArea, vec4(0.2f,0.9f,0.2f,0.85f), CUI::CORNER_ALL, Bars.h/3);
+			YesArea.w *= m_Yes / (float)m_Total;
+			RenderTools()->DrawUIRect(&YesArea, vec4(0.2f, 0.9f, 0.2f, 0.85f), CUI::CORNER_ALL, Bars.h / 3);
 
 			PassArea.x += YesArea.w;
 			PassArea.w -= YesArea.w;
@@ -329,9 +329,9 @@ void CVoting::RenderBars(CUIRect Bars)
 		if(m_No)
 		{
 			CUIRect NoArea = Bars;
-			NoArea.w *= m_No/(float)m_Total;
-			NoArea.x = (Bars.x + Bars.w)-NoArea.w;
-			RenderTools()->DrawUIRect(&NoArea, vec4(0.9f,0.2f,0.2f,0.85f), CUI::CORNER_ALL, Bars.h/3);
+			NoArea.w *= m_No / (float)m_Total;
+			NoArea.x = (Bars.x + Bars.w) - NoArea.w;
+			RenderTools()->DrawUIRect(&NoArea, vec4(0.9f, 0.2f, 0.2f, 0.85f), CUI::CORNER_ALL, Bars.h / 3);
 
 			PassArea.w -= NoArea.w;
 		}

@@ -3,22 +3,21 @@
 #ifndef GAME_CLIENT_COMPONENTS_MENUS_H
 #define GAME_CLIENT_COMPONENTS_MENUS_H
 
-#include <base/vmath.h>
 #include <base/tl/sorted_array.h>
+#include <base/vmath.h>
 
-#include <engine/graphics.h>
-#include <engine/demo.h>
-#include <engine/contacts.h>
-#include <engine/serverbrowser.h>
 #include <engine/config.h>
+#include <engine/contacts.h>
+#include <engine/demo.h>
+#include <engine/graphics.h>
+#include <engine/serverbrowser.h>
 
-#include <game/voting.h>
 #include <game/client/component.h>
 #include <game/client/localization.h>
 #include <game/client/ui.h>
+#include <game/voting.h>
 
 #include "skins.h"
-
 
 // component to fetch keypresses, override all other input
 class CMenusKeyBinder : public CComponent
@@ -47,13 +46,14 @@ public:
 	}
 	int ToAbsolute(float RelativeValue, int Min, int Max)
 	{
-		return round_to_int(RelativeValue*(Max - Min) + Min + 0.1f);
+		return round_to_int(RelativeValue * (Max - Min) + Min + 0.1f);
 	}
 } LinearScrollbarScale;
 static class CLogarithmicScrollbarScale : public IScrollbarScale
 {
 private:
 	int m_MinAdjustment;
+
 public:
 	CLogarithmicScrollbarScale(int MinAdjustment)
 	{
@@ -78,7 +78,7 @@ public:
 			Max += m_MinAdjustment;
 			ResultAdjustment = -m_MinAdjustment;
 		}
-		return round_to_int(exp(RelativeValue*(log(Max) - log(Min)) + log(Min))) + ResultAdjustment;
+		return round_to_int(exp(RelativeValue * (log(Max) - log(Min)) + log(Min))) + ResultAdjustment;
 	}
 } LogarithmicScrollbarScale(25);
 
@@ -88,7 +88,7 @@ public:
 	class CUIElementBase
 	{
 	protected:
-		static CMenus *m_pMenus;	// TODO: Refactor in order to remove this reference to menus
+		static CMenus *m_pMenus; // TODO: Refactor in order to remove this reference to menus
 		static CRenderTools *m_pRenderTools;
 		static CUI *m_pUI;
 		static IInput *m_pInput;
@@ -96,15 +96,25 @@ public:
 		static CConfig *m_pConfig;
 
 	public:
-		static void Init(CMenus *pMenus) { m_pMenus = pMenus; m_pRenderTools = pMenus->RenderTools(); m_pUI = pMenus->UI(); m_pInput = pMenus->Input(); m_pClient = pMenus->Client(); m_pConfig = pMenus->Config(); }
+		static void Init(CMenus *pMenus)
+		{
+			m_pMenus = pMenus;
+			m_pRenderTools = pMenus->RenderTools();
+			m_pUI = pMenus->UI();
+			m_pInput = pMenus->Input();
+			m_pClient = pMenus->Client();
+			m_pConfig = pMenus->Config();
+		}
 	};
 
 	class CButtonContainer : public CUIElementBase
 	{
 		bool m_CleanBackground;
 		float m_FadeStartTime;
+
 	public:
-		CButtonContainer(bool CleanBackground = false) : m_FadeStartTime(0.0f) { m_CleanBackground = CleanBackground; }
+		CButtonContainer(bool CleanBackground = false) :
+			m_FadeStartTime(0.0f) { m_CleanBackground = CleanBackground; }
 		float GetFade(bool Checked = false, float Seconds = 0.6f);
 		bool IsCleanBackground() const { return m_CleanBackground; }
 	};
@@ -152,7 +162,8 @@ private:
 		vec4 m_SliderColorGrabbed;
 		int m_Flags;
 
-		enum {
+		enum
+		{
 			FLAG_CONTENT_STATIC_WIDTH = 0x1
 		};
 
@@ -217,18 +228,19 @@ private:
 		CScrollRegionParams m_Params;
 
 	public:
-		enum {
-			SCROLLHERE_KEEP_IN_VIEW=0,
+		enum
+		{
+			SCROLLHERE_KEEP_IN_VIEW = 0,
 			SCROLLHERE_TOP,
 			SCROLLHERE_BOTTOM,
 		};
 
 		CScrollRegion();
-		void Begin(CUIRect* pClipRect, vec2* pOutOffset, CScrollRegionParams* pParams = 0);
+		void Begin(CUIRect *pClipRect, vec2 *pOutOffset, CScrollRegionParams *pParams = 0);
 		void End();
 		void AddRect(CUIRect Rect);
 		void ScrollHere(int Option = CScrollRegion::SCROLLHERE_KEEP_IN_VIEW);
-		bool IsRectClipped(const CUIRect& Rect) const;
+		bool IsRectClipped(const CUIRect &Rect) const;
 		bool IsScrollbarShown() const;
 		bool IsAnimating() const;
 	};
@@ -277,7 +289,7 @@ private:
 		bool DoFilter(float FilterHeight = 20.0f, float Spacing = 2.0f);
 		void DoFooter(const char *pBottomText, float FooterHeight = 20.0f); // call before DoStart to create a footer
 		void DoStart(float RowHeight, int NumItems, int ItemsPerRow, int RowsPerScroll, int SelectedIndex,
-					const CUIRect *pRect = 0, bool Background = true, bool *pActive = 0, int BackgroundCorners = CUI::CORNER_ALL);
+			const CUIRect *pRect = 0, bool Background = true, bool *pActive = 0, int BackgroundCorners = CUI::CORNER_ALL);
 		CListboxItem DoNextItem(const void *pID, bool Selected = false, bool *pActive = 0);
 		CListboxItem DoSubheader();
 		int DoEnd();
@@ -286,10 +298,9 @@ private:
 		float GetScrollBarWidth() const { return m_ScrollRegion.IsScrollbarShown() ? 20 : 0; } // defined in menus_scrollregion.cpp
 	};
 
-
 	enum
 	{
-		POPUP_NONE=0,
+		POPUP_NONE = 0,
 		POPUP_MESSAGE, // generic message popup (one button)
 		POPUP_CONFIRM, // generic confirmation popup (two buttons)
 		POPUP_FIRST_LAUNCH,
@@ -305,7 +316,7 @@ private:
 
 	enum
 	{
-		PAGE_NEWS=0,
+		PAGE_NEWS = 0,
 		PAGE_GAME,
 		PAGE_PLAYERS,
 		PAGE_SERVER_INFO,
@@ -317,14 +328,14 @@ private:
 		PAGE_SYSTEM,
 		PAGE_START,
 
-		SETTINGS_GENERAL=0,
+		SETTINGS_GENERAL = 0,
 		SETTINGS_PLAYER,
 		SETTINGS_TBD, // TODO: replace this removed tee page
 		SETTINGS_CONTROLS,
 		SETTINGS_GRAPHICS,
 		SETTINGS_SOUND,
 
-		ACTLB_NONE=0,
+		ACTLB_NONE = 0,
 		ACTLB_LANG,
 		ACTLB_THEME,
 	};
@@ -348,7 +359,7 @@ private:
 
 	// generic popups
 	typedef void (CMenus::*FPopupButtonCallback)();
-	void DefaultButtonCallback() { /* do nothing */ };
+	void DefaultButtonCallback(){/* do nothing */};
 	enum
 	{
 		BUTTON_CONFIRM = 0, // confirm / yes / close / ok
@@ -383,14 +394,15 @@ private:
 
 	static int MenuImageScan(const char *pName, int IsDir, int DirType, void *pUser);
 
-	const CMenuImage *FindMenuImage(const char* pName);
+	const CMenuImage *FindMenuImage(const char *pName);
 
 	// themes
 	class CTheme
 	{
 	public:
 		CTheme() {}
-		CTheme(const char *n, bool HasDay, bool HasNight) : m_Name(n), m_HasDay(HasDay), m_HasNight(HasNight) {}
+		CTheme(const char *n, bool HasDay, bool HasNight) :
+			m_Name(n), m_HasDay(HasDay), m_HasNight(HasNight) {}
 
 		string m_Name;
 		bool m_HasDay;
@@ -409,11 +421,12 @@ private:
 	public:
 		enum
 		{
-			GAMEICON_SIZE=64,
-			GAMEICON_OLDHEIGHT=192,
+			GAMEICON_SIZE = 64,
+			GAMEICON_OLDHEIGHT = 192,
 		};
 		CGameIcon() {}
-		CGameIcon(const char *pName) : m_Name(pName) {}
+		CGameIcon(const char *pName) :
+			m_Name(pName) {}
 
 		string m_Name;
 		IGraphics::CTextureHandle m_IconTexture;
@@ -468,7 +481,7 @@ private:
 	// demo
 	enum
 	{
-		SORT_DEMONAME=0,
+		SORT_DEMONAME = 0,
 		SORT_LENGTH,
 		SORT_DATE,
 	};
@@ -499,11 +512,7 @@ private:
 
 		bool operator<(const CDemoItem &Other) const
 		{
-			return !str_comp(m_aFilename, "..") ? true
-				: !str_comp(Other.m_aFilename, "..") ? false
-				: m_IsDir && !Other.m_IsDir ? true
-				: !m_IsDir && Other.m_IsDir ? false
-				: str_comp_filenames(m_aFilename, Other.m_aFilename) < 0;
+			return !str_comp(m_aFilename, "..") ? true : !str_comp(Other.m_aFilename, "..") ? false : m_IsDir && !Other.m_IsDir ? true : !m_IsDir && Other.m_IsDir ? false : str_comp_filenames(m_aFilename, Other.m_aFilename) < 0;
 		}
 	};
 
@@ -554,7 +563,7 @@ private:
 
 	void DemolistOnUpdate(bool Reset);
 	void DemolistPopulate();
-	static int DemolistFetchCallback(const CFsFileInfo* pFileInfo, int IsDir, int StorageType, void *pUser);
+	static int DemolistFetchCallback(const CFsFileInfo *pFileInfo, int IsDir, int StorageType, void *pUser);
 
 	// friends
 	class CFriendItem
@@ -594,7 +603,6 @@ private:
 
 	void FriendlistOnUpdate();
 
-
 	// server browser
 	class CBrowserFilter
 	{
@@ -611,7 +619,7 @@ private:
 	public:
 		enum
 		{
-			FILTER_CUSTOM=0,
+			FILTER_CUSTOM = 0,
 			FILTER_ALL,
 			FILTER_STANDARD,
 			FILTER_FAVORITES,
@@ -622,19 +630,19 @@ private:
 		CButtonContainer m_DownButtonContainer;
 
 		CBrowserFilter() {}
-		CBrowserFilter(int Custom, const char* pName, IServerBrowser *pServerBrowser);
+		CBrowserFilter(int Custom, const char *pName, IServerBrowser *pServerBrowser);
 		void Switch();
 		bool Extended() const;
 		int Custom() const;
 		int Filter() const;
-		const char* Name() const;
+		const char *Name() const;
 
 		void SetFilterNum(int Num);
 
 		int NumSortedServers() const;
 		int NumPlayers() const;
-		const CServerInfo* SortedGet(int Index) const;
-		const void* ID(int Index) const;
+		const CServerInfo *SortedGet(int Index) const;
+		const void *ID(int Index) const;
 
 		void Reset();
 		void GetFilter(CServerFilterInfo *pFilterInfo) const;
@@ -699,7 +707,7 @@ private:
 	static CColumn ms_aBrowserCols[NUM_BROWSER_COLS];
 	static CColumn ms_aDemoCols[NUM_DEMO_COLS];
 
-	CBrowserFilter* GetSelectedBrowserFilter()
+	CBrowserFilter *GetSelectedBrowserFilter()
 	{
 		const int Tab = ServerBrowser()->GetType();
 		if(m_aSelectedFilters[Tab] == -1)
@@ -707,9 +715,9 @@ private:
 		return &m_lFilters[m_aSelectedFilters[Tab]];
 	}
 
-	const CServerInfo* GetSelectedServerInfo()
+	const CServerInfo *GetSelectedServerInfo()
 	{
-		CBrowserFilter* pSelectedFilter = GetSelectedBrowserFilter();
+		CBrowserFilter *pSelectedFilter = GetSelectedBrowserFilter();
 		if(!pSelectedFilter)
 			return 0;
 		const int Tab = ServerBrowser()->GetType();
@@ -724,12 +732,11 @@ private:
 	void ServerBrowserFilterOnUpdate();
 	void ServerBrowserSortingOnUpdate();
 
-
 	// video settings
 	bool m_CheckVideoSettings;
 	enum
 	{
-		MAX_RESOLUTIONS=256,
+		MAX_RESOLUTIONS = 256,
 	};
 	CVideoMode m_aModes[MAX_RESOLUTIONS];
 	int m_NumModes;
@@ -749,7 +756,7 @@ private:
 	void RenderNews(CUIRect MainView);
 	void RenderBackButton(CUIRect MainView);
 	inline float GetListHeaderHeight() const { return ms_ListheaderHeight + (Config()->m_UiWideview ? 3.0f : 0.0f); }
-	inline float GetListHeaderHeightFactor() const { return 1.0f + (Config()->m_UiWideview ? (3.0f/ms_ListheaderHeight) : 0.0f); }
+	inline float GetListHeaderHeightFactor() const { return 1.0f + (Config()->m_UiWideview ? (3.0f / ms_ListheaderHeight) : 0.0f); }
 	static void ConchainUpdateMusicState(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	void UpdateMusicState();
 
@@ -799,8 +806,8 @@ private:
 	void UpdateFriends();
 
 	// found in menus_settings.cpp
-	void RenderLanguageSelection(CUIRect MainView, bool Header=true);
-	void RenderThemeSelection(CUIRect MainView, bool Header=true);
+	void RenderLanguageSelection(CUIRect MainView, bool Header = true);
+	void RenderThemeSelection(CUIRect MainView, bool Header = true);
 	void RenderHSLPicker(CUIRect Picker);
 	void RenderSkinSelection(CUIRect MainView);
 	void RenderSkinPartSelection(CUIRect MainView);
@@ -821,8 +828,8 @@ private:
 	void ResetSettingsSound();
 	void PopupConfirmPlayerCountry();
 
-	bool DoResolutionList(CUIRect* pRect, CListBox* pListBox,
-						  const sorted_array<CVideoMode>& lModes);
+	bool DoResolutionList(CUIRect *pRect, CListBox *pListBox,
+		const sorted_array<CVideoMode> &lModes);
 
 	// found in menus_callback.cpp
 	float RenderSettingsControlsMouse(CUIRect View);
@@ -840,7 +847,7 @@ private:
 
 	void SetActive(bool Active);
 
-	void InvokePopupMenu(void *pID, int Flags, float X, float Y, float W, float H, int (*pfnFunc)(CMenus *pMenu, CUIRect Rect), void *pExtra=0);
+	void InvokePopupMenu(void *pID, int Flags, float X, float Y, float W, float H, int (*pfnFunc)(CMenus *pMenu, CUIRect Rect), void *pExtra = 0);
 	void DoPopupMenu();
 
 	// loading
@@ -853,6 +860,7 @@ private:
 
 	void RenderBackground(float Time);
 	void RenderBackgroundShadow(const CUIRect *pRect, bool TopToBottom, float Rounding = 5.0f);
+
 public:
 	void InitLoading(int TotalWorkAmount);
 	void RenderLoading(int WorkedAmount = 0);

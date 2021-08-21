@@ -2,12 +2,12 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/graphics.h>
 #include <engine/shared/config.h>
-#include <generated/protocol.h>
 #include <generated/client_data.h>
+#include <generated/protocol.h>
 
-#include <game/client/ui.h>
-#include <game/client/render.h>
 #include "emoticon.h"
+#include <game/client/render.h>
+#include <game/client/ui.h>
 
 CEmoticon::CEmoticon()
 {
@@ -63,11 +63,11 @@ void CEmoticon::DrawCircle(float x, float y, float r, int Segments)
 	IGraphics::CFreeformItem Array[32];
 	int NumItems = 0;
 	float FSegments = (float)Segments;
-	for(int i = 0; i < Segments; i+=2)
+	for(int i = 0; i < Segments; i += 2)
 	{
-		float a1 = i/FSegments * 2*pi;
-		float a2 = (i+1)/FSegments * 2*pi;
-		float a3 = (i+2)/FSegments * 2*pi;
+		float a1 = i / FSegments * 2 * pi;
+		float a2 = (i + 1) / FSegments * 2 * pi;
+		float a3 = (i + 2) / FSegments * 2 * pi;
 		float Ca1 = cosf(a1);
 		float Ca2 = cosf(a2);
 		float Ca3 = cosf(a3);
@@ -77,9 +77,9 @@ void CEmoticon::DrawCircle(float x, float y, float r, int Segments)
 
 		Array[NumItems++] = IGraphics::CFreeformItem(
 			x, y,
-			x+Ca1*r, y+Sa1*r,
-			x+Ca3*r, y+Sa3*r,
-			x+Ca2*r, y+Sa2*r);
+			x + Ca1 * r, y + Sa1 * r,
+			x + Ca3 * r, y + Sa3 * r,
+			x + Ca2 * r, y + Sa2 * r);
 		if(NumItems == 32)
 		{
 			m_pClient->Graphics()->QuadsDrawFreeform(Array, 32);
@@ -89,7 +89,6 @@ void CEmoticon::DrawCircle(float x, float y, float r, int Segments)
 	if(NumItems)
 		m_pClient->Graphics()->QuadsDrawFreeform(Array, NumItems);
 }
-
 
 void CEmoticon::OnRender()
 {
@@ -108,7 +107,7 @@ void CEmoticon::OnRender()
 		return;
 	}
 
-	if(m_pClient->m_Snap.m_SpecInfo.m_Active || (m_pClient->m_Snap.m_pGameData && m_pClient->m_Snap.m_pGameData->m_GameStateFlags&GAMESTATEFLAG_GAMEOVER))
+	if(m_pClient->m_Snap.m_SpecInfo.m_Active || (m_pClient->m_Snap.m_pGameData && m_pClient->m_Snap.m_pGameData->m_GameStateFlags & GAMESTATEFLAG_GAMEOVER))
 	{
 		m_Active = false;
 		m_WasActive = false;
@@ -117,15 +116,15 @@ void CEmoticon::OnRender()
 
 	m_WasActive = true;
 
-	if (length(m_SelectorMouse) > 170.0f)
+	if(length(m_SelectorMouse) > 170.0f)
 		m_SelectorMouse = normalize(m_SelectorMouse) * 170.0f;
 
-	float SelectedAngle = angle(m_SelectorMouse) + 2*pi/24;
-	if (SelectedAngle < 0)
-		SelectedAngle += 2*pi;
+	float SelectedAngle = angle(m_SelectorMouse) + 2 * pi / 24;
+	if(SelectedAngle < 0)
+		SelectedAngle += 2 * pi;
 
-	if (length(m_SelectorMouse) > 110.0f)
-		m_SelectedEmote = (int)(SelectedAngle / (2*pi) * NUM_EMOTICONS);
+	if(length(m_SelectorMouse) > 110.0f)
+		m_SelectedEmote = (int)(SelectedAngle / (2 * pi) * NUM_EMOTICONS);
 	else
 		m_SelectedEmote = -1;
 
@@ -137,18 +136,18 @@ void CEmoticon::OnRender()
 
 	Graphics()->TextureClear();
 	Graphics()->QuadsBegin();
-	Graphics()->SetColor(0,0,0,0.3f);
-	DrawCircle(Screen.w/2, Screen.h/2, 190.0f, 64);
+	Graphics()->SetColor(0, 0, 0, 0.3f);
+	DrawCircle(Screen.w / 2, Screen.h / 2, 190.0f, 64);
 	Graphics()->QuadsEnd();
 
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_EMOTICONS].m_Id);
 	Graphics()->QuadsBegin();
 
-	for (int i = 0; i < NUM_EMOTICONS; i++)
+	for(int i = 0; i < NUM_EMOTICONS; i++)
 	{
-		float Angle = 2*pi*i/NUM_EMOTICONS;
-		if (Angle > pi)
-			Angle -= 2*pi;
+		float Angle = 2 * pi * i / NUM_EMOTICONS;
+		if(Angle > pi)
+			Angle -= 2 * pi;
 
 		bool Selected = m_SelectedEmote == i;
 
@@ -157,13 +156,13 @@ void CEmoticon::OnRender()
 		float NudgeX = 150.0f * cosf(Angle);
 		float NudgeY = 150.0f * sinf(Angle);
 		RenderTools()->SelectSprite(SPRITE_OOP + i);
-		IGraphics::CQuadItem QuadItem(Screen.w/2 + NudgeX, Screen.h/2 + NudgeY, Size, Size);
+		IGraphics::CQuadItem QuadItem(Screen.w / 2 + NudgeX, Screen.h / 2 + NudgeY, Size, Size);
 		Graphics()->QuadsDraw(&QuadItem, 1);
 	}
 
 	Graphics()->QuadsEnd();
 
-	RenderTools()->RenderCursor(m_SelectorMouse.x + Screen.w/2, m_SelectorMouse.y + Screen.h/2, 24.0f);
+	RenderTools()->RenderCursor(m_SelectorMouse.x + Screen.w / 2, m_SelectorMouse.y + Screen.h / 2, 24.0f);
 }
 
 void CEmoticon::Emote(int Emoticon)

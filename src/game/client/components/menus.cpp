@@ -2,34 +2,34 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <math.h>
 
-#include <base/system.h>
 #include <base/math.h>
+#include <base/system.h>
 #include <base/vmath.h>
 
 #include <engine/config.h>
+#include <engine/contacts.h>
 #include <engine/editor.h>
 #include <engine/engine.h>
-#include <engine/contacts.h>
 #include <engine/keys.h>
 #include <engine/serverbrowser.h>
+#include <engine/shared/config.h>
 #include <engine/storage.h>
 #include <engine/textrender.h>
-#include <engine/shared/config.h>
 
 #include <game/version.h>
 #include <generated/protocol.h>
 
-#include <generated/client_data.h>
 #include <game/client/components/binds.h>
 #include <game/client/components/camera.h>
 #include <game/client/components/console.h>
 #include <game/client/components/sounds.h>
 #include <game/client/gameclient.h>
 #include <game/client/lineinput.h>
+#include <generated/client_data.h>
 #include <mastersrv/mastersrv.h>
 
-#include "maplayers.h"
 #include "countryflags.h"
+#include "maplayers.h"
 #include "menus.h"
 #include "skins.h"
 
@@ -111,7 +111,7 @@ float CMenus::CButtonContainer::GetFade(bool Checked, float Seconds)
 		return 1.0f;
 	}
 
-	return max(0.0f, m_FadeStartTime -  m_pClient->LocalTime() + Seconds)/Seconds;
+	return max(0.0f, m_FadeStartTime - m_pClient->LocalTime() + Seconds) / Seconds;
 }
 
 void CMenus::DoIcon(int ImageId, int SpriteId, const CUIRect *pRect, const vec4 *pColor)
@@ -122,7 +122,7 @@ void CMenus::DoIcon(int ImageId, int SpriteId, const CUIRect *pRect, const vec4 
 	RenderTools()->SelectSprite(SpriteId);
 	if(pColor)
 	{
-		Graphics()->SetColor(pColor->r*pColor->a, pColor->g*pColor->a, pColor->b*pColor->a, pColor->a);
+		Graphics()->SetColor(pColor->r * pColor->a, pColor->g * pColor->a, pColor->b * pColor->a, pColor->a);
 	}
 	IGraphics::CQuadItem QuadItem(pRect->x, pRect->y, pRect->w, pRect->h);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
@@ -160,13 +160,12 @@ bool CMenus::DoButton_Menu(CButtonContainer *pBC, const char *pText, bool Checke
 	if(pImageName)
 	{
 		CUIRect Image;
-		pRect->VSplitRight(pRect->h*4.0f, &Text, &Image); // always correct ratio for image
+		pRect->VSplitRight(pRect->h * 4.0f, &Text, &Image); // always correct ratio for image
 
 		// render image
 		const CMenuImage *pImage = FindMenuImage(pImageName);
 		if(pImage)
 		{
-
 			Graphics()->TextureSet(pImage->m_GreyTexture);
 			Graphics()->WrapClamp();
 			Graphics()->QuadsBegin();
@@ -180,7 +179,7 @@ bool CMenus::DoButton_Menu(CButtonContainer *pBC, const char *pText, bool Checke
 				Graphics()->TextureSet(pImage->m_OrgTexture);
 				Graphics()->WrapClamp();
 				Graphics()->QuadsBegin();
-				Graphics()->SetColor(1.0f*FadeVal, 1.0f*FadeVal, 1.0f*FadeVal, FadeVal);
+				Graphics()->SetColor(1.0f * FadeVal, 1.0f * FadeVal, 1.0f * FadeVal, FadeVal);
 				Graphics()->QuadsDrawTL(&QuadItem, 1);
 				Graphics()->QuadsEnd();
 			}
@@ -189,13 +188,13 @@ bool CMenus::DoButton_Menu(CButtonContainer *pBC, const char *pText, bool Checke
 	}
 
 	Text.HMargin(pRect->h >= 20.0f ? 2.0f : 1.0f, &Text);
-	Text.HMargin((Text.h*FontFactor)/2.0f, &Text);
+	Text.HMargin((Text.h * FontFactor) / 2.0f, &Text);
 	if(TextFade)
 	{
-		TextRender()->TextColor(1.0f-FadeVal, 1.0f-FadeVal, 1.0f-FadeVal, 1.0f);
-		TextRender()->TextSecondaryColor(0.0f+FadeVal, 0.0f+FadeVal, 0.0f+FadeVal, 0.25f);
+		TextRender()->TextColor(1.0f - FadeVal, 1.0f - FadeVal, 1.0f - FadeVal, 1.0f);
+		TextRender()->TextSecondaryColor(0.0f + FadeVal, 0.0f + FadeVal, 0.0f + FadeVal, 0.25f);
 	}
-	UI()->DoLabel(&Text, pText, Text.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
+	UI()->DoLabel(&Text, pText, Text.h * ms_FontmodHeight, CUI::ALIGN_CENTER);
 	if(TextFade)
 	{
 		TextRender()->TextColor(CUI::ms_DefaultTextColor);
@@ -208,13 +207,13 @@ void CMenus::DoButton_KeySelect(CButtonContainer *pBC, const char *pText, const 
 {
 	const float FadeVal = pBC->GetFade();
 
-	RenderTools()->DrawUIRect(pRect, vec4(0.0f+FadeVal, 0.0f+FadeVal, 0.0f+FadeVal, 0.25f+FadeVal*0.5f), CUI::CORNER_ALL, 5.0f);
+	RenderTools()->DrawUIRect(pRect, vec4(0.0f + FadeVal, 0.0f + FadeVal, 0.0f + FadeVal, 0.25f + FadeVal * 0.5f), CUI::CORNER_ALL, 5.0f);
 
 	CUIRect Label;
 	pRect->HMargin(1.0f, &Label);
-	TextRender()->TextColor(1.0f-FadeVal, 1.0f-FadeVal, 1.0f-FadeVal, 1.0f);
-	TextRender()->TextSecondaryColor(0.0f+FadeVal, 0.0f+FadeVal, 0.0f+FadeVal, 0.25f);
-	UI()->DoLabel(&Label, pText, Label.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
+	TextRender()->TextColor(1.0f - FadeVal, 1.0f - FadeVal, 1.0f - FadeVal, 1.0f);
+	TextRender()->TextSecondaryColor(0.0f + FadeVal, 0.0f + FadeVal, 0.0f + FadeVal, 0.25f);
+	UI()->DoLabel(&Label, pText, Label.h * ms_FontmodHeight, CUI::ALIGN_CENTER);
 	TextRender()->TextColor(CUI::ms_DefaultTextColor);
 	TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 }
@@ -222,16 +221,16 @@ void CMenus::DoButton_KeySelect(CButtonContainer *pBC, const char *pText, const 
 bool CMenus::DoButton_MenuTabTop(CButtonContainer *pBC, const char *pText, bool Checked, const CUIRect *pRect, float Alpha, float FontAlpha, int Corners, float Rounding, float FontFactor)
 {
 	const float ActualAlpha = UI()->MouseHovered(pRect) ? 1.0f : Alpha;
-	const float FadeVal = pBC->GetFade(Checked)*FontAlpha;
+	const float FadeVal = pBC->GetFade(Checked) * FontAlpha;
 
-	RenderTools()->DrawUIRect(pRect, vec4(0.0f+FadeVal, 0.0f+FadeVal, 0.0f+FadeVal, Config()->m_ClMenuAlpha/100.0f*ActualAlpha+FadeVal*0.5f), Corners, Rounding);
+	RenderTools()->DrawUIRect(pRect, vec4(0.0f + FadeVal, 0.0f + FadeVal, 0.0f + FadeVal, Config()->m_ClMenuAlpha / 100.0f * ActualAlpha + FadeVal * 0.5f), Corners, Rounding);
 
 	CUIRect Label;
 	pRect->HMargin(pRect->h >= 20.0f ? 2.0f : 1.0f, &Label);
-	Label.HMargin((Label.h*FontFactor)/2.0f, &Label);
-	TextRender()->TextColor(1.0f-FadeVal, 1.0f-FadeVal, 1.0f-FadeVal, FontAlpha);
-	TextRender()->TextSecondaryColor(0.0f+FadeVal, 0.0f+FadeVal, 0.0f+FadeVal, 0.25f*FontAlpha);
-	UI()->DoLabel(&Label, pText, Label.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
+	Label.HMargin((Label.h * FontFactor) / 2.0f, &Label);
+	TextRender()->TextColor(1.0f - FadeVal, 1.0f - FadeVal, 1.0f - FadeVal, FontAlpha);
+	TextRender()->TextSecondaryColor(0.0f + FadeVal, 0.0f + FadeVal, 0.0f + FadeVal, 0.25f * FontAlpha);
+	UI()->DoLabel(&Label, pText, Label.h * ms_FontmodHeight, CUI::ALIGN_CENTER);
 	TextRender()->TextColor(CUI::ms_DefaultTextColor);
 	TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 	return UI()->DoButtonLogic(pBC, pRect);
@@ -253,7 +252,7 @@ bool CMenus::DoButton_GridHeader(const void *pID, const char *pText, bool Checke
 	CUIRect Label;
 	pRect->VMargin(2.0f, &Label);
 	Label.y += 2.0f;
-	UI()->DoLabel(&Label, pText, Label.h*ms_FontmodHeight*0.8f, Align);
+	UI()->DoLabel(&Label, pText, Label.h * ms_FontmodHeight * 0.8f, Align);
 
 	if(Checked)
 	{
@@ -296,7 +295,7 @@ bool CMenus::DoButton_CheckBox(const void *pID, const char *pText, bool Checked,
 	Graphics()->QuadsEnd();
 
 	Label.y += 1.0f; // lame fix
-	UI()->DoLabel(&Label, pText, Label.h*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
+	UI()->DoLabel(&Label, pText, Label.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);
 
 	if(Locked)
 	{
@@ -381,15 +380,15 @@ bool CMenus::DoEditBoxUTF8(void *pID, const CUIRect *pRect, char *pStr, unsigned
 		else if(s_DoScroll)
 		{
 			// do scrolling
-			if(UI()->MouseX() < pRect->x && s_ScrollStart-UI()->MouseX() > 10.0f)
+			if(UI()->MouseX() < pRect->x && s_ScrollStart - UI()->MouseX() > 10.0f)
 			{
-				s_AtIndex = max(0, s_AtIndex-1);
+				s_AtIndex = max(0, s_AtIndex - 1);
 				s_ScrollStart = UI()->MouseX();
 				UpdateOffset = true;
 			}
-			else if(UI()->MouseX() > pRect->x+pRect->w && UI()->MouseX()-s_ScrollStart > 10.0f)
+			else if(UI()->MouseX() > pRect->x + pRect->w && UI()->MouseX() - s_ScrollStart > 10.0f)
 			{
-				s_AtIndex = min(Len, s_AtIndex+1);
+				s_AtIndex = min(Len, s_AtIndex + 1);
 				s_ScrollStart = UI()->MouseX();
 				UpdateOffset = true;
 			}
@@ -428,7 +427,7 @@ bool CMenus::DoEditBoxUTF8(void *pID, const CUIRect *pRect, char *pStr, unsigned
 	{
 		if(UI()->MouseButton(0))
 		{
-			if (UI()->LastActiveItem() != pID)
+			if(UI()->LastActiveItem() != pID)
 				JustGotActive = true;
 			UI()->SetActiveItem(pID);
 		}
@@ -455,7 +454,7 @@ bool CMenus::DoEditBoxUTF8(void *pID, const CUIRect *pRect, char *pStr, unsigned
 	{
 		unsigned s = str_length(pStr);
 		if(s >= sizeof(aStars))
-			s = sizeof(aStars)-1;
+			s = sizeof(aStars) - 1;
 		for(unsigned int i = 0; i < s; ++i)
 			aStars[i] = '*';
 		aStars[s] = 0;
@@ -466,24 +465,22 @@ bool CMenus::DoEditBoxUTF8(void *pID, const CUIRect *pRect, char *pStr, unsigned
 	if(UI()->LastActiveItem() == pID && !JustGotActive && (UpdateOffset || Input()->NumEvents()))
 	{
 		float w = TextRender()->TextWidth(FontSize, pDisplayStr, s_AtIndex);
-		if(w-*pOffset > Textbox.w)
+		if(w - *pOffset > Textbox.w)
 		{
 			// move to the left
 			float wt = TextRender()->TextWidth(FontSize, pDisplayStr, -1);
 			do
 			{
-				*pOffset += min(wt-*pOffset-Textbox.w, Textbox.w/3);
-			}
-			while(w-*pOffset > Textbox.w);
+				*pOffset += min(wt - *pOffset - Textbox.w, Textbox.w / 3);
+			} while(w - *pOffset > Textbox.w);
 		}
-		else if(w-*pOffset < 0.0f)
+		else if(w - *pOffset < 0.0f)
 		{
 			// move to the right
 			do
 			{
-				*pOffset = max(0.0f, *pOffset-Textbox.w/3);
-			}
-			while(w-*pOffset < 0.0f);
+				*pOffset = max(0.0f, *pOffset - Textbox.w / 3);
+			} while(w - *pOffset < 0.0f);
 		}
 	}
 	UI()->ClipEnable(pRect);
@@ -497,12 +494,12 @@ bool CMenus::DoEditBoxUTF8(void *pID, const CUIRect *pRect, char *pStr, unsigned
 		// set cursor active
 		m_CursorActive = true;
 
-		if((2*time_get()/time_freq()) % 2)	// make it blink
+		if((2 * time_get() / time_freq()) % 2) // make it blink
 		{
 			float TextWidth = TextRender()->TextWidth(FontSize, pDisplayStr, s_AtIndex);
 			Textbox = *pRect;
 			Textbox.VSplitLeft(2.0f, 0, &Textbox);
-			Textbox.x += TextWidth - *pOffset - TextRender()->TextWidth(FontSize, "|", -1)/2;
+			Textbox.x += TextWidth - *pOffset - TextRender()->TextWidth(FontSize, "|", -1) / 2;
 			UI()->DoLabel(&Textbox, "|", FontSize, CUI::ALIGN_LEFT);
 		}
 	}
@@ -526,9 +523,9 @@ void CMenus::DoEditBoxOptionUTF8(void *pID, char *pOption, unsigned OptionSize, 
 	char aBuf[32];
 	str_format(aBuf, sizeof(aBuf), "%s:", pStr);
 	Label.y += 2.0f;
-	UI()->DoLabel(&Label, aBuf, pRect->h*ms_FontmodHeight*0.8f, CUI::ALIGN_CENTER);
+	UI()->DoLabel(&Label, aBuf, pRect->h * ms_FontmodHeight * 0.8f, CUI::ALIGN_CENTER);
 
-	DoEditBoxUTF8(pID, &EditBox, pOption, OptionSize, OptionMaxLength, pRect->h*ms_FontmodHeight*0.8f, pOffset, Hidden);
+	DoEditBoxUTF8(pID, &EditBox, pOption, OptionSize, OptionMaxLength, pRect->h * ms_FontmodHeight * 0.8f, pOffset, Hidden);
 }
 
 void CMenus::DoScrollbarOption(void *pID, int *pOption, const CUIRect *pRect, const char *pStr, int Min, int Max, IScrollbarScale *pScale, bool Infinite)
@@ -550,14 +547,14 @@ void CMenus::DoScrollbarOption(void *pID, int *pOption, const CUIRect *pRect, co
 	else
 		str_format(aBuf, sizeof(aBuf), "%s: \xe2\x88\x9e", pStr);
 
-	float FontSize = pRect->h*ms_FontmodHeight*0.8f;
+	float FontSize = pRect->h * ms_FontmodHeight * 0.8f;
 	float VSplitVal = max(TextRender()->TextWidth(FontSize, aBuf, -1), TextRender()->TextWidth(FontSize, aBufMax, -1));
 
 	RenderTools()->DrawUIRect(pRect, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
 
 	CUIRect Label, ScrollBar;
-	pRect->VSplitLeft(pRect->h+10.0f+VSplitVal, &Label, &ScrollBar);
-	Label.VSplitLeft(Label.h+5.0f, 0, &Label);
+	pRect->VSplitLeft(pRect->h + 10.0f + VSplitVal, &Label, &ScrollBar);
+	Label.VSplitLeft(Label.h + 5.0f, 0, &Label);
 	Label.y += 2.0f;
 	UI()->DoLabel(&Label, aBuf, FontSize, CUI::ALIGN_LEFT);
 
@@ -569,7 +566,7 @@ void CMenus::DoScrollbarOption(void *pID, int *pOption, const CUIRect *pRect, co
 	*pOption = Value;
 }
 
-void CMenus::DoScrollbarOptionLabeled(void *pID, int *pOption, const CUIRect *pRect, const char *pStr, const char* aLabels[], int Num, IScrollbarScale *pScale)
+void CMenus::DoScrollbarOptionLabeled(void *pID, int *pOption, const CUIRect *pRect, const char *pStr, const char *aLabels[], int Num, IScrollbarScale *pScale)
 {
 	int Value = clamp(*pOption, 0, Num - 1);
 	const int Max = Num - 1;
@@ -577,12 +574,12 @@ void CMenus::DoScrollbarOptionLabeled(void *pID, int *pOption, const CUIRect *pR
 	char aBuf[128];
 	str_format(aBuf, sizeof(aBuf), "%s: %s", pStr, aLabels[Value]);
 
-	float FontSize = pRect->h*ms_FontmodHeight*0.8f;
+	float FontSize = pRect->h * ms_FontmodHeight * 0.8f;
 
 	RenderTools()->DrawUIRect(pRect, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
 
 	CUIRect Label, ScrollBar;
-	pRect->VSplitLeft(pRect->h+5.0f, 0, &Label);
+	pRect->VSplitLeft(pRect->h + 5.0f, 0, &Label);
 	Label.VSplitRight(60.0f, &Label, &ScrollBar);
 	Label.y += 2.0f;
 	UI()->DoLabel(&Label, aBuf, FontSize, CUI::ALIGN_LEFT);
@@ -625,7 +622,7 @@ float CMenus::DoIndependentDropdownMenu(void *pID, const CUIRect *pRect, const c
 	// label
 	Label = Header;
 	Label.y += 2.0f;
-	UI()->DoLabel(&Label, pStr, Header.h*ms_FontmodHeight*0.8f, CUI::ALIGN_CENTER);
+	UI()->DoLabel(&Label, pStr, Header.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_CENTER);
 
 	if(UI()->DoButtonLogic(pID, &Header))
 		*pActive ^= 1;
@@ -649,18 +646,18 @@ void CMenus::DoInfoBox(const CUIRect *pRect, const char *pLabel, const char *pVa
 	char aBuf[32];
 	str_format(aBuf, sizeof(aBuf), "%s:", pLabel);
 	Label.y += 2.0f;
-	UI()->DoLabel(&Label, aBuf, pRect->h*ms_FontmodHeight*0.8f, CUI::ALIGN_CENTER);
+	UI()->DoLabel(&Label, aBuf, pRect->h * ms_FontmodHeight * 0.8f, CUI::ALIGN_CENTER);
 
 	Value.y += 2.0f;
-	UI()->DoLabel(&Value, pValue, pRect->h*ms_FontmodHeight*0.8f, CUI::ALIGN_CENTER);
+	UI()->DoLabel(&Value, pValue, pRect->h * ms_FontmodHeight * 0.8f, CUI::ALIGN_CENTER);
 }
 
 float CMenus::DoScrollbarV(const void *pID, const CUIRect *pRect, float Current)
 {
 	// layout
 	CUIRect Handle;
-	pRect->HSplitTop(min(pRect->h/8.0f, 33.0f), &Handle, 0);
-	Handle.y += (pRect->h-Handle.h)*Current;
+	pRect->HSplitTop(min(pRect->h / 8.0f, 33.0f), &Handle, 0);
+	Handle.y += (pRect->h - Handle.h) * Current;
 	Handle.VMargin(5.0f, &Handle);
 
 	CUIRect Rail;
@@ -684,7 +681,7 @@ float CMenus::DoScrollbarV(const void *pID, const CUIRect *pRect, float Current)
 	{
 		if(UI()->MouseButton(0))
 		{
-			s_OffsetY = UI()->MouseY()-Handle.y;
+			s_OffsetY = UI()->MouseY() - Handle.y;
 			UI()->SetActiveItem(pID);
 			Grabbed = true;
 		}
@@ -704,13 +701,13 @@ float CMenus::DoScrollbarV(const void *pID, const CUIRect *pRect, float Current)
 	if(Grabbed)
 	{
 		const float Min = pRect->y;
-		const float Max = pRect->h-Handle.h;
-		const float Cur = UI()->MouseY()-s_OffsetY;
-		ReturnValue = clamp((Cur-Min)/Max, 0.0f, 1.0f);
+		const float Max = pRect->h - Handle.h;
+		const float Cur = UI()->MouseY() - s_OffsetY;
+		ReturnValue = clamp((Cur - Min) / Max, 0.0f, 1.0f);
 	}
 
 	// render
-	RenderTools()->DrawRoundRect(&Rail, vec4(1.0f, 1.0f, 1.0f, 0.25f), Rail.w/2.0f);
+	RenderTools()->DrawRoundRect(&Rail, vec4(1.0f, 1.0f, 1.0f, 0.25f), Rail.w / 2.0f);
 
 	vec4 Color;
 	if(Grabbed)
@@ -719,7 +716,7 @@ float CMenus::DoScrollbarV(const void *pID, const CUIRect *pRect, float Current)
 		Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	else
 		Color = vec4(0.8f, 0.8f, 0.8f, 1.0f);
-	RenderTools()->DrawRoundRect(&Handle, Color, Handle.w/2.0f);
+	RenderTools()->DrawRoundRect(&Handle, Color, Handle.w / 2.0f);
 
 	return ReturnValue;
 }
@@ -728,8 +725,8 @@ float CMenus::DoScrollbarH(const void *pID, const CUIRect *pRect, float Current)
 {
 	// layout
 	CUIRect Handle;
-	pRect->VSplitLeft(max(min(pRect->w/8.0f, 33.0f), pRect->h), &Handle, 0);
-	Handle.x += (pRect->w-Handle.w)*clamp(Current, 0.0f, 1.0f);
+	pRect->VSplitLeft(max(min(pRect->w / 8.0f, 33.0f), pRect->h), &Handle, 0);
+	Handle.x += (pRect->w - Handle.w) * clamp(Current, 0.0f, 1.0f);
 	Handle.HMargin(5.0f, &Handle);
 
 	CUIRect Rail;
@@ -753,7 +750,7 @@ float CMenus::DoScrollbarH(const void *pID, const CUIRect *pRect, float Current)
 	{
 		if(UI()->MouseButton(0))
 		{
-			s_OffsetX = UI()->MouseX()-Handle.x;
+			s_OffsetX = UI()->MouseX() - Handle.x;
 			UI()->SetActiveItem(pID);
 			Grabbed = true;
 		}
@@ -773,13 +770,13 @@ float CMenus::DoScrollbarH(const void *pID, const CUIRect *pRect, float Current)
 	if(Grabbed)
 	{
 		const float Min = pRect->x;
-		const float Max = pRect->w-Handle.w;
-		const float Cur = UI()->MouseX()-s_OffsetX;
-		ReturnValue = clamp((Cur-Min)/Max, 0.0f, 1.0f);
+		const float Max = pRect->w - Handle.w;
+		const float Cur = UI()->MouseX() - s_OffsetX;
+		ReturnValue = clamp((Cur - Min) / Max, 0.0f, 1.0f);
 	}
 
 	// render
-	RenderTools()->DrawRoundRect(&Rail, vec4(1.0f, 1.0f, 1.0f, 0.25f), Rail.h/2.0f);
+	RenderTools()->DrawRoundRect(&Rail, vec4(1.0f, 1.0f, 1.0f, 0.25f), Rail.h / 2.0f);
 
 	vec4 Color;
 	if(Grabbed)
@@ -788,7 +785,7 @@ float CMenus::DoScrollbarH(const void *pID, const CUIRect *pRect, float Current)
 		Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	else
 		Color = vec4(0.8f, 0.8f, 0.8f, 1.0f);
-	RenderTools()->DrawRoundRect(&Handle, Color, Handle.h/2.0f);
+	RenderTools()->DrawRoundRect(&Handle, Color, Handle.h / 2.0f);
 
 	return ReturnValue;
 }
@@ -798,26 +795,26 @@ void CMenus::DoJoystickBar(const CUIRect *pRect, float Current, float Tolerance,
 	CUIRect Handle;
 	pRect->VSplitLeft(7, &Handle, 0); // Slider size
 
-	Handle.x += (pRect->w-Handle.w)*Current;
+	Handle.x += (pRect->w - Handle.w) * Current;
 
 	// render
 	CUIRect Rail;
 	pRect->HMargin(4.0f, &Rail);
-	RenderTools()->DrawUIRect(&Rail, vec4(1.0f, 1.0f, 1.0f, Active ? 0.25f : 0.125f), CUI::CORNER_ALL, Rail.h/2.0f);
+	RenderTools()->DrawUIRect(&Rail, vec4(1.0f, 1.0f, 1.0f, Active ? 0.25f : 0.125f), CUI::CORNER_ALL, Rail.h / 2.0f);
 
 	CUIRect ToleranceArea = Rail;
 	ToleranceArea.w *= Tolerance;
-	ToleranceArea.x += (Rail.w-ToleranceArea.w)/2.0f;
+	ToleranceArea.x += (Rail.w - ToleranceArea.w) / 2.0f;
 	vec4 ToleranceColor = Active ? vec4(0.8f, 0.35f, 0.35f, 1.0f) : vec4(0.7f, 0.5f, 0.5f, 1.0f);
-	RenderTools()->DrawUIRect(&ToleranceArea, ToleranceColor, CUI::CORNER_ALL, ToleranceArea.h/2.0f);
+	RenderTools()->DrawUIRect(&ToleranceArea, ToleranceColor, CUI::CORNER_ALL, ToleranceArea.h / 2.0f);
 
 	CUIRect Slider = Handle;
 	Slider.HMargin(4.0f, &Slider);
 	vec4 SliderColor = Active ? vec4(0.95f, 0.95f, 0.95f, 1.0f) : vec4(0.8f, 0.8f, 0.8f, 1.0f);
-	RenderTools()->DrawUIRect(&Slider, SliderColor, CUI::CORNER_ALL, Slider.h/2.0f);
+	RenderTools()->DrawUIRect(&Slider, SliderColor, CUI::CORNER_ALL, Slider.h / 2.0f);
 }
 
-int CMenus::DoKeyReader(CButtonContainer *pBC, const CUIRect *pRect, int Key, int Modifier, int* pNewModifier)
+int CMenus::DoKeyReader(CButtonContainer *pBC, const CUIRect *pRect, int Key, int Modifier, int *pNewModifier)
 {
 	// process
 	static const void *s_pGrabbedID = 0;
@@ -913,15 +910,15 @@ void CMenus::RenderMenubar(CUIRect Rect)
 	{
 		int NumButtons = 6;
 		float Spacing = 3.0f;
-		float ButtonWidth = (Box.w/NumButtons)-(Spacing*(NumButtons-1))/NumButtons;
+		float ButtonWidth = (Box.w / NumButtons) - (Spacing * (NumButtons - 1)) / NumButtons;
 		float Alpha = 1.0f;
 		if(m_GamePage == PAGE_SETTINGS)
 			Alpha = InactiveAlpha;
 
 		// render header backgrounds
 		CUIRect Left, Right;
-		Box.VSplitLeft(ButtonWidth*4.0f + Spacing*3.0f, &Left, 0);
-		Box.VSplitRight(ButtonWidth*1.5f + Spacing, 0, &Right);
+		Box.VSplitLeft(ButtonWidth * 4.0f + Spacing * 3.0f, &Left, 0);
+		Box.VSplitRight(ButtonWidth * 1.5f + Spacing, 0, &Right);
 		RenderBackgroundShadow(&Left, false);
 		RenderBackgroundShadow(&Right, false);
 
@@ -957,10 +954,11 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			NewPage = PAGE_SETTINGS;
 
 		Right.VSplitRight(Spacing, &Right, 0); // little space
-		Right.VSplitRight(ButtonWidth/2.0f, &Right, &Button);
+		Right.VSplitRight(ButtonWidth / 2.0f, &Right, &Button);
 		static CButtonContainer s_ServerBrowserButton;
 		if(DoButton_SpriteID(&s_ServerBrowserButton, IMAGE_BROWSER, UI()->MouseHovered(&Button) || m_GamePage == PAGE_INTERNET || m_GamePage == PAGE_LAN ? SPRITE_BROWSER_B : SPRITE_BROWSER_A,
-			m_GamePage == PAGE_INTERNET || m_GamePage == PAGE_LAN, &Button) || CheckHotKey(KEY_B))
+			   m_GamePage == PAGE_INTERNET || m_GamePage == PAGE_LAN, &Button) ||
+			CheckHotKey(KEY_B))
 		{
 			NewPage = ServerBrowser()->GetType() == IServerBrowser::TYPE_INTERNET ? PAGE_INTERNET : PAGE_LAN;
 		}
@@ -973,7 +971,7 @@ void CMenus::RenderMenubar(CUIRect Rect)
 	{
 		int NumButtons = 5;
 		float Spacing = 3.0f;
-		float ButtonWidth = (Box.w/NumButtons)-(Spacing*(NumButtons-1))/NumButtons;
+		float ButtonWidth = (Box.w / NumButtons) - (Spacing * (NumButtons - 1)) / NumButtons;
 		float NotActiveAlpha = Client()->State() == IClient::STATE_ONLINE ? 0.5f : 1.0f;
 		int Corners = Client()->State() == IClient::STATE_ONLINE ? CUI::CORNER_T : CUI::CORNER_ALL;
 
@@ -985,8 +983,8 @@ void CMenus::RenderMenubar(CUIRect Rect)
 
 		Box.VSplitLeft(ButtonWidth, &Button, &Box);
 		static CButtonContainer s_GeneralButton;
-		if(DoButton_MenuTabTop(&s_GeneralButton, Localize("General"), Client()->State() == IClient::STATE_OFFLINE && Config()->m_UiSettingsPage==SETTINGS_GENERAL, &Button,
-			Config()->m_UiSettingsPage == SETTINGS_GENERAL ? 1.0f : NotActiveAlpha, 1.0f, Corners))
+		if(DoButton_MenuTabTop(&s_GeneralButton, Localize("General"), Client()->State() == IClient::STATE_OFFLINE && Config()->m_UiSettingsPage == SETTINGS_GENERAL, &Button,
+			   Config()->m_UiSettingsPage == SETTINGS_GENERAL ? 1.0f : NotActiveAlpha, 1.0f, Corners))
 		{
 			m_pClient->m_pCamera->ChangePosition(CCamera::POS_SETTINGS_GENERAL);
 			Config()->m_UiSettingsPage = SETTINGS_GENERAL;
@@ -997,13 +995,12 @@ void CMenus::RenderMenubar(CUIRect Rect)
 		{
 			static CButtonContainer s_PlayerButton;
 			if(DoButton_MenuTabTop(&s_PlayerButton, Localize("Player"), Client()->State() == IClient::STATE_OFFLINE && Config()->m_UiSettingsPage == SETTINGS_PLAYER, &Button,
-				Config()->m_UiSettingsPage == SETTINGS_PLAYER ? 1.0f : NotActiveAlpha, 1.0f, Corners))
+				   Config()->m_UiSettingsPage == SETTINGS_PLAYER ? 1.0f : NotActiveAlpha, 1.0f, Corners))
 			{
 				m_pClient->m_pCamera->ChangePosition(CCamera::POS_SETTINGS_PLAYER);
 				Config()->m_UiSettingsPage = SETTINGS_PLAYER;
 			}
 		}
-
 
 		// TODO: replace tee page to something else
 		// Box.VSplitLeft(Spacing, 0, &Box); // little space
@@ -1021,8 +1018,8 @@ void CMenus::RenderMenubar(CUIRect Rect)
 		Box.VSplitLeft(Spacing, 0, &Box); // little space
 		Box.VSplitLeft(ButtonWidth, &Button, &Box);
 		static CButtonContainer s_ControlsButton;
-		if(DoButton_MenuTabTop(&s_ControlsButton, Localize("Controls"), Client()->State() == IClient::STATE_OFFLINE && Config()->m_UiSettingsPage==SETTINGS_CONTROLS, &Button,
-			Config()->m_UiSettingsPage == SETTINGS_CONTROLS ? 1.0f : NotActiveAlpha, 1.0f, Corners))
+		if(DoButton_MenuTabTop(&s_ControlsButton, Localize("Controls"), Client()->State() == IClient::STATE_OFFLINE && Config()->m_UiSettingsPage == SETTINGS_CONTROLS, &Button,
+			   Config()->m_UiSettingsPage == SETTINGS_CONTROLS ? 1.0f : NotActiveAlpha, 1.0f, Corners))
 		{
 			m_pClient->m_pCamera->ChangePosition(CCamera::POS_SETTINGS_CONTROLS);
 			Config()->m_UiSettingsPage = SETTINGS_CONTROLS;
@@ -1031,8 +1028,8 @@ void CMenus::RenderMenubar(CUIRect Rect)
 		Box.VSplitLeft(Spacing, 0, &Box); // little space
 		Box.VSplitLeft(ButtonWidth, &Button, &Box);
 		static CButtonContainer s_GraphicsButton;
-		if(DoButton_MenuTabTop(&s_GraphicsButton, Localize("Graphics"), Client()->State() == IClient::STATE_OFFLINE && Config()->m_UiSettingsPage==SETTINGS_GRAPHICS, &Button,
-			Config()->m_UiSettingsPage == SETTINGS_GRAPHICS ? 1.0f : NotActiveAlpha, 1.0f, Corners))
+		if(DoButton_MenuTabTop(&s_GraphicsButton, Localize("Graphics"), Client()->State() == IClient::STATE_OFFLINE && Config()->m_UiSettingsPage == SETTINGS_GRAPHICS, &Button,
+			   Config()->m_UiSettingsPage == SETTINGS_GRAPHICS ? 1.0f : NotActiveAlpha, 1.0f, Corners))
 		{
 			m_pClient->m_pCamera->ChangePosition(CCamera::POS_SETTINGS_GRAPHICS);
 			Config()->m_UiSettingsPage = SETTINGS_GRAPHICS;
@@ -1041,8 +1038,8 @@ void CMenus::RenderMenubar(CUIRect Rect)
 		Box.VSplitLeft(Spacing, 0, &Box); // little space
 		Box.VSplitLeft(ButtonWidth, &Button, &Box);
 		static CButtonContainer s_SoundButton;
-		if(DoButton_MenuTabTop(&s_SoundButton, Localize("Sound"), Client()->State() == IClient::STATE_OFFLINE && Config()->m_UiSettingsPage==SETTINGS_SOUND, &Button,
-			Config()->m_UiSettingsPage == SETTINGS_SOUND ? 1.0f : NotActiveAlpha, 1.0f, Corners))
+		if(DoButton_MenuTabTop(&s_SoundButton, Localize("Sound"), Client()->State() == IClient::STATE_OFFLINE && Config()->m_UiSettingsPage == SETTINGS_SOUND, &Button,
+			   Config()->m_UiSettingsPage == SETTINGS_SOUND ? 1.0f : NotActiveAlpha, 1.0f, Corners))
 		{
 			m_pClient->m_pCamera->ChangePosition(CCamera::POS_SETTINGS_SOUND);
 			Config()->m_UiSettingsPage = SETTINGS_SOUND;
@@ -1051,12 +1048,12 @@ void CMenus::RenderMenubar(CUIRect Rect)
 	else if((Client()->State() == IClient::STATE_OFFLINE && m_MenuPage >= PAGE_INTERNET && m_MenuPage <= PAGE_LAN) || (Client()->State() == IClient::STATE_ONLINE && m_GamePage >= PAGE_INTERNET && m_GamePage <= PAGE_LAN))
 	{
 		float Spacing = 3.0f;
-		float ButtonWidth = (Box.w/6.0f)-(Spacing*5.0)/6.0f;
+		float ButtonWidth = (Box.w / 6.0f) - (Spacing * 5.0) / 6.0f;
 		int Corners = Client()->State() == IClient::STATE_ONLINE ? CUI::CORNER_T : CUI::CORNER_ALL;
 		float NotActiveAlpha = Client()->State() == IClient::STATE_ONLINE ? 0.5f : 1.0f;
 
 		CUIRect Left;
-		Box.VSplitLeft(ButtonWidth*2.0f+Spacing, &Left, 0);
+		Box.VSplitLeft(ButtonWidth * 2.0f + Spacing, &Left, 0);
 
 		// render header backgrounds
 		if(Client()->State() == IClient::STATE_OFFLINE)
@@ -1066,8 +1063,9 @@ void CMenus::RenderMenubar(CUIRect Rect)
 
 		Left.VSplitLeft(ButtonWidth, &Button, &Left);
 		static CButtonContainer s_InternetButton;
-		if(DoButton_MenuTabTop(&s_InternetButton, Localize("Global"), m_ActivePage==PAGE_INTERNET && Client()->State() == IClient::STATE_OFFLINE, &Button,
-			m_ActivePage==PAGE_INTERNET ? 1.0f : NotActiveAlpha, 1.0f, Corners) || CheckHotKey(KEY_G))
+		if(DoButton_MenuTabTop(&s_InternetButton, Localize("Global"), m_ActivePage == PAGE_INTERNET && Client()->State() == IClient::STATE_OFFLINE, &Button,
+			   m_ActivePage == PAGE_INTERNET ? 1.0f : NotActiveAlpha, 1.0f, Corners) ||
+			CheckHotKey(KEY_G))
 		{
 			m_pClient->m_pCamera->ChangePosition(CCamera::POS_INTERNET);
 			ServerBrowser()->SetType(IServerBrowser::TYPE_INTERNET);
@@ -1078,8 +1076,9 @@ void CMenus::RenderMenubar(CUIRect Rect)
 		Left.VSplitLeft(Spacing, 0, &Left); // little space
 		Left.VSplitLeft(ButtonWidth, &Button, &Left);
 		static CButtonContainer s_LanButton;
-		if(DoButton_MenuTabTop(&s_LanButton, Localize("Local"), m_ActivePage==PAGE_LAN && Client()->State() == IClient::STATE_OFFLINE, &Button,
-			m_ActivePage==PAGE_LAN ? 1.0f : NotActiveAlpha, 1.0f, Corners) || CheckHotKey(KEY_L))
+		if(DoButton_MenuTabTop(&s_LanButton, Localize("Local"), m_ActivePage == PAGE_LAN && Client()->State() == IClient::STATE_OFFLINE, &Button,
+			   m_ActivePage == PAGE_LAN ? 1.0f : NotActiveAlpha, 1.0f, Corners) ||
+			CheckHotKey(KEY_L))
 		{
 			m_pClient->m_pCamera->ChangePosition(CCamera::POS_LAN);
 			ServerBrowser()->SetType(IServerBrowser::TYPE_LAN);
@@ -1109,13 +1108,11 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			Box.HMargin(2.0f, &Box);
 			TextRender()->TextColor(CUI::ms_HighlightTextColor);
 			TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
-			UI()->DoLabel(&Box, Localize("Demos"), Box.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
+			UI()->DoLabel(&Box, Localize("Demos"), Box.h * ms_FontmodHeight, CUI::ALIGN_CENTER);
 			TextRender()->TextColor(CUI::ms_DefaultTextColor);
 			TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 		}
 	}
-
-
 
 	if(NewPage != -1)
 	{
@@ -1146,26 +1143,26 @@ void CMenus::RenderLoading(int WorkedAmount)
 	if(Config()->m_Debug)
 	{
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "progress: %03d/%03d (+%02d) %dms", m_LoadCurrent, m_LoadTotal, WorkedAmount, s_LastLoadRender == 0 ? 0 : int((Now-s_LastLoadRender)*1000.0f/Freq));
+		str_format(aBuf, sizeof(aBuf), "progress: %03d/%03d (+%02d) %dms", m_LoadCurrent, m_LoadTotal, WorkedAmount, s_LastLoadRender == 0 ? 0 : int((Now - s_LastLoadRender) * 1000.0f / Freq));
 		Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "loading", aBuf);
 	}
 
 	// make sure that we don't render for each little thing we load
 	// because that will slow down loading if we have vsync
-	if(s_LastLoadRender > 0 && Now-s_LastLoadRender < Freq/60)
+	if(s_LastLoadRender > 0 && Now - s_LastLoadRender < Freq / 60)
 		return;
 	s_LastLoadRender = Now;
 	static int64 s_LoadingStart = Now;
 
 	m_pClient->StartRendering();
-	RenderBackground((Now-s_LoadingStart)/Freq);
+	RenderBackground((Now - s_LoadingStart) / Freq);
 
 	CUIRect Screen = *UI()->Screen();
 	const float w = 700;
 	const float h = 200;
-	const float x = Screen.w/2-w/2;
-	const float y = Screen.h/2-h/2;
-	CUIRect Rect = { x, y, w, h };
+	const float x = Screen.w / 2 - w / 2;
+	const float y = Screen.h / 2 - h / 2;
+	CUIRect Rect = {x, y, w, h};
 
 	Graphics()->BlendNormal();
 	RenderTools()->DrawRoundRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.5f), 40.0f);
@@ -1175,15 +1172,15 @@ void CMenus::RenderLoading(int WorkedAmount)
 	TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 	UI()->DoLabel(&Rect, "Teeworlds", 48.0f, CUI::ALIGN_CENTER);
 
-	const float Percent = m_LoadCurrent/(float)m_LoadTotal;
+	const float Percent = m_LoadCurrent / (float)m_LoadTotal;
 	const float Spacing = 40.0f;
 	const float BarRounding = 5.0f;
 
-	CUIRect FullBar = { x+Spacing, y+h-75.0f, w-2*Spacing, 25.0f };
+	CUIRect FullBar = {x + Spacing, y + h - 75.0f, w - 2 * Spacing, 25.0f};
 	RenderTools()->DrawRoundRect(&FullBar, vec4(1.0f, 1.0f, 1.0f, 0.1f), BarRounding);
 
 	CUIRect FillingBar = FullBar;
-	FillingBar.w = (FullBar.w-2*BarRounding)*Percent+2*BarRounding;
+	FillingBar.w = (FullBar.w - 2 * BarRounding) * Percent + 2 * BarRounding;
 	RenderTools()->DrawRoundRect(&FillingBar, vec4(1.0f, 1.0f, 1.0f, 0.75f), BarRounding);
 
 	if(Percent > 0.5f)
@@ -1192,7 +1189,7 @@ void CMenus::RenderLoading(int WorkedAmount)
 		TextRender()->TextColor(0.2f, 0.2f, 0.2f, 1.0f);
 	}
 	char aBuf[8];
-	str_format(aBuf, sizeof(aBuf), "%d%%", (int)(100*Percent));
+	str_format(aBuf, sizeof(aBuf), "%d%%", (int)(100 * Percent));
 	UI()->DoLabel(&FullBar, aBuf, 20.0f, CUI::ALIGN_CENTER);
 
 	if(Percent > 0.5f)
@@ -1216,7 +1213,7 @@ void CMenus::RenderBackButton(CUIRect MainView)
 
 	// same size like tabs in top but variables not really needed
 	float Spacing = 3.0f;
-	float ButtonWidth = (MainView.w/6.0f)-(Spacing*5.0)/6.0f;
+	float ButtonWidth = (MainView.w / 6.0f) - (Spacing * 5.0) / 6.0f;
 
 	// render background
 	MainView.HSplitBottom(60.0f, 0, &MainView);
@@ -1261,12 +1258,12 @@ int CMenus::MenuImageScan(const char *pName, int IsDir, int DirType, void *pUser
 	int Step = Info.m_Format == CImageInfo::FORMAT_RGBA ? 4 : 3;
 
 	// make the texture gray scale
-	for(int i = 0; i < Info.m_Width*Info.m_Height; i++)
+	for(int i = 0; i < Info.m_Width * Info.m_Height; i++)
 	{
-		int v = (d[i*Step]+d[i*Step+1]+d[i*Step+2])/3;
-		d[i*Step] = v;
-		d[i*Step+1] = v;
-		d[i*Step+2] = v;
+		int v = (d[i * Step] + d[i * Step + 1] + d[i * Step + 2]) / 3;
+		d[i * Step] = v;
+		d[i * Step + 1] = v;
+		d[i * Step + 2] = v;
 	}
 
 	/* same grey like sinks
@@ -1341,8 +1338,8 @@ void CMenus::UpdatedFilteredVideoModes()
 	for(int i = 0; i < m_NumModes; i++)
 	{
 		const int G = gcd(m_aModes[i].m_Width, m_aModes[i].m_Height);
-		if(m_aModes[i].m_Width/G == DesktopWidthG &&
-			m_aModes[i].m_Height/G == DesktopHeightG &&
+		if(m_aModes[i].m_Width / G == DesktopWidthG &&
+			m_aModes[i].m_Height / G == DesktopHeightG &&
 			m_aModes[i].m_Width <= Graphics()->DesktopWidth() &&
 			m_aModes[i].m_Height <= Graphics()->DesktopHeight())
 		{
@@ -1372,8 +1369,8 @@ void CMenus::OnInit()
 	UpdateVideoModeSettings();
 	RenderLoading(3);
 
-	m_MousePos.x = Graphics()->ScreenWidth()/2;
-	m_MousePos.y = Graphics()->ScreenHeight()/2;
+	m_MousePos.x = Graphics()->ScreenWidth() / 2;
+	m_MousePos.y = Graphics()->ScreenHeight() / 2;
 
 	// load menu images
 	m_lMenuImages.clear();
@@ -1450,7 +1447,6 @@ void CMenus::PopupCountry(int Selection, FPopupButtonCallback pfnOkButtonCallbac
 	m_Popup = POPUP_COUNTRY;
 }
 
-
 void CMenus::RenderMenu(CUIRect Screen)
 {
 	static int s_InitTick = 5;
@@ -1467,7 +1463,7 @@ void CMenus::RenderMenu(CUIRect Screen)
 			// Wait a few frames before refreshing server browser,
 			// else the increased rendering time at startup prevents
 			// the network from being pumped effectively.
-			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_INTERNET|IServerBrowser::REFRESHFLAG_LAN);
+			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_INTERNET | IServerBrowser::REFRESHFLAG_LAN);
 		}
 	}
 
@@ -1495,7 +1491,7 @@ void CMenus::RenderMenu(CUIRect Screen)
 				BarHeight += 3.0f + 25.0f;
 			else if(Client()->State() == IClient::STATE_ONLINE && m_GamePage >= PAGE_INTERNET && m_GamePage <= PAGE_LAN)
 				BarHeight += 3.0f + 25.0f;
-			float VMargin = Screen.w/2-365.0f;
+			float VMargin = Screen.w / 2 - 365.0f;
 			if(Config()->m_UiWideview)
 				VMargin = min(VMargin, 60.0f);
 
@@ -1510,15 +1506,15 @@ void CMenus::RenderMenu(CUIRect Screen)
 				CUIRect Button, Row;
 				float TopOffset = 27.0f;
 				Screen.HSplitTop(TopOffset, &Row, 0);
-				Row.VSplitRight(TopOffset/* - 3.0f*/, &Row, &Button);
+				Row.VSplitRight(TopOffset /* - 3.0f*/, &Row, &Button);
 				static CButtonContainer s_QuitButton;
 
 				// draw red-blending button
-				vec4 Color = mix(vec4(0.f, 0.f, 0.f, 0.25f), vec4(1.f/0xff*0xf9, 1.f/0xff*0x2b, 1.f/0xff*0x2b, 0.75f), s_QuitButton.GetFade());
+				vec4 Color = mix(vec4(0.f, 0.f, 0.f, 0.25f), vec4(1.f / 0xff * 0xf9, 1.f / 0xff * 0x2b, 1.f / 0xff * 0x2b, 0.75f), s_QuitButton.GetFade());
 				RenderTools()->DrawUIRect(&Button, Color, CUI::CORNER_BL, 5.0f);
 
 				// draw non-blending X
-				UI()->DoLabel(&Button, "\xE2\x9C\x95", Button.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
+				UI()->DoLabel(&Button, "\xE2\x9C\x95", Button.h * ms_FontmodHeight, CUI::ALIGN_CENTER);
 				if(UI()->DoButtonLogic(&s_QuitButton, &Button))
 					m_Popup = POPUP_QUIT;
 
@@ -1646,28 +1642,28 @@ void CMenus::RenderMenu(CUIRect Screen)
 		}
 
 		const float ButtonHeight = 20.0f;
-		const float FontSize = ButtonHeight*ms_FontmodHeight*0.8f;
+		const float FontSize = ButtonHeight * ms_FontmodHeight * 0.8f;
 		const float SpacingH = 2.0f;
 		const float SpacingW = 3.0f;
 		CUIRect Box = Screen;
-		Box.VMargin(Box.w/2.0f-(365.0f), &Box);
-		const float ButtonWidth = (Box.w/6.0f)-(SpacingW*5.0)/6.0f;
-		Box.VMargin(ButtonWidth+SpacingW, &Box);
-		Box.HMargin(Box.h/2.0f-((int)(NumOptions+1)*ButtonHeight+(int)(NumOptions)*SpacingH)/2.0f-10.0f, &Box);
+		Box.VMargin(Box.w / 2.0f - (365.0f), &Box);
+		const float ButtonWidth = (Box.w / 6.0f) - (SpacingW * 5.0) / 6.0f;
+		Box.VMargin(ButtonWidth + SpacingW, &Box);
+		Box.HMargin(Box.h / 2.0f - ((int)(NumOptions + 1) * ButtonHeight + (int)(NumOptions)*SpacingH) / 2.0f - 10.0f, &Box);
 
 		// render the box
 		RenderTools()->DrawUIRect(&Box, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
 
 		// headline and title
 		CUIRect Part;
-		Box.HSplitTop(ButtonHeight+5.0f, &Part, &Box);
+		Box.HSplitTop(ButtonHeight + 5.0f, &Part, &Box);
 		Part.y += 3.0f;
-		UI()->DoLabel(&Part, pTitle, Part.h*ms_FontmodHeight*0.8f, CUI::ALIGN_CENTER);
+		UI()->DoLabel(&Part, pTitle, Part.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_CENTER);
 
 		// inner box
 		CUIRect BottomBar;
 		Box.HSplitTop(SpacingH, 0, &Box);
-		Box.HSplitBottom(ButtonHeight+5.0f+SpacingH, &Box, &BottomBar);
+		Box.HSplitBottom(ButtonHeight + 5.0f + SpacingH, &Box, &BottomBar);
 		BottomBar.HSplitTop(SpacingH, 0, &BottomBar);
 		RenderTools()->DrawUIRect(&Box, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
 
@@ -1757,7 +1753,7 @@ void CMenus::RenderMenu(CUIRect Screen)
 			{
 				char aBuf[128];
 				int64 Now = time_get();
-				if(Now-m_DownloadLastCheckTime >= time_freq())
+				if(Now - m_DownloadLastCheckTime >= time_freq())
 				{
 					if(m_DownloadLastCheckSize > Client()->MapDownloadAmount())
 					{
@@ -1766,10 +1762,10 @@ void CMenus::RenderMenu(CUIRect Screen)
 					}
 
 					// update download speed
-					float Diff = (Client()->MapDownloadAmount()-m_DownloadLastCheckSize)/((int)((Now-m_DownloadLastCheckTime)/time_freq()));
-					float StartDiff = m_DownloadLastCheckSize-0.0f;
-					if(StartDiff+Diff > 0.0f)
-						m_DownloadSpeed = (Diff/(StartDiff+Diff))*(Diff/1.0f) + (StartDiff/(Diff+StartDiff))*m_DownloadSpeed;
+					float Diff = (Client()->MapDownloadAmount() - m_DownloadLastCheckSize) / ((int)((Now - m_DownloadLastCheckTime) / time_freq()));
+					float StartDiff = m_DownloadLastCheckSize - 0.0f;
+					if(StartDiff + Diff > 0.0f)
+						m_DownloadSpeed = (Diff / (StartDiff + Diff)) * (Diff / 1.0f) + (StartDiff / (Diff + StartDiff)) * m_DownloadSpeed;
 					else
 						m_DownloadSpeed = 0.0f;
 					m_DownloadLastCheckTime = Now;
@@ -1778,11 +1774,11 @@ void CMenus::RenderMenu(CUIRect Screen)
 
 				Box.HSplitTop(15.f, 0, &Box);
 				Box.HSplitTop(ButtonHeight, &Part, &Box);
-				str_format(aBuf, sizeof(aBuf), "%d/%d KiB (%.1f KiB/s)", Client()->MapDownloadAmount()/1024, Client()->MapDownloadTotalsize()/1024,	m_DownloadSpeed/1024.0f);
+				str_format(aBuf, sizeof(aBuf), "%d/%d KiB (%.1f KiB/s)", Client()->MapDownloadAmount() / 1024, Client()->MapDownloadTotalsize() / 1024, m_DownloadSpeed / 1024.0f);
 				UI()->DoLabel(&Part, aBuf, FontSize, CUI::ALIGN_CENTER);
 
 				// time left
-				int SecondsLeft = max(1, m_DownloadSpeed > 0.0f ? static_cast<int>((Client()->MapDownloadTotalsize()-Client()->MapDownloadAmount())/m_DownloadSpeed) : 1);
+				int SecondsLeft = max(1, m_DownloadSpeed > 0.0f ? static_cast<int>((Client()->MapDownloadTotalsize() - Client()->MapDownloadAmount()) / m_DownloadSpeed) : 1);
 				if(SecondsLeft >= 60)
 				{
 					int MinutesLeft = SecondsLeft / 60;
@@ -1801,7 +1797,7 @@ void CMenus::RenderMenu(CUIRect Screen)
 				Box.HSplitTop(ButtonHeight, &Part, &Box);
 				Part.VMargin(40.0f, &Part);
 				RenderTools()->DrawUIRect(&Part, vec4(1.0f, 1.0f, 1.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
-				Part.w = max(10.0f, (Part.w*Client()->MapDownloadAmount())/Client()->MapDownloadTotalsize());
+				Part.w = max(10.0f, (Part.w * Client()->MapDownloadAmount()) / Client()->MapDownloadTotalsize());
 				RenderTools()->DrawUIRect(&Part, vec4(1.0f, 1.0f, 1.0f, 0.5f), CUI::CORNER_ALL, 5.0f);
 			}
 			else
@@ -1859,8 +1855,8 @@ void CMenus::RenderMenu(CUIRect Screen)
 					Item.m_Rect.Margin(5.0f, &Item.m_Rect);
 					Item.m_Rect.HSplitBottom(10.0f, &Item.m_Rect, &Label);
 					float OldWidth = Item.m_Rect.w;
-					Item.m_Rect.w = Item.m_Rect.h*2;
-					Item.m_Rect.x += (OldWidth-Item.m_Rect.w)/ 2.0f;
+					Item.m_Rect.w = Item.m_Rect.h * 2;
+					Item.m_Rect.x += (OldWidth - Item.m_Rect.w) / 2.0f;
 
 					Graphics()->TextureSet(pEntry->m_Texture);
 					Graphics()->QuadsBegin();
@@ -1909,7 +1905,7 @@ void CMenus::RenderMenu(CUIRect Screen)
 			UI()->DoLabel(&Box, pExtraText, FontSize, CUI::ALIGN_LEFT);
 
 			CUIRect EditBox;
-			Box.HSplitBottom(Box.h/2.0f, 0, &Box);
+			Box.HSplitBottom(Box.h / 2.0f, 0, &Box);
 			Box.HSplitTop(20.0f, &EditBox, &Box);
 
 			static float s_OffsetRenameDemo = 0.0f;
@@ -1936,7 +1932,7 @@ void CMenus::RenderMenu(CUIRect Screen)
 						str_format(aBufOld, sizeof(aBufOld), "%s/%s", m_aCurrentDemoFolder, m_lDemos[m_DemolistSelectedIndex].m_aFilename);
 						int Length = str_length(m_aCurrentDemoFile);
 						char aBufNew[IO_MAX_PATH_LENGTH];
-						if(Length <= 4 || m_aCurrentDemoFile[Length-5] != '.' || str_comp_nocase(m_aCurrentDemoFile+Length-4, "demo"))
+						if(Length <= 4 || m_aCurrentDemoFile[Length - 5] != '.' || str_comp_nocase(m_aCurrentDemoFile + Length - 4, "demo"))
 							str_format(aBufNew, sizeof(aBufNew), "%s/%s.demo", m_aCurrentDemoFolder, m_aCurrentDemoFile);
 						else
 							str_format(aBufNew, sizeof(aBufNew), "%s/%s", m_aCurrentDemoFolder, m_aCurrentDemoFile);
@@ -1955,10 +1951,10 @@ void CMenus::RenderMenu(CUIRect Screen)
 		{
 			Box.HSplitTop(24.0f, 0, &Box);
 			Box.VMargin(10.0f, &Part);
-			UI()->DoLabel(&Part, pExtraText, FontSize, CUI::ALIGN_LEFT, Box.w-20.0f);
+			UI()->DoLabel(&Part, pExtraText, FontSize, CUI::ALIGN_LEFT, Box.w - 20.0f);
 
 			CUIRect EditBox;
-			Box.HSplitBottom(Box.h/2.0f, 0, &Box);
+			Box.HSplitBottom(Box.h / 2.0f, 0, &Box);
 			Box.HSplitTop(20.0f, &EditBox, &Box);
 
 			static float s_OffsetSaveSkin = 0.0f;
@@ -1988,10 +1984,10 @@ void CMenus::RenderMenu(CUIRect Screen)
 		{
 			Box.HSplitTop(20.0f, 0, &Box);
 			Box.VMargin(10.0f, &Part);
-			UI()->DoLabel(&Part, pExtraText, FontSize, CUI::ALIGN_LEFT, Box.w-20.0f);
+			UI()->DoLabel(&Part, pExtraText, FontSize, CUI::ALIGN_LEFT, Box.w - 20.0f);
 
 			CUIRect EditBox;
-			Box.HSplitBottom(ButtonHeight*2.0f, 0, &Box);
+			Box.HSplitBottom(ButtonHeight * 2.0f, 0, &Box);
 			Box.HSplitTop(ButtonHeight, &EditBox, &Box);
 
 			static float s_OffsetName = 0.0f;
@@ -2049,7 +2045,6 @@ void CMenus::RenderMenu(CUIRect Screen)
 	}
 }
 
-
 void CMenus::SetActive(bool Active)
 {
 	m_MenuActive = Active;
@@ -2092,10 +2087,14 @@ bool CMenus::OnCursorMove(float x, float y, int CursorType)
 	UI()->ConvertCursorMove(&x, &y, CursorType);
 	m_MousePos.x += x;
 	m_MousePos.y += y;
-	if(m_MousePos.x < 0) m_MousePos.x = 0;
-	if(m_MousePos.y < 0) m_MousePos.y = 0;
-	if(m_MousePos.x > Graphics()->ScreenWidth()) m_MousePos.x = Graphics()->ScreenWidth();
-	if(m_MousePos.y > Graphics()->ScreenHeight()) m_MousePos.y = Graphics()->ScreenHeight();
+	if(m_MousePos.x < 0)
+		m_MousePos.x = 0;
+	if(m_MousePos.y < 0)
+		m_MousePos.y = 0;
+	if(m_MousePos.x > Graphics()->ScreenWidth())
+		m_MousePos.x = Graphics()->ScreenWidth();
+	if(m_MousePos.y > Graphics()->ScreenHeight())
+		m_MousePos.y = Graphics()->ScreenHeight();
 
 	return true;
 }
@@ -2105,7 +2104,7 @@ bool CMenus::OnInput(IInput::CEvent e)
 	m_LastInput = time_get();
 
 	// special handle esc and enter for popup purposes
-	if(e.m_Flags&IInput::FLAG_PRESS)
+	if(e.m_Flags & IInput::FLAG_PRESS)
 	{
 		if(e.m_Key == KEY_ESCAPE)
 		{
@@ -2117,7 +2116,7 @@ bool CMenus::OnInput(IInput::CEvent e)
 
 	if(IsActive())
 	{
-		if(e.m_Flags&IInput::FLAG_PRESS)
+		if(e.m_Flags & IInput::FLAG_PRESS)
 		{
 			// special for popups
 			if(e.m_Key == KEY_RETURN || e.m_Key == KEY_KP_ENTER)
@@ -2140,7 +2139,7 @@ void CMenus::OnConsoleInit()
 {
 	CUIElementBase::Init(this);
 
-	Console()->Register("play", "r[file]", CFGFLAG_CLIENT|CFGFLAG_STORE, Con_Play, this, "Play the file specified");
+	Console()->Register("play", "r[file]", CFGFLAG_CLIENT | CFGFLAG_STORE, Con_Play, this, "Play the file specified");
 }
 
 void CMenus::OnShutdown()
@@ -2183,7 +2182,7 @@ void CMenus::OnStateChange(int NewState, int OldState)
 	}
 	else if(NewState == IClient::STATE_CONNECTING)
 		m_Popup = POPUP_CONNECTING;
-	else if (NewState == IClient::STATE_ONLINE || NewState == IClient::STATE_DEMOPLAYBACK)
+	else if(NewState == IClient::STATE_ONLINE || NewState == IClient::STATE_DEMOPLAYBACK)
 	{
 		m_Popup = POPUP_NONE;
 		SetActive(false);
@@ -2220,9 +2219,9 @@ void CMenus::OnRender()
 	{
 		// update the ui
 		const CUIRect *pScreen = UI()->Screen();
-		float MouseX = (m_MousePos.x/(float)Graphics()->ScreenWidth())*pScreen->w;
-		float MouseY = (m_MousePos.y/(float)Graphics()->ScreenHeight())*pScreen->h;
-		UI()->Update(MouseX, MouseY, MouseX*3.0f, MouseY*3.0f);
+		float MouseX = (m_MousePos.x / (float)Graphics()->ScreenWidth()) * pScreen->w;
+		float MouseY = (m_MousePos.y / (float)Graphics()->ScreenHeight()) * pScreen->h;
+		UI()->Update(MouseX, MouseY, MouseX * 3.0f, MouseY * 3.0f);
 
 		// render demo player or main menu
 		UI()->MapScreen();
@@ -2259,15 +2258,11 @@ void CMenus::OnRender()
 
 bool CMenus::CheckHotKey(int Key) const
 {
-	return !m_KeyReaderIsActive && !m_KeyReaderWasActive && !m_PrevCursorActive && !m_PopupActive
-		&& !Input()->KeyIsPressed(KEY_LSHIFT) && !Input()->KeyIsPressed(KEY_RSHIFT)
-		&& !Input()->KeyIsPressed(KEY_LCTRL) && !Input()->KeyIsPressed(KEY_RCTRL)
-		&& !Input()->KeyIsPressed(KEY_LALT)
-		&& UI()->KeyIsPressed(Key);
+	return !m_KeyReaderIsActive && !m_KeyReaderWasActive && !m_PrevCursorActive && !m_PopupActive && !Input()->KeyIsPressed(KEY_LSHIFT) && !Input()->KeyIsPressed(KEY_RSHIFT) && !Input()->KeyIsPressed(KEY_LCTRL) && !Input()->KeyIsPressed(KEY_RCTRL) && !Input()->KeyIsPressed(KEY_LALT) && UI()->KeyIsPressed(Key);
 }
 
 bool CMenus::IsBackgroundNeeded() const
-{ 
+{
 	return !m_pClient->m_InitComplete || (Client()->State() != IClient::STATE_ONLINE && !m_pClient->m_pMapLayersBackGround->MenuMapLoaded());
 }
 
@@ -2280,24 +2275,24 @@ void CMenus::RenderBackground(float Time)
 	// render the tiles
 	Graphics()->TextureClear();
 	Graphics()->QuadsBegin();
-		const float Size = 15.0f;
-		const float OffsetTime = fmod(Time*0.15f, 2.0f);
-		for(int y = -2; y < (int)(ScreenWidth/Size); y++)
-			for(int x = -2; x < (int)(ScreenHeight/Size); x++)
-			{
-				Graphics()->SetColor(0.0f, 0.0f, 0.0f, 0.045f);
-				IGraphics::CQuadItem QuadItem((x-OffsetTime)*Size*2+(y&1)*Size, (y+OffsetTime)*Size, Size, Size);
-				Graphics()->QuadsDrawTL(&QuadItem, 1);
-			}
+	const float Size = 15.0f;
+	const float OffsetTime = fmod(Time * 0.15f, 2.0f);
+	for(int y = -2; y < (int)(ScreenWidth / Size); y++)
+		for(int x = -2; x < (int)(ScreenHeight / Size); x++)
+		{
+			Graphics()->SetColor(0.0f, 0.0f, 0.0f, 0.045f);
+			IGraphics::CQuadItem QuadItem((x - OffsetTime) * Size * 2 + (y & 1) * Size, (y + OffsetTime) * Size, Size, Size);
+			Graphics()->QuadsDrawTL(&QuadItem, 1);
+		}
 	Graphics()->QuadsEnd();
 
 	// render border fade
 	static IGraphics::CTextureHandle s_TextureBlob = Graphics()->LoadTexture("ui/blob.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
 	Graphics()->TextureSet(s_TextureBlob);
 	Graphics()->QuadsBegin();
-		Graphics()->SetColor(0,0,0,0.5f);
-		IGraphics::CQuadItem QuadItem = IGraphics::CQuadItem(-100, -100, ScreenWidth+200, ScreenHeight+200);
-		Graphics()->QuadsDrawTL(&QuadItem, 1);
+	Graphics()->SetColor(0, 0, 0, 0.5f);
+	IGraphics::CQuadItem QuadItem = IGraphics::CQuadItem(-100, -100, ScreenWidth + 200, ScreenHeight + 200);
+	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
 
 	UI()->MapScreen();
@@ -2306,7 +2301,7 @@ void CMenus::RenderBackground(float Time)
 void CMenus::RenderBackgroundShadow(const CUIRect *pRect, bool TopToBottom, float Rounding)
 {
 	const vec4 Transparent(0.0f, 0.0f, 0.0f, 0.0f);
-	const vec4 Background(0.0f, 0.0f, 0.0f, Config()->m_ClMenuAlpha/100.0f);
+	const vec4 Background(0.0f, 0.0f, 0.0f, Config()->m_ClMenuAlpha / 100.0f);
 	if(TopToBottom)
 		RenderTools()->DrawUIRect4(pRect, Background, Background, Transparent, Transparent, CUI::CORNER_T, Rounding);
 	else
@@ -2347,7 +2342,7 @@ void CMenus::SetMenuPage(int NewPage)
 		{
 		case PAGE_START: CameraPos = CCamera::POS_START; break;
 		case PAGE_DEMOS: CameraPos = CCamera::POS_DEMOS; break;
-		case PAGE_SETTINGS: CameraPos = CCamera::POS_SETTINGS_GENERAL+Config()->m_UiSettingsPage; break;
+		case PAGE_SETTINGS: CameraPos = CCamera::POS_SETTINGS_GENERAL + Config()->m_UiSettingsPage; break;
 		case PAGE_INTERNET: CameraPos = CCamera::POS_INTERNET; break;
 		case PAGE_LAN: CameraPos = CCamera::POS_LAN;
 		}

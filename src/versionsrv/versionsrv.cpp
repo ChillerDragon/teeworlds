@@ -11,19 +11,21 @@
 
 #include <game/version.h>
 
-#include "versionsrv.h"
 #include "mapversions.h"
+#include "versionsrv.h"
 
-enum {
-	MAX_MAPS_PER_PACKET=48,
-	MAX_PACKETS=16,
-	MAX_MAPS=MAX_MAPS_PER_PACKET*MAX_PACKETS,
+enum
+{
+	MAX_MAPS_PER_PACKET = 48,
+	MAX_PACKETS = 16,
+	MAX_MAPS = MAX_MAPS_PER_PACKET * MAX_PACKETS,
 };
 
 struct CPacketData
 {
 	int m_Size;
-	struct {
+	struct
+	{
 		unsigned char m_aHeader[sizeof(VERSIONSRV_MAPLIST)];
 		CMapVersion m_aMaplist[MAX_MAPS_PER_PACKET];
 	} m_Data;
@@ -56,7 +58,7 @@ void BuildPackets()
 			pCurrent++;
 		}
 
-		m_aPackets[m_NumPackets].m_Size = sizeof(VERSIONSRV_MAPLIST) + sizeof(CMapVersion)*Chunk;
+		m_aPackets[m_NumPackets].m_Size = sizeof(VERSIONSRV_MAPLIST) + sizeof(CMapVersion) * Chunk;
 
 		m_NumPackets++;
 	}

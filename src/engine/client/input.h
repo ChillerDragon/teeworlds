@@ -11,7 +11,7 @@ class CInput : public IEngineInput
 	CConfig *m_pConfig;
 	IConsole *m_pConsole;
 
-	sorted_array<SDL_Joystick*> m_apJoysticks;
+	sorted_array<SDL_Joystick *> m_apJoysticks;
 	int m_SelectedJoystickIndex;
 	char m_aSelectedJoystickGUID[34];
 	SDL_Joystick *GetActiveJoystick();
@@ -30,8 +30,8 @@ class CInput : public IEngineInput
 	bool IsEventValid(CEvent *pEvent) const { return pEvent->m_InputCount == m_InputCounter; }
 
 	//quick access to input
-	unsigned short m_aInputCount[g_MaxKeys];	// tw-KEY
-	unsigned char m_aInputState[g_MaxKeys];	// SDL_SCANCODE
+	unsigned short m_aInputCount[g_MaxKeys]; // tw-KEY
+	unsigned char m_aInputState[g_MaxKeys]; // SDL_SCANCODE
 	int m_InputCounter;
 
 	void ClearKeyStates();

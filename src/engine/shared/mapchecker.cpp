@@ -5,8 +5,8 @@
 
 #include <engine/storage.h>
 
-#include <versionsrv/versionsrv.h>
 #include <versionsrv/mapversions.h>
+#include <versionsrv/versionsrv.h>
 
 #include "mapchecker.h"
 
@@ -41,8 +41,8 @@ void CMapChecker::AddMaplist(CMapVersion *pMaplist, int Num)
 		m_pFirst = pEntry;
 
 		str_copy(pEntry->m_aMapName, pMaplist[i].m_aName, sizeof(pEntry->m_aMapName));
-		pEntry->m_MapCrc = (pMaplist[i].m_aCrc[0]<<24) | (pMaplist[i].m_aCrc[1]<<16) | (pMaplist[i].m_aCrc[2]<<8) | pMaplist[i].m_aCrc[3];
-		pEntry->m_MapSize = (pMaplist[i].m_aSize[0]<<24) | (pMaplist[i].m_aSize[1]<<16) | (pMaplist[i].m_aSize[2]<<8) | pMaplist[i].m_aSize[3];
+		pEntry->m_MapCrc = (pMaplist[i].m_aCrc[0] << 24) | (pMaplist[i].m_aCrc[1] << 16) | (pMaplist[i].m_aCrc[2] << 8) | pMaplist[i].m_aCrc[3];
+		pEntry->m_MapSize = (pMaplist[i].m_aSize[0] << 24) | (pMaplist[i].m_aSize[1] << 16) | (pMaplist[i].m_aSize[2] << 8) | pMaplist[i].m_aSize[3];
 		mem_copy(&pEntry->m_MapSha256, &pMaplist[i].m_aSha256, sizeof(pEntry->m_MapSha256));
 	}
 }
@@ -67,7 +67,7 @@ bool CMapChecker::ReadAndValidateMap(IStorage *pStorage, const char *pFilename, 
 {
 	// extract map name
 	char aMapName[MAX_MAP_LENGTH];
-	char aMapNameExt[MAX_MAP_LENGTH+4];
+	char aMapNameExt[MAX_MAP_LENGTH + 4];
 	bool StandardMap = false;
 	const char *pExtractedName = pFilename;
 	const char *pEnd = 0;
@@ -75,7 +75,7 @@ bool CMapChecker::ReadAndValidateMap(IStorage *pStorage, const char *pFilename, 
 	for(const char *pSrc = pFilename; *pSrc; ++pSrc)
 	{
 		if(*pSrc == '/' || *pSrc == '\\')
-			pExtractedName = pSrc+1;
+			pExtractedName = pSrc + 1;
 		else if(*pSrc == '.')
 			pEnd = pSrc;
 	}

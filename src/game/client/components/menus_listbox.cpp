@@ -2,8 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <math.h>
 
-#include <base/system.h>
 #include <base/math.h>
+#include <base/system.h>
 #include <base/vmath.h>
 
 #include <engine/config.h>
@@ -13,7 +13,7 @@
 
 CMenus::CListBox::CListBox()
 {
-	m_ScrollOffset = vec2(0,0);
+	m_ScrollOffset = vec2(0, 0);
 	m_ListBoxUpdateScroll = false;
 	m_aFilterString[0] = '\0';
 	m_OffsetFilter = 0.0f;
@@ -26,19 +26,19 @@ void CMenus::CListBox::DoBegin(const CUIRect *pRect)
 }
 
 void CMenus::CListBox::DoHeader(const CUIRect *pRect, const char *pTitle,
-							   float HeaderHeight, float Spacing)
+	float HeaderHeight, float Spacing)
 {
 	CUIRect Header;
 	CUIRect View = *pRect;
 
 	// background
-	View.HSplitTop(HeaderHeight+Spacing, &Header, 0);
-	m_pRenderTools->DrawUIRect(&Header, vec4(0.0f, 0.0f, 0.0f, m_pConfig->m_ClMenuAlpha/100.0f), m_BackgroundCorners&CUI::CORNER_T, 5.0f);
+	View.HSplitTop(HeaderHeight + Spacing, &Header, 0);
+	m_pRenderTools->DrawUIRect(&Header, vec4(0.0f, 0.0f, 0.0f, m_pConfig->m_ClMenuAlpha / 100.0f), m_BackgroundCorners & CUI::CORNER_T, 5.0f);
 
 	// draw header
 	View.HSplitTop(HeaderHeight, &Header, &View);
 	Header.y += 2.0f;
-	m_pUI->DoLabel(&Header, pTitle, Header.h*ms_FontmodHeight*0.8f, CUI::ALIGN_CENTER);
+	m_pUI->DoLabel(&Header, pTitle, Header.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_CENTER);
 
 	View.HSplitTop(Spacing, &Header, &View);
 
@@ -59,17 +59,17 @@ bool CMenus::CListBox::DoFilter(float FilterHeight, float Spacing)
 	CUIRect View = m_ListBoxView;
 
 	// background
-	View.HSplitTop(FilterHeight+Spacing, &Filter, 0);
-	m_pRenderTools->DrawUIRect(&Filter, vec4(0.0f, 0.0f, 0.0f, m_pConfig->m_ClMenuAlpha/100.0f), 0, 5.0f);
+	View.HSplitTop(FilterHeight + Spacing, &Filter, 0);
+	m_pRenderTools->DrawUIRect(&Filter, vec4(0.0f, 0.0f, 0.0f, m_pConfig->m_ClMenuAlpha / 100.0f), 0, 5.0f);
 
 	// draw filter
 	View.HSplitTop(FilterHeight, &Filter, &View);
 	Filter.Margin(Spacing, &Filter);
 
-	float FontSize = Filter.h*ms_FontmodHeight*0.8f;
+	float FontSize = Filter.h * ms_FontmodHeight * 0.8f;
 
 	CUIRect Label, EditBox;
-	Filter.VSplitLeft(Filter.w/5.0f, &Label, &EditBox);
+	Filter.VSplitLeft(Filter.w / 5.0f, &Label, &EditBox);
 	Label.y += Spacing;
 	m_pUI->DoLabel(&Label, Localize("Search:"), FontSize, CUI::ALIGN_CENTER);
 	bool Changed = m_pMenus->DoEditBox(m_aFilterString, &EditBox, m_aFilterString, sizeof(m_aFilterString), FontSize, &m_OffsetFilter);
@@ -87,8 +87,8 @@ void CMenus::CListBox::DoFooter(const char *pBottomText, float FooterHeight)
 	m_FooterHeight = FooterHeight;
 }
 
-void CMenus::CListBox::DoStart(float RowHeight, int NumItems, int ItemsPerRow, int RowsPerScroll, 
-							int SelectedIndex, const CUIRect *pRect, bool Background, bool *pActive, int BackgroundCorners)
+void CMenus::CListBox::DoStart(float RowHeight, int NumItems, int ItemsPerRow, int RowsPerScroll,
+	int SelectedIndex, const CUIRect *pRect, bool Background, bool *pActive, int BackgroundCorners)
 {
 	CUIRect View;
 	if(pRect)
@@ -99,7 +99,7 @@ void CMenus::CListBox::DoStart(float RowHeight, int NumItems, int ItemsPerRow, i
 	// background
 	m_BackgroundCorners = BackgroundCorners;
 	if(Background)
-		m_pRenderTools->DrawUIRect(&View, vec4(0.0f, 0.0f, 0.0f, m_pConfig->m_ClMenuAlpha/100.0f), m_BackgroundCorners&CUI::CORNER_B, 5.0f);
+		m_pRenderTools->DrawUIRect(&View, vec4(0.0f, 0.0f, 0.0f, m_pConfig->m_ClMenuAlpha / 100.0f), m_BackgroundCorners & CUI::CORNER_B, 5.0f);
 
 	// draw footers
 	if(m_pBottomText)
@@ -108,7 +108,7 @@ void CMenus::CListBox::DoStart(float RowHeight, int NumItems, int ItemsPerRow, i
 		View.HSplitBottom(m_FooterHeight, &View, &Footer);
 		Footer.VSplitLeft(10.0f, 0, &Footer);
 		Footer.y += 2.0f;
-		m_pUI->DoLabel(&Footer, m_pBottomText, Footer.h*ms_FontmodHeight*0.8f, CUI::ALIGN_CENTER);
+		m_pUI->DoLabel(&Footer, m_pBottomText, Footer.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_CENTER);
 	}
 
 	// setup the variables
@@ -145,7 +145,7 @@ CMenus::CListboxItem CMenus::CListBox::DoNextRow()
 	static CUIRect s_RowView;
 	CListboxItem Item = {0};
 
-	if(m_ListBoxItemIndex%m_ListBoxItemsPerRow == 0)
+	if(m_ListBoxItemIndex % m_ListBoxItemsPerRow == 0)
 		m_ListBoxView.HSplitTop(m_ListBoxRowHeight /*-2.0f*/, &s_RowView, &m_ListBoxView);
 	m_ScrollRegion.AddRect(s_RowView);
 	if(m_ListBoxUpdateScroll && m_ListBoxSelectedIndex == m_ListBoxItemIndex)
@@ -154,7 +154,7 @@ CMenus::CListboxItem CMenus::CListBox::DoNextRow()
 		m_ListBoxUpdateScroll = false;
 	}
 
-	s_RowView.VSplitLeft(s_RowView.w/(m_ListBoxItemsPerRow-m_ListBoxItemIndex%m_ListBoxItemsPerRow), &Item.m_Rect, &s_RowView);
+	s_RowView.VSplitLeft(s_RowView.w / (m_ListBoxItemsPerRow - m_ListBoxItemIndex % m_ListBoxItemsPerRow), &Item.m_Rect, &s_RowView);
 
 	Item.m_Selected = m_ListBoxSelectedIndex == m_ListBoxItemIndex;
 	Item.m_Visible = !m_ScrollRegion.IsRectClipped(Item.m_Rect);
