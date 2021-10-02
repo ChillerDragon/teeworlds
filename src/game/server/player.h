@@ -5,6 +5,7 @@
 
 #include "alloc.h"
 
+#include <game/server/gamecontext.h>
 
 enum
 {

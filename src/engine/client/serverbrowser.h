@@ -7,6 +7,8 @@
 #include "serverbrowser_entry.h"
 #include "serverbrowser_fav.h"
 #include "serverbrowser_filter.h"
+#include <engine/masterserver.h>
+#include <engine/serverbrowser.h>
 
 class CServerBrowser : public IServerBrowser
 {

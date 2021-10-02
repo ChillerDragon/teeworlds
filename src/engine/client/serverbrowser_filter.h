@@ -4,6 +4,7 @@
 #define ENGINE_CLIENT_SERVERBROWSER_FILTER_H
 
 #include <base/tl/array.h>
+#include <engine/serverbrowser.h>
 
 class CServerBrowserFilter
 {

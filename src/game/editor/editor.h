@@ -18,6 +18,9 @@
 #include <game/mapitems.h>
 #include <game/client/render.h>
 
+#include <engine/console.h>
+#include <engine/editor.h>
+#include <engine/graphics.h>
 #include <engine/shared/config.h>
 #include <engine/shared/datafile.h>
 #include <engine/editor.h>

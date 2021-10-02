@@ -7,6 +7,8 @@
 #include "gamecontroller.h"
 #include "player.h"
 
+#include <engine/server.h>
+#include <game/gamecore.h>
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS)
 
