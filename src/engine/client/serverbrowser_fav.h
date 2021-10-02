@@ -5,6 +5,7 @@
 
 #include "serverbrowser_entry.h"
 #include "serverbrowser_filter.h"
+#include <engine/engine.h>
 #include <engine/serverbrowser.h>
 
 class CServerBrowserFavorites

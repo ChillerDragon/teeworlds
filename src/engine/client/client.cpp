@@ -9,6 +9,8 @@
 #include <base/system.h>
 
 #include <engine/client.h>
+#include <engine/client/contacts.h>
+#include <engine/client/serverbrowser.h>
 #include <engine/config.h>
 #include <engine/console.h>
 #include <engine/editor.h>

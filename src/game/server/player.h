@@ -5,6 +5,8 @@
 
 #include "alloc.h"
 
+#include <game/server/gamecontext.h>
+
 enum
 {
 	WEAPON_GAME = -3, // team switching etc

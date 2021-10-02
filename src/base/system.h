@@ -11,6 +11,10 @@
 #include "detect.h"
 #include <time.h>
 
+#if defined(CONF_FAMILY_WINDOWS)
+#include <windows.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -6,6 +6,8 @@
 #include "huffman.h"
 #include "ringbuffer.h"
 
+#include <base/system.h>
+
 /*
 
 CURRENT:
