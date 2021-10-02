@@ -138,7 +138,7 @@ public:
 			is being created.
 	*/
 	void Snap(int SnappingClient);
-	
+
 	void PostSnap();
 
 	/*

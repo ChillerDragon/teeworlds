@@ -3,10 +3,10 @@
 #ifndef GAME_CLIENT_RENDER_H
 #define GAME_CLIENT_RENDER_H
 
-#include <engine/graphics.h>
 #include <base/vmath.h>
-#include <generated/protocol.h>
+#include <engine/graphics.h>
 #include <game/mapitems.h>
+#include <generated/protocol.h>
 
 // sprite renderings
 enum
@@ -26,7 +26,7 @@ public:
 	CTeeRenderInfo()
 	{
 		for(int i = 0; i < NUM_SKINPARTS; i++)
-			m_aColors[i] = vec4(1,1,1,1);
+			m_aColors[i] = vec4(1, 1, 1, 1);
 		m_Size = 1.0f;
 		m_GotAirJump = 1;
 	};
@@ -48,14 +48,14 @@ class CRenderTools
 {
 	class CConfig *m_pConfig;
 	class IGraphics *m_pGraphics;
-public:
 
+public:
 	class IGraphics *Graphics() const { return m_pGraphics; }
 
 	void Init(class CConfig *pConfig, class IGraphics *pGraphics);
 
-	void SelectSprite(struct CDataSprite *pSprite, int Flags=0, int sx=0, int sy=0);
-	void SelectSprite(int id, int Flags=0, int sx=0, int sy=0);
+	void SelectSprite(struct CDataSprite *pSprite, int Flags = 0, int sx = 0, int sy = 0);
+	void SelectSprite(int id, int Flags = 0, int sx = 0, int sy = 0);
 
 	void DrawSprite(float x, float y, float size);
 	void RenderCursor(float CenterX, float CenterY, float Size);
@@ -63,7 +63,7 @@ public:
 	// object render methods (gc_render_obj.cpp)
 	void RenderTee(class CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos);
 	void RenderTeeHand(const CTeeRenderInfo *pInfo, vec2 CenterPos, vec2 Dir, float AngleOffset,
-					   vec2 PostRotOffset);
+		vec2 PostRotOffset);
 
 	// map render methods (gc_render_map.cpp)
 	static void RenderEvalEnvelope(CEnvPoint *pPoints, int NumPoints, int Channels, float Time, float *pResult);

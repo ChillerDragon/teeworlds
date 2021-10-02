@@ -9,8 +9,8 @@
 #include <engine/graphics.h>
 #include <engine/input.h>
 #include <engine/keys.h>
-#include <engine/storage.h>
 #include <engine/serverbrowser.h>
+#include <engine/storage.h>
 #include <engine/textrender.h>
 
 #include <generated/client_data.h>
@@ -18,7 +18,6 @@
 
 #include "countryflags.h"
 #include "menus.h"
-
 
 // popup menu handling
 static struct
@@ -72,12 +71,12 @@ void CMenus::DoPopupMenu()
 
 		int Corners = CUIRect::CORNER_ALL;
 		if(s_Popups.m_IsMenu)
-			Corners = CUIRect::CORNER_R|CUIRect::CORNER_B;
+			Corners = CUIRect::CORNER_R | CUIRect::CORNER_B;
 
 		CUIRect r = s_Popups.m_Rect;
-		r.Draw(vec4(0.5f,0.5f,0.5f,0.75f), 3.0f, Corners);
+		r.Draw(vec4(0.5f, 0.5f, 0.5f, 0.75f), 3.0f, Corners);
 		r.Margin(1.0f, &r);
-		r.Draw(vec4(0,0,0,0.75f), 3.0f, Corners);
+		r.Draw(vec4(0, 0, 0, 0.75f), 3.0f, Corners);
 		r.Margin(4.0f, &r);
 
 		if(s_Popups.m_pfnFunc(this, r))
@@ -87,4 +86,3 @@ void CMenus::DoPopupMenu()
 			m_PopupActive = false;
 	}
 }
-

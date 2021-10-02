@@ -1,14 +1,14 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <generated/server_data.h>
 #include <game/server/gamecontext.h>
 #include <game/server/player.h>
+#include <generated/server_data.h>
 
 #include "character.h"
 #include "pickup.h"
 
-CPickup::CPickup(CGameWorld *pGameWorld, int Type, vec2 Pos)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_PICKUP, Pos, PickupPhysSize)
+CPickup::CPickup(CGameWorld *pGameWorld, int Type, vec2 Pos) :
+	CEntity(pGameWorld, CGameWorld::ENTTYPE_PICKUP, Pos, PickupPhysSize)
 {
 	m_Type = Type;
 
@@ -19,7 +19,7 @@ CPickup::CPickup(CGameWorld *pGameWorld, int Type, vec2 Pos)
 
 void CPickup::Reset()
 {
-	if (g_pData->m_aPickups[m_Type].m_Spawndelay > 0)
+	if(g_pData->m_aPickups[m_Type].m_Spawndelay > 0)
 		m_SpawnTick = Server()->Tick() + Server()->TickSpeed() * g_pData->m_aPickups[m_Type].m_Spawndelay;
 	else
 		m_SpawnTick = -1;
@@ -47,72 +47,72 @@ void CPickup::Tick()
 	{
 		// player picked us up, is someone was hooking us, let them go
 		bool Picked = false;
-		switch (m_Type)
+		switch(m_Type)
 		{
-			case PICKUP_HEALTH:
-				if(pChr->IncreaseHealth(1))
-				{
-					Picked = true;
-					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
-				}
-				break;
+		case PICKUP_HEALTH:
+			if(pChr->IncreaseHealth(1))
+			{
+				Picked = true;
+				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
+			}
+			break;
 
-			case PICKUP_ARMOR:
-				if(pChr->IncreaseArmor(1))
-				{
-					Picked = true;
-					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
-				}
-				break;
+		case PICKUP_ARMOR:
+			if(pChr->IncreaseArmor(1))
+			{
+				Picked = true;
+				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
+			}
+			break;
 
-			case PICKUP_GRENADE:
-				if(pChr->GiveWeapon(WEAPON_GRENADE, g_pData->m_Weapons.m_aId[WEAPON_GRENADE].m_Maxammo))
-				{
-					Picked = true;
-					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_GRENADE);
-					if(pChr->GetPlayer())
-						GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), WEAPON_GRENADE);
-				}
-				break;
-			case PICKUP_SHOTGUN:
-				if(pChr->GiveWeapon(WEAPON_SHOTGUN, g_pData->m_Weapons.m_aId[WEAPON_SHOTGUN].m_Maxammo))
-				{
-					Picked = true;
-					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
-					if(pChr->GetPlayer())
-						GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), WEAPON_SHOTGUN);
-				}
-				break;
-			case PICKUP_LASER:
-				if(pChr->GiveWeapon(WEAPON_LASER, g_pData->m_Weapons.m_aId[WEAPON_LASER].m_Maxammo))
-				{
-					Picked = true;
-					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
-					if(pChr->GetPlayer())
-						GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), WEAPON_LASER);
-				}
-				break;
+		case PICKUP_GRENADE:
+			if(pChr->GiveWeapon(WEAPON_GRENADE, g_pData->m_Weapons.m_aId[WEAPON_GRENADE].m_Maxammo))
+			{
+				Picked = true;
+				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_GRENADE);
+				if(pChr->GetPlayer())
+					GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), WEAPON_GRENADE);
+			}
+			break;
+		case PICKUP_SHOTGUN:
+			if(pChr->GiveWeapon(WEAPON_SHOTGUN, g_pData->m_Weapons.m_aId[WEAPON_SHOTGUN].m_Maxammo))
+			{
+				Picked = true;
+				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
+				if(pChr->GetPlayer())
+					GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), WEAPON_SHOTGUN);
+			}
+			break;
+		case PICKUP_LASER:
+			if(pChr->GiveWeapon(WEAPON_LASER, g_pData->m_Weapons.m_aId[WEAPON_LASER].m_Maxammo))
+			{
+				Picked = true;
+				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
+				if(pChr->GetPlayer())
+					GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), WEAPON_LASER);
+			}
+			break;
 
-			case PICKUP_NINJA:
-				{
-					Picked = true;
-					// activate ninja on target player
-					pChr->GiveNinja();
+		case PICKUP_NINJA:
+		{
+			Picked = true;
+			// activate ninja on target player
+			pChr->GiveNinja();
 
-					// loop through all players, setting their emotes
-					CCharacter *pC = static_cast<CCharacter *>(GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER));
-					for(; pC; pC = (CCharacter *)pC->TypeNext())
-					{
-						if (pC != pChr)
-							pC->SetEmote(EMOTE_SURPRISE, Server()->Tick() + Server()->TickSpeed());
-					}
+			// loop through all players, setting their emotes
+			CCharacter *pC = static_cast<CCharacter *>(GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER));
+			for(; pC; pC = (CCharacter *)pC->TypeNext())
+			{
+				if(pC != pChr)
+					pC->SetEmote(EMOTE_SURPRISE, Server()->Tick() + Server()->TickSpeed());
+			}
 
-					pChr->SetEmote(EMOTE_ANGRY, Server()->Tick() + 1200 * Server()->TickSpeed() / 1000);
-					break;
-				}
+			pChr->SetEmote(EMOTE_ANGRY, Server()->Tick() + 1200 * Server()->TickSpeed() / 1000);
+			break;
+		}
 
-			default:
-				break;
+		default:
+			break;
 		};
 
 		if(Picked)

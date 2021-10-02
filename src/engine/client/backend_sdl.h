@@ -3,40 +3,40 @@
 #include "graphics_threaded.h"
 
 #if defined(CONF_PLATFORM_MACOSX)
-	#include <objc/objc-runtime.h>
+#include <objc/objc-runtime.h>
 
-	class semaphore
+class semaphore
+{
+	SDL_sem *sem;
+
+public:
+	semaphore() { sem = SDL_CreateSemaphore(0); }
+	~semaphore() { SDL_DestroySemaphore(sem); }
+	void wait() { SDL_SemWait(sem); }
+	void signal() { SDL_SemPost(sem); }
+};
+
+class CAutoreleasePool
+{
+private:
+	id m_Pool;
+
+public:
+	CAutoreleasePool()
 	{
-		SDL_sem *sem;
-	public:
-		semaphore() { sem = SDL_CreateSemaphore(0); }
-		~semaphore() { SDL_DestroySemaphore(sem); }
-		void wait() { SDL_SemWait(sem); }
-		void signal() { SDL_SemPost(sem); }
-	};
+		Class NSAutoreleasePoolClass = (Class)objc_getClass("NSAutoreleasePool");
+		m_Pool = class_createInstance(NSAutoreleasePoolClass, 0);
+		SEL selector = sel_registerName("init");
+		((id(*)(id, SEL))objc_msgSend)(m_Pool, selector);
+	}
 
-	class CAutoreleasePool
+	~CAutoreleasePool()
 	{
-	private:
-		id m_Pool;
-
-	public:
-		CAutoreleasePool()
-		{
-			Class NSAutoreleasePoolClass = (Class) objc_getClass("NSAutoreleasePool");
-			m_Pool = class_createInstance(NSAutoreleasePoolClass, 0);
-			SEL selector = sel_registerName("init");
-			((id (*)(id, SEL))objc_msgSend)(m_Pool, selector);
-		}
-
-		~CAutoreleasePool()
-		{
-			SEL selector = sel_registerName("drain");
-			((id (*)(id, SEL))objc_msgSend)(m_Pool, selector);
-		}
-	};
+		SEL selector = sel_registerName("drain");
+		((id(*)(id, SEL))objc_msgSend)(m_Pool, selector);
+	}
+};
 #endif
-
 
 // basic threaded backend, abstract, missing init and shutdown functions
 class CGraphicsBackend_Threaded : public IGraphicsBackend
@@ -62,7 +62,7 @@ protected:
 
 private:
 	ICommandProcessor *m_pProcessor;
-	CCommandBuffer * volatile m_pBuffer;
+	CCommandBuffer *volatile m_pBuffer;
 	volatile bool m_Shutdown;
 	semaphore m_Activity;
 	semaphore m_BufferDone;
@@ -76,8 +76,9 @@ class CCommandProcessorFragment_General
 {
 	void Cmd_Nop();
 	void Cmd_Signal(const CCommandBuffer::CSignalCommand *pCommand);
+
 public:
-	bool RunCommand(const CCommandBuffer::CCommand * pBaseCommand);
+	bool RunCommand(const CCommandBuffer::CCommand *pBaseCommand);
 };
 
 // takes care of opengl related rendering
@@ -92,8 +93,8 @@ class CCommandProcessorFragment_OpenGL
 			STATE_TEX2D = 1,
 			STATE_TEX3D = 2,
 
-			MIN_GL_MAX_3D_TEXTURE_SIZE = 64,																					// GL_MAX_3D_TEXTURE_SIZE must be at least 64 according to the standard
-			MAX_ARRAYSIZE_TEX3D = IGraphics::NUMTILES_DIMENSION * IGraphics::NUMTILES_DIMENSION / MIN_GL_MAX_3D_TEXTURE_SIZE,	// = 4
+			MIN_GL_MAX_3D_TEXTURE_SIZE = 64, // GL_MAX_3D_TEXTURE_SIZE must be at least 64 according to the standard
+			MAX_ARRAYSIZE_TEX3D = IGraphics::NUMTILES_DIMENSION * IGraphics::NUMTILES_DIMENSION / MIN_GL_MAX_3D_TEXTURE_SIZE, // = 4
 		};
 		GLuint m_Tex2D;
 		GLuint m_Tex3D[MAX_ARRAYSIZE_TEX3D];
@@ -115,7 +116,8 @@ public:
 
 	struct CInitCommand : public CCommandBuffer::CCommand
 	{
-		CInitCommand() : CCommand(CMD_INIT) {}
+		CInitCommand() :
+			CCommand(CMD_INIT) {}
 		volatile int *m_pTextureMemoryUsage;
 		int *m_pTextureArraySize;
 	};
@@ -138,7 +140,7 @@ private:
 public:
 	CCommandProcessorFragment_OpenGL();
 
-	bool RunCommand(const CCommandBuffer::CCommand * pBaseCommand);
+	bool RunCommand(const CCommandBuffer::CCommand *pBaseCommand);
 };
 
 // takes care of sdl related commands
@@ -147,6 +149,7 @@ class CCommandProcessorFragment_SDL
 	// SDL stuff
 	SDL_Window *m_pWindow;
 	SDL_GLContext m_GLContext;
+
 public:
 	enum
 	{
@@ -156,14 +159,16 @@ public:
 
 	struct CInitCommand : public CCommandBuffer::CCommand
 	{
-		CInitCommand() : CCommand(CMD_INIT) {}
+		CInitCommand() :
+			CCommand(CMD_INIT) {}
 		SDL_Window *m_pWindow;
 		SDL_GLContext m_GLContext;
 	};
 
 	struct CShutdownCommand : public CCommandBuffer::CCommand
 	{
-		CShutdownCommand() : CCommand(CMD_SHUTDOWN) {}
+		CShutdownCommand() :
+			CCommand(CMD_SHUTDOWN) {}
 	};
 
 private:
@@ -171,6 +176,7 @@ private:
 	void Cmd_Shutdown(const CShutdownCommand *pCommand);
 	void Cmd_Swap(const CCommandBuffer::CSwapCommand *pCommand);
 	void Cmd_VSync(const CCommandBuffer::CVSyncCommand *pCommand);
+
 public:
 	CCommandProcessorFragment_SDL();
 
@@ -183,7 +189,8 @@ class CCommandProcessor_SDL_OpenGL : public CGraphicsBackend_Threaded::ICommandP
 	CCommandProcessorFragment_OpenGL m_OpenGL;
 	CCommandProcessorFragment_SDL m_SDL;
 	CCommandProcessorFragment_General m_General;
- public:
+
+public:
 	virtual void RunBuffer(CCommandBuffer *pBuffer);
 };
 
@@ -196,6 +203,7 @@ class CGraphicsBackend_SDL_OpenGL : public CGraphicsBackend_Threaded
 	volatile int m_TextureMemoryUsage;
 	int m_NumScreens;
 	int m_TextureArraySize;
+
 public:
 	virtual int Init(const char *pName, int *pScreen, int *pWindowWidth, int *pWindowHeight, int *pScreenWidth, int *pScreenHeight, int FsaaSamples, int Flags, int *pDesktopWidth, int *pDesktopHeight);
 	virtual int Shutdown();
@@ -207,12 +215,12 @@ public:
 
 	virtual void Minimize();
 	virtual void Maximize();
-	virtual bool Fullscreen(bool State);		// on=true/off=false
-	virtual void SetWindowBordered(bool State);	// on=true/off=false
+	virtual bool Fullscreen(bool State); // on=true/off=false
+	virtual void SetWindowBordered(bool State); // on=true/off=false
 	virtual bool SetWindowScreen(int Index);
 	virtual int GetWindowScreen();
 	virtual int GetVideoModes(CVideoMode *pModes, int MaxModes, int Screen);
-	virtual bool GetDesktopResolution(int Index, int *pDesktopWidth, int* pDesktopHeight);
+	virtual bool GetDesktopResolution(int Index, int *pDesktopWidth, int *pDesktopHeight);
 	virtual int WindowActive();
 	virtual int WindowOpen();
 };

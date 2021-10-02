@@ -1,20 +1,19 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/graphics.h>
 #include <engine/demo.h>
+#include <engine/graphics.h>
 #include <engine/shared/config.h>
-#include <generated/protocol.h>
 #include <generated/client_data.h>
+#include <generated/protocol.h>
 
 #include <game/client/gameclient.h>
-#include <game/client/ui.h>
 #include <game/client/render.h>
+#include <game/client/ui.h>
 
-#include <game/client/components/flow.h>
 #include <game/client/components/effects.h>
+#include <game/client/components/flow.h>
 
 #include "items.h"
-
 
 void CItems::RenderProjectile(const CNetObj_Projectile *pCurrent, int ItemID)
 {
@@ -43,32 +42,32 @@ void CItems::RenderProjectile(const CNetObj_Projectile *pCurrent, int ItemID)
 
 	float Ct;
 	if(m_pClient->ShouldUsePredicted() && Config()->m_ClPredictProjectiles)
-		Ct = ((float)(Client()->PredGameTick() - 1 - pCurrent->m_StartTick) + Client()->PredIntraGameTick())/(float)SERVER_TICK_SPEED;
+		Ct = ((float)(Client()->PredGameTick() - 1 - pCurrent->m_StartTick) + Client()->PredIntraGameTick()) / (float)SERVER_TICK_SPEED;
 	else
-		Ct = (Client()->PrevGameTick()-pCurrent->m_StartTick)/(float)SERVER_TICK_SPEED + s_LastGameTickTime;
+		Ct = (Client()->PrevGameTick() - pCurrent->m_StartTick) / (float)SERVER_TICK_SPEED + s_LastGameTickTime;
 	if(Ct < 0)
 		return; // projectile haven't been shot yet
 
 	vec2 StartPos(pCurrent->m_X, pCurrent->m_Y);
-	vec2 StartVel(pCurrent->m_VelX/100.0f, pCurrent->m_VelY/100.0f);
+	vec2 StartVel(pCurrent->m_VelX / 100.0f, pCurrent->m_VelY / 100.0f);
 	vec2 Pos = CalcPos(StartPos, StartVel, Curvature, Speed, Ct);
-	vec2 PrevPos = CalcPos(StartPos, StartVel, Curvature, Speed, Ct-0.001f);
+	vec2 PrevPos = CalcPos(StartPos, StartVel, Curvature, Speed, Ct - 0.001f);
 
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 	Graphics()->QuadsBegin();
 
-	RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[clamp(pCurrent->m_Type, 0, NUM_WEAPONS-1)].m_pSpriteProj);
-	const vec2 Vel = Pos-PrevPos;
+	RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[clamp(pCurrent->m_Type, 0, NUM_WEAPONS - 1)].m_pSpriteProj);
+	const vec2 Vel = Pos - PrevPos;
 
 	// add particle for this projectile
 	if(pCurrent->m_Type == WEAPON_GRENADE)
 	{
-		m_pClient->m_pEffects->SmokeTrail(Pos, Vel*-1);
+		m_pClient->m_pEffects->SmokeTrail(Pos, Vel * -1);
 		const float Now = Client()->LocalTime();
 		static float s_Time = 0.0f;
 		static float s_LastLocalTime = Now;
 		s_Time += (Now - s_LastLocalTime) * m_pClient->GetAnimationPlaybackSpeed();
-		Graphics()->QuadsSetRotation(s_Time*pi*2*2 + ItemID);
+		Graphics()->QuadsSetRotation(s_Time * pi * 2 * 2 + ItemID);
 		s_LastLocalTime = Now;
 	}
 	else
@@ -97,8 +96,7 @@ void CItems::RenderPickup(const CNetObj_Pickup *pPrev, const CNetObj_Pickup *pCu
 		SPRITE_PICKUP_LASER,
 		SPRITE_PICKUP_NINJA,
 		SPRITE_PICKUP_GUN,
-		SPRITE_PICKUP_HAMMER
-	};
+		SPRITE_PICKUP_HAMMER};
 	RenderTools()->SelectSprite(aSprites[pCurrent->m_Type]);
 
 	switch(pCurrent->m_Type)
@@ -113,7 +111,7 @@ void CItems::RenderPickup(const CNetObj_Pickup *pPrev, const CNetObj_Pickup *pCu
 		Size = g_pData->m_Weapons.m_aId[WEAPON_LASER].m_VisualSize;
 		break;
 	case PICKUP_NINJA:
-		m_pClient->m_pEffects->PowerupShine(Pos, vec2(96,18));
+		m_pClient->m_pEffects->PowerupShine(Pos, vec2(96, 18));
 		Size *= 2.0f;
 		Pos.x -= 10.0f;
 		break;
@@ -129,9 +127,9 @@ void CItems::RenderPickup(const CNetObj_Pickup *pPrev, const CNetObj_Pickup *pCu
 	static float s_Time = 0.0f;
 	static float s_LastLocalTime = Now;
 	s_Time += (Now - s_LastLocalTime) * m_pClient->GetAnimationPlaybackSpeed();
-	const float Offset = Pos.y/32.0f + Pos.x/32.0f;
-	Pos.x += cosf(s_Time*2.0f+Offset)*2.5f;
-	Pos.y += sinf(s_Time*2.0f+Offset)*2.5f;
+	const float Offset = Pos.y / 32.0f + Pos.x / 32.0f;
+	Pos.x += cosf(s_Time * 2.0f + Offset) * 2.5f;
+	Pos.y += sinf(s_Time * 2.0f + Offset) * 2.5f;
 	s_LastLocalTime = Now;
 
 	Graphics()->QuadsSetRotation(0.0f);
@@ -149,7 +147,7 @@ void CItems::RenderFlag(const CNetObj_Flag *pPrev, const CNetObj_Flag *pCurrent,
 		// make sure that the flag isn't interpolated between capture and return
 		if(pPrevGameDataFlag &&
 			((pCurrent->m_Team == TEAM_RED && pPrevGameDataFlag->m_FlagCarrierRed != pCurGameDataFlag->m_FlagCarrierRed) ||
-			(pCurrent->m_Team == TEAM_BLUE && pPrevGameDataFlag->m_FlagCarrierBlue != pCurGameDataFlag->m_FlagCarrierBlue)))
+				(pCurrent->m_Team == TEAM_BLUE && pPrevGameDataFlag->m_FlagCarrierBlue != pCurGameDataFlag->m_FlagCarrierBlue)))
 			Pos = vec2(pCurrent->m_X, pCurrent->m_Y);
 
 		int FlagCarrier = -1;
@@ -168,17 +166,16 @@ void CItems::RenderFlag(const CNetObj_Flag *pPrev, const CNetObj_Flag *pCurrent,
 	Graphics()->QuadsBegin();
 	RenderTools()->SelectSprite(pCurrent->m_Team == TEAM_RED ? SPRITE_FLAG_RED : SPRITE_FLAG_BLUE);
 	Graphics()->QuadsSetRotation(0.0f);
-	IGraphics::CQuadItem QuadItem(Pos.x, Pos.y-Size*0.75f, Size, Size*2);
+	IGraphics::CQuadItem QuadItem(Pos.x, Pos.y - Size * 0.75f, Size, Size * 2);
 	Graphics()->QuadsDraw(&QuadItem, 1);
 	Graphics()->QuadsEnd();
 }
-
 
 void CItems::RenderLaser(const struct CNetObj_Laser *pCurrent)
 {
 	const vec2 Pos = vec2(pCurrent->m_X, pCurrent->m_Y);
 	const vec2 From = vec2(pCurrent->m_FromX, pCurrent->m_FromY);
-	const vec2 Dir = normalize(Pos-From);
+	const vec2 Dir = normalize(Pos - From);
 
 	static int s_LastGameTick = Client()->GameTick();
 	static float s_LastIntraTick = Client()->IntraGameTick();
@@ -198,24 +195,24 @@ void CItems::RenderLaser(const struct CNetObj_Laser *pCurrent)
 
 	// do outline
 	const vec4 OuterColor(0.075f, 0.075f, 0.25f, 1.0f);
-	const vec2 Outer = vec2(Dir.y, -Dir.x) * (7.0f*RemainingRelativeLifetime);
+	const vec2 Outer = vec2(Dir.y, -Dir.x) * (7.0f * RemainingRelativeLifetime);
 	Graphics()->SetColor(OuterColor);
 	IGraphics::CFreeformItem Freeform(
-			From.x-Outer.x, From.y-Outer.y,
-			From.x+Outer.x, From.y+Outer.y,
-			Pos.x-Outer.x, Pos.y-Outer.y,
-			Pos.x+Outer.x, Pos.y+Outer.y);
+		From.x - Outer.x, From.y - Outer.y,
+		From.x + Outer.x, From.y + Outer.y,
+		Pos.x - Outer.x, Pos.y - Outer.y,
+		Pos.x + Outer.x, Pos.y + Outer.y);
 	Graphics()->QuadsDrawFreeform(&Freeform, 1);
 
 	// do inner
 	const vec4 InnerColor(0.5f, 0.5f, 1.0f, 1.0f);
-	const vec2 Inner = vec2(Dir.y, -Dir.x) * (5.0f*RemainingRelativeLifetime);
+	const vec2 Inner = vec2(Dir.y, -Dir.x) * (5.0f * RemainingRelativeLifetime);
 	Graphics()->SetColor(InnerColor);
 	Freeform = IGraphics::CFreeformItem(
-			From.x-Inner.x, From.y-Inner.y,
-			From.x+Inner.x, From.y+Inner.y,
-			Pos.x-Inner.x, Pos.y-Inner.y,
-			Pos.x+Inner.x, Pos.y+Inner.y);
+		From.x - Inner.x, From.y - Inner.y,
+		From.x + Inner.x, From.y + Inner.y,
+		Pos.x - Inner.x, Pos.y - Inner.y,
+		Pos.x + Inner.x, Pos.y + Inner.y);
 	Graphics()->QuadsDrawFreeform(&Freeform, 1);
 
 	Graphics()->QuadsEnd();
@@ -225,8 +222,8 @@ void CItems::RenderLaser(const struct CNetObj_Laser *pCurrent)
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_PARTICLES].m_Id);
 	Graphics()->QuadsBegin();
 
-	const int aSprites[] = { SPRITE_PART_SPLAT01, SPRITE_PART_SPLAT02, SPRITE_PART_SPLAT03 };
-	RenderTools()->SelectSprite(aSprites[s_LastGameTick%3]);
+	const int aSprites[] = {SPRITE_PART_SPLAT01, SPRITE_PART_SPLAT02, SPRITE_PART_SPLAT03};
+	RenderTools()->SelectSprite(aSprites[s_LastGameTick % 3]);
 	Graphics()->QuadsSetRotation(s_LastGameTick);
 	Graphics()->SetColor(OuterColor);
 	IGraphics::CQuadItem QuadItem(Pos.x, Pos.y, 24, 24);
@@ -279,9 +276,8 @@ void CItems::OnRender()
 			{
 				const void *pPrevGameDataFlag = Client()->SnapFindItem(IClient::SNAP_PREV, NETOBJTYPE_GAMEDATAFLAG, m_pClient->m_Snap.m_GameDataFlagSnapID);
 				RenderFlag(static_cast<const CNetObj_Flag *>(pPrev), static_cast<const CNetObj_Flag *>(pData),
-							static_cast<const CNetObj_GameDataFlag *>(pPrevGameDataFlag), m_pClient->m_Snap.m_pGameDataFlag);
+					static_cast<const CNetObj_GameDataFlag *>(pPrevGameDataFlag), m_pClient->m_Snap.m_pGameDataFlag);
 			}
 		}
 	}
 }
-

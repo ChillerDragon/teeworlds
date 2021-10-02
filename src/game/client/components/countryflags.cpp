@@ -4,15 +4,14 @@
 #include <base/system.h>
 
 #include <engine/console.h>
+#include <engine/external/json-parser/json.h>
 #include <engine/graphics.h>
+#include <engine/shared/config.h>
 #include <engine/storage.h>
 #include <engine/textrender.h>
-#include <engine/external/json-parser/json.h>
-#include <engine/shared/config.h>
 
-#include "menus.h"
 #include "countryflags.h"
-
+#include "menus.h"
 
 void CCountryFlags::LoadCountryflagsIndexfile()
 {
@@ -127,7 +126,7 @@ void CCountryFlags::LoadCountryflagsIndexfile()
 	else
 		mem_zero(m_CodeIndexLUT, sizeof(m_CodeIndexLUT));
 	for(int i = 0; i < m_aCountryFlags.size(); ++i)
-		m_CodeIndexLUT[max(0, (m_aCountryFlags[i].m_CountryCode-CODE_LB)%CODE_RANGE)] = i;
+		m_CodeIndexLUT[max(0, (m_aCountryFlags[i].m_CountryCode - CODE_LB) % CODE_RANGE)] = i;
 }
 
 int CCountryFlags::GetInitAmount() const
@@ -159,7 +158,7 @@ int CCountryFlags::Num() const
 
 const CCountryFlags::CCountryFlag *CCountryFlags::GetByCountryCode(int CountryCode) const
 {
-	return GetByIndex(m_CodeIndexLUT[max(0, (CountryCode-CODE_LB)%CODE_RANGE)]);
+	return GetByIndex(m_CodeIndexLUT[max(0, (CountryCode - CODE_LB) % CODE_RANGE)]);
 }
 
 const CCountryFlags::CCountryFlag *CCountryFlags::GetByIndex(int Index, bool SkipBlocked) const
@@ -171,7 +170,7 @@ const CCountryFlags::CCountryFlag *CCountryFlags::GetByIndex(int Index, bool Ski
 				if(!Index--)
 					return &m_aCountryFlags[i];
 	}
-	return &m_aCountryFlags[max(0, Index%m_aCountryFlags.size())];
+	return &m_aCountryFlags[max(0, Index % m_aCountryFlags.size())];
 }
 
 void CCountryFlags::Render(int CountryCode, const vec4 *pColor, float x, float y, float w, float h, bool AllowBlocked)
@@ -183,7 +182,7 @@ void CCountryFlags::Render(int CountryCode, const vec4 *pColor, float x, float y
 	{
 		Graphics()->TextureSet(pFlag->m_Texture);
 		Graphics()->QuadsBegin();
-		Graphics()->SetColor(pColor->r*pColor->a, pColor->g*pColor->a, pColor->b*pColor->a, pColor->a);
+		Graphics()->SetColor(pColor->r * pColor->a, pColor->g * pColor->a, pColor->b * pColor->a, pColor->a);
 		IGraphics::CQuadItem QuadItem(x, y, w, h);
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();
@@ -192,7 +191,7 @@ void CCountryFlags::Render(int CountryCode, const vec4 *pColor, float x, float y
 	{
 		static CTextCursor s_Cursor(10.0f);
 		s_Cursor.Reset();
-		s_Cursor.MoveTo(x+w/2, y+h/2);
+		s_Cursor.MoveTo(x + w / 2, y + h / 2);
 		s_Cursor.m_MaxLines = w;
 		s_Cursor.m_Align = TEXTALIGN_MC;
 		TextRender()->TextOutlined(&s_Cursor, pFlag->m_aCountryCodeString, -1);

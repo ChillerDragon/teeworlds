@@ -6,10 +6,9 @@
 
 #include <engine/console.h>
 #include <engine/engine.h>
-#include <engine/storage.h>
 #include <engine/shared/config.h>
 #include <engine/shared/network.h>
-
+#include <engine/storage.h>
 
 static int HostLookupThread(void *pUser)
 {
@@ -44,7 +43,7 @@ public:
 			str_format(aFilenameSent, sizeof(aFilenameSent), "dumps/%s_network_sent_%s.txt", pEngine->m_pAppname, aBuf);
 			str_format(aFilenameRecv, sizeof(aFilenameRecv), "dumps/%s_network_recv_%s.txt", pEngine->m_pAppname, aBuf);
 			pEngine->StartLogging(pEngine->m_pStorage->OpenFile(aFilenameSent, IOFLAG_WRITE, IStorage::TYPE_SAVE),
-									pEngine->m_pStorage->OpenFile(aFilenameRecv, IOFLAG_WRITE, IStorage::TYPE_SAVE));
+				pEngine->m_pStorage->OpenFile(aFilenameRecv, IOFLAG_WRITE, IStorage::TYPE_SAVE));
 		}
 	}
 
@@ -56,15 +55,14 @@ public:
 
 		//
 		dbg_msg("engine", "running on %s-%s-%s", CONF_FAMILY_STRING, CONF_PLATFORM_STRING, CONF_ARCH_STRING);
-	#ifdef CONF_ARCH_ENDIAN_LITTLE
+#ifdef CONF_ARCH_ENDIAN_LITTLE
 		dbg_msg("engine", "arch is little endian");
-	#elif defined(CONF_ARCH_ENDIAN_BIG)
+#elif defined(CONF_ARCH_ENDIAN_BIG)
 		dbg_msg("engine", "arch is big endian");
-	#else
+#else
 		dbg_msg("engine", "unknown endian");
-	#endif
+#endif
 
-		
 		m_JobPool.Init(1);
 
 		m_DataLogSent = 0;
@@ -87,7 +85,7 @@ public:
 		if(!m_pConsole || !m_pStorage)
 			return;
 
-		m_pConsole->Register("dbg_lognetwork", "", CFGFLAG_SERVER|CFGFLAG_CLIENT, Con_DbgLognetwork, this, "Log the network");
+		m_pConsole->Register("dbg_lognetwork", "", CFGFLAG_SERVER | CFGFLAG_CLIENT, Con_DbgLognetwork, this, "Log the network");
 	}
 
 	void InitLogfile()
@@ -100,7 +98,7 @@ public:
 				str_timestamp(aBuf, sizeof(aBuf));
 			else
 				aBuf[0] = 0;
-			char aLogFilename[128];			
+			char aLogFilename[128];
 			str_format(aLogFilename, sizeof(aLogFilename), "dumps/%s%s.txt", m_pConfig->m_Logfile, aBuf);
 			IOHANDLE Handle = m_pStorage->OpenFile(aLogFilename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
 			if(Handle)

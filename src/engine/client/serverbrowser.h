@@ -3,25 +3,25 @@
 #ifndef ENGINE_CLIENT_SERVERBROWSER_H
 #define ENGINE_CLIENT_SERVERBROWSER_H
 
-#include <engine/serverbrowser.h>
 #include "serverbrowser_entry.h"
 #include "serverbrowser_fav.h"
 #include "serverbrowser_filter.h"
+#include <engine/serverbrowser.h>
 
 class CServerBrowser : public IServerBrowser
 {
 public:
 	enum
 	{
-		SET_MASTER_ADD=1,
+		SET_MASTER_ADD = 1,
 		SET_FAV_ADD,
 		SET_TOKEN,
 	};
-		
+
 	CServerBrowser();
 	void Init(class CNetClient *pClient, const char *pNetVersion);
 	void Set(const NETADDR &Addr, int SetType, int Token, const CServerInfo *pInfo);
-	void Update(bool ForceResort);	
+	void Update(bool ForceResort);
 
 	// interface functions
 	int GetType() { return m_ActServerlistType; }
@@ -54,7 +54,7 @@ public:
 	void RemoveFilter(int Index) { m_ServerBrowserFilter.RemoveFilter(Index); }
 
 	static void CBFTrackPacket(int TrackID, void *pUser);
-	
+
 	void LoadServerlist();
 	void SaveServerlist();
 
@@ -64,7 +64,7 @@ private:
 	class IConsole *m_pConsole;
 	class IStorage *m_pStorage;
 	class IMasterServer *m_pMasterServer;
-		
+
 	class CServerBrowserFavorites m_ServerBrowserFavorites;
 	class CServerBrowserFilter m_ServerBrowserFilter;
 
@@ -83,7 +83,7 @@ private:
 		int m_NumPlayers;
 		int m_NumServers;
 		int m_NumServerCapacity;
-	
+
 		CServerEntry *m_aServerlistIp[256]; // ip hash list
 		CServerEntry **m_ppServerlist;
 

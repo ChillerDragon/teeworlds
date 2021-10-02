@@ -1,14 +1,15 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include "datafile.h"
 #include <base/system.h>
 #include <engine/map.h>
 #include <engine/storage.h>
 #include <game/mapitems.h>
-#include "datafile.h"
 
 class CMap : public IEngineMap
 {
 	CDataFileReader m_DataFile;
+
 public:
 	CMap() {}
 
@@ -52,7 +53,7 @@ public:
 				if(pLayer->m_Type == LAYERTYPE_TILES)
 				{
 					CMapItemLayerTilemap *pTilemap = reinterpret_cast<CMapItemLayerTilemap *>(pLayer);
-					
+
 					if(pTilemap->m_Version > 3)
 					{
 						const int TilemapCount = pTilemap->m_Width * pTilemap->m_Height;
@@ -85,9 +86,8 @@ public:
 					}
 				}
 			}
-			
 		}
-		
+
 		return true;
 	}
 

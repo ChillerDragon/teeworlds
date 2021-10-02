@@ -2,8 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_LOCALIZATION_H
 #define GAME_LOCALIZATION_H
-#include <base/tl/string.h>
 #include <base/tl/sorted_array.h>
+#include <base/tl/string.h>
 
 class CLocalizationDatabase
 {
@@ -16,9 +16,9 @@ class CLocalizationDatabase
 		// TODO: do this as an const char * and put everything on a incremental heap
 		string m_Replacement;
 
-		bool operator <(const CString &Other) const { return m_Hash < Other.m_Hash || (m_Hash == Other.m_Hash && m_ContextHash < Other.m_ContextHash); }
-		bool operator <=(const CString &Other) const { return m_Hash < Other.m_Hash || (m_Hash == Other.m_Hash && m_ContextHash <= Other.m_ContextHash); }
-		bool operator ==(const CString &Other) const { return m_Hash == Other.m_Hash && m_ContextHash == Other.m_ContextHash; }
+		bool operator<(const CString &Other) const { return m_Hash < Other.m_Hash || (m_Hash == Other.m_Hash && m_ContextHash < Other.m_ContextHash); }
+		bool operator<=(const CString &Other) const { return m_Hash < Other.m_Hash || (m_Hash == Other.m_Hash && m_ContextHash <= Other.m_ContextHash); }
+		bool operator==(const CString &Other) const { return m_Hash == Other.m_Hash && m_ContextHash == Other.m_ContextHash; }
 	};
 
 	sorted_array<CString> m_Strings;
@@ -45,8 +45,9 @@ class CLocConstString
 	unsigned m_Hash;
 	unsigned m_ContextHash;
 	int m_Version;
+
 public:
-	CLocConstString(const char *pStr, const char *pContext="");
+	CLocConstString(const char *pStr, const char *pContext = "");
 	void Reload();
 
 	inline operator const char *()
