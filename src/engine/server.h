@@ -35,7 +35,7 @@ public:
 
 	virtual int SendMsg(CMsgPacker *pMsg, int Flags, int ClientID) = 0;
 
-	template<class T>
+	template< class T >
 	int SendPackMsg(T *pMsg, int Flags, int ClientID)
 	{
 		CMsgPacker Packer(pMsg->MsgID(), false);
@@ -57,8 +57,8 @@ public:
 
 	enum
 	{
-		RCON_CID_SERV=-1,
-		RCON_CID_VOTE=-2,
+		RCON_CID_SERV = -1,
+		RCON_CID_VOTE = -2,
 	};
 	virtual void SetRconCID(int ClientID) = 0;
 	virtual bool IsAuthed(int ClientID) const = 0;

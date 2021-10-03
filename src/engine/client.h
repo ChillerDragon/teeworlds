@@ -4,8 +4,8 @@
 #define ENGINE_CLIENT_H
 #include "kernel.h"
 
-#include "message.h"
 #include "graphics.h"
+#include "message.h"
 
 class IClient : public IInterface
 {
@@ -27,8 +27,8 @@ protected:
 	float m_RenderFrameTime;
 
 	int m_GameTickSpeed;
-public:
 
+public:
 	class CSnapItem
 	{
 	public:
@@ -48,7 +48,7 @@ public:
 
 	enum
 	{
-		STATE_OFFLINE=0,
+		STATE_OFFLINE = 0,
 		STATE_CONNECTING,
 		STATE_LOADING,
 		STATE_ONLINE,
@@ -120,8 +120,8 @@ public:
 
 	enum
 	{
-		SNAP_CURRENT=0,
-		SNAP_PREV=1
+		SNAP_CURRENT = 0,
+		SNAP_PREV = 1
 	};
 
 	// TODO: Refactor: should redo this a bit i think, too many virtual calls
@@ -136,7 +136,7 @@ public:
 
 	virtual int SendMsg(CMsgPacker *pMsg, int Flags) = 0;
 
-	template<class T>
+	template< class T >
 	int SendPackMsg(T *pMsg, int Flags)
 	{
 		CMsgPacker Packer(pMsg->MsgID(), false);
@@ -183,7 +183,6 @@ public:
 	virtual const char *NetVersionHashUsed() const = 0;
 	virtual const char *NetVersionHashReal() const = 0;
 	virtual int ClientVersion() const = 0;
-
 };
 
 extern IGameClient *CreateGameClient();
