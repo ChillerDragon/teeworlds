@@ -7,7 +7,7 @@
 #include <engine/storage.h>
 #include <game/gamecore.h> // StrToInts, IntsToStr
 
-template<typename T>
+template< typename T >
 static int MakeVersion(int i, const T &v)
 {
 	return (i << 16) + sizeof(T);
@@ -15,7 +15,7 @@ static int MakeVersion(int i, const T &v)
 
 int CEditor::Save(const char *pFilename)
 {
-	return m_Map.Save(Kernel()->RequestInterface<IStorage>(), pFilename);
+	return m_Map.Save(Kernel()->RequestInterface< IStorage >(), pFilename);
 }
 
 int CEditorMap::Save(class IStorage *pStorage, const char *pFileName)
@@ -252,7 +252,7 @@ int CEditorMap::Save(class IStorage *pStorage, const char *pFileName)
 int CEditor::Load(const char *pFileName, int StorageType)
 {
 	Reset();
-	return m_Map.Load(Kernel()->RequestInterface<IStorage>(), pFileName, StorageType);
+	return m_Map.Load(Kernel()->RequestInterface< IStorage >(), pFileName, StorageType);
 }
 
 void CEditor::LoadCurrentMap()
@@ -531,7 +531,7 @@ int CEditor::Append(const char *pFileName, int StorageType)
 	NewMap.m_pEditor = this;
 
 	int Err;
-	Err = NewMap.Load(Kernel()->RequestInterface<IStorage>(), pFileName, StorageType);
+	Err = NewMap.Load(Kernel()->RequestInterface< IStorage >(), pFileName, StorageType);
 	if(!Err)
 		return Err;
 

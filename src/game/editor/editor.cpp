@@ -766,7 +766,7 @@ void CEditor::CallbackAppendMap(const char *pFileName, int StorageType, void *pU
 }
 void CEditor::CallbackSaveMap(const char *pFileName, int StorageType, void *pUser)
 {
-	CEditor *pEditor = static_cast<CEditor *>(pUser);
+	CEditor *pEditor = static_cast< CEditor * >(pUser);
 	char aBuf[1024];
 	// add map extension
 	if(!str_endswith(pFileName, ".map"))
@@ -1478,7 +1478,7 @@ void CEditor::DoQuadPoint(CQuad *pQuad, int QuadIndex, int V)
 	Graphics()->QuadsDraw(&QuadItem, 1);
 }
 
-void CEditor::DoQuadEnvelopes(const array<CQuad> &lQuads, IGraphics::CTextureHandle Texture)
+void CEditor::DoQuadEnvelopes(const array< CQuad > &lQuads, IGraphics::CTextureHandle Texture)
 {
 	int Num = lQuads.size();
 	CEnvelope **apEnvelope = new CEnvelope *[Num];
@@ -1745,7 +1745,7 @@ void CEditor::DoMapEditor(CUIRect View)
 			m_Map.m_pGameLayer->Render();
 		}
 
-		CLayerTiles *pT = static_cast<CLayerTiles *>(GetSelectedLayerType(0, LAYERTYPE_TILES));
+		CLayerTiles *pT = static_cast< CLayerTiles * >(GetSelectedLayerType(0, LAYERTYPE_TILES));
 		if(m_ShowTileInfo && pT && pT->m_Visible && m_ZoomLevel <= 300)
 		{
 			GetSelectedGroup()->MapScreen();
@@ -2676,7 +2676,7 @@ void CEditor::ReplaceImage(const char *pFileName, int StorageType, void *pUser)
 			{
 				if(pGroup->m_lLayers[l]->m_Type == LAYERTYPE_TILES)
 				{
-					CLayerTiles *pLayer = static_cast<CLayerTiles *>(pGroup->m_lLayers[l]);
+					CLayerTiles *pLayer = static_cast< CLayerTiles * >(pGroup->m_lLayers[l]);
 					//resets live auto map of affected layers
 					if(pLayer->m_Image == pEditor->m_SelectedImage)
 					{
@@ -2763,7 +2763,7 @@ void CEditor::SortImages()
 
 	if(!Sorted)
 	{
-		array<CEditorImage *> lTemp = array<CEditorImage *>(m_Map.m_lImages);
+		array< CEditorImage * > lTemp = array< CEditorImage * >(m_Map.m_lImages);
 		gs_pSortedIndex = new int[lTemp.size()];
 
 		std::stable_sort(&m_Map.m_lImages[0], &m_Map.m_lImages[m_Map.m_lImages.size()], CompareImage);
@@ -2853,13 +2853,13 @@ void CEditor::RenderImagesList(CUIRect ToolBox)
 				{
 					if(pGroup->m_lLayers[l]->m_Type == LAYERTYPE_TILES)
 					{
-						CLayerTiles *pLayer = static_cast<CLayerTiles *>(pGroup->m_lLayers[l]);
+						CLayerTiles *pLayer = static_cast< CLayerTiles * >(pGroup->m_lLayers[l]);
 						if(pLayer->m_Image == i)
 							Used = true;
 					}
 					else if(pGroup->m_lLayers[l]->m_Type == LAYERTYPE_QUADS)
 					{
-						CLayerQuads *pLayer = static_cast<CLayerQuads *>(pGroup->m_lLayers[l]);
+						CLayerQuads *pLayer = static_cast< CLayerQuads * >(pGroup->m_lLayers[l]);
 						if(pLayer->m_Image == i)
 							Used = true;
 					}
@@ -3490,7 +3490,7 @@ void CEditor::RenderEnvelopeEditor(CUIRect View)
 
 	if(pEnvelope)
 	{
-		static array<int> Selection;
+		static array< int > Selection;
 		static int sEnvelopeEditorID = 0;
 		static int s_ActiveChannels = 0xf;
 
@@ -4327,7 +4327,7 @@ void CEditorMap::DeleteEnvelope(int Index)
 		for(int j = 0; j < m_lGroups[i]->m_lLayers.size(); ++j)
 			if(m_lGroups[i]->m_lLayers[j]->m_Type == LAYERTYPE_QUADS)
 			{
-				CLayerQuads *pLayer = static_cast<CLayerQuads *>(m_lGroups[i]->m_lLayers[j]);
+				CLayerQuads *pLayer = static_cast< CLayerQuads * >(m_lGroups[i]->m_lLayers[j]);
 				for(int k = 0; k < pLayer->m_lQuads.size(); ++k)
 				{
 					if(pLayer->m_lQuads[k].m_PosEnv == Index)
@@ -4342,7 +4342,7 @@ void CEditorMap::DeleteEnvelope(int Index)
 			}
 			else if(m_lGroups[i]->m_lLayers[j]->m_Type == LAYERTYPE_TILES)
 			{
-				CLayerTiles *pLayer = static_cast<CLayerTiles *>(m_lGroups[i]->m_lLayers[j]);
+				CLayerTiles *pLayer = static_cast< CLayerTiles * >(m_lGroups[i]->m_lLayers[j]);
 				if(pLayer->m_ColorEnv == Index)
 					pLayer->m_ColorEnv = -1;
 				if(pLayer->m_ColorEnv > Index)
@@ -4412,13 +4412,13 @@ void CEditorMap::CreateDefault()
 
 void CEditor::Init()
 {
-	m_pInput = Kernel()->RequestInterface<IInput>();
-	m_pClient = Kernel()->RequestInterface<IClient>();
-	m_pConfig = Kernel()->RequestInterface<IConfigManager>()->Values();
-	m_pConsole = Kernel()->RequestInterface<IConsole>();
-	m_pGraphics = Kernel()->RequestInterface<IGraphics>();
-	m_pTextRender = Kernel()->RequestInterface<ITextRender>();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pInput = Kernel()->RequestInterface< IInput >();
+	m_pClient = Kernel()->RequestInterface< IClient >();
+	m_pConfig = Kernel()->RequestInterface< IConfigManager >()->Values();
+	m_pConsole = Kernel()->RequestInterface< IConsole >();
+	m_pGraphics = Kernel()->RequestInterface< IGraphics >();
+	m_pTextRender = Kernel()->RequestInterface< ITextRender >();
+	m_pStorage = Kernel()->RequestInterface< IStorage >();
 	m_UI.Init(m_pConfig, m_pGraphics, m_pInput, m_pTextRender);
 	m_RenderTools.Init(m_pConfig, m_pGraphics);
 	m_Map.m_pEditor = this;
@@ -4456,7 +4456,7 @@ static int s_WinterMainIndicesNew[] = {218, 219, 220, 221, 222, 223, 234, 235, 2
 
 void CEditor::ConMapMagic(IConsole::IResult *pResult, void *pUserData)
 {
-	CEditor *pSelf = static_cast<CEditor *>(pUserData);
+	CEditor *pSelf = static_cast< CEditor * >(pUserData);
 	int Flag = pResult->GetInteger(0);
 
 	for(unsigned m = 0; m < sizeof(s_aMaps) / sizeof(s_aMaps[0]); ++m)
@@ -4498,7 +4498,7 @@ void CEditor::DoMapMagic(int ImageID, int SrcIndex)
 		{
 			if(m_Map.m_lGroups[g]->m_lLayers[i]->m_Type == LAYERTYPE_TILES)
 			{
-				CLayerTiles *pLayer = static_cast<CLayerTiles *>(m_Map.m_lGroups[g]->m_lLayers[i]);
+				CLayerTiles *pLayer = static_cast< CLayerTiles * >(m_Map.m_lGroups[g]->m_lLayers[i]);
 				if(pLayer->m_Image == ImageID)
 				{
 					for(int Count = 0; Count < pLayer->m_Height * pLayer->m_Width; ++Count)

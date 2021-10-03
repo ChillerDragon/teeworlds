@@ -78,7 +78,7 @@ class CTilesetMapper : public IAutoMapper
 		int m_Random;
 		int m_Rotation;
 
-		array<CRuleCondition> m_aConditions;
+		array< CRuleCondition > m_aConditions;
 	};
 
 	struct CRuleSet
@@ -86,10 +86,10 @@ class CTilesetMapper : public IAutoMapper
 		char m_aName[128];
 		int m_BaseTile;
 
-		array<CRule> m_aRules;
+		array< CRule > m_aRules;
 	};
 
-	array<CRuleSet> m_aRuleSets;
+	array< CRuleSet > m_aRuleSets;
 
 public:
 	CTilesetMapper(class CEditor *pEditor) :
@@ -145,7 +145,7 @@ public:
 	{
 		char m_aName[128];
 
-		array<CRule> m_aRules;
+		array< CRule > m_aRules;
 	};
 
 	CDoodadsMapper(class CEditor *pEditor) :
@@ -159,14 +159,14 @@ public:
 	virtual const char *GetRuleSetName(int Index) const;
 
 private:
-	void PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array<int>> *pPositions, int Amount, int LeftWall = 0);
+	void PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array< array< int > > *pPositions, int Amount, int LeftWall = 0);
 
-	array<CRuleSet> m_aRuleSets;
+	array< CRuleSet > m_aRuleSets;
 
-	array<array<int>> m_FloorIDs;
-	array<array<int>> m_CeilingIDs;
-	array<array<int>> m_RightWallIDs;
-	array<array<int>> m_LeftWallIDs;
+	array< array< int > > m_FloorIDs;
+	array< array< int > > m_CeilingIDs;
+	array< array< int > > m_RightWallIDs;
+	array< array< int > > m_LeftWallIDs;
 };
 
 #endif

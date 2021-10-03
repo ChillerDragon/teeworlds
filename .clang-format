@@ -48,6 +48,7 @@ PointerAlignment: Right
 ReflowComments: true
 SpaceBeforeParens: Never
 SpaceAfterTemplateKeyword: false
+SpacesInAngles: true
 TabWidth: 8
 UseTab: ForContinuationAndIndentation
 ...

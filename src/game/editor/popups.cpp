@@ -110,11 +110,11 @@ int CEditor::PopupGroup(CEditor *pEditor, CUIRect View)
 		if(pEditor->DoButton_Editor(&s_DeleteButton, "Clean-up game tiles", 0, &Button, 0, "Removes game tiles that aren't based on a layer"))
 		{
 			// gather all tile layers
-			array<CLayerTiles *> Layers;
+			array< CLayerTiles * > Layers;
 			for(int i = 0; i < pEditor->m_Map.m_pGameGroup->m_lLayers.size(); ++i)
 			{
 				if(pEditor->m_Map.m_pGameGroup->m_lLayers[i] != pEditor->m_Map.m_pGameLayer && pEditor->m_Map.m_pGameGroup->m_lLayers[i]->m_Type == LAYERTYPE_TILES)
-					Layers.add(static_cast<CLayerTiles *>(pEditor->m_Map.m_pGameGroup->m_lLayers[i]));
+					Layers.add(static_cast< CLayerTiles * >(pEditor->m_Map.m_pGameGroup->m_lLayers[i]));
 			}
 
 			// search for unneeded game tiles
@@ -122,7 +122,7 @@ int CEditor::PopupGroup(CEditor *pEditor, CUIRect View)
 			for(int y = 0; y < gl->m_Height; ++y)
 				for(int x = 0; x < gl->m_Width; ++x)
 				{
-					if(gl->m_pTiles[y * gl->m_Width + x].m_Index > static_cast<unsigned char>(TILE_NOHOOK))
+					if(gl->m_pTiles[y * gl->m_Width + x].m_Index > static_cast< unsigned char >(TILE_NOHOOK))
 						continue;
 
 					bool Found = false;
@@ -962,7 +962,7 @@ static bool s_AutoMapProceedOrder = false;
 
 int CEditor::PopupDoodadAutoMap(CEditor *pEditor, CUIRect View)
 {
-	CLayerTiles *pLayer = static_cast<CLayerTiles *>(pEditor->GetSelectedLayer(0));
+	CLayerTiles *pLayer = static_cast< CLayerTiles * >(pEditor->GetSelectedLayer(0));
 	IAutoMapper *pMapper = pEditor->m_Map.m_lImages[pLayer->m_Image]->m_pAutoMapper;
 	CUIRect Rect;
 
@@ -998,7 +998,7 @@ int CEditor::PopupDoodadAutoMap(CEditor *pEditor, CUIRect View)
 
 int CEditor::PopupSelectDoodadRuleSet(CEditor *pEditor, CUIRect View)
 {
-	CLayerTiles *pLayer = static_cast<CLayerTiles *>(pEditor->GetSelectedLayer(0));
+	CLayerTiles *pLayer = static_cast< CLayerTiles * >(pEditor->GetSelectedLayer(0));
 	CUIRect Button;
 	static int s_AutoMapperDoodadButtons[IAutoMapper::MAX_RULES];
 	IAutoMapper *pMapper = pEditor->m_Map.m_lImages[pLayer->m_Image]->m_pAutoMapper;
@@ -1019,7 +1019,7 @@ int CEditor::PopupSelectDoodadRuleSet(CEditor *pEditor, CUIRect View)
 
 int CEditor::PopupSelectConfigAutoMap(CEditor *pEditor, CUIRect View)
 {
-	CLayerTiles *pLayer = static_cast<CLayerTiles *>(pEditor->GetSelectedLayer(0));
+	CLayerTiles *pLayer = static_cast< CLayerTiles * >(pEditor->GetSelectedLayer(0));
 	CUIRect Button;
 	static int s_AutoMapperConfigButtons[IAutoMapper::MAX_RULES];
 
@@ -1060,7 +1060,7 @@ int CEditor::PopupSelectConfigAutoMap(CEditor *pEditor, CUIRect View)
 void CEditor::PopupSelectConfigAutoMapInvoke(float x, float y)
 {
 	static int s_AutoMapConfigSelectID = 0;
-	CLayerTiles *pLayer = static_cast<CLayerTiles *>(GetSelectedLayer(0));
+	CLayerTiles *pLayer = static_cast< CLayerTiles * >(GetSelectedLayer(0));
 
 	if(pLayer && pLayer->m_Image >= 0 && pLayer->m_Image < m_Map.m_lImages.size() &&
 		m_Map.m_lImages[pLayer->m_Image]->m_pAutoMapper->RuleSetNum())

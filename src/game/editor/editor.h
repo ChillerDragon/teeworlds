@@ -52,7 +52,7 @@ class CEnvelope
 {
 public:
 	int m_Channels;
-	array<CEnvPoint> m_lPoints;
+	array< CEnvPoint > m_lPoints;
 	char m_aName[32];
 	float m_Bottom, m_Top;
 	bool m_Synchronized;
@@ -210,7 +210,7 @@ class CLayerGroup
 public:
 	class CEditorMap *m_pMap;
 
-	array<CLayer *> m_lLayers;
+	array< CLayer * > m_lLayers;
 
 	int m_OffsetX;
 	int m_OffsetY;
@@ -312,9 +312,9 @@ public:
 		Clean();
 	}
 
-	array<CLayerGroup *> m_lGroups;
-	array<CEditorImage *> m_lImages;
-	array<CEnvelope *> m_lEnvelopes;
+	array< CLayerGroup * > m_lGroups;
+	array< CEditorImage * > m_lImages;
+	array< CEnvelope * > m_lEnvelopes;
 
 	class CMapInfo
 	{
@@ -503,7 +503,7 @@ public:
 	void GetSize(float *w, float *h) const;
 
 	int m_Image;
-	array<CQuad> m_lQuads;
+	array< CQuad > m_lQuads;
 };
 
 class CLayerGame : public CLayerTiles
@@ -708,7 +708,7 @@ public:
 
 		bool operator<(const CFilelistItem &Other) { return !str_comp(m_aFilename, "..") ? true : !str_comp(Other.m_aFilename, "..") ? false : m_IsDir && !Other.m_IsDir ? true : !m_IsDir && Other.m_IsDir ? false : str_comp_filenames(m_aFilename, Other.m_aFilename) < 0; }
 	};
-	sorted_array<CFilelistItem> m_FileList;
+	sorted_array< CFilelistItem > m_FileList;
 	int m_FilesStartAt;
 	int m_FilesCur;
 	int m_FilesStopAt;
@@ -831,7 +831,7 @@ public:
 	void PopupSelectConfigAutoMapInvoke(float x, float y);
 	bool PopupAutoMapProceedOrder();
 
-	void DoQuadEnvelopes(const array<CQuad> &m_lQuads, IGraphics::CTextureHandle Texture);
+	void DoQuadEnvelopes(const array< CQuad > &m_lQuads, IGraphics::CTextureHandle Texture);
 	void DoQuadEnvPoint(const CQuad *pQuad, int QIndex, int pIndex);
 	void DoQuadPoint(CQuad *pQuad, int QuadIndex, int v);
 

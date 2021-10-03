@@ -276,7 +276,7 @@ void CLayerTiles::FillSelection(bool Empty, CLayer *pBrush, CUIRect Rect)
 	int w = ConvertX(Rect.w);
 	int h = ConvertY(Rect.h);
 
-	CLayerTiles *pLt = static_cast<CLayerTiles *>(pBrush);
+	CLayerTiles *pLt = static_cast< CLayerTiles * >(pBrush);
 
 	for(int y = 0; y < h; y++)
 	{

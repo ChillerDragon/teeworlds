@@ -342,7 +342,7 @@ void CDoodadsMapper::AnalyzeGameLayer()
 				// create an new chain
 				if(!FloorKeepChaining)
 				{
-					array<int> aChain;
+					array< int > aChain;
 					aChain.add(y * pLayer->m_Width + x);
 					FloorChainID = m_FloorIDs.add(aChain);
 					FloorKeepChaining = true;
@@ -365,7 +365,7 @@ void CDoodadsMapper::AnalyzeGameLayer()
 				// create an new chain
 				if(!CeilingKeepChaining)
 				{
-					array<int> aChain;
+					array< int > aChain;
 					aChain.add(y * pLayer->m_Width + x);
 					CeilingChainID = m_CeilingIDs.add(aChain);
 					CeilingKeepChaining = true;
@@ -413,7 +413,7 @@ void CDoodadsMapper::AnalyzeGameLayer()
 				// create an new chain
 				if(!RWallKeepChaining)
 				{
-					array<int> aChain;
+					array< int > aChain;
 					aChain.add(y * pLayer->m_Width + x);
 					RWallChainID = m_RightWallIDs.add(aChain);
 					RWallKeepChaining = true;
@@ -436,7 +436,7 @@ void CDoodadsMapper::AnalyzeGameLayer()
 				// create an new chain
 				if(!LWallKeepChaining)
 				{
-					array<int> aChain;
+					array< int > aChain;
 					aChain.add(y * pLayer->m_Width + x);
 					LWallChainID = m_LeftWallIDs.add(aChain);
 					LWallKeepChaining = true;
@@ -490,7 +490,7 @@ void CDoodadsMapper::AnalyzeGameLayer()
 	}
 }
 
-void CDoodadsMapper::PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array<int>> *pPositions, int Amount, int LeftWall)
+void CDoodadsMapper::PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array< array< int > > *pPositions, int Amount, int LeftWall)
 {
 	if(pRule->m_Location == CRule::CEILING)
 		pRule->m_RelativePos.y++;
@@ -610,8 +610,8 @@ void CDoodadsMapper::PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array
 			// make the place occupied
 			if(RandomValue > 1)
 			{
-				array<int> aChainBefore;
-				array<int> aChainAfter;
+				array< int > aChainBefore;
+				array< int > aChainAfter;
 
 				for(int j = 0; j < c; j++)
 					aChainBefore.add((*pPositions)[f][j]);
