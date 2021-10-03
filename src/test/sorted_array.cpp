@@ -4,6 +4,6 @@
 
 TEST(SortedArray, SortEmptyRange)
 {
-	sorted_array<int> x;
+	sorted_array< int > x;
 	x.sort_range();
 }
