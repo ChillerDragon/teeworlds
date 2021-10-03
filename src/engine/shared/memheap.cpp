@@ -1,21 +1,20 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/system.h>
 #include "memheap.h"
-
+#include <base/system.h>
 
 // allocates a new chunk to be used
 void CHeap::NewChunk()
 {
 	// allocate memory
-	char *pMem = (char*)mem_alloc(sizeof(CChunk)+CHUNK_SIZE);
+	char *pMem = (char *)mem_alloc(sizeof(CChunk) + CHUNK_SIZE);
 	if(!pMem)
 		return;
 
 	// the chunk structure is located in the begining of the chunk
 	// init it and return the chunk
-	CChunk *pChunk = (CChunk*)pMem;
-	pChunk->m_pMemory = (char*)(pChunk+1);
+	CChunk *pChunk = (CChunk *)pMem;
+	pChunk->m_pMemory = (char *)(pChunk + 1);
 	pChunk->m_pCurrent = pChunk->m_pMemory;
 	pChunk->m_pEnd = pChunk->m_pMemory + CHUNK_SIZE;
 	pChunk->m_pNext = m_pCurrent;
@@ -28,7 +27,7 @@ void *CHeap::AllocateFromChunk(unsigned int Size)
 {
 	// check if we need can fit the allocation
 	if(m_pCurrent->m_pCurrent + Size > m_pCurrent->m_pEnd)
-		return (void*)0x0;
+		return (void *)0x0;
 
 	// get memory and move the pointer forward
 	char *pMem = m_pCurrent->m_pCurrent;

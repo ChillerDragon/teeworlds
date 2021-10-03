@@ -1,14 +1,15 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include "datafile.h"
 #include <base/system.h>
 #include <engine/map.h>
 #include <engine/storage.h>
 #include <game/mapitems.h>
-#include "datafile.h"
 
 class CMap : public IEngineMap
 {
 	CDataFileReader m_DataFile;
+
 public:
 	CMap() {}
 
@@ -28,7 +29,7 @@ public:
 	virtual bool Load(const char *pMapName, IStorage *pStorage)
 	{
 		if(!pStorage)
-			pStorage = Kernel()->RequestInterface<IStorage>();
+			pStorage = Kernel()->RequestInterface< IStorage >();
 		if(!pStorage)
 			return false;
 		if(!m_DataFile.Open(pStorage, pMapName, IStorage::TYPE_ALL))
@@ -44,15 +45,15 @@ public:
 		m_DataFile.GetType(MAPITEMTYPE_LAYER, &LayersStart, &LayersNum);
 		for(int g = 0; g < GroupsNum; g++)
 		{
-			CMapItemGroup *pGroup = static_cast<CMapItemGroup *>(m_DataFile.GetItem(GroupsStart + g, 0, 0));
+			CMapItemGroup *pGroup = static_cast< CMapItemGroup * >(m_DataFile.GetItem(GroupsStart + g, 0, 0));
 			for(int l = 0; l < pGroup->m_NumLayers; l++)
 			{
-				CMapItemLayer *pLayer = static_cast<CMapItemLayer *>(m_DataFile.GetItem(LayersStart + pGroup->m_StartLayer + l, 0, 0));
+				CMapItemLayer *pLayer = static_cast< CMapItemLayer * >(m_DataFile.GetItem(LayersStart + pGroup->m_StartLayer + l, 0, 0));
 
 				if(pLayer->m_Type == LAYERTYPE_TILES)
 				{
-					CMapItemLayerTilemap *pTilemap = reinterpret_cast<CMapItemLayerTilemap *>(pLayer);
-					
+					CMapItemLayerTilemap *pTilemap = reinterpret_cast< CMapItemLayerTilemap * >(pLayer);
+
 					if(pTilemap->m_Version > 3)
 					{
 						const int TilemapCount = pTilemap->m_Width * pTilemap->m_Height;
@@ -63,13 +64,13 @@ public:
 							dbg_msg("engine", "map layer too big (%d * %d * %u causes an integer overflow)", pTilemap->m_Width, pTilemap->m_Height, unsigned(sizeof(CTile)));
 							return false;
 						}
-						CTile *pTiles = static_cast<CTile *>(mem_alloc(TilemapSize));
+						CTile *pTiles = static_cast< CTile * >(mem_alloc(TilemapSize));
 						if(!pTiles)
 							return false;
 
 						// extract original tile data
 						int i = 0;
-						CTile *pSavedTiles = static_cast<CTile *>(m_DataFile.GetData(pTilemap->m_Data));
+						CTile *pSavedTiles = static_cast< CTile * >(m_DataFile.GetData(pTilemap->m_Data));
 						while(i < TilemapCount)
 						{
 							for(unsigned Counter = 0; Counter <= pSavedTiles->m_Skip && i < TilemapCount; Counter++)
@@ -81,13 +82,12 @@ public:
 							pSavedTiles++;
 						}
 
-						m_DataFile.ReplaceData(pTilemap->m_Data, reinterpret_cast<char *>(pTiles), TilemapSize);
+						m_DataFile.ReplaceData(pTilemap->m_Data, reinterpret_cast< char * >(pTiles), TilemapSize);
 					}
 				}
 			}
-			
 		}
-		
+
 		return true;
 	}
 

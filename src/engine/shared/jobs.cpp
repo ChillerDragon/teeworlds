@@ -1,7 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/system.h>
 #include "jobs.h"
+#include <base/system.h>
 
 CJobPool::CJobPool()
 {
@@ -55,7 +55,6 @@ void CJobPool::WorkerThread(void *pUser)
 		else
 			thread_sleep(10);
 	}
-
 }
 
 int CJobPool::Init(int NumThreads)
@@ -86,4 +85,3 @@ int CJobPool::Add(CJob *pJob, JOBFUNC pfnFunc, void *pData)
 	lock_unlock(m_Lock);
 	return 0;
 }
-

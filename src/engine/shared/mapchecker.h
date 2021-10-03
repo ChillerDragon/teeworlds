@@ -11,7 +11,7 @@ class CMapChecker
 {
 	enum
 	{
-		MAX_MAP_LENGTH=8,
+		MAX_MAP_LENGTH = 8,
 	};
 
 	struct CWhitelistEntry
