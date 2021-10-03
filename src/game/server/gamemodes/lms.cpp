@@ -2,12 +2,13 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 
+#include "lms.h"
 #include <game/server/entities/character.h>
 #include <game/server/gamecontext.h>
 #include <game/server/player.h>
-#include "lms.h"
 
-CGameControllerLMS::CGameControllerLMS(CGameContext *pGameServer) : IGameController(pGameServer)
+CGameControllerLMS::CGameControllerLMS(CGameContext *pGameServer) :
+	IGameController(pGameServer)
 {
 	m_pGameType = "LMS";
 	m_GameFlags = GAMEFLAG_SURVIVAL;
@@ -32,13 +33,13 @@ void CGameControllerLMS::OnCharacterSpawn(CCharacter *pChr)
 void CGameControllerLMS::DoWincheckRound()
 {
 	// check for time based win
-	if(m_GameInfo.m_TimeLimit > 0 && (Server()->Tick()-m_GameStartTick) >= m_GameInfo.m_TimeLimit*Server()->TickSpeed()*60)
+	if(m_GameInfo.m_TimeLimit > 0 && (Server()->Tick() - m_GameStartTick) >= m_GameInfo.m_TimeLimit * Server()->TickSpeed() * 60)
 	{
 		for(int i = 0; i < MAX_CLIENTS; ++i)
 		{
 			if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS &&
 				(!GameServer()->m_apPlayers[i]->m_RespawnDisabled ||
-				(GameServer()->m_apPlayers[i]->GetCharacter() && GameServer()->m_apPlayers[i]->GetCharacter()->IsAlive())))
+					(GameServer()->m_apPlayers[i]->GetCharacter() && GameServer()->m_apPlayers[i]->GetCharacter()->IsAlive())))
 				GameServer()->m_apPlayers[i]->m_Score++;
 		}
 
@@ -53,16 +54,16 @@ void CGameControllerLMS::DoWincheckRound()
 		{
 			if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS &&
 				(!GameServer()->m_apPlayers[i]->m_RespawnDisabled ||
-				(GameServer()->m_apPlayers[i]->GetCharacter() && GameServer()->m_apPlayers[i]->GetCharacter()->IsAlive())))
+					(GameServer()->m_apPlayers[i]->GetCharacter() && GameServer()->m_apPlayers[i]->GetCharacter()->IsAlive())))
 			{
 				++AlivePlayerCount;
 				pAlivePlayer = GameServer()->m_apPlayers[i];
 			}
 		}
 
-		if(AlivePlayerCount == 0)		// no winner
+		if(AlivePlayerCount == 0) // no winner
 			EndRound();
-		else if(AlivePlayerCount == 1)	// 1 winner
+		else if(AlivePlayerCount == 1) // 1 winner
 		{
 			pAlivePlayer->m_Score++;
 			EndRound();
