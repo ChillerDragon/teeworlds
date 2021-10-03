@@ -4,7 +4,6 @@
 #include "auto_map.h"
 #include "editor.h"
 
-
 void CTilesetMapper::Load(const json_value &rElement)
 {
 	for(unsigned i = 0; i < rElement.u.array.length; ++i)
@@ -14,7 +13,7 @@ void CTilesetMapper::Load(const json_value &rElement)
 
 		// new rule set
 		CRuleSet NewRuleSet;
-		const char* pConfName = rElement[i].u.object.values[0].name;
+		const char *pConfName = rElement[i].u.object.values[0].name;
 		str_copy(NewRuleSet.m_aName, pConfName, sizeof(NewRuleSet.m_aName));
 		const json_value &rStart = *(rElement[i].u.object.values[0].value);
 
@@ -102,7 +101,7 @@ void CTilesetMapper::Load(const json_value &rElement)
 	}
 }
 
-const char* CTilesetMapper::GetRuleSetName(int Index) const
+const char *CTilesetMapper::GetRuleSetName(int Index) const
 {
 	if(Index < 0 || Index >= m_aRuleSets.size())
 		return "";
@@ -121,15 +120,15 @@ void CTilesetMapper::Proceed(CLayerTiles *pLayer, int ConfigID, RECTi Area)
 		return;
 
 	pLayer->Clamp(&Area);
-	
+
 	int BaseTile = pConf->m_BaseTile;
 
 	// auto map !
-	int MaxIndex = pLayer->m_Width*pLayer->m_Height;
+	int MaxIndex = pLayer->m_Width * pLayer->m_Height;
 	for(int y = Area.y; y < Area.y + Area.h; y++)
 		for(int x = Area.x; x < Area.x + Area.w; x++)
 		{
-			CTile *pTile = &(pLayer->m_pTiles[y*pLayer->m_Width+x]);
+			CTile *pTile = &(pLayer->m_pTiles[y * pLayer->m_Width + x]);
 			if(pTile->m_Index == 0)
 				continue;
 
@@ -141,13 +140,13 @@ void CTilesetMapper::Proceed(CLayerTiles *pLayer, int ConfigID, RECTi Area)
 				for(int j = 0; j < pConf->m_aRules[i].m_aConditions.size() && RespectRules; ++j)
 				{
 					CRuleCondition *pCondition = &pConf->m_aRules[i].m_aConditions[j];
-					int CheckIndex = clamp((y+pCondition->m_Y), 0, pLayer->m_Height-1)*pLayer->m_Width+clamp((x+pCondition->m_X), 0, pLayer->m_Width-1);
+					int CheckIndex = clamp((y + pCondition->m_Y), 0, pLayer->m_Height - 1) * pLayer->m_Width + clamp((x + pCondition->m_X), 0, pLayer->m_Width - 1);
 
 					if(CheckIndex < 0 || CheckIndex >= MaxIndex)
 						RespectRules = false;
 					else
 					{
- 						if(pCondition->m_Value == CRuleCondition::EMPTY || pCondition->m_Value == CRuleCondition::FULL)
+						if(pCondition->m_Value == CRuleCondition::EMPTY || pCondition->m_Value == CRuleCondition::FULL)
 						{
 							if(pLayer->m_pTiles[CheckIndex].m_Index > 0 && pCondition->m_Value == CRuleCondition::EMPTY)
 								RespectRules = false;
@@ -172,15 +171,15 @@ void CTilesetMapper::Proceed(CLayerTiles *pLayer, int ConfigID, RECTi Area)
 					if(pConf->m_aRules[i].m_Rotation == 90)
 						pTile->m_Flags ^= TILEFLAG_ROTATE;
 					else if(pConf->m_aRules[i].m_Rotation == 180)
-						pTile->m_Flags ^= (TILEFLAG_HFLIP|TILEFLAG_VFLIP);
+						pTile->m_Flags ^= (TILEFLAG_HFLIP | TILEFLAG_VFLIP);
 					else if(pConf->m_aRules[i].m_Rotation == 270)
-						pTile->m_Flags ^= (TILEFLAG_HFLIP|TILEFLAG_VFLIP|TILEFLAG_ROTATE);
+						pTile->m_Flags ^= (TILEFLAG_HFLIP | TILEFLAG_VFLIP | TILEFLAG_ROTATE);
 
 					// flip
 					if(pConf->m_aRules[i].m_HFlip)
-						pTile->m_Flags ^= pTile->m_Flags&TILEFLAG_ROTATE ? TILEFLAG_HFLIP : TILEFLAG_VFLIP;
+						pTile->m_Flags ^= pTile->m_Flags & TILEFLAG_ROTATE ? TILEFLAG_HFLIP : TILEFLAG_VFLIP;
 					if(pConf->m_aRules[i].m_VFlip)
-						pTile->m_Flags ^= pTile->m_Flags&TILEFLAG_ROTATE ? TILEFLAG_VFLIP : TILEFLAG_HFLIP;
+						pTile->m_Flags ^= pTile->m_Flags & TILEFLAG_ROTATE ? TILEFLAG_VFLIP : TILEFLAG_HFLIP;
 				}
 			}
 		}
@@ -197,7 +196,7 @@ void CDoodadsMapper::Load(const json_value &rElement)
 
 		// new rule set
 		CRuleSet NewRuleSet;
-		const char* pConfName = rElement[i].u.object.values[0].name;
+		const char *pConfName = rElement[i].u.object.values[0].name;
 		str_copy(NewRuleSet.m_aName, pConfName, sizeof(NewRuleSet.m_aName));
 		const json_value &rStart = *(rElement[i].u.object.values[0].value);
 
@@ -241,9 +240,9 @@ void CDoodadsMapper::Load(const json_value &rElement)
 				NewRule.m_RelativePos.y = 0;
 
 			// width
-			NewRule.m_Size.x = absolute(NewRule.m_Rect.x-NewRule.m_Rect.y)%16+1;
+			NewRule.m_Size.x = absolute(NewRule.m_Rect.x - NewRule.m_Rect.y) % 16 + 1;
 			// height
-			NewRule.m_Size.y = floor((float)absolute(NewRule.m_Rect.x-NewRule.m_Rect.y)/16)+1;
+			NewRule.m_Size.y = floor((float)absolute(NewRule.m_Rect.x - NewRule.m_Rect.y) / 16) + 1;
 
 			// random
 			const json_value &rRandom = rRuleNode[j]["random"];
@@ -290,7 +289,7 @@ void CDoodadsMapper::Load(const json_value &rElement)
 	}
 }
 
-const char* CDoodadsMapper::GetRuleSetName(int Index) const
+const char *CDoodadsMapper::GetRuleSetName(int Index) const
 {
 	if(Index < 0 || Index >= m_aRuleSets.size())
 		return "";
@@ -317,14 +316,14 @@ void CDoodadsMapper::AnalyzeGameLayer()
 
 	// floors and ceilings
 	// browse up to down
-	for(int y = 1; y < pLayer->m_Height-1; y++)
+	for(int y = 1; y < pLayer->m_Height - 1; y++)
 	{
 		FloorKeepChaining = false;
 		CeilingKeepChaining = false;
 
-		for(int x = 1; x < pLayer->m_Width-1; x++)
+		for(int x = 1; x < pLayer->m_Width - 1; x++)
 		{
-			CTile *pTile = &(pLayer->m_pTiles[y*pLayer->m_Width+x]);
+			CTile *pTile = &(pLayer->m_pTiles[y * pLayer->m_Width + x]);
 
 			// empty, skip
 			if(pTile->m_Index == 0)
@@ -335,7 +334,7 @@ void CDoodadsMapper::AnalyzeGameLayer()
 			}
 
 			// check up
-			int CheckIndex = (y-1)*pLayer->m_Width+x;
+			int CheckIndex = (y - 1) * pLayer->m_Width + x;
 
 			// add a floor part
 			if(pTile->m_Index == 1 && (pLayer->m_pTiles[CheckIndex].m_Index == 0 || pLayer->m_pTiles[CheckIndex].m_Index > ENTITY_OFFSET))
@@ -344,21 +343,21 @@ void CDoodadsMapper::AnalyzeGameLayer()
 				if(!FloorKeepChaining)
 				{
 					array<int> aChain;
-					aChain.add(y*pLayer->m_Width+x);
+					aChain.add(y * pLayer->m_Width + x);
 					FloorChainID = m_FloorIDs.add(aChain);
 					FloorKeepChaining = true;
 				}
 				else
 				{
 					// keep chaining
-					m_FloorIDs[FloorChainID].add(y*pLayer->m_Width+x);
+					m_FloorIDs[FloorChainID].add(y * pLayer->m_Width + x);
 				}
 			}
 			else
 				FloorKeepChaining = false;
 
 			// check down
-			CheckIndex = (y+1)*pLayer->m_Width+x;
+			CheckIndex = (y + 1) * pLayer->m_Width + x;
 
 			// add a ceiling part
 			if(pTile->m_Index == 1 && (pLayer->m_pTiles[CheckIndex].m_Index == 0 || pLayer->m_pTiles[CheckIndex].m_Index > ENTITY_OFFSET))
@@ -367,14 +366,14 @@ void CDoodadsMapper::AnalyzeGameLayer()
 				if(!CeilingKeepChaining)
 				{
 					array<int> aChain;
-					aChain.add(y*pLayer->m_Width+x);
+					aChain.add(y * pLayer->m_Width + x);
 					CeilingChainID = m_CeilingIDs.add(aChain);
 					CeilingKeepChaining = true;
 				}
 				else
 				{
 					// keep chaining
-					m_CeilingIDs[CeilingChainID].add(y*pLayer->m_Width+x);
+					m_CeilingIDs[CeilingChainID].add(y * pLayer->m_Width + x);
 				}
 			}
 			else
@@ -389,14 +388,14 @@ void CDoodadsMapper::AnalyzeGameLayer()
 
 	// walls
 	// browse left to right
-	for(int x = 1; x < pLayer->m_Width-1; x++)
+	for(int x = 1; x < pLayer->m_Width - 1; x++)
 	{
 		RWallKeepChaining = false;
 		LWallKeepChaining = false;
 
-		for(int y = 1; y < pLayer->m_Height-1; y++)
+		for(int y = 1; y < pLayer->m_Height - 1; y++)
 		{
-			CTile *pTile = &(pLayer->m_pTiles[y*pLayer->m_Width+x]);
+			CTile *pTile = &(pLayer->m_pTiles[y * pLayer->m_Width + x]);
 
 			if(pTile->m_Index == 0)
 			{
@@ -406,7 +405,7 @@ void CDoodadsMapper::AnalyzeGameLayer()
 			}
 
 			// check right
-			int CheckIndex = y*pLayer->m_Width+(x+1);
+			int CheckIndex = y * pLayer->m_Width + (x + 1);
 
 			// add a right wall part
 			if(pTile->m_Index == 1 && (pLayer->m_pTiles[CheckIndex].m_Index == 0 || pLayer->m_pTiles[CheckIndex].m_Index > ENTITY_OFFSET))
@@ -415,21 +414,21 @@ void CDoodadsMapper::AnalyzeGameLayer()
 				if(!RWallKeepChaining)
 				{
 					array<int> aChain;
-					aChain.add(y*pLayer->m_Width+x);
+					aChain.add(y * pLayer->m_Width + x);
 					RWallChainID = m_RightWallIDs.add(aChain);
 					RWallKeepChaining = true;
 				}
 				else
 				{
 					// keep chaining
-					m_RightWallIDs[RWallChainID].add(y*pLayer->m_Width+x);
+					m_RightWallIDs[RWallChainID].add(y * pLayer->m_Width + x);
 				}
 			}
 			else
 				RWallKeepChaining = false;
 
 			// check left
-			CheckIndex = y*pLayer->m_Width+(x-1);
+			CheckIndex = y * pLayer->m_Width + (x - 1);
 
 			// add a left wall part
 			if(pTile->m_Index == 1 && (pLayer->m_pTiles[CheckIndex].m_Index == 0 || pLayer->m_pTiles[CheckIndex].m_Index > ENTITY_OFFSET))
@@ -438,14 +437,14 @@ void CDoodadsMapper::AnalyzeGameLayer()
 				if(!LWallKeepChaining)
 				{
 					array<int> aChain;
-					aChain.add(y*pLayer->m_Width+x);
+					aChain.add(y * pLayer->m_Width + x);
 					LWallChainID = m_LeftWallIDs.add(aChain);
 					LWallKeepChaining = true;
 				}
 				else
 				{
 					// keep chaining
-					m_LeftWallIDs[LWallChainID].add(y*pLayer->m_Width+x);
+					m_LeftWallIDs[LWallChainID].add(y * pLayer->m_Width + x);
 				}
 			}
 			else
@@ -491,7 +490,7 @@ void CDoodadsMapper::AnalyzeGameLayer()
 	}
 }
 
-void CDoodadsMapper::PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array<int> > *pPositions, int Amount, int LeftWall)
+void CDoodadsMapper::PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array<int>> *pPositions, int Amount, int LeftWall)
 {
 	if(pRule->m_Location == CRule::CEILING)
 		pRule->m_RelativePos.y++;
@@ -504,11 +503,11 @@ void CDoodadsMapper::PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array
 		pRule->m_HFlip ^= LeftWall;
 		pRule->m_RelativePos.x--;
 		pRule->m_RelativePos.x = -pRule->m_RelativePos.x;
-		pRule->m_RelativePos.x -= pRule->m_Size.x-1;
+		pRule->m_RelativePos.x -= pRule->m_Size.x - 1;
 	}
 
-	int MaxIndex = pLayer->m_Width*pLayer->m_Height;
-	int RandomValue = pRule->m_Random*((101.f-Amount)/100.0f);
+	int MaxIndex = pLayer->m_Width * pLayer->m_Height;
+	int RandomValue = pRule->m_Random * ((101.f - Amount) / 100.0f);
 
 	if(pRule->m_Random == 1)
 		RandomValue = 1;
@@ -520,11 +519,10 @@ void CDoodadsMapper::PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array
 	for(int f = 0; f < pPositions->size(); f++)
 		for(int c = 0; c < (*pPositions)[f].size(); c += pRule->m_Size.x)
 		{
-			if((pRule->m_Location == CRule::FLOOR || pRule->m_Location == CRule::CEILING)
-				&& (*pPositions)[f].size()-c < pRule->m_Size.x)
-			break;
+			if((pRule->m_Location == CRule::FLOOR || pRule->m_Location == CRule::CEILING) && (*pPositions)[f].size() - c < pRule->m_Size.x)
+				break;
 
-			if(pRule->m_Location == CRule::WALLS && (*pPositions)[f].size()-c < pRule->m_Size.y)
+			if(pRule->m_Location == CRule::WALLS && (*pPositions)[f].size() - c < pRule->m_Size.y)
 				break;
 
 			if(RandomValue > 1 && !IAutoMapper::Random(RandomValue))
@@ -535,29 +533,29 @@ void CDoodadsMapper::PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array
 
 			// relative position
 			ID += pRule->m_RelativePos.x;
-			ID += pRule->m_RelativePos.y*pLayer->m_Width;
+			ID += pRule->m_RelativePos.y * pLayer->m_Width;
 
 			for(int y = 0; y < pRule->m_Size.y; y++)
 				for(int x = 0; x < pRule->m_Size.x; x++)
 				{
-					int Index = y*pLayer->m_Width+x+ID;
+					int Index = y * pLayer->m_Width + x + ID;
 					if(Index <= 0 || Index >= MaxIndex)
 						continue;
 
-					pLayer->m_pTiles[Index].m_Index = pRule->m_Rect.x+y*16+x;
+					pLayer->m_pTiles[Index].m_Index = pRule->m_Rect.x + y * 16 + x;
 				}
 
 			// hflip
 			if(pRule->m_HFlip)
 			{
 				for(int y = 0; y < pRule->m_Size.y; y++)
-					for(int x = 0; x < pRule->m_Size.x/2; x++)
+					for(int x = 0; x < pRule->m_Size.x / 2; x++)
 					{
-						int Index = y*pLayer->m_Width+x+ID;
+						int Index = y * pLayer->m_Width + x + ID;
 						if(Index <= 0 || Index >= MaxIndex)
 							continue;
 
-						int CheckIndex = Index+pRule->m_Size.x-1-x*2;
+						int CheckIndex = Index + pRule->m_Size.x - 1 - x * 2;
 
 						if(CheckIndex <= 0 || CheckIndex >= MaxIndex)
 							continue;
@@ -570,7 +568,7 @@ void CDoodadsMapper::PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array
 				for(int y = 0; y < pRule->m_Size.y; y++)
 					for(int x = 0; x < pRule->m_Size.x; x++)
 					{
-						int Index = y*pLayer->m_Width+x+ID;
+						int Index = y * pLayer->m_Width + x + ID;
 						if(Index <= 0 || Index >= MaxIndex)
 							continue;
 
@@ -581,14 +579,14 @@ void CDoodadsMapper::PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array
 			// vflip
 			if(pRule->m_VFlip)
 			{
-				for(int y = 0; y < pRule->m_Size.y/2; y++)
+				for(int y = 0; y < pRule->m_Size.y / 2; y++)
 					for(int x = 0; x < pRule->m_Size.x; x++)
 					{
-						int Index = y*pLayer->m_Width+x+ID;
+						int Index = y * pLayer->m_Width + x + ID;
 						if(Index <= 0 || Index >= MaxIndex)
 							continue;
 
-						int CheckIndex = Index+(pRule->m_Size.y-1-y*2)*pLayer->m_Width;
+						int CheckIndex = Index + (pRule->m_Size.y - 1 - y * 2) * pLayer->m_Width;
 
 						if(CheckIndex <= 0 || CheckIndex >= MaxIndex)
 							continue;
@@ -601,7 +599,7 @@ void CDoodadsMapper::PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array
 				for(int y = 0; y < pRule->m_Size.y; y++)
 					for(int x = 0; x < pRule->m_Size.x; x++)
 					{
-						int Index = y*pLayer->m_Width+x+ID;
+						int Index = y * pLayer->m_Width + x + ID;
 						if(Index <= 0 || Index >= MaxIndex)
 							continue;
 
@@ -622,7 +620,7 @@ void CDoodadsMapper::PlaceDoodads(CLayerTiles *pLayer, CRule *pRule, array<array
 				if(pRule->m_Location == CRule::WALLS)
 					Size = pRule->m_Size.y;
 
-				for(int j = c+Size; j < (*pPositions)[f].size(); j++)
+				for(int j = c + Size; j < (*pPositions)[f].size(); j++)
 					aChainAfter.add((*pPositions)[f][j]);
 
 				pPositions->remove_index(f);
@@ -650,17 +648,17 @@ void CDoodadsMapper::Proceed(CLayerTiles *pLayer, int ConfigID, int Amount)
 	if(!pConf->m_aRules.size())
 		return;
 
-	int MaxIndex = pLayer->m_Width*pLayer->m_Height;
+	int MaxIndex = pLayer->m_Width * pLayer->m_Height;
 
 	// clear tiles
-	for(int i = 0 ; i < MaxIndex; i++)
+	for(int i = 0; i < MaxIndex; i++)
 	{
 		pLayer->m_pTiles[i].m_Index = 0;
 		pLayer->m_pTiles[i].m_Flags = 0;
 	}
 
 	// place doodads
-	for(int i = 0 ; i < pConf->m_aRules.size(); i++)
+	for(int i = 0; i < pConf->m_aRules.size(); i++)
 	{
 		CRule *pRule = &pConf->m_aRules[i];
 
