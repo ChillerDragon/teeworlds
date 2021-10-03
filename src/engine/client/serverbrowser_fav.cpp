@@ -10,14 +10,13 @@
 
 #include <engine/config.h>
 #include <engine/console.h>
-#include <engine/engine.h>
 #include <engine/contacts.h>
+#include <engine/engine.h>
 #include <engine/masterserver.h>
 
 #include <mastersrv/mastersrv.h>
 
 #include "serverbrowser_fav.h"
-
 
 CServerBrowserFavorites::CServerBrowserFavorites()
 {
@@ -134,7 +133,7 @@ CServerBrowserFavorites::CFavoriteServer *CServerBrowserFavorites::FindFavoriteB
 
 void CServerBrowserFavorites::RemoveFavoriteEntry(int Index)
 {
-	mem_move(&m_aFavoriteServers[Index], &m_aFavoriteServers[Index+1], sizeof(CFavoriteServer)*(m_NumFavoriteServers-(Index+1)));
+	mem_move(&m_aFavoriteServers[Index], &m_aFavoriteServers[Index + 1], sizeof(CFavoriteServer) * (m_NumFavoriteServers - (Index + 1)));
 	m_NumFavoriteServers--;
 }
 
@@ -245,13 +244,13 @@ const NETADDR *CServerBrowserFavorites::UpdateFavorites()
 
 void CServerBrowserFavorites::ConAddFavorite(IConsole::IResult *pResult, void *pUserData)
 {
-	CServerBrowserFavorites *pSelf = static_cast<CServerBrowserFavorites *>(pUserData);
+	CServerBrowserFavorites *pSelf = static_cast< CServerBrowserFavorites * >(pUserData);
 	pSelf->AddFavoriteEx(pResult->GetString(0), 0, false, pResult->NumArguments() > 1 ? pResult->GetString(1) : 0);
 }
 
 void CServerBrowserFavorites::ConRemoveFavorite(IConsole::IResult *pResult, void *pUserData)
 {
-	CServerBrowserFavorites *pSelf = static_cast<CServerBrowserFavorites *>(pUserData);
+	CServerBrowserFavorites *pSelf = static_cast< CServerBrowserFavorites * >(pUserData);
 	pSelf->RemoveFavoriteEx(pResult->GetString(0), 0);
 }
 

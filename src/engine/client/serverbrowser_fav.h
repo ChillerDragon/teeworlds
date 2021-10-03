@@ -3,22 +3,23 @@
 #ifndef ENGINE_CLIENT_SERVERBROWSER_FAV_H
 #define ENGINE_CLIENT_SERVERBROWSER_FAV_H
 
-#include <engine/serverbrowser.h>
 #include "serverbrowser_entry.h"
 #include "serverbrowser_filter.h"
+#include <engine/engine.h>
+#include <engine/serverbrowser.h>
 
 class CServerBrowserFavorites
 {
 public:
 	enum
 	{
-		FAVSTATE_LOOKUP=0,
+		FAVSTATE_LOOKUP = 0,
 		FAVSTATE_LOOKUPCHECK,
 		FAVSTATE_INVALID,
 		FAVSTATE_ADDR,
 		FAVSTATE_HOST,
 
-		MAX_FAVORITES=256,
+		MAX_FAVORITES = 256,
 	};
 
 	struct CFavoriteServer
@@ -46,7 +47,7 @@ public:
 
 	CServerBrowserFavorites();
 	void Init(class CNetClient *pNetClient, class IConsole *pConsole, class IEngine *pEngine, class IConfigManager *pConfigManager);
-	
+
 	bool AddFavoriteEx(const char *pHostname, const NETADDR *pAddr, bool DoCheck, const char *pPassword = 0);
 	CFavoriteServer *FindFavoriteByAddr(const NETADDR &Addr, int *Index);
 	CFavoriteServer *FindFavoriteByHostname(const char *pHostname, int *Index);

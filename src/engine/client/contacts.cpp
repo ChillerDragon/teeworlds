@@ -16,7 +16,7 @@ IContactList::IContactList()
 
 const CContactInfo *IContactList::GetContact(int Index) const
 {
-	return &m_aContacts[max(0, Index%m_NumContacts)];
+	return &m_aContacts[max(0, Index % m_NumContacts)];
 }
 
 int IContactList::GetContactState(const char *pName, const char *pClan) const
@@ -92,22 +92,22 @@ void IContactList::RemoveContact(int Index)
 {
 	if(Index >= 0 && Index < m_NumContacts)
 	{
-		mem_move(&m_aContacts[Index], &m_aContacts[Index+1], sizeof(CContactInfo)*(m_NumContacts-(Index+1)));
+		mem_move(&m_aContacts[Index], &m_aContacts[Index + 1], sizeof(CContactInfo) * (m_NumContacts - (Index + 1)));
 		--m_NumContacts;
 	}
 	return;
 }
 
-void IContactList::ConfigSave(IConfigManager *pConfigManager, const char* pCmdStr)
+void IContactList::ConfigSave(IConfigManager *pConfigManager, const char *pCmdStr)
 {
 	char aBuf[128];
-	const char *pEnd = aBuf+sizeof(aBuf)-4;
+	const char *pEnd = aBuf + sizeof(aBuf) - 4;
 	for(int i = 0; i < this->m_NumContacts; ++i)
 	{
 		str_copy(aBuf, pCmdStr, sizeof(aBuf));
 
 		const char *pSrc = this->m_aContacts[i].m_aName;
-		char *pDst = aBuf+str_length(aBuf);
+		char *pDst = aBuf + str_length(aBuf);
 		*pDst++ = '"';
 		while(*pSrc && pDst < pEnd)
 		{
@@ -135,35 +135,35 @@ void IContactList::ConfigSave(IConfigManager *pConfigManager, const char* pCmdSt
 
 void CFriends::ConAddFriend(IConsole::IResult *pResult, void *pUserData)
 {
-	CFriends *pSelf = static_cast<CFriends *>(pUserData);
+	CFriends *pSelf = static_cast< CFriends * >(pUserData);
 	pSelf->AddFriend(pResult->GetString(0), pResult->GetString(1));
 }
 
 void CFriends::ConRemoveFriend(IConsole::IResult *pResult, void *pUserData)
 {
-	CFriends *pSelf = static_cast<CFriends *>(pUserData);
+	CFriends *pSelf = static_cast< CFriends * >(pUserData);
 	pSelf->RemoveFriend(pResult->GetString(0), pResult->GetString(1));
 }
 
 void CBlacklist::ConAddIgnore(IConsole::IResult *pResult, void *pUserData)
 {
-	CBlacklist *pSelf = static_cast<CBlacklist *>(pUserData);
+	CBlacklist *pSelf = static_cast< CBlacklist * >(pUserData);
 	pSelf->AddIgnoredPlayer(pResult->GetString(0), pResult->GetString(1));
 }
 
 void CBlacklist::ConRemoveIgnore(IConsole::IResult *pResult, void *pUserData)
 {
-	CBlacklist *pSelf = static_cast<CBlacklist *>(pUserData);
+	CBlacklist *pSelf = static_cast< CBlacklist * >(pUserData);
 	pSelf->RemoveIgnoredPlayer(pResult->GetString(0), pResult->GetString(1));
 }
 
 void CFriends::Init()
 {
-	IConfigManager *pConfigManager = Kernel()->RequestInterface<IConfigManager>();
+	IConfigManager *pConfigManager = Kernel()->RequestInterface< IConfigManager >();
 	if(pConfigManager)
 		pConfigManager->RegisterCallback(ConfigSaveCallback, this);
 
-	IConsole *pConsole = Kernel()->RequestInterface<IConsole>();
+	IConsole *pConsole = Kernel()->RequestInterface< IConsole >();
 	if(pConsole)
 	{
 		pConsole->Register("add_friend", "s[name] s[clan]", CFGFLAG_CLIENT, ConAddFriend, this, "Add a friend");
@@ -173,11 +173,11 @@ void CFriends::Init()
 
 void CBlacklist::Init()
 {
-	IConfigManager *pConfigManager = Kernel()->RequestInterface<IConfigManager>();
+	IConfigManager *pConfigManager = Kernel()->RequestInterface< IConfigManager >();
 	if(pConfigManager)
 		pConfigManager->RegisterCallback(ConfigSaveCallback, this);
 
-	IConsole *pConsole = Kernel()->RequestInterface<IConsole>();
+	IConsole *pConsole = Kernel()->RequestInterface< IConsole >();
 	if(pConsole)
 	{
 		pConsole->Register("add_ignore", "s[name] s[clan]", CFGFLAG_CLIENT, ConAddIgnore, this, "Ignore a player");

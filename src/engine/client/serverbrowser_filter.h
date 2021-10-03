@@ -4,14 +4,15 @@
 #define ENGINE_CLIENT_SERVERBROWSER_FILTER_H
 
 #include <base/tl/array.h>
+#include <engine/serverbrowser.h>
 
 class CServerBrowserFilter
 {
 public:
 	enum
 	{
-		RESORT_FLAG_FORCE=1,
-		RESORT_FLAG_FAV=2,
+		RESORT_FLAG_FORCE = 1,
+		RESORT_FLAG_FAV = 2,
 	};
 
 	class CServerFilter
@@ -22,16 +23,16 @@ public:
 
 		// filter settings
 		CServerFilterInfo m_FilterInfo;
-		
+
 		// stats
 		int m_NumSortedPlayers;
 		int m_NumSortedServers;
 		int *m_pSortedServerlist;
 		int m_SortedServersCapacity;
-		
+
 		CServerFilter();
 		~CServerFilter();
-		CServerFilter& operator=(const CServerFilter& Other);
+		CServerFilter &operator=(const CServerFilter &Other);
 
 		void Filter();
 		int GetSortHash() const;
@@ -59,7 +60,7 @@ public:
 	void GetFilter(int Index, class CServerFilterInfo *pFilterInfo) const;
 	void RemoveFilter(int Index);
 	void SetFilter(int Index, const class CServerFilterInfo *pFilterInfo);
-	
+
 	// stats
 	const void *GetID(int FilterIndex, int Index) const { return &m_lFilters[FilterIndex].m_pSortedServerlist[Index]; }
 	int GetIndex(int FilterIndex, int Index) const { return m_lFilters[FilterIndex].m_pSortedServerlist[Index]; }
@@ -70,7 +71,7 @@ private:
 	class CConfig *m_pConfig;
 	class IFriends *m_pFriends;
 	char m_aNetVersion[128];
-	array<CServerFilter> m_lFilters;
+	array< CServerFilter > m_lFilters;
 
 	// get updated on sort
 	class CServerEntry **m_ppServerlist;
