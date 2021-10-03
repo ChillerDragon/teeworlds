@@ -1,9 +1,9 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/system.h>
 #include "eventhandler.h"
 #include "gamecontext.h"
 #include "player.h"
+#include <base/system.h>
 
 //////////////////////////////////////////////////
 // Event handler
@@ -23,7 +23,7 @@ void *CEventHandler::Create(int Type, int Size, int64 Mask)
 {
 	if(m_NumEvents == MAX_EVENTS)
 		return 0;
-	if(m_CurrentOffset+Size >= MAX_DATASIZE)
+	if(m_CurrentOffset + Size >= MAX_DATASIZE)
 		return 0;
 
 	void *p = &m_aData[m_CurrentOffset];

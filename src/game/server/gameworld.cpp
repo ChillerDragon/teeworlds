@@ -1,12 +1,11 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
+#include "gameworld.h"
 #include "entities/character.h"
 #include "entity.h"
 #include "gamecontext.h"
 #include "gamecontroller.h"
-#include "gameworld.h"
-
 
 //////////////////////////////////////////////////
 // game world
@@ -49,9 +48,9 @@ int CGameWorld::FindEntities(vec2 Pos, float Radius, CEntity **ppEnts, int Max, 
 		return 0;
 
 	int Num = 0;
-	for(CEntity *pEnt = m_apFirstEntityTypes[Type];	pEnt; pEnt = pEnt->m_pNextTypeEntity)
+	for(CEntity *pEnt = m_apFirstEntityTypes[Type]; pEnt; pEnt = pEnt->m_pNextTypeEntity)
 	{
-		if(distance(pEnt->m_Pos, Pos) < Radius+pEnt->m_ProximityRadius)
+		if(distance(pEnt->m_Pos, Pos) < Radius + pEnt->m_ProximityRadius)
 		{
 			if(ppEnts)
 				ppEnts[Num] = pEnt;
@@ -110,7 +109,7 @@ void CGameWorld::RemoveEntity(CEntity *pEnt)
 void CGameWorld::Snap(int SnappingClient)
 {
 	for(int i = 0; i < NUM_ENTTYPES; i++)
-		for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt; )
+		for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt;)
 		{
 			m_pNextTraverseEntity = pEnt->m_pNextTypeEntity;
 			pEnt->Snap(SnappingClient);
@@ -121,7 +120,7 @@ void CGameWorld::Snap(int SnappingClient)
 void CGameWorld::PostSnap()
 {
 	for(int i = 0; i < NUM_ENTTYPES; i++)
-		for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt; )
+		for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt;)
 		{
 			m_pNextTraverseEntity = pEnt->m_pNextTypeEntity;
 			pEnt->PostSnap();
@@ -133,7 +132,7 @@ void CGameWorld::Reset()
 {
 	// reset all entities
 	for(int i = 0; i < NUM_ENTTYPES; i++)
-		for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt; )
+		for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt;)
 		{
 			m_pNextTraverseEntity = pEnt->m_pNextTypeEntity;
 			pEnt->Reset();
@@ -151,7 +150,7 @@ void CGameWorld::RemoveEntities()
 {
 	// destroy objects marked for destruction
 	for(int i = 0; i < NUM_ENTTYPES; i++)
-		for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt; )
+		for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt;)
 		{
 			m_pNextTraverseEntity = pEnt->m_pNextTypeEntity;
 			if(pEnt->IsMarkedForDestroy())
@@ -172,7 +171,7 @@ void CGameWorld::Tick()
 	{
 		// update all objects
 		for(int i = 0; i < NUM_ENTTYPES; i++)
-			for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt; )
+			for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt;)
 			{
 				m_pNextTraverseEntity = pEnt->m_pNextTypeEntity;
 				pEnt->TickPaused();
@@ -183,7 +182,7 @@ void CGameWorld::Tick()
 	{
 		// update all objects
 		for(int i = 0; i < NUM_ENTTYPES; i++)
-			for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt; )
+			for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt;)
 			{
 				m_pNextTraverseEntity = pEnt->m_pNextTypeEntity;
 				pEnt->Tick();
@@ -191,7 +190,7 @@ void CGameWorld::Tick()
 			}
 
 		for(int i = 0; i < NUM_ENTTYPES; i++)
-			for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt; )
+			for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt;)
 			{
 				m_pNextTraverseEntity = pEnt->m_pNextTypeEntity;
 				pEnt->TickDefered();
@@ -202,9 +201,8 @@ void CGameWorld::Tick()
 	RemoveEntities();
 }
 
-
 // TODO: should be more general
-CCharacter *CGameWorld::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2& NewPos, CEntity *pNotThis)
+CCharacter *CGameWorld::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2 &NewPos, CEntity *pNotThis)
 {
 	// Find other players
 	float ClosestLen = distance(Pos0, Pos1) * 100.0f;
@@ -212,13 +210,13 @@ CCharacter *CGameWorld::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, v
 
 	CCharacter *p = (CCharacter *)FindFirst(ENTTYPE_CHARACTER);
 	for(; p; p = (CCharacter *)p->TypeNext())
- 	{
+	{
 		if(p == pNotThis)
 			continue;
 
 		vec2 IntersectPos = closest_point_on_line(Pos0, Pos1, p->m_Pos);
 		float Len = distance(p->m_Pos, IntersectPos);
-		if(Len < p->m_ProximityRadius+Radius)
+		if(Len < p->m_ProximityRadius + Radius)
 		{
 			Len = distance(Pos0, IntersectPos);
 			if(Len < ClosestLen)
@@ -233,21 +231,20 @@ CCharacter *CGameWorld::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, v
 	return pClosest;
 }
 
-
 CEntity *CGameWorld::ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pNotThis)
 {
 	// Find other players
-	float ClosestRange = Radius*2;
+	float ClosestRange = Radius * 2;
 	CEntity *pClosest = 0;
 
 	CEntity *p = FindFirst(Type);
 	for(; p; p = p->TypeNext())
- 	{
+	{
 		if(p == pNotThis)
 			continue;
 
 		float Len = distance(Pos, p->m_Pos);
-		if(Len < p->m_ProximityRadius+Radius)
+		if(Len < p->m_ProximityRadius + Radius)
 		{
 			if(Len < ClosestRange)
 			{
