@@ -35,14 +35,13 @@ extern "C" {
 		<dbg_break>
 */
 void dbg_assert(int test, const char *msg);
-#define dbg_assert(test,msg) dbg_assert_imp(__FILE__, __LINE__, test, msg)
+#define dbg_assert(test, msg) dbg_assert_imp(__FILE__, __LINE__, test, msg)
 void dbg_assert_imp(const char *filename, int line, int test, const char *msg);
-
 
 #ifdef __clang_analyzer__
 #include <assert.h>
 #undef dbg_assert
-#define dbg_assert(test,msg) assert(test)
+#define dbg_assert(test, msg) assert(test)
 #endif
 
 /*
@@ -67,7 +66,7 @@ void dbg_break();
 		<dbg_assert>
 */
 void dbg_msg(const char *sys, const char *fmt, ...)
-GNUC_ATTRIBUTE((format(printf, 2, 3)));
+	GNUC_ATTRIBUTE((format(printf, 2, 3)));
 
 /* Group: Memory */
 
@@ -176,7 +175,8 @@ int mem_comp(const void *a, const void *b, int size);
 int mem_has_null(const void *block, unsigned size);
 
 /* Group: File IO */
-enum {
+enum
+{
 	IOFLAG_READ = 1,
 	IOFLAG_WRITE = 2,
 	IOFLAG_RANDOM = 4,
@@ -369,7 +369,6 @@ int io_close(IOHANDLE io);
 */
 int io_flush(IOHANDLE io);
 
-
 /*
 	Function: io_stdin
 		Returns an <IOHANDLE> to the standard input.
@@ -387,7 +386,6 @@ IOHANDLE io_stdout();
 		Returns an <IOHANDLE> to the standard error.
 */
 IOHANDLE io_stderr();
-
 
 /* Group: Threads */
 
@@ -453,7 +451,7 @@ void thread_detach(void *thread);
 void cpu_relax();
 
 /* Group: Locks */
-typedef void* LOCK;
+typedef void *LOCK;
 
 LOCK lock_create();
 void lock_destroy(LOCK lock);
@@ -462,23 +460,22 @@ int lock_trylock(LOCK lock);
 void lock_wait(LOCK lock);
 void lock_unlock(LOCK lock);
 
-
 /* Group: Semaphores */
 
 #if !defined(CONF_PLATFORM_MACOSX)
-	#if defined(CONF_FAMILY_UNIX)
-		#include <semaphore.h>
-		typedef sem_t SEMAPHORE;
-	#elif defined(CONF_FAMILY_WINDOWS)
-		typedef void* SEMAPHORE;
-	#else
-		#error missing sempahore implementation
-	#endif
+#if defined(CONF_FAMILY_UNIX)
+#include <semaphore.h>
+typedef sem_t SEMAPHORE;
+#elif defined(CONF_FAMILY_WINDOWS)
+typedef void *SEMAPHORE;
+#else
+#error missing sempahore implementation
+#endif
 
-	void semaphore_init(SEMAPHORE *sem);
-	void semaphore_wait(SEMAPHORE *sem);
-	void semaphore_signal(SEMAPHORE *sem);
-	void semaphore_destroy(SEMAPHORE *sem);
+void semaphore_init(SEMAPHORE *sem);
+void semaphore_wait(SEMAPHORE *sem);
+void semaphore_signal(SEMAPHORE *sem);
+void semaphore_destroy(SEMAPHORE *sem);
 #endif
 
 /* Group: Timer */
@@ -529,7 +526,6 @@ int time_timestamp();
 */
 int time_houroftheday();
 
-
 enum
 {
 	SEASON_SPRING = 0,
@@ -577,7 +573,7 @@ typedef struct
 
 enum
 {
-	NETADDR_MAXSTRSIZE = 1+(8*4+7)+1+1+5+1, // [XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX]:XXXXX
+	NETADDR_MAXSTRSIZE = 1 + (8 * 4 + 7) + 1 + 1 + 5 + 1, // [XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX]:XXXXX
 
 	NETADDR_SIZE_IPV4 = 4,
 	NETADDR_SIZE_IPV6 = 16,
@@ -586,7 +582,7 @@ enum
 	NETTYPE_IPV4 = 1,
 	NETTYPE_IPV6 = 2,
 	NETTYPE_LINK_BROADCAST = 4,
-	NETTYPE_ALL = NETTYPE_IPV4|NETTYPE_IPV6
+	NETTYPE_ALL = NETTYPE_IPV4 | NETTYPE_IPV6
 };
 
 typedef struct
@@ -731,7 +727,6 @@ int net_udp_recv(NETSOCKET sock, NETADDR *addr, void *data, int maxsize);
 		Returns 0 on success. -1 on error.
 */
 int net_udp_close(NETSOCKET sock);
-
 
 /* Group: Network TCP */
 
@@ -922,7 +917,7 @@ int str_length(const char *str);
 		- Guarantees that dst string will contain zero-termination.
 */
 void str_format(char *buffer, int buffer_size, const char *format, ...)
-GNUC_ATTRIBUTE((format(printf, 3, 4)));
+	GNUC_ATTRIBUTE((format(printf, 3, 4)));
 
 /*
 	Function: str_sanitize_strong
@@ -1168,7 +1163,6 @@ int str_comp_filenames(const char *a, const char *b);
 */
 const char *str_startswith_nocase(const char *str, const char *prefix);
 
-
 /*
 	Function: str_startswith
 		Checks case sensitive whether the string begins with a certain prefix.
@@ -1298,9 +1292,9 @@ int str_is_number(const char *pstr);
 */
 void str_timestamp(char *buffer, int buffer_size);
 void str_timestamp_format(char *buffer, int buffer_size, const char *format)
-GNUC_ATTRIBUTE((format(strftime, 3, 0)));
+	GNUC_ATTRIBUTE((format(strftime, 3, 0)));
 void str_timestamp_ex(time_t time, char *buffer, int buffer_size, const char *format)
-GNUC_ATTRIBUTE((format(strftime, 4, 0)));
+	GNUC_ATTRIBUTE((format(strftime, 4, 0)));
 
 /*
 	Function: str_span
@@ -1336,7 +1330,7 @@ void fs_listdir(const char *dir, FS_LISTDIR_CALLBACK cb, int type, void *user);
 
 typedef struct
 {
-	const char* m_pName;
+	const char *m_pName;
 	time_t m_TimeCreated; // seconds since UNIX Epoch
 	time_t m_TimeModified; // seconds since UNIX Epoch
 } CFsFileInfo;
@@ -1353,7 +1347,7 @@ typedef struct
 		type - Type of the directory
 		user - Pointer to give to the callback
 */
-typedef int (*FS_LISTDIR_CALLBACK_FILEINFO)(const CFsFileInfo* info, int is_dir, int dir_type, void *user);
+typedef int (*FS_LISTDIR_CALLBACK_FILEINFO)(const CFsFileInfo *info, int is_dir, int dir_type, void *user);
 void fs_listdir_fileinfo(const char *dir, FS_LISTDIR_CALLBACK_FILEINFO cb, int type, void *user);
 
 /*
@@ -1383,7 +1377,6 @@ int fs_makedir(const char *path);
 		Returns 0 on success. Negative value on failure.
 */
 int fs_makedir_recursive(const char *path);
-
 
 /*
 	Function: fs_storage_path
@@ -1537,7 +1530,6 @@ int fs_file_time(const char *name, time_t *created, time_t *modified);
 	Group: Undocumented
 */
 
-
 /*
 	Function: net_tcp_connect_non_blocking
 
@@ -1577,7 +1569,6 @@ int net_socket_read_wait(NETSOCKET sock, int time);
 
 void swap_endian(void *data, unsigned elem_size, unsigned num);
 
-
 typedef void (*DBG_LOGGER)(const char *line);
 void dbg_logger(DBG_LOGGER logger);
 
@@ -1598,7 +1589,6 @@ typedef struct
 	int recv_packets;
 	int recv_bytes;
 } NETSTATS;
-
 
 void net_stats(NETSTATS *stats);
 
