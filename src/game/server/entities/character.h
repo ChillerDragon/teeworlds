@@ -8,7 +8,6 @@
 #include <game/gamecore.h>
 #include <game/server/entity.h>
 
-
 class CCharacter : public CEntity
 {
 	MACRO_ALLOC_POOL_ID()
@@ -19,7 +18,7 @@ public:
 
 	enum
 	{
-		MIN_KILLMESSAGE_CLIENTVERSION=0x0704,   // todo 0.8: remove me
+		MIN_KILLMESSAGE_CLIENTVERSION = 0x0704, // todo 0.8: remove me
 	};
 
 	CCharacter(CGameWorld *pWorld);
@@ -125,7 +124,6 @@ private:
 	int m_ReckoningTick; // tick that we are performing dead reckoning From
 	CCharacterCore m_SendCore; // core that we should send
 	CCharacterCore m_ReckoningCore; // the dead reckoning core
-
 };
 
 #endif
