@@ -1,8 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/keys.h>
-#include <engine/input.h>
 #include "lineinput.h"
+#include <engine/input.h>
+#include <engine/keys.h>
 
 CLineInput::CLineInput()
 {
@@ -41,8 +41,8 @@ bool CLineInput::MoveWordStop(char c)
 {
 	// jump to spaces and special ASCII characters
 	return ((32 <= c && c <= 47) || //  !"#$%&'()*+,-./
-			(58 <= c && c <= 64) || // :;<=>?@
-			(91 <= c && c <= 96));  // [\]^_`
+		(58 <= c && c <= 64) || // :;<=>?@
+		(91 <= c && c <= 96)); // [\]^_`
 }
 
 bool CLineInput::Manipulate(IInput::CEvent Event, char *pStr, int StrMaxSize, int StrMaxChars, int *pStrLenPtr, int *pCursorPosPtr, int *pNumCharsPtr, IInput *pInput)
@@ -55,7 +55,7 @@ bool CLineInput::Manipulate(IInput::CEvent Event, char *pStr, int StrMaxSize, in
 	if(CursorPos > Len)
 		CursorPos = Len;
 
-	if(Event.m_Flags&IInput::FLAG_TEXT &&
+	if(Event.m_Flags & IInput::FLAG_TEXT &&
 		!(KEY_LCTRL <= Event.m_Key && Event.m_Key <= KEY_RGUI))
 	{
 		// gather string stats
@@ -74,11 +74,11 @@ bool CLineInput::Manipulate(IInput::CEvent Event, char *pStr, int StrMaxSize, in
 		// add new string
 		if(CharCount)
 		{
-			if(Len+CharSize < StrMaxSize && CursorPos+CharSize < StrMaxSize && NumChars+CharCount <= StrMaxChars)
+			if(Len + CharSize < StrMaxSize && CursorPos + CharSize < StrMaxSize && NumChars + CharCount <= StrMaxChars)
 			{
-				mem_move(pStr + CursorPos + CharSize, pStr + CursorPos, Len-CursorPos+1); // +1 == null term
+				mem_move(pStr + CursorPos + CharSize, pStr + CursorPos, Len - CursorPos + 1); // +1 == null term
 				for(int i = 0; i < CharSize; i++)
-					pStr[CursorPos+i] = Event.m_aText[i];
+					pStr[CursorPos + i] = Event.m_aText[i];
 				CursorPos += CharSize;
 				Len += CharSize;
 				NumChars += CharCount;
@@ -87,7 +87,7 @@ bool CLineInput::Manipulate(IInput::CEvent Event, char *pStr, int StrMaxSize, in
 		}
 	}
 
-	if(Event.m_Flags&IInput::FLAG_PRESS)
+	if(Event.m_Flags & IInput::FLAG_PRESS)
 	{
 		int Key = Event.m_Key;
 		bool MoveWord = false;
@@ -105,8 +105,8 @@ bool CLineInput::Manipulate(IInput::CEvent Event, char *pStr, int StrMaxSize, in
 				NewCursorPos = str_utf8_rewind(pStr, NewCursorPos);
 				NumChars -= 1;
 			} while(MoveWord && NewCursorPos > 0 && !MoveWordStop(pStr[NewCursorPos - 1]));
-			int CharSize = CursorPos-NewCursorPos;
-			mem_move(pStr+NewCursorPos, pStr+CursorPos, Len - NewCursorPos - CharSize + 1); // +1 == null term
+			int CharSize = CursorPos - NewCursorPos;
+			mem_move(pStr + NewCursorPos, pStr + CursorPos, Len - NewCursorPos - CharSize + 1); // +1 == null term
 			CursorPos = NewCursorPos;
 			Len -= CharSize;
 			Changes = true;

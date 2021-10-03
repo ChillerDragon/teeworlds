@@ -38,7 +38,7 @@ void CMapImages::LoadMapImages(IMap *pMap, class CLayers *pLayers, int MapType)
 		bool FoundTileLayer = false;
 		for(int k = 0; k < pLayers->NumLayers(); k++)
 		{
-			const CMapItemLayer * const pLayer = pLayers->GetLayer(k);
+			const CMapItemLayer *const pLayer = pLayers->GetLayer(k);
 			if(!FoundQuadLayer && pLayer->m_Type == LAYERTYPE_QUADS && ((const CMapItemLayerQuads *)pLayer)->m_Image == i)
 				FoundQuadLayer = true;
 			if(!FoundTileLayer && pLayer->m_Type == LAYERTYPE_TILES && ((const CMapItemLayerTilemap *)pLayer)->m_Image == i)
@@ -47,7 +47,7 @@ void CMapImages::LoadMapImages(IMap *pMap, class CLayers *pLayers, int MapType)
 		if(FoundTileLayer)
 			TextureFlags = FoundQuadLayer ? IGraphics::TEXLOAD_MULTI_DIMENSION : IGraphics::TEXLOAD_ARRAY_256;
 
-		CMapItemImage *pImg = (CMapItemImage *)pMap->GetItem(Start+i, 0, 0);
+		CMapItemImage *pImg = (CMapItemImage *)pMap->GetItem(Start + i, 0, 0);
 		if(pImg->m_External || (pImg->m_Version > 1 && pImg->m_Format != CImageInfo::FORMAT_RGB && pImg->m_Format != CImageInfo::FORMAT_RGBA))
 		{
 			char Buf[IO_MAX_PATH_LENGTH];
