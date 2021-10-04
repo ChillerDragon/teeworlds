@@ -13,8 +13,8 @@ class CMapLayers : public CComponent
 	int m_Type;
 	float m_OnlineStartTime;
 
-	array<CEnvPoint> m_lEnvPoints;
-	array<CEnvPoint> m_lEnvPointsMenu;
+	array< CEnvPoint > m_lEnvPoints;
+	array< CEnvPoint > m_lEnvPointsMenu;
 
 	CTile *m_pEggTiles;
 	int m_EggLayerWidth;
@@ -22,7 +22,7 @@ class CMapLayers : public CComponent
 
 	static void EnvelopeEval(float TimeOffset, int Env, float *pChannels, void *pUser);
 
-	void LoadEnvPoints(const CLayers *pLayers, array<CEnvPoint> &lEnvPoints);
+	void LoadEnvPoints(const CLayers *pLayers, array< CEnvPoint > &lEnvPoints);
 	void LoadBackgroundMap();
 
 	void PlaceEasterEggs(const CLayers *pLayers);

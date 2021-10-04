@@ -335,7 +335,7 @@ private:
 		IGraphics::CTextureHandle m_OrgTexture;
 		IGraphics::CTextureHandle m_GreyTexture;
 	};
-	array<CMenuImage> m_lMenuImages;
+	array< CMenuImage > m_lMenuImages;
 
 	static int MenuImageScan(const char *pName, int IsDir, int DirType, void *pUser);
 
@@ -355,7 +355,7 @@ private:
 		IGraphics::CTextureHandle m_IconTexture;
 		bool operator<(const CTheme &Other) const { return m_Name < Other.m_Name; }
 	};
-	sorted_array<CTheme> m_lThemes;
+	sorted_array< CTheme > m_lThemes;
 
 	static int ThemeScan(const char *pName, int IsDir, int DirType, void *pUser);
 	static int ThemeIconScan(const char *pName, int IsDir, int DirType, void *pUser);
@@ -376,7 +376,7 @@ private:
 		string m_Name;
 		IGraphics::CTextureHandle m_IconTexture;
 	};
-	array<CGameIcon> m_lGameIcons;
+	array< CGameIcon > m_lGameIcons;
 	IGraphics::CTextureHandle m_GameIconDefault;
 	void DoGameIcon(const char *pName, const CUIRect *pRect);
 	static int GameIconScan(const char *pName, int IsDir, int DirType, void *pUser);
@@ -489,7 +489,7 @@ private:
 		}
 	};
 
-	sorted_array<CDemoItem> m_lDemos;
+	sorted_array< CDemoItem > m_lDemos;
 	char m_aCurrentDemoFolder[IO_MAX_PATH_LENGTH];
 	char m_aCurrentDemoFile[IO_MAX_PATH_LENGTH];
 	int m_DemolistSelectedIndex;
@@ -535,7 +535,7 @@ private:
 		FRIEND_OFF,
 		NUM_FRIEND_TYPES
 	};
-	sorted_array<CFriendItem> m_lFriendList[NUM_FRIEND_TYPES];
+	sorted_array< CFriendItem > m_lFriendList[NUM_FRIEND_TYPES];
 	const CFriendItem *m_pDeleteFriend;
 
 	void FriendlistOnUpdate();
@@ -586,7 +586,7 @@ private:
 		void SetFilter(const CServerFilterInfo *pFilterInfo);
 	};
 
-	array<CBrowserFilter> m_lFilters;
+	array< CBrowserFilter > m_lFilters;
 
 	int m_RemoveFilterIndex;
 
@@ -682,8 +682,8 @@ private:
 		int m_WidthValue;
 		int m_HeightValue;
 	};
-	sorted_array<CVideoMode> m_lRecommendedVideoModes;
-	sorted_array<CVideoMode> m_lOtherVideoModes;
+	sorted_array< CVideoMode > m_lRecommendedVideoModes;
+	sorted_array< CVideoMode > m_lOtherVideoModes;
 	void UpdatedFilteredVideoModes();
 	void UpdateVideoModeSettings();
 
@@ -766,7 +766,7 @@ private:
 	void PopupConfirmPlayerCountry();
 
 	bool DoResolutionList(CUIRect *pRect, CListBox *pListBox,
-		const sorted_array<CVideoMode> &lModes);
+		const sorted_array< CVideoMode > &lModes);
 
 	// found in menus_callback.cpp
 	float RenderSettingsControlsMouse(CUIRect View);

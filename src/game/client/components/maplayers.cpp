@@ -131,7 +131,7 @@ void CMapLayers::OnShutdown()
 	}
 }
 
-void CMapLayers::LoadEnvPoints(const CLayers *pLayers, array<CEnvPoint> &lEnvPoints)
+void CMapLayers::LoadEnvPoints(const CLayers *pLayers, array< CEnvPoint > &lEnvPoints)
 {
 	lEnvPoints.clear();
 

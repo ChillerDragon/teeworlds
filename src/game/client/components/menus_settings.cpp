@@ -309,7 +309,7 @@ void CMenus::RenderHSLPicker(CUIRect MainView)
 void CMenus::RenderSkinSelection(CUIRect MainView)
 {
 	static float s_LastSelectionTime = -10.0f;
-	static sorted_array<const CSkins::CSkin *> s_paSkinList;
+	static sorted_array< const CSkins::CSkin * > s_paSkinList;
 	static CListBox s_ListBox;
 	if(m_RefreshSkinSelector)
 	{
@@ -408,7 +408,7 @@ void CMenus::RenderSkinSelection(CUIRect MainView)
 void CMenus::RenderSkinPartSelection(CUIRect MainView)
 {
 	static bool s_InitSkinPartList = true;
-	static sorted_array<const CSkins::CSkinPart *> s_paList[6];
+	static sorted_array< const CSkins::CSkinPart * > s_paList[6];
 	static CListBox s_ListBox;
 	if(s_InitSkinPartList)
 	{
@@ -637,7 +637,7 @@ int CMenus::ThemeIconScan(const char *pName, int IsDir, int DirType, void *pUser
 	str_truncate(aThemeName, sizeof(aThemeName), pName, pSuffix - pName);
 
 	// save icon for an existing theme
-	for(sorted_array<CTheme>::range r = pSelf->m_lThemes.all(); !r.empty(); r.pop_front()) // bit slow but whatever
+	for(sorted_array< CTheme >::range r = pSelf->m_lThemes.all(); !r.empty(); r.pop_front()) // bit slow but whatever
 	{
 		if(str_comp(r.front().m_Name, aThemeName) == 0 || (!r.front().m_Name[0] && str_comp(aThemeName, "none") == 0))
 		{
@@ -660,7 +660,7 @@ int CMenus::ThemeIconScan(const char *pName, int IsDir, int DirType, void *pUser
 	return 0; // no existing theme
 }
 
-void LoadLanguageIndexfile(IStorage *pStorage, IConsole *pConsole, sorted_array<CLanguage> *pLanguages)
+void LoadLanguageIndexfile(IStorage *pStorage, IConsole *pConsole, sorted_array< CLanguage > *pLanguages)
 {
 	// read file data into buffer
 	const char *pFilename = "languages/index.json";
@@ -707,7 +707,7 @@ void LoadLanguageIndexfile(IStorage *pStorage, IConsole *pConsole, sorted_array<
 void CMenus::RenderLanguageSelection(CUIRect MainView, bool Header)
 {
 	static int s_SelectedLanguage = -1;
-	static sorted_array<CLanguage> s_Languages;
+	static sorted_array< CLanguage > s_Languages;
 	static CListBox s_ListBox;
 
 	if(s_Languages.size() == 0)
@@ -731,7 +731,7 @@ void CMenus::RenderLanguageSelection(CUIRect MainView, bool Header)
 	bool IsActive = m_ActiveListBox == ACTLB_LANG;
 	s_ListBox.DoStart(20.0f, s_Languages.size(), 1, 3, s_SelectedLanguage, Header ? 0 : &MainView, Header, &IsActive);
 
-	for(sorted_array<CLanguage>::range r = s_Languages.all(); !r.empty(); r.pop_front())
+	for(sorted_array< CLanguage >::range r = s_Languages.all(); !r.empty(); r.pop_front())
 	{
 		CListboxItem Item = s_ListBox.DoNextItem(&r.front(), s_SelectedLanguage != -1 && !str_comp(s_Languages[s_SelectedLanguage].m_Name, r.front().m_Name), &IsActive);
 		if(IsActive)
@@ -800,7 +800,7 @@ void CMenus::RenderThemeSelection(CUIRect MainView, bool Header)
 	bool IsActive = m_ActiveListBox == ACTLB_THEME;
 	s_ListBox.DoStart(20.0f, m_lThemes.size(), 1, 3, SelectedTheme, Header ? 0 : &MainView, Header, &IsActive);
 
-	for(sorted_array<CTheme>::range r = m_lThemes.all(); !r.empty(); r.pop_front())
+	for(sorted_array< CTheme >::range r = m_lThemes.all(); !r.empty(); r.pop_front())
 	{
 		const CTheme &Theme = r.front();
 		CListboxItem Item = s_ListBox.DoNextItem(&Theme, SelectedTheme == (&Theme - m_lThemes.base_ptr()), &IsActive);
@@ -1624,7 +1624,7 @@ float CMenus::RenderSettingsControlsStats(CUIRect View)
 }
 
 bool CMenus::DoResolutionList(CUIRect *pRect, CListBox *pListBox,
-	const sorted_array<CVideoMode> &lModes)
+	const sorted_array< CVideoMode > &lModes)
 {
 	int OldSelected = -1;
 	char aBuf[32];

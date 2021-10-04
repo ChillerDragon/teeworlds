@@ -622,15 +622,15 @@ void CChat::AddLine(const char *pLine, int ClientID, int Mode, int TargetID)
 
 		if(++Length >= 127)
 		{
-			*(const_cast<char *>(pStr)) = 0;
+			*(const_cast< char * >(pStr)) = 0;
 			break;
 		}
 	}
 	if(pEnd != 0)
-		*(const_cast<char *>(pEnd)) = 0;
+		*(const_cast< char * >(pEnd)) = 0;
 
 	bool Highlighted = false;
-	char *p = const_cast<char *>(pLine);
+	char *p = const_cast< char * >(pLine);
 	while(*p)
 	{
 		pLine = p;

@@ -312,7 +312,7 @@ struct CRenderInfo
 
 void CGameConsole::PossibleCommandsRenderCallback(int Index, const char *pStr, void *pUser)
 {
-	CRenderInfo *pInfo = static_cast<CRenderInfo *>(pUser);
+	CRenderInfo *pInfo = static_cast< CRenderInfo * >(pUser);
 
 	if(pInfo->m_EnumCount == pInfo->m_WantedCompletion)
 	{
@@ -784,7 +784,7 @@ void CGameConsole::ConchainConsoleOutputLevelUpdate(IConsole::IResult *pResult, 
 	pfnCallback(pResult, pCallbackUserData);
 	if(pResult->NumArguments() == 1)
 	{
-		CGameConsole *pThis = static_cast<CGameConsole *>(pUserData);
+		CGameConsole *pThis = static_cast< CGameConsole * >(pUserData);
 		pThis->Console()->SetPrintOutputLevel(pThis->m_PrintCBIndex, pResult->GetInteger(0));
 	}
 }
@@ -808,7 +808,7 @@ void CGameConsole::OnConsoleInit()
 	m_LocalConsole.Init(this);
 	m_RemoteConsole.Init(this);
 
-	m_pConsole = Kernel()->RequestInterface<IConsole>();
+	m_pConsole = Kernel()->RequestInterface< IConsole >();
 
 	m_PrintCBIndex = Console()->RegisterPrintCallback(Config()->m_ConsoleOutputLevel, ClientConsolePrintCallback, this);
 

@@ -123,7 +123,7 @@ void CHud::RenderPauseTimer()
 		}
 		else
 		{
-			float Seconds = static_cast<float>(m_pClient->m_Snap.m_pGameData->m_GameStateEndTick - Client()->GameTick()) / SERVER_TICK_SPEED;
+			float Seconds = static_cast< float >(m_pClient->m_Snap.m_pGameData->m_GameStateEndTick - Client()->GameTick()) / SERVER_TICK_SPEED;
 			if(Seconds < 5)
 				str_format(aBuf, sizeof(aBuf), "%.1f", Seconds);
 			else
@@ -476,7 +476,7 @@ void CHud::RenderWarmupTimer()
 		}
 		else
 		{
-			float Seconds = static_cast<float>(m_pClient->m_Snap.m_pGameData->m_GameStateEndTick - Client()->GameTick()) / SERVER_TICK_SPEED;
+			float Seconds = static_cast< float >(m_pClient->m_Snap.m_pGameData->m_GameStateEndTick - Client()->GameTick()) / SERVER_TICK_SPEED;
 			if(Seconds < 5)
 				str_format(aBuf, sizeof(aBuf), "%.1f", Seconds);
 			else

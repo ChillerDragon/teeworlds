@@ -21,7 +21,7 @@ class CLocalizationDatabase
 		bool operator==(const CString &Other) const { return m_Hash == Other.m_Hash && m_ContextHash == Other.m_ContextHash; }
 	};
 
-	sorted_array<CString> m_Strings;
+	sorted_array< CString > m_Strings;
 	int m_VersionCounter;
 	int m_CurrentVersion;
 

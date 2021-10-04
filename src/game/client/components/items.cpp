@@ -275,8 +275,8 @@ void CItems::OnRender()
 			if(pPrev)
 			{
 				const void *pPrevGameDataFlag = Client()->SnapFindItem(IClient::SNAP_PREV, NETOBJTYPE_GAMEDATAFLAG, m_pClient->m_Snap.m_GameDataFlagSnapID);
-				RenderFlag(static_cast<const CNetObj_Flag *>(pPrev), static_cast<const CNetObj_Flag *>(pData),
-					static_cast<const CNetObj_GameDataFlag *>(pPrevGameDataFlag), m_pClient->m_Snap.m_pGameDataFlag);
+				RenderFlag(static_cast< const CNetObj_Flag * >(pPrev), static_cast< const CNetObj_Flag * >(pData),
+					static_cast< const CNetObj_GameDataFlag * >(pPrevGameDataFlag), m_pClient->m_Snap.m_pGameDataFlag);
 			}
 		}
 	}

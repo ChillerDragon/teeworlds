@@ -81,7 +81,7 @@ private:
 	void RenderGroup(int Group);
 	void Update(float TimePassed);
 
-	template<int TGROUP>
+	template< int TGROUP >
 	class CRenderGroup : public CComponent
 	{
 	public:
@@ -89,8 +89,8 @@ private:
 		virtual void OnRender() { m_pParts->RenderGroup(TGROUP); }
 	};
 
-	CRenderGroup<GROUP_PROJECTILE_TRAIL> m_RenderTrail;
-	CRenderGroup<GROUP_EXPLOSIONS> m_RenderExplosions;
-	CRenderGroup<GROUP_GENERAL> m_RenderGeneral;
+	CRenderGroup< GROUP_PROJECTILE_TRAIL > m_RenderTrail;
+	CRenderGroup< GROUP_EXPLOSIONS > m_RenderExplosions;
+	CRenderGroup< GROUP_GENERAL > m_RenderGeneral;
 };
 #endif

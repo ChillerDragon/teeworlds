@@ -306,7 +306,7 @@ void CBinds::SetDefaults()
 void CBinds::OnConsoleInit()
 {
 	// bindings
-	IConfigManager *pConfigManager = Kernel()->RequestInterface<IConfigManager>();
+	IConfigManager *pConfigManager = Kernel()->RequestInterface< IConfigManager >();
 	if(pConfigManager)
 		pConfigManager->RegisterCallback(ConfigSaveCallback, this);
 

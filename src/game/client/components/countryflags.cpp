@@ -112,7 +112,7 @@ void CCountryFlags::LoadCountryflagsIndexfile()
 
 	// find index of default item
 	int DefaultIndex = 0, Index = 0;
-	for(sorted_array<CCountryFlag>::range r = m_aCountryFlags.all(); !r.empty(); r.pop_front(), ++Index)
+	for(sorted_array< CCountryFlag >::range r = m_aCountryFlags.all(); !r.empty(); r.pop_front(), ++Index)
 		if(r.front().m_CountryCode == -1)
 		{
 			DefaultIndex = Index;

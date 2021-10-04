@@ -1568,7 +1568,7 @@ void CMenus::RenderMenu(CUIRect Screen)
 				UI()->DoLabel(&Part, aBuf, FontSize, CUI::ALIGN_CENTER);
 
 				// time left
-				int SecondsLeft = max(1, m_DownloadSpeed > 0.0f ? static_cast<int>((Client()->MapDownloadTotalsize() - Client()->MapDownloadAmount()) / m_DownloadSpeed) : 1);
+				int SecondsLeft = max(1, m_DownloadSpeed > 0.0f ? static_cast< int >((Client()->MapDownloadTotalsize() - Client()->MapDownloadAmount()) / m_DownloadSpeed) : 1);
 				if(SecondsLeft >= 60)
 				{
 					int MinutesLeft = SecondsLeft / 60;

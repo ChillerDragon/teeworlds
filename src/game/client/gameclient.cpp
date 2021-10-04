@@ -218,20 +218,20 @@ static CGameMsg gs_GameMsgList[NUM_GAMEMSGS] = {
 void CGameClient::OnConsoleInit()
 {
 	m_InitComplete = false;
-	m_pEngine = Kernel()->RequestInterface<IEngine>();
-	m_pClient = Kernel()->RequestInterface<IClient>();
-	m_pTextRender = Kernel()->RequestInterface<ITextRender>();
-	m_pSound = Kernel()->RequestInterface<ISound>();
-	m_pInput = Kernel()->RequestInterface<IInput>();
-	m_pConfig = Kernel()->RequestInterface<IConfigManager>()->Values();
-	m_pConsole = Kernel()->RequestInterface<IConsole>();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
-	m_pDemoPlayer = Kernel()->RequestInterface<IDemoPlayer>();
-	m_pDemoRecorder = Kernel()->RequestInterface<IDemoRecorder>();
-	m_pServerBrowser = Kernel()->RequestInterface<IServerBrowser>();
-	m_pEditor = Kernel()->RequestInterface<IEditor>();
-	m_pFriends = Kernel()->RequestInterface<IFriends>();
-	m_pBlacklist = Kernel()->RequestInterface<IBlacklist>();
+	m_pEngine = Kernel()->RequestInterface< IEngine >();
+	m_pClient = Kernel()->RequestInterface< IClient >();
+	m_pTextRender = Kernel()->RequestInterface< ITextRender >();
+	m_pSound = Kernel()->RequestInterface< ISound >();
+	m_pInput = Kernel()->RequestInterface< IInput >();
+	m_pConfig = Kernel()->RequestInterface< IConfigManager >()->Values();
+	m_pConsole = Kernel()->RequestInterface< IConsole >();
+	m_pStorage = Kernel()->RequestInterface< IStorage >();
+	m_pDemoPlayer = Kernel()->RequestInterface< IDemoPlayer >();
+	m_pDemoRecorder = Kernel()->RequestInterface< IDemoRecorder >();
+	m_pServerBrowser = Kernel()->RequestInterface< IServerBrowser >();
+	m_pEditor = Kernel()->RequestInterface< IEditor >();
+	m_pFriends = Kernel()->RequestInterface< IFriends >();
+	m_pBlacklist = Kernel()->RequestInterface< IBlacklist >();
 
 	// setup pointers
 	m_pBinds = &::gs_Binds;
@@ -349,7 +349,7 @@ void CGameClient::OnConsoleInit()
 
 void CGameClient::OnInit()
 {
-	m_pGraphics = Kernel()->RequestInterface<IGraphics>();
+	m_pGraphics = Kernel()->RequestInterface< IGraphics >();
 
 	// propagate pointers
 	m_UI.Init(Config(), Graphics(), Input(), TextRender());
@@ -1473,7 +1473,7 @@ void CGameClient::OnDemoRecSnap()
 		if(!m_aClients[i].m_Active)
 			continue;
 
-		CNetObj_De_ClientInfo *pClientInfo = static_cast<CNetObj_De_ClientInfo *>(Client()->SnapNewItem(NETOBJTYPE_DE_CLIENTINFO, i, sizeof(CNetObj_De_ClientInfo)));
+		CNetObj_De_ClientInfo *pClientInfo = static_cast< CNetObj_De_ClientInfo * >(Client()->SnapNewItem(NETOBJTYPE_DE_CLIENTINFO, i, sizeof(CNetObj_De_ClientInfo)));
 		if(!pClientInfo)
 			return;
 
@@ -1495,7 +1495,7 @@ void CGameClient::OnDemoRecSnap()
 	CTuningParams StandardTuning;
 	if(mem_comp(&StandardTuning, &m_Tuning, sizeof(CTuningParams)) != 0)
 	{
-		CNetObj_De_TuneParams *pTuneParams = static_cast<CNetObj_De_TuneParams *>(Client()->SnapNewItem(NETOBJTYPE_DE_TUNEPARAMS, 0, sizeof(CNetObj_De_TuneParams)));
+		CNetObj_De_TuneParams *pTuneParams = static_cast< CNetObj_De_TuneParams * >(Client()->SnapNewItem(NETOBJTYPE_DE_TUNEPARAMS, 0, sizeof(CNetObj_De_TuneParams)));
 		if(!pTuneParams)
 			return;
 
@@ -1503,7 +1503,7 @@ void CGameClient::OnDemoRecSnap()
 	}
 
 	// add game info
-	CNetObj_De_GameInfo *pGameInfo = static_cast<CNetObj_De_GameInfo *>(Client()->SnapNewItem(NETOBJTYPE_DE_GAMEINFO, 0, sizeof(CNetObj_De_GameInfo)));
+	CNetObj_De_GameInfo *pGameInfo = static_cast< CNetObj_De_GameInfo * >(Client()->SnapNewItem(NETOBJTYPE_DE_GAMEINFO, 0, sizeof(CNetObj_De_GameInfo)));
 	if(!pGameInfo)
 		return;
 
@@ -1909,7 +1909,7 @@ int CGameClient::GetClientID(const char *pName)
 
 void CGameClient::ConTeam(IConsole::IResult *pResult, void *pUserData)
 {
-	CGameClient *pClient = static_cast<CGameClient *>(pUserData);
+	CGameClient *pClient = static_cast< CGameClient * >(pUserData);
 	if(pClient->Client()->State() != IClient::STATE_ONLINE || pClient->m_LocalClientID == -1)
 		return;
 	CMenus::CSwitchTeamInfo Info;
@@ -1926,14 +1926,14 @@ void CGameClient::ConTeam(IConsole::IResult *pResult, void *pUserData)
 
 void CGameClient::ConKill(IConsole::IResult *pResult, void *pUserData)
 {
-	CGameClient *pClient = static_cast<CGameClient *>(pUserData);
+	CGameClient *pClient = static_cast< CGameClient * >(pUserData);
 	if(pClient->Client()->State() == IClient::STATE_ONLINE)
 		pClient->SendKill();
 }
 
 void CGameClient::ConReadyChange(IConsole::IResult *pResult, void *pUserData)
 {
-	CGameClient *pClient = static_cast<CGameClient *>(pUserData);
+	CGameClient *pClient = static_cast< CGameClient * >(pUserData);
 	if(pClient->Client()->State() == IClient::STATE_ONLINE)
 		pClient->SendReadyChange();
 }
@@ -1941,7 +1941,7 @@ void CGameClient::ConReadyChange(IConsole::IResult *pResult, void *pUserData)
 void CGameClient::ConchainSkinChange(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
 {
 	pfnCallback(pResult, pCallbackUserData);
-	CGameClient *pClient = static_cast<CGameClient *>(pUserData);
+	CGameClient *pClient = static_cast< CGameClient * >(pUserData);
 	if(pClient->Client()->State() == IClient::STATE_ONLINE && pResult->NumArguments())
 		pClient->SendSkinChange();
 }
@@ -1949,7 +1949,7 @@ void CGameClient::ConchainSkinChange(IConsole::IResult *pResult, void *pUserData
 void CGameClient::ConchainFriendUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
 {
 	pfnCallback(pResult, pCallbackUserData);
-	CGameClient *pClient = static_cast<CGameClient *>(pUserData);
+	CGameClient *pClient = static_cast< CGameClient * >(pUserData);
 	for(int i = 0; i < MAX_CLIENTS; ++i)
 	{
 		if(pClient->m_aClients[i].m_Active)
@@ -1960,7 +1960,7 @@ void CGameClient::ConchainFriendUpdate(IConsole::IResult *pResult, void *pUserDa
 void CGameClient::ConchainBlacklistUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
 {
 	pfnCallback(pResult, pCallbackUserData);
-	CGameClient *pClient = static_cast<CGameClient *>(pUserData);
+	CGameClient *pClient = static_cast< CGameClient * >(pUserData);
 	for(int i = 0; i < MAX_CLIENTS; ++i)
 	{
 		if(pClient->m_aClients[i].m_Active)
@@ -1971,7 +1971,7 @@ void CGameClient::ConchainBlacklistUpdate(IConsole::IResult *pResult, void *pUse
 void CGameClient::ConchainXmasHatUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
 {
 	pfnCallback(pResult, pCallbackUserData);
-	CGameClient *pClient = static_cast<CGameClient *>(pUserData);
+	CGameClient *pClient = static_cast< CGameClient * >(pUserData);
 	if(pClient->Client()->State() != IClient::STATE_ONLINE)
 		return;
 

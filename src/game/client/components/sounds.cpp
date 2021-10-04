@@ -17,7 +17,7 @@ struct CUserData
 
 static int LoadSoundsThread(void *pUser)
 {
-	CUserData *pData = static_cast<CUserData *>(pUser);
+	CUserData *pData = static_cast< CUserData * >(pUser);
 
 	for(int s = 0; s < g_pData->m_NumSounds; s++)
 	{

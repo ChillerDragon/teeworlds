@@ -70,7 +70,7 @@ void CMapImages::LoadMapImages(IMap *pMap, class CLayers *pLayers, int MapType)
 
 void CMapImages::OnMapLoad()
 {
-	LoadMapImages(Kernel()->RequestInterface<IMap>(), Layers(), MAP_TYPE_GAME);
+	LoadMapImages(Kernel()->RequestInterface< IMap >(), Layers(), MAP_TYPE_GAME);
 }
 
 void CMapImages::OnMenuMapLoad(IMap *pMap)
