@@ -2,8 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <math.h>
 
-#include <base/system.h>
 #include <base/math.h>
+#include <base/system.h>
 #include <base/vmath.h>
 
 #include <engine/config.h>
@@ -20,21 +20,21 @@ CMenus::CScrollRegion::CScrollRegion()
 	m_AnimInitScrollY = 0;
 	m_AnimTargetScrollY = 0;
 	m_RequestScrollY = -1;
-	m_ContentScrollOff = vec2(0,0);
+	m_ContentScrollOff = vec2(0, 0);
 	m_Params = CScrollRegionParams();
 }
 
-void CMenus::CScrollRegion::Begin(CUIRect* pClipRect, vec2* pOutOffset, CScrollRegionParams* pParams)
+void CMenus::CScrollRegion::Begin(CUIRect *pClipRect, vec2 *pOutOffset, CScrollRegionParams *pParams)
 {
 	if(pParams)
 		m_Params = *pParams;
 
 	const bool ContentOverflows = m_ContentH > pClipRect->h;
-	const bool ForceShowScrollbar = m_Params.m_Flags&CScrollRegionParams::FLAG_CONTENT_STATIC_WIDTH;
+	const bool ForceShowScrollbar = m_Params.m_Flags & CScrollRegionParams::FLAG_CONTENT_STATIC_WIDTH;
 
 	CUIRect ScrollBarBg;
 	bool HasScrollBar = ContentOverflows || ForceShowScrollbar;
-	CUIRect* pModifyRect = HasScrollBar ? pClipRect : 0;
+	CUIRect *pModifyRect = HasScrollBar ? pClipRect : 0;
 	pClipRect->VSplitRight(m_Params.m_ScrollbarWidth, pModifyRect, &ScrollBarBg);
 	ScrollBarBg.Margin(m_Params.m_ScrollbarMargin, &m_RailRect);
 
@@ -44,7 +44,7 @@ void CMenus::CScrollRegion::Begin(CUIRect* pClipRect, vec2* pOutOffset, CScrollR
 		if(m_Params.m_ScrollbarBgColor.a > 0)
 			ScrollBarBg.Draw(m_Params.m_ScrollbarBgColor, 4.0f, CUIRect::CORNER_R);
 		if(m_Params.m_RailBgColor.a > 0)
-			m_RailRect.Draw(m_Params.m_RailBgColor, m_RailRect.w/2.0f);
+			m_RailRect.Draw(m_Params.m_RailBgColor, m_RailRect.w / 2.0f);
 	}
 	if(!ContentOverflows)
 		m_ContentScrollOff.y = 0;
@@ -92,11 +92,11 @@ void CMenus::CScrollRegion::End()
 	}
 
 	const float SliderHeight = max(m_Params.m_SliderMinHeight,
-		m_ClipRect.h/m_ContentH * m_RailRect.h);
+		m_ClipRect.h / m_ContentH * m_RailRect.h);
 
 	CUIRect Slider = m_RailRect;
 	Slider.h = SliderHeight;
-	
+
 	const float MaxSlider = m_RailRect.h - SliderHeight;
 	const float MaxScroll = m_ContentH - m_ClipRect.h;
 
@@ -123,11 +123,11 @@ void CMenus::CScrollRegion::End()
 		m_ScrollY = m_AnimTargetScrollY;
 	}
 
-	Slider.y += m_ScrollY/MaxScroll * MaxSlider;
+	Slider.y += m_ScrollY / MaxScroll * MaxSlider;
 
 	bool Hovered = false;
 	bool Grabbed = false;
-	const void* pID = &m_ScrollY;
+	const void *pID = &m_ScrollY;
 	const bool InsideSlider = m_pUI->MouseHovered(&Slider);
 	const bool InsideRail = m_pUI->MouseHovered(&m_RailRect);
 
@@ -155,9 +155,9 @@ void CMenus::CScrollRegion::End()
 	}
 	else if(InsideRail && m_pUI->MouseButtonClicked(0))
 	{
-		m_ScrollY += (m_pUI->MouseY() - (Slider.y+Slider.h/2)) / MaxSlider * MaxScroll;
+		m_ScrollY += (m_pUI->MouseY() - (Slider.y + Slider.h / 2)) / MaxSlider * MaxScroll;
 		m_pUI->SetActiveItem(pID);
-		m_SliderGrabPos.y = Slider.h/2;
+		m_SliderGrabPos.y = Slider.h / 2;
 		m_AnimTargetScrollY = m_ScrollY;
 		m_AnimTime = 0;
 		Hovered = true;
@@ -177,7 +177,7 @@ void CMenus::CScrollRegion::End()
 		SliderColor = m_Params.m_SliderColorHover;
 	else
 		SliderColor = m_Params.m_SliderColor;
-	Slider.Draw(SliderColor, Slider.w/2.0f);
+	Slider.Draw(SliderColor, Slider.w / 2.0f);
 }
 
 void CMenus::CScrollRegion::AddRect(CUIRect Rect)
@@ -196,32 +196,31 @@ void CMenus::CScrollRegion::ScrollHere(int Option)
 
 	switch(Option)
 	{
-		case CScrollRegion::SCROLLHERE_TOP:
+	case CScrollRegion::SCROLLHERE_TOP:
+		m_RequestScrollY = TopScroll;
+		break;
+
+	case CScrollRegion::SCROLLHERE_BOTTOM:
+		m_RequestScrollY = TopScroll - (m_ClipRect.h - MinHeight);
+		break;
+
+	case CScrollRegion::SCROLLHERE_KEEP_IN_VIEW:
+	default:
+	{
+		const float dy = m_LastAddedRect.y - m_ClipRect.y;
+
+		if(dy < 0)
 			m_RequestScrollY = TopScroll;
-			break;
-
-		case CScrollRegion::SCROLLHERE_BOTTOM:
+		else if(dy > (m_ClipRect.h - MinHeight))
 			m_RequestScrollY = TopScroll - (m_ClipRect.h - MinHeight);
-			break;
-
-		case CScrollRegion::SCROLLHERE_KEEP_IN_VIEW:
-		default: {
-			const float dy = m_LastAddedRect.y - m_ClipRect.y;
-
-			if(dy < 0)
-				m_RequestScrollY = TopScroll;
-			else if(dy > (m_ClipRect.h-MinHeight))
-				m_RequestScrollY = TopScroll - (m_ClipRect.h - MinHeight);
-		} break;
+	}
+	break;
 	}
 }
 
-bool CMenus::CScrollRegion::IsRectClipped(const CUIRect& Rect) const
+bool CMenus::CScrollRegion::IsRectClipped(const CUIRect &Rect) const
 {
-	return (m_ClipRect.x > (Rect.x + Rect.w)
-		|| (m_ClipRect.x + m_ClipRect.w) < Rect.x
-		|| m_ClipRect.y > (Rect.y + Rect.h)
-		|| (m_ClipRect.y + m_ClipRect.h) < Rect.y);
+	return (m_ClipRect.x > (Rect.x + Rect.w) || (m_ClipRect.x + m_ClipRect.w) < Rect.x || m_ClipRect.y > (Rect.y + Rect.h) || (m_ClipRect.y + m_ClipRect.h) < Rect.y);
 }
 
 bool CMenus::CScrollRegion::IsScrollbarShown() const

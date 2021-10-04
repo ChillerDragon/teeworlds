@@ -3,8 +3,8 @@
 #ifndef GAME_CLIENT_UI_H
 #define GAME_CLIENT_UI_H
 
-#include <engine/input.h>
 #include "ui_rect.h"
+#include <engine/input.h>
 
 class IScrollbarScale
 {
@@ -21,13 +21,14 @@ public:
 	}
 	int ToAbsolute(float RelativeValue, int Min, int Max) const
 	{
-		return round_to_int(RelativeValue*(Max - Min) + Min + 0.1f);
+		return round_to_int(RelativeValue * (Max - Min) + Min + 0.1f);
 	}
 } const LinearScrollbarScale;
 static class CLogarithmicScrollbarScale : public IScrollbarScale
 {
 private:
 	int m_MinAdjustment;
+
 public:
 	CLogarithmicScrollbarScale(int MinAdjustment)
 	{
@@ -52,10 +53,9 @@ public:
 			Max += m_MinAdjustment;
 			ResultAdjustment = -m_MinAdjustment;
 		}
-		return round_to_int(exp(RelativeValue*(log(Max) - log(Min)) + log(Min))) + ResultAdjustment;
+		return round_to_int(exp(RelativeValue * (log(Max) - log(Min)) + log(Min))) + ResultAdjustment;
 	}
 } LogarithmicScrollbarScale(25);
-
 
 class CUI
 {
@@ -101,7 +101,14 @@ public:
 	static const float ms_FontmodHeight;
 
 	// TODO: Refactor: Fill this in
-	void Init(class CConfig *pConfig, class IGraphics *pGraphics, class IInput *pInput, class ITextRender *pTextRender) { m_pConfig = pConfig; m_pGraphics = pGraphics; m_pInput = pInput; m_pTextRender = pTextRender; CUIRect::Init(pGraphics); }
+	void Init(class CConfig *pConfig, class IGraphics *pGraphics, class IInput *pInput, class ITextRender *pTextRender)
+	{
+		m_pConfig = pConfig;
+		m_pGraphics = pGraphics;
+		m_pInput = pInput;
+		m_pTextRender = pTextRender;
+		CUIRect::Init(pGraphics);
+	}
 	class CConfig *Config() const { return m_pConfig; }
 	class IGraphics *Graphics() const { return m_pGraphics; }
 	class IInput *Input() const { return m_pInput; }
@@ -134,12 +141,26 @@ public:
 	float MouseY() const { return m_MouseY; }
 	float MouseWorldX() const { return m_MouseWorldX; }
 	float MouseWorldY() const { return m_MouseWorldY; }
-	bool MouseButton(int Index) const { return (m_MouseButtons>>Index)&1; }
-	bool MouseButtonClicked(int Index) const { return MouseButton(Index) && !((m_LastMouseButtons>>Index)&1) ; }
+	bool MouseButton(int Index) const { return (m_MouseButtons >> Index) & 1; }
+	bool MouseButtonClicked(int Index) const { return MouseButton(Index) && !((m_LastMouseButtons >> Index) & 1); }
 
 	void SetHotItem(const void *pID) { m_pBecommingHotItem = pID; }
-	void SetActiveItem(const void *pID) { m_ActiveItemValid = true; m_pActiveItem = pID; if (pID) m_pLastActiveItem = pID; }
-	bool CheckActiveItem(const void *pID) { if(m_pActiveItem == pID) { m_ActiveItemValid = true; return true; } return false; }
+	void SetActiveItem(const void *pID)
+	{
+		m_ActiveItemValid = true;
+		m_pActiveItem = pID;
+		if(pID)
+			m_pLastActiveItem = pID;
+	}
+	bool CheckActiveItem(const void *pID)
+	{
+		if(m_pActiveItem == pID)
+		{
+			m_ActiveItemValid = true;
+			return true;
+		}
+		return false;
+	}
 	void ClearLastActiveItem() { m_pLastActiveItem = 0; }
 	const void *HotItem() const { return m_pHotItem; }
 	const void *NextHotItem() const { return m_pBecommingHotItem; }
@@ -147,7 +168,11 @@ public:
 	const void *LastActiveItem() const { return m_pLastActiveItem; }
 
 	void StartCheck() { m_ActiveItemValid = false; }
-	void FinishCheck() { if(!m_ActiveItemValid) SetActiveItem(0); }
+	void FinishCheck()
+	{
+		if(!m_ActiveItemValid)
+			SetActiveItem(0);
+	}
 
 	bool MouseInside(const CUIRect *pRect) const { return pRect->Inside(m_MouseX, m_MouseY); }
 	bool MouseInsideClip() const { return !IsClipped() || MouseInside(ClipArea()); }
@@ -185,9 +210,8 @@ public:
 
 	// client ID
 	float DrawClientID(float FontSize, vec2 Position, int ID,
-					const vec4& BgColor = vec4(1.0f, 1.0f, 1.0f, 0.5f), const vec4& TextColor = vec4(0.1f, 0.1f, 0.1f, 1.0f));
+		const vec4 &BgColor = vec4(1.0f, 1.0f, 1.0f, 0.5f), const vec4 &TextColor = vec4(0.1f, 0.1f, 0.1f, 1.0f));
 	float GetClientIDRectWidth(float FontSize);
 };
-
 
 #endif

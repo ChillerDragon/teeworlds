@@ -7,15 +7,14 @@
 #include <base/math.h>
 #include <engine/console.h>
 #include <new>
-#include <engine/console.h>
-#include "memheap.h"
 
 class CConsole : public IConsole
 {
 	class CCommand : public CCommandInfo
 	{
 	public:
-		CCommand(bool BasicAccess) : CCommandInfo(BasicAccess) {}
+		CCommand(bool BasicAccess) :
+			CCommandInfo(BasicAccess) {}
 		CCommand *m_pNext;
 		int m_Flags;
 		bool m_Temp;
@@ -26,7 +25,6 @@ class CConsole : public IConsole
 
 		void SetAccessLevel(int AccessLevel) { m_AccessLevel = clamp(AccessLevel, (int)(ACCESS_LEVEL_ADMIN), (int)(ACCESS_LEVEL_MOD)); }
 	};
-
 
 	class CChain
 	{
@@ -80,19 +78,20 @@ class CConsole : public IConsole
 	enum
 	{
 		CONSOLE_MAX_STR_LENGTH = 1024,
-		MAX_PARTS = (CONSOLE_MAX_STR_LENGTH+1)/2
+		MAX_PARTS = (CONSOLE_MAX_STR_LENGTH + 1) / 2
 	};
 
 	class CResult : public IResult
 	{
 	public:
-		char m_aStringStorage[CONSOLE_MAX_STR_LENGTH+1];
+		char m_aStringStorage[CONSOLE_MAX_STR_LENGTH + 1];
 		char *m_pArgsStart;
 
 		const char *m_pCommand;
 		const char *m_apArgs[MAX_PARTS];
 
-		CResult() : IResult()
+		CResult() :
+			IResult()
 		{
 			mem_zero(m_aStringStorage, sizeof(m_aStringStorage));
 			m_pArgsStart = 0;
@@ -100,16 +99,16 @@ class CConsole : public IConsole
 			mem_zero(m_apArgs, sizeof(m_apArgs));
 		}
 
-		CResult &operator =(const CResult &Other)
+		CResult &operator=(const CResult &Other)
 		{
 			if(this != &Other)
 			{
 				IResult::operator=(Other);
 				mem_copy(m_aStringStorage, Other.m_aStringStorage, sizeof(m_aStringStorage));
-				m_pArgsStart = m_aStringStorage+(Other.m_pArgsStart-Other.m_aStringStorage);
-				m_pCommand = m_aStringStorage+(Other.m_pCommand-Other.m_aStringStorage);
+				m_pArgsStart = m_aStringStorage + (Other.m_pArgsStart - Other.m_aStringStorage);
+				m_pCommand = m_aStringStorage + (Other.m_pCommand - Other.m_aStringStorage);
 				for(unsigned i = 0; i < Other.m_NumArgs; ++i)
-					m_apArgs[i] = m_aStringStorage+(Other.m_apArgs[i]-Other.m_aStringStorage);
+					m_apArgs[i] = m_aStringStorage + (Other.m_apArgs[i] - Other.m_aStringStorage);
 			}
 			return *this;
 		}
@@ -146,7 +145,7 @@ class CConsole : public IConsole
 			CQueueEntry *m_pNext;
 			CCommand *m_pCommand;
 			CResult m_Result;
-		} *m_pFirst, *m_pLast;
+		} * m_pFirst, *m_pLast;
 
 		void AddEntry()
 		{
@@ -169,7 +168,8 @@ class CConsole : public IConsole
 	void AddCommandSorted(CCommand *pCommand);
 	CCommand *FindCommand(const char *pName, int FlagMask);
 
-	struct CMapListEntryTemp {
+	struct CMapListEntryTemp
+	{
 		CMapListEntryTemp *m_pPrev;
 		CMapListEntryTemp *m_pNext;
 		char m_aName[TEMPMAP_NAME_LENGTH];
@@ -208,7 +208,7 @@ public:
 
 	virtual int RegisterPrintCallback(int OutputLevel, FPrintCallback pfnPrintCallback, void *pUserData);
 	virtual void SetPrintOutputLevel(int Index, int OutputLevel);
-	virtual void Print(int Level, const char *pFrom, const char *pStr, bool Highlighted=false);
+	virtual void Print(int Level, const char *pFrom, const char *pStr, bool Highlighted = false);
 
 	virtual int ParseCommandArgs(const char *pArgs, const char *pFormat, FCommandCallback pfnCallback, void *pContext);
 

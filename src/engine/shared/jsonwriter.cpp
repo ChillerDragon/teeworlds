@@ -46,7 +46,6 @@ void CJsonWriter::EndObject()
 	CompleteDataType();
 	WriteIndent(true);
 	WriteInternal("}");
-	
 }
 
 void CJsonWriter::BeginArray()
@@ -111,9 +110,7 @@ void CJsonWriter::WriteNullValue()
 
 bool CJsonWriter::CanWriteDatatype()
 {
-	return m_NumStates == 0
-		|| TopState()->m_Kind == STATE_ARRAY
-		|| TopState()->m_Kind == STATE_ATTRIBUTE;
+	return m_NumStates == 0 || TopState()->m_Kind == STATE_ARRAY || TopState()->m_Kind == STATE_ATTRIBUTE;
 }
 
 inline void CJsonWriter::WriteInternal(const char *pStr)
@@ -164,8 +161,7 @@ void CJsonWriter::WriteInternalEscaped(const char *pStr)
 
 void CJsonWriter::WriteIndent(bool EndElement)
 {
-	const bool NotRootOrAttribute = m_NumStates != 0
-		&& TopState()->m_Kind != STATE_ATTRIBUTE;
+	const bool NotRootOrAttribute = m_NumStates != 0 && TopState()->m_Kind != STATE_ATTRIBUTE;
 
 	if(NotRootOrAttribute && !TopState()->m_Empty && !EndElement)
 		WriteInternal(",");

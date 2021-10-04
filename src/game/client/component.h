@@ -3,8 +3,8 @@
 #ifndef GAME_CLIENT_COMPONENT_H
 #define GAME_CLIENT_COMPONENT_H
 
-#include <engine/input.h>
 #include "gameclient.h"
+#include <engine/input.h>
 
 class CComponent
 {
@@ -30,6 +30,7 @@ protected:
 	class IServerBrowser *ServerBrowser() const { return m_pClient->ServerBrowser(); }
 	class CLayers *Layers() const { return m_pClient->Layers(); }
 	class CCollision *Collision() const { return m_pClient->Collision(); }
+
 public:
 	virtual ~CComponent() {}
 

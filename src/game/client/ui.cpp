@@ -2,12 +2,12 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/system.h>
 
-#include <engine/shared/config.h>
-#include <engine/graphics.h>
-#include <engine/textrender.h>
-#include <engine/keys.h>
-#include <engine/input.h>
 #include "ui.h"
+#include <engine/graphics.h>
+#include <engine/input.h>
+#include <engine/keys.h>
+#include <engine/shared/config.h>
+#include <engine/textrender.h>
 
 /********************************************************
  UI
@@ -50,9 +50,12 @@ void CUI::Update(float MouseX, float MouseY, float MouseWorldX, float MouseWorld
 	unsigned MouseButtons = 0;
 	if(Enabled())
 	{
-		if(Input()->KeyIsPressed(KEY_MOUSE_1)) MouseButtons |= 1;
-		if(Input()->KeyIsPressed(KEY_MOUSE_2)) MouseButtons |= 2;
-		if(Input()->KeyIsPressed(KEY_MOUSE_3)) MouseButtons |= 4;
+		if(Input()->KeyIsPressed(KEY_MOUSE_1))
+			MouseButtons |= 1;
+		if(Input()->KeyIsPressed(KEY_MOUSE_2))
+			MouseButtons |= 2;
+		if(Input()->KeyIsPressed(KEY_MOUSE_3))
+			MouseButtons |= 4;
 	}
 
 	m_MouseX = MouseX;
@@ -79,14 +82,14 @@ bool CUI::KeyIsPressed(int Key) const
 
 bool CUI::ConsumeHotkey(unsigned Hotkey)
 {
-	bool Pressed = m_HotkeysPressed&Hotkey;
+	bool Pressed = m_HotkeysPressed & Hotkey;
 	m_HotkeysPressed &= ~Hotkey;
 	return Pressed;
 }
 
 void CUI::OnInput(const IInput::CEvent &e)
 {
-	if(e.m_Flags&IInput::FLAG_PRESS)
+	if(e.m_Flags & IInput::FLAG_PRESS)
 	{
 		if(e.m_Key == KEY_RETURN || e.m_Key == KEY_KP_ENTER)
 			m_HotkeysPressed |= HOTKEY_ENTER;
@@ -108,12 +111,12 @@ void CUI::ConvertCursorMove(float *pX, float *pY, int CursorType) const
 	float Factor = 1.0f;
 	switch(CursorType)
 	{
-		case IInput::CURSOR_MOUSE:
-			Factor = Config()->m_UiMousesens/100.0f;
-			break;
-		case IInput::CURSOR_JOYSTICK:
-			Factor = Config()->m_UiJoystickSens/100.0f;
-			break;
+	case IInput::CURSOR_MOUSE:
+		Factor = Config()->m_UiMousesens / 100.0f;
+		break;
+	case IInput::CURSOR_JOYSTICK:
+		Factor = Config()->m_UiJoystickSens / 100.0f;
+		break;
 	}
 	*pX *= Factor;
 	*pY *= Factor;
@@ -128,7 +131,7 @@ const CUIRect *CUI::Screen()
 
 float CUI::PixelSize()
 {
-	return Screen()->w/Graphics()->ScreenWidth();
+	return Screen()->w / Graphics()->ScreenWidth();
 }
 
 void CUI::MapScreen()
@@ -146,8 +149,8 @@ void CUI::ClipEnable(const CUIRect *pRect)
 		CUIRect Intersection;
 		Intersection.x = max(pRect->x, pOldRect->x);
 		Intersection.y = max(pRect->y, pOldRect->y);
-		Intersection.w = min(pRect->x+pRect->w, pOldRect->x+pOldRect->w) - pRect->x;
-		Intersection.h = min(pRect->y+pRect->h, pOldRect->y+pOldRect->h) - pRect->y;
+		Intersection.w = min(pRect->x + pRect->w, pOldRect->x + pOldRect->w) - pRect->x;
+		Intersection.h = min(pRect->y + pRect->h, pOldRect->y + pOldRect->h) - pRect->y;
 		m_aClips[m_NumClips] = Intersection;
 	}
 	else
@@ -176,9 +179,9 @@ void CUI::UpdateClipping()
 	if(IsClipped())
 	{
 		const CUIRect *pRect = ClipArea();
-		const float XScale = Graphics()->ScreenWidth()/Screen()->w;
-		const float YScale = Graphics()->ScreenHeight()/Screen()->h;
-		Graphics()->ClipEnable((int)(pRect->x*XScale), (int)(pRect->y*YScale), (int)(pRect->w*XScale), (int)(pRect->h*YScale));
+		const float XScale = Graphics()->ScreenWidth() / Screen()->w;
+		const float YScale = Graphics()->ScreenHeight() / Screen()->h;
+		Graphics()->ClipEnable((int)(pRect->x * XScale), (int)(pRect->y * YScale), (int)(pRect->w * XScale), (int)(pRect->h * YScale));
 	}
 	else
 	{
@@ -303,8 +306,8 @@ float CUI::DoScrollbarV(const void *pID, const CUIRect *pRect, float Current)
 {
 	// layout
 	CUIRect Handle;
-	pRect->HSplitTop(min(pRect->h/8.0f, 33.0f), &Handle, 0);
-	Handle.y += (pRect->h-Handle.h)*Current;
+	pRect->HSplitTop(min(pRect->h / 8.0f, 33.0f), &Handle, 0);
+	Handle.y += (pRect->h - Handle.h) * Current;
 	Handle.VMargin(5.0f, &Handle);
 
 	CUIRect Rail;
@@ -328,7 +331,7 @@ float CUI::DoScrollbarV(const void *pID, const CUIRect *pRect, float Current)
 	{
 		if(MouseButton(0))
 		{
-			s_OffsetY = MouseY()-Handle.y;
+			s_OffsetY = MouseY() - Handle.y;
 			SetActiveItem(pID);
 			Grabbed = true;
 		}
@@ -348,13 +351,13 @@ float CUI::DoScrollbarV(const void *pID, const CUIRect *pRect, float Current)
 	if(Grabbed)
 	{
 		const float Min = pRect->y;
-		const float Max = pRect->h-Handle.h;
-		const float Cur = MouseY()-s_OffsetY;
-		ReturnValue = clamp((Cur-Min)/Max, 0.0f, 1.0f);
+		const float Max = pRect->h - Handle.h;
+		const float Cur = MouseY() - s_OffsetY;
+		ReturnValue = clamp((Cur - Min) / Max, 0.0f, 1.0f);
 	}
 
 	// render
-	Rail.Draw(vec4(1.0f, 1.0f, 1.0f, 0.25f), Rail.w/2.0f);
+	Rail.Draw(vec4(1.0f, 1.0f, 1.0f, 0.25f), Rail.w / 2.0f);
 
 	vec4 Color;
 	if(Grabbed)
@@ -363,7 +366,7 @@ float CUI::DoScrollbarV(const void *pID, const CUIRect *pRect, float Current)
 		Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	else
 		Color = vec4(0.8f, 0.8f, 0.8f, 1.0f);
-	Handle.Draw(Color, Handle.w/2.0f);
+	Handle.Draw(Color, Handle.w / 2.0f);
 
 	return ReturnValue;
 }
@@ -372,8 +375,8 @@ float CUI::DoScrollbarH(const void *pID, const CUIRect *pRect, float Current)
 {
 	// layout
 	CUIRect Handle;
-	pRect->VSplitLeft(max(min(pRect->w/8.0f, 33.0f), pRect->h), &Handle, 0);
-	Handle.x += (pRect->w-Handle.w)*clamp(Current, 0.0f, 1.0f);
+	pRect->VSplitLeft(max(min(pRect->w / 8.0f, 33.0f), pRect->h), &Handle, 0);
+	Handle.x += (pRect->w - Handle.w) * clamp(Current, 0.0f, 1.0f);
 	Handle.HMargin(5.0f, &Handle);
 
 	CUIRect Rail;
@@ -397,7 +400,7 @@ float CUI::DoScrollbarH(const void *pID, const CUIRect *pRect, float Current)
 	{
 		if(MouseButton(0))
 		{
-			s_OffsetX = MouseX()-Handle.x;
+			s_OffsetX = MouseX() - Handle.x;
 			SetActiveItem(pID);
 			Grabbed = true;
 		}
@@ -417,13 +420,13 @@ float CUI::DoScrollbarH(const void *pID, const CUIRect *pRect, float Current)
 	if(Grabbed)
 	{
 		const float Min = pRect->x;
-		const float Max = pRect->w-Handle.w;
-		const float Cur = MouseX()-s_OffsetX;
-		ReturnValue = clamp((Cur-Min)/Max, 0.0f, 1.0f);
+		const float Max = pRect->w - Handle.w;
+		const float Cur = MouseX() - s_OffsetX;
+		ReturnValue = clamp((Cur - Min) / Max, 0.0f, 1.0f);
 	}
 
 	// render
-	Rail.Draw(vec4(1.0f, 1.0f, 1.0f, 0.25f), Rail.h/2.0f);
+	Rail.Draw(vec4(1.0f, 1.0f, 1.0f, 0.25f), Rail.h / 2.0f);
 
 	vec4 Color;
 	if(Grabbed)
@@ -432,7 +435,7 @@ float CUI::DoScrollbarH(const void *pID, const CUIRect *pRect, float Current)
 		Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	else
 		Color = vec4(0.8f, 0.8f, 0.8f, 1.0f);
-	Handle.Draw(Color, Handle.h/2.0f);
+	Handle.Draw(Color, Handle.h / 2.0f);
 
 	return ReturnValue;
 }
@@ -456,14 +459,14 @@ void CUI::DoScrollbarOption(const void *pID, int *pOption, const CUIRect *pRect,
 	else
 		str_format(aBuf, sizeof(aBuf), "%s: \xe2\x88\x9e", pStr);
 
-	float FontSize = pRect->h*ms_FontmodHeight*0.8f;
+	float FontSize = pRect->h * ms_FontmodHeight * 0.8f;
 	float VSplitVal = max(TextRender()->TextWidth(FontSize, aBuf, -1), TextRender()->TextWidth(FontSize, aBufMax, -1));
 
 	pRect->Draw(vec4(0.0f, 0.0f, 0.0f, 0.25f));
 
 	CUIRect Label, ScrollBar;
-	pRect->VSplitLeft(pRect->h+10.0f+VSplitVal, &Label, &ScrollBar);
-	Label.VSplitLeft(Label.h+5.0f, 0, &Label);
+	pRect->VSplitLeft(pRect->h + 10.0f + VSplitVal, &Label, &ScrollBar);
+	Label.VSplitLeft(Label.h + 5.0f, 0, &Label);
 	Label.y += 2.0f;
 	DoLabel(&Label, aBuf, FontSize, CUI::ALIGN_LEFT);
 
@@ -475,7 +478,7 @@ void CUI::DoScrollbarOption(const void *pID, int *pOption, const CUIRect *pRect,
 	*pOption = Value;
 }
 
-void CUI::DoScrollbarOptionLabeled(const void *pID, int *pOption, const CUIRect *pRect, const char *pStr, const char* aLabels[], int NumLabels, const IScrollbarScale *pScale)
+void CUI::DoScrollbarOptionLabeled(const void *pID, int *pOption, const CUIRect *pRect, const char *pStr, const char *aLabels[], int NumLabels, const IScrollbarScale *pScale)
 {
 	int Value = clamp(*pOption, 0, NumLabels - 1);
 	const int Max = NumLabels - 1;
@@ -483,12 +486,12 @@ void CUI::DoScrollbarOptionLabeled(const void *pID, int *pOption, const CUIRect 
 	char aBuf[128];
 	str_format(aBuf, sizeof(aBuf), "%s: %s", pStr, aLabels[Value]);
 
-	float FontSize = pRect->h*ms_FontmodHeight*0.8f;
+	float FontSize = pRect->h * ms_FontmodHeight * 0.8f;
 
 	pRect->Draw(vec4(0.0f, 0.0f, 0.0f, 0.25f));
 
 	CUIRect Label, ScrollBar;
-	pRect->VSplitLeft(pRect->h+5.0f, 0, &Label);
+	pRect->VSplitLeft(pRect->h + 5.0f, 0, &Label);
 	Label.VSplitRight(60.0f, &Label, &ScrollBar);
 	Label.y += 2.0f;
 	DoLabel(&Label, aBuf, FontSize, CUI::ALIGN_LEFT);
@@ -502,7 +505,7 @@ void CUI::DoScrollbarOptionLabeled(const void *pID, int *pOption, const CUIRect 
 	*pOption = clamp(Value, 0, Max);
 }
 
-float CUI::DrawClientID(float FontSize, vec2 CursorPosition, int ID, const vec4& BgColor, const vec4& TextColor)
+float CUI::DrawClientID(float FontSize, vec2 CursorPosition, int ID, const vec4 &BgColor, const vec4 &TextColor)
 {
 	if(!m_pConfig->m_ClShowUserId)
 		return 0;

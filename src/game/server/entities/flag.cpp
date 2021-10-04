@@ -6,8 +6,8 @@
 #include "character.h"
 #include "flag.h"
 
-CFlag::CFlag(CGameWorld *pGameWorld, int Team, vec2 StandPos)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_FLAG, StandPos, ms_PhysSize)
+CFlag::CFlag(CGameWorld *pGameWorld, int Team, vec2 StandPos) :
+	CEntity(pGameWorld, CGameWorld::ENTTYPE_FLAG, StandPos, ms_PhysSize)
 {
 	m_Team = Team;
 	m_StandPos = StandPos;
@@ -51,8 +51,7 @@ void CFlag::TickDefered()
 	else
 	{
 		// flag hits death-tile or left the game layer, reset it
-		if((GameServer()->Collision()->GetCollisionAt(m_Pos.x, m_Pos.y) & CCollision::COLFLAG_DEATH)
-			|| GameLayerClipped(m_Pos))
+		if((GameServer()->Collision()->GetCollisionAt(m_Pos.x, m_Pos.y) & CCollision::COLFLAG_DEATH) || GameLayerClipped(m_Pos))
 		{
 			Reset();
 			GameServer()->m_pController->OnFlagReturn(this);
@@ -60,7 +59,7 @@ void CFlag::TickDefered()
 
 		if(!m_AtStand)
 		{
-			if(Server()->Tick() > m_DropTick + Server()->TickSpeed()*30)
+			if(Server()->Tick() > m_DropTick + Server()->TickSpeed() * 30)
 			{
 				Reset();
 				GameServer()->m_pController->OnFlagReturn(this);

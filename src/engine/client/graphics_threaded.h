@@ -9,6 +9,7 @@ class CCommandBuffer
 		unsigned char *m_pData;
 		unsigned m_Size;
 		unsigned m_Used;
+
 	public:
 		CBuffer(unsigned BufferSize)
 		{
@@ -19,7 +20,7 @@ class CCommandBuffer
 
 		~CBuffer()
 		{
-			delete [] m_pData;
+			delete[] m_pData;
 			m_pData = 0x0;
 			m_Used = 0;
 			m_Size = 0;
@@ -50,7 +51,7 @@ public:
 
 	enum
 	{
-		MAX_TEXTURES=1024*4,
+		MAX_TEXTURES = 1024 * 4,
 	};
 
 	enum
@@ -117,9 +118,18 @@ public:
 		BLEND_ADDITIVE,
 	};
 
-	struct CPoint { float x, y; };
-	struct CTexCoord { float u, v, i; };
-	struct CColor { float r, g, b, a; };
+	struct CPoint
+	{
+		float x, y;
+	};
+	struct CTexCoord
+	{
+		float u, v, i;
+	};
+	struct CColor
+	{
+		float r, g, b, a;
+	};
 
 	struct CVertex
 	{
@@ -131,7 +141,8 @@ public:
 	struct CCommand
 	{
 	public:
-		CCommand(unsigned Cmd) : m_Cmd(Cmd), m_Size(0) {}
+		CCommand(unsigned Cmd) :
+			m_Cmd(Cmd), m_Size(0) {}
 		unsigned m_Cmd;
 		unsigned m_Size;
 	};
@@ -157,25 +168,29 @@ public:
 
 	struct CClearCommand : public CCommand
 	{
-		CClearCommand() : CCommand(CMD_CLEAR) {}
+		CClearCommand() :
+			CCommand(CMD_CLEAR) {}
 		CColor m_Color;
 	};
 
 	struct CSignalCommand : public CCommand
 	{
-		CSignalCommand() : CCommand(CMD_SIGNAL) {}
+		CSignalCommand() :
+			CCommand(CMD_SIGNAL) {}
 		semaphore *m_pSemaphore;
 	};
 
 	struct CRunBufferCommand : public CCommand
 	{
-		CRunBufferCommand() : CCommand(CMD_RUNBUFFER) {}
+		CRunBufferCommand() :
+			CCommand(CMD_RUNBUFFER) {}
 		CCommandBuffer *m_pOtherBuffer;
 	};
 
 	struct CRenderCommand : public CCommand
 	{
-		CRenderCommand() : CCommand(CMD_RENDER) {}
+		CRenderCommand() :
+			CCommand(CMD_RENDER) {}
 		CState m_State;
 		unsigned m_PrimType;
 		unsigned m_PrimCount;
@@ -184,21 +199,24 @@ public:
 
 	struct CScreenshotCommand : public CCommand
 	{
-		CScreenshotCommand() : CCommand(CMD_SCREENSHOT) {}
+		CScreenshotCommand() :
+			CCommand(CMD_SCREENSHOT) {}
 		int m_X, m_Y, m_W, m_H; // specify rectangle size, -1 if fullscreen (width/height)
 		CImageInfo *m_pImage; // processor will fill this out, the one who adds this command must free the data as well
 	};
 
 	struct CSwapCommand : public CCommand
 	{
-		CSwapCommand() : CCommand(CMD_SWAP) {}
+		CSwapCommand() :
+			CCommand(CMD_SWAP) {}
 
 		int m_Finish;
 	};
 
 	struct CVSyncCommand : public CCommand
 	{
-		CVSyncCommand() : CCommand(CMD_VSYNC) {}
+		CVSyncCommand() :
+			CCommand(CMD_VSYNC) {}
 
 		int m_VSync;
 		bool *m_pRetOk;
@@ -206,7 +224,8 @@ public:
 
 	struct CTextureCreateCommand : public CCommand
 	{
-		CTextureCreateCommand() : CCommand(CMD_TEXTURE_CREATE) {}
+		CTextureCreateCommand() :
+			CCommand(CMD_TEXTURE_CREATE) {}
 
 		// texture information
 		int m_Slot;
@@ -222,7 +241,8 @@ public:
 
 	struct CTextureUpdateCommand : public CCommand
 	{
-		CTextureUpdateCommand() : CCommand(CMD_TEXTURE_UPDATE) {}
+		CTextureUpdateCommand() :
+			CCommand(CMD_TEXTURE_UPDATE) {}
 
 		// texture information
 		int m_Slot;
@@ -235,18 +255,18 @@ public:
 		void *m_pData; // will be freed by the command processor
 	};
 
-
 	struct CTextureDestroyCommand : public CCommand
 	{
-		CTextureDestroyCommand() : CCommand(CMD_TEXTURE_DESTROY) {}
+		CTextureDestroyCommand() :
+			CCommand(CMD_TEXTURE_DESTROY) {}
 
 		// texture information
 		int m_Slot;
 	};
 
 	//
-	CCommandBuffer(unsigned CmdBufferSize, unsigned DataBufferSize)
-	: m_CmdBuffer(CmdBufferSize), m_DataBuffer(DataBufferSize)
+	CCommandBuffer(unsigned CmdBufferSize, unsigned DataBufferSize) :
+		m_CmdBuffer(CmdBufferSize), m_DataBuffer(DataBufferSize)
 	{
 	}
 
@@ -318,7 +338,7 @@ public:
 	virtual void SetWindowBordered(bool State) = 0;
 	virtual bool SetWindowScreen(int Index) = 0;
 	virtual int GetVideoModes(CVideoMode *pModes, int MaxModes, int Screen) = 0;
-	virtual bool GetDesktopResolution(int Index, int *pDesktopWidth, int* pDesktopHeight) = 0;
+	virtual bool GetDesktopResolution(int Index, int *pDesktopWidth, int *pDesktopHeight) = 0;
 	virtual int GetWindowScreen() = 0;
 	virtual int WindowActive() = 0;
 	virtual int WindowOpen() = 0;
@@ -334,11 +354,11 @@ class CGraphics_Threaded : public IEngineGraphics
 	{
 		NUM_CMDBUFFERS = 2,
 
-		MAX_VERTICES = 32*1024,
-		MAX_TEXTURES = 1024*4,
+		MAX_VERTICES = 32 * 1024,
+		MAX_TEXTURES = 1024 * 4,
 
-		DRAWING_QUADS=1,
-		DRAWING_LINES=2
+		DRAWING_QUADS = 1,
+		DRAWING_LINES = 2
 	};
 
 	CCommandBuffer::CState m_State;
@@ -381,6 +401,7 @@ class CGraphics_Threaded : public IEngineGraphics
 
 	int IssueInit();
 	int InitWindow();
+
 public:
 	CGraphics_Threaded();
 

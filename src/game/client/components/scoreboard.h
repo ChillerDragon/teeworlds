@@ -19,7 +19,7 @@ class CScoreboard : public CComponent
 
 	bool m_Active;
 	bool m_Activate;
- 	class CUIRect m_TotalRect;
+	class CUIRect m_TotalRect;
 
 public:
 	CScoreboard();
@@ -27,10 +27,10 @@ public:
 	virtual void OnConsoleInit();
 	virtual void OnRender();
 	virtual void OnRelease();
-	
- 	bool IsActive() const;
+
+	bool IsActive() const;
 	void ResetPlayerStats(int ClientID);
- 	class CUIRect GetScoreboardRect() const { return m_TotalRect; }
+	class CUIRect GetScoreboardRect() const { return m_TotalRect; }
 };
 
 #endif
