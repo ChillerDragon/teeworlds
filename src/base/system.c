@@ -17,14 +17,14 @@
 #include <unistd.h>
 
 /* unix net includes */
-#include <sys/socket.h>
-#include <sys/ioctl.h>
+#include <arpa/inet.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <fcntl.h>
 #include <pthread.h>
-#include <arpa/inet.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
 
 #include <dirent.h>
 
@@ -34,13 +34,14 @@
 
 #elif defined(CONF_FAMILY_WINDOWS)
 #define WIN32_LEAN_AND_MEAN
+#include <direct.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <process.h>
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include <fcntl.h>
-#include <direct.h>
-#include <errno.h>
-#include <process.h>
+
 #include <wincrypt.h>
 #else
 #error NOT IMPLEMENTED
