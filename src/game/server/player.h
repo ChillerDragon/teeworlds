@@ -130,6 +130,18 @@ private:
 	int m_SpectatorID;
 	class CFlag *m_pSpecFlag;
 	bool m_ActiveSpecSwitch;
+
+public:
+	struct CAccountData {
+		CAccountData()
+		{
+			m_Xp = 0;
+			m_Level = 0;
+		}
+		int m_Xp;
+		int m_Level;
+	};
+	CAccountData m_AccountData;
 };
 
 #endif
