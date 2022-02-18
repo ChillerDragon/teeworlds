@@ -11,6 +11,7 @@
 #include <engine/graphics.h>
 #include <engine/input.h>
 #include <engine/keys.h>
+#include <engine/mapchecker.h>
 #include <engine/storage.h>
 #include <engine/textrender.h>
 
@@ -162,7 +163,7 @@ int CLayerGroup::SwapLayers(int Index0, int Index1)
 	if(Index1 < 0 || Index1 >= m_lLayers.size()) return Index0;
 	if(Index0 == Index1) return Index0;
 	m_pMap->m_Modified = true;
-	tl_swap(m_lLayers[Index0], m_lLayers[Index1]);
+	std::swap(m_lLayers[Index0], m_lLayers[Index1]);
 	return Index1;
 }
 
@@ -1880,7 +1881,7 @@ void CEditor::DoMapEditor(CUIRect View)
 									// move up
 									if(m_SelectedQuad < pQuadLayer->m_lQuads.size()-1)
 									{
-										tl_swap(pQuadLayer->m_lQuads[m_SelectedQuad], pQuadLayer->m_lQuads[m_SelectedQuad+1]);
+										std::swap(pQuadLayer->m_lQuads[m_SelectedQuad], pQuadLayer->m_lQuads[m_SelectedQuad+1]);
 										m_SelectedQuad++;
 									}
 								}
@@ -1889,7 +1890,7 @@ void CEditor::DoMapEditor(CUIRect View)
 									// move down
 									if(m_SelectedQuad > 0)
 									{
-										tl_swap(pQuadLayer->m_lQuads[m_SelectedQuad], pQuadLayer->m_lQuads[m_SelectedQuad-1]);
+										std::swap(pQuadLayer->m_lQuads[m_SelectedQuad], pQuadLayer->m_lQuads[m_SelectedQuad-1]);
 										m_SelectedQuad--;
 									}
 								}
@@ -1899,7 +1900,7 @@ void CEditor::DoMapEditor(CUIRect View)
 									int NumQuads = pQuadLayer->m_lQuads.size();
 									while(m_SelectedQuad < NumQuads-1)
 									{
-										tl_swap(pQuadLayer->m_lQuads[m_SelectedQuad], pQuadLayer->m_lQuads[m_SelectedQuad+1]);
+										std::swap(pQuadLayer->m_lQuads[m_SelectedQuad], pQuadLayer->m_lQuads[m_SelectedQuad+1]);
 										m_SelectedQuad++;
 									}
 								}
@@ -1908,7 +1909,7 @@ void CEditor::DoMapEditor(CUIRect View)
 									// move to back
 									while(m_SelectedQuad > 0)
 									{
-										tl_swap(pQuadLayer->m_lQuads[m_SelectedQuad], pQuadLayer->m_lQuads[m_SelectedQuad-1]);
+										std::swap(pQuadLayer->m_lQuads[m_SelectedQuad], pQuadLayer->m_lQuads[m_SelectedQuad-1]);
 										m_SelectedQuad--;
 									}
 								}
@@ -4241,7 +4242,7 @@ void CEditor::Init()
 	m_pGraphics = Kernel()->RequestInterface<IGraphics>();
 	m_pTextRender = Kernel()->RequestInterface<ITextRender>();
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
-	m_UI.Init(m_pConfig, m_pGraphics, m_pInput, m_pTextRender);
+	m_UI.Init(Kernel());
 	m_RenderTools.Init(m_pConfig, m_pGraphics);
 	m_Map.m_pEditor = this;
 
@@ -4268,7 +4269,6 @@ void CEditor::Init()
 #endif
 }
 
-static const char *s_aMaps[] = {"ctf1", "ctf2", "ctf3", "ctf4", "ctf5", "ctf6", "ctf7", "ctf8", "dm1", "dm2", "dm3", "dm6", "dm7", "dm8", "dm9", "lms1"};
 static const char *s_aImageName[] = { "grass_doodads", "winter_main" };
 
 static int s_GrassDoodadsIndicesOld[] = { 42, 43, 44, 58, 59, 60, 74, 75, 76, 132, 133, 148, 149, 163, 164, 165, 169, 170, 185, 186 };
@@ -4279,13 +4279,15 @@ static int s_WinterMainIndicesNew[] = { 218, 219, 220, 221, 222, 223, 234, 235, 
 void CEditor::ConMapMagic(IConsole::IResult *pResult, void *pUserData)
 {
 	CEditor *pSelf = static_cast<CEditor *>(pUserData);
+	IMapChecker *pMapChecker = pSelf->Kernel()->RequestInterface<IMapChecker>();
 	int Flag = pResult->GetInteger(0);
 
-	for(unsigned m = 0; m < sizeof(s_aMaps) / sizeof(s_aMaps[0]); ++m)
+	for(int m = 0; m < pMapChecker->NumStandardMaps(); ++m)
 	{
-		char aBuf[64] = { 0 };
-		str_format(aBuf, sizeof(aBuf), "maps/%s.map", s_aMaps[m]);
-		dbg_msg("map magic", "processing map '%s'", s_aMaps[m]);
+		const char *pMapName = pMapChecker->GetStandardMapName(m);
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "maps/%s.map", pMapName);
+		dbg_msg("map magic", "processing map '%s'", pMapName);
 		CallbackOpenMap(aBuf, IStorage::TYPE_ALL, pSelf);
 		bool Edited = false;
 
@@ -4305,8 +4307,8 @@ void CEditor::ConMapMagic(IConsole::IResult *pResult, void *pUserData)
 
 		if(Edited)
 		{
-			str_format(aBuf, sizeof(aBuf), "maps/%s_mapmagic.map", s_aMaps[m]);
-			dbg_msg("map magic", "saving map '%s_mapmagic'", s_aMaps[m]);
+			str_format(aBuf, sizeof(aBuf), "maps/%s_mapmagic.map", pMapName);
+			dbg_msg("map magic", "saving map '%s_mapmagic'", pMapName);
 			CallbackSaveMap(aBuf, IStorage::TYPE_SAVE, pSelf);
 		}
 	}
@@ -4381,6 +4383,8 @@ void CEditor::UpdateAndRender()
 	else
 		m_AnimateTime = 0;
 	ms_pUiGotContext = 0;
+
+	CUIElementBase::Init(UI()); // update static pointer because game and editor use separate UI
 	UI()->StartCheck();
 
 	for(int i = 0; i < Input()->NumEvents(); i++)
@@ -4449,6 +4453,8 @@ void CEditor::UpdateAndRender()
 	UI()->FinishCheck();
 	UI()->ClearHotkeys();
 	Input()->Clear();
+
+	CLineInput::RenderCandidates();
 }
 
 IEditor *CreateEditor() { return new CEditor; }

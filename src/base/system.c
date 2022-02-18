@@ -309,12 +309,12 @@ void mem_zero(void *block,unsigned size)
 	memset(block, 0, size);
 }
 
-IOHANDLE io_open(const char *filename, int flags)
+IOHANDLE io_open_impl(const char *filename, int flags)
 {
-	dbg_assert(flags == IOFLAG_READ || flags == IOFLAG_WRITE || flags == IOFLAG_APPEND, "flags must be read, write or append");
+	dbg_assert(flags == (IOFLAG_READ | IOFLAG_SKIP_BOM) || flags == IOFLAG_READ || flags == IOFLAG_WRITE || flags == IOFLAG_APPEND, "flags must be read, read+skipbom, write or append");
 #if defined(CONF_FAMILY_WINDOWS)
 	WCHAR wBuffer[IO_MAX_PATH_LENGTH];
-	if(flags == IOFLAG_READ)
+	if((flags & IOFLAG_READ) != 0)
 	{
 		// check for filename case sensitive
 		WIN32_FIND_DATAW finddata;
@@ -349,7 +349,7 @@ IOHANDLE io_open(const char *filename, int flags)
 	}
 	return 0x0;
 #else
-	if(flags == IOFLAG_READ)
+	if((flags & IOFLAG_READ) != 0)
 		return (IOHANDLE)fopen(filename, "rb");
 	if(flags == IOFLAG_WRITE)
 		return (IOHANDLE)fopen(filename, "wb");
@@ -357,6 +357,21 @@ IOHANDLE io_open(const char *filename, int flags)
 		return (IOHANDLE)fopen(filename, "ab");
 	return 0x0;
 #endif
+}
+
+IOHANDLE io_open(const char *filename, int flags)
+{
+	IOHANDLE result = io_open_impl(filename, flags);
+	unsigned char buf[3];
+	if((flags & IOFLAG_SKIP_BOM) == 0 || !result)
+	{
+		return result;
+	}
+	if(io_read(result, buf, sizeof(buf)) != 3 || buf[0] != 0xef || buf[1] != 0xbb || buf[2] != 0xbf)
+	{
+		io_seek(result, 0, IOSEEK_START);
+	}
+	return result;
 }
 
 unsigned io_read(IOHANDLE io, void *buffer, unsigned size)
@@ -510,7 +525,12 @@ void *thread_init(void (*threadfunc)(void *), void *u)
 #if defined(CONF_FAMILY_UNIX)
 	{
 		pthread_t id;
-		if(pthread_create(&id, NULL, thread_run, data) != 0)
+		pthread_attr_t attr;
+		pthread_attr_init(&attr);
+#if defined(CONF_PLATFORM_MACOS)
+		pthread_attr_set_qos_class_np(&attr, QOS_CLASS_USER_INTERACTIVE, 0);
+#endif
+		if(pthread_create(&id, &attr, thread_run, data) != 0)
 		{
 			return 0;
 		}
@@ -1532,7 +1552,7 @@ void fs_listdir(const char *dir, FS_LISTDIR_CALLBACK cb, int type, void *user)
 	{
 		WideCharToMultiByte(CP_UTF8, 0, finddata.cFileName, -1, buffer2, sizeof(buffer2), NULL, NULL);
 		str_copy(buffer+length, buffer2, (int)sizeof(buffer)-length);
-		if(cb(buffer2, fs_is_dir(buffer), type, user))
+		if(cb(buffer2, (finddata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0, type, user))
 			break;
 	}
 	while(FindNextFileW(handle, &finddata));
@@ -1553,7 +1573,7 @@ void fs_listdir(const char *dir, FS_LISTDIR_CALLBACK cb, int type, void *user)
 	while((entry = readdir(d)) != NULL)
 	{
 		str_copy(buffer+length, entry->d_name, (int)sizeof(buffer)-length);
-		if(cb(entry->d_name, fs_is_dir(buffer), type, user))
+		if(cb(entry->d_name, entry->d_type == DT_UNKNOWN ? fs_is_dir(buffer) : entry->d_type == DT_DIR, type, user))
 			break;
 	}
 
@@ -1593,7 +1613,7 @@ void fs_listdir_fileinfo(const char *dir, FS_LISTDIR_CALLBACK_FILEINFO cb, int t
 		info.m_TimeCreated = filetime_to_unixtime(&finddata.ftCreationTime);
 		info.m_TimeModified = filetime_to_unixtime(&finddata.ftLastWriteTime);
 
-		if(cb(&info, fs_is_dir(buffer), type, user))
+		if(cb(&info, (finddata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0, type, user))
 			break;
 	}
 	while(FindNextFileW(handle, &finddata));
@@ -1623,7 +1643,7 @@ void fs_listdir_fileinfo(const char *dir, FS_LISTDIR_CALLBACK_FILEINFO cb, int t
 		info.m_TimeCreated = created;
 		info.m_TimeModified = modified;
 
-		if(cb(&info, fs_is_dir(buffer), type, user))
+		if(cb(&info, entry->d_type == DT_UNKNOWN ? fs_is_dir(buffer) : entry->d_type == DT_DIR, type, user))
 			break;
 	}
 
@@ -1860,7 +1880,7 @@ int fs_read(const char *name, void **result, unsigned *result_len)
 
 char *fs_read_str(const char *name)
 {
-	IOHANDLE file = io_open(name, IOFLAG_READ);
+	IOHANDLE file = io_open(name, IOFLAG_READ | IOFLAG_SKIP_BOM);
 	char *result;
 	if(!file)
 	{
@@ -1885,6 +1905,7 @@ int fs_file_time(const char *name, time_t *created, time_t *modified)
 
 	*created = filetime_to_unixtime(&finddata.ftCreationTime);
 	*modified = filetime_to_unixtime(&finddata.ftLastWriteTime);
+	FindClose(handle);
 #elif defined(CONF_FAMILY_UNIX)
 	struct stat sb;
 	if(stat(name, &sb))
@@ -2829,6 +2850,35 @@ int secure_random_init()
 	if(secure_random_data.urandom)
 	{
 		secure_random_data.initialized = 1;
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+#endif
+}
+
+int secure_random_uninit()
+{
+	if(!secure_random_data.initialized)
+	{
+		return 0;
+	}
+#if defined(CONF_FAMILY_WINDOWS)
+	if(CryptReleaseContext(secure_random_data.provider, 0))
+	{
+		secure_random_data.initialized = 0;
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+#else
+	if(!io_close(secure_random_data.urandom))
+	{
+		secure_random_data.initialized = 0;
 		return 0;
 	}
 	else

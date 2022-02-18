@@ -193,8 +193,11 @@ void CHud::RenderNetworkIssueNotification()
 
 void CHud::RenderDeadNotification()
 {
-	if(m_pClient->m_Snap.m_pGameData->m_GameStateFlags == 0 && m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS &&
-		m_pClient->m_Snap.m_pLocalInfo && (m_pClient->m_Snap.m_pLocalInfo->m_PlayerFlags&PLAYERFLAG_DEAD))
+	if(m_pClient->m_Snap.m_pGameData->m_GameStateFlags == 0
+		&& m_pClient->m_LocalClientID != -1
+		&& m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS
+		&& m_pClient->m_Snap.m_pLocalInfo
+		&& (m_pClient->m_Snap.m_pLocalInfo->m_PlayerFlags&PLAYERFLAG_DEAD))
 	{
 		static CTextCursor s_Cursor(16.0f);
 		s_Cursor.MoveTo(150*Graphics()->ScreenAspect(), 50);
@@ -334,7 +337,7 @@ void CHud::RenderScoreHud()
 				}
 			}
 			// search local player info if not a spectator, nor within top2 scores
-			if(Local == -1 && m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS)
+			if(Local == -1 && m_pClient->m_LocalClientID != -1 && m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS)
 			{
 				for(; i < MAX_CLIENTS && m_pClient->m_Snap.m_aInfoByScore[i].m_pPlayerInfo; ++i)
 				{
@@ -629,7 +632,7 @@ void CHud::RenderCursor()
 	Graphics()->QuadsBegin();
 
 	// render cursor
-	RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[m_pClient->m_Snap.m_pLocalCharacter->m_Weapon%NUM_WEAPONS].m_pSpriteCursor);
+	RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[maximum(0, m_pClient->m_Snap.m_pLocalCharacter->m_Weapon%NUM_WEAPONS)].m_pSpriteCursor);
 	float CursorSize = 64;
 	RenderTools()->DrawSprite(m_pClient->m_pControls->m_TargetPos.x, m_pClient->m_pControls->m_TargetPos.y, CursorSize);
 	Graphics()->QuadsEnd();
@@ -729,7 +732,7 @@ void CHud::RenderHealthAndAmmo(const CNetObj_Character *pCharacter)
 	}
 	else
 	{
-		RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[pCharacter->m_Weapon%NUM_WEAPONS].m_pSpriteProj);
+		RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[maximum(0, pCharacter->m_Weapon%NUM_WEAPONS)].m_pSpriteProj);
 		if(pCharacter->m_Weapon == WEAPON_GRENADE)
 		{
 			for(i = 0; i < minimum(pCharacter->m_AmmoCount, 10); i++)
@@ -775,16 +778,16 @@ void CHud::RenderHealthAndAmmo(const CNetObj_Character *pCharacter)
 
 void CHud::RenderSpectatorHud()
 {
+	const int SpecID = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
+	const int SpecMode = m_pClient->m_Snap.m_SpecInfo.m_SpecMode;
+
 	// draw the box
 	const float Width = m_Width * 0.25f - 2.0f;
 	CUIRect Rect = {m_Width-Width, m_Height-15.0f, Width, 15.0f};
 	Rect.Draw(vec4(0.0f, 0.0f, 0.0f, 0.4f), 5.0f, CUIRect::CORNER_TL);
 
 	// draw the text
-	char aName[64];
-	const int SpecID = m_pClient->m_Snap.m_SpecInfo.m_SpectatorID;
-	const int SpecMode = m_pClient->m_Snap.m_SpecInfo.m_SpecMode;
-	str_format(aName, sizeof(aName), "%s", Config()->m_ClShowsocial ? m_pClient->m_aClients[m_pClient->m_Snap.m_SpecInfo.m_SpectatorID].m_aName : "");
+	const char *pName = Config()->m_ClShowsocial && SpecID != -1 ? m_pClient->m_aClients[SpecID].m_aName : "";
 	char aBuf[128];
 
 	static CTextCursor s_SpectateLabelCursor(8.0f);
@@ -802,7 +805,7 @@ void CHud::RenderSpectatorHud()
 		str_format(aBuf, sizeof(aBuf), "%s", Localize("Free-View"));
 		break;
 	case SPEC_PLAYER:
-		str_format(aBuf, sizeof(aBuf), "%s", aName);
+		str_format(aBuf, sizeof(aBuf), "%s", pName);
 		break;
 	case SPEC_FLAGRED:
 	case SPEC_FLAGBLUE:
@@ -810,7 +813,7 @@ void CHud::RenderSpectatorHud()
 		str_format(aFlag, sizeof(aFlag), SpecMode == SPEC_FLAGRED ? Localize("Red Flag") : Localize("Blue Flag"));
 
 		if(SpecID != -1)
-			str_format(aBuf, sizeof(aBuf), "%s (%s)", aFlag, aName);
+			str_format(aBuf, sizeof(aBuf), "%s (%s)", aFlag, pName);
 		else
 			str_format(aBuf, sizeof(aBuf), "%s", aFlag);
 		break;
@@ -826,8 +829,9 @@ void CHud::RenderSpectatorHud()
 
 void CHud::RenderSpectatorNotification()
 {
-	if(m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team == TEAM_SPECTATORS &&
-		m_pClient->m_TeamChangeTime + 5.0f >= Client()->LocalTime())
+	if(m_pClient->m_LocalClientID != -1
+		&& m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team == TEAM_SPECTATORS
+		&& m_pClient->m_TeamChangeTime + 5.0f >= Client()->LocalTime())
 	{
 		// count non spectators
 		int NumPlayers = 0;
@@ -849,7 +853,8 @@ void CHud::RenderSpectatorNotification()
 
 void CHud::RenderReadyUpNotification()
 {
-	if(!(m_pClient->m_Snap.m_paPlayerInfos[m_pClient->m_LocalClientID]->m_PlayerFlags&PLAYERFLAG_READY))
+	if(m_pClient->m_LocalClientID != -1
+		&& !(m_pClient->m_Snap.m_paPlayerInfos[m_pClient->m_LocalClientID]->m_PlayerFlags&PLAYERFLAG_READY))
 	{
 		static CTextCursor s_Cursor(16.0f);
 
@@ -987,7 +992,7 @@ void CHud::OnRender()
 		if(m_pClient->m_Snap.m_pLocalCharacter && !(m_pClient->m_Snap.m_pGameData->m_GameStateFlags&(GAMESTATEFLAG_ROUNDOVER|GAMESTATEFLAG_GAMEOVER)))
 		{
 			RenderHealthAndAmmo(m_pClient->m_Snap.m_pLocalCharacter);
-			if(Race)
+			if(Race && m_pClient->m_LocalClientID != -1)
 			{
 				RenderRaceTime(m_pClient->m_Snap.m_paPlayerInfosRace[m_pClient->m_LocalClientID]);
 				RenderCheckpoint();

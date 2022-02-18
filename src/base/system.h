@@ -180,6 +180,7 @@ enum {
 	IOFLAG_READ = 1,
 	IOFLAG_WRITE = 2,
 	IOFLAG_APPEND = 4,
+	IOFLAG_SKIP_BOM = 8,
 
 	IOSEEK_START = 0,
 	IOSEEK_CUR = 1,
@@ -196,7 +197,7 @@ typedef struct IOINTERNAL *IOHANDLE;
 
 	Parameters:
 		filename - File to open.
-		flags - A set of flags. IOFLAG_READ, IOFLAG_WRITE, IOFLAG_APPEND.
+		flags - A set of flags. IOFLAG_READ, IOFLAG_WRITE, IOFLAG_APPEND, IOFLAG_SKIP_BOM.
 
 	Returns:
 		Returns a handle to the file on success and 0 on failure.
@@ -1780,6 +1781,16 @@ void str_utf8_stats(const char *str, int max_size, int max_count, int *size, int
 		1 - Initialization failed.
 */
 int secure_random_init();
+
+/*
+	Function: secure_random_uninit
+		Uninitializes the secure random module.
+
+	Returns:
+		0 - Uninitialization succeeded.
+		1 - Uninitialization failed.
+*/
+int secure_random_uninit();
 
 /*
 	Function: secure_random_fill

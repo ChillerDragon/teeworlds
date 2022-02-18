@@ -385,7 +385,7 @@ endif()
 
 if(TARGET_OS STREQUAL "windows")
   set(PLATFORM_CLIENT)
-  set(PLATFORM_CLIENT_LIBS opengl32 winmm)
+  set(PLATFORM_CLIENT_LIBS opengl32 winmm imm32)
   set(PLATFORM_LIBS ws2_32) # Windows sockets
 elseif(TARGET_OS STREQUAL "mac")
   find_library(CARBON Carbon)
@@ -398,7 +398,7 @@ elseif(TARGET_OS STREQUAL "mac")
   set(PLATFORM_LIBS ${CARBON})
 else()
   set(PLATFORM_CLIENT)
-  find_package(OpenGL COMPONENTS OpenGL REQUIRED)
+  find_package(OpenGL)
   if(CMAKE_VERSION VERSION_LESS 3.10)
     set(PLATFORM_CLIENT_LIBS ${OPENGL_gl_LIBRARY})
   else()
@@ -1282,7 +1282,6 @@ set_src(BASE GLOB_RECURSE src/base
   tl/algorithm.h
   tl/allocator.h
   tl/array.h
-  tl/base.h
   tl/range.h
   tl/sorted_array.h
   tl/string.h
@@ -1302,6 +1301,7 @@ set_src(ENGINE_INTERFACE GLOB src/engine
   kernel.h
   keys.h
   map.h
+  mapchecker.h
   masterserver.h
   message.h
   server.h
@@ -1728,10 +1728,12 @@ add_custom_target(everything DEPENDS ${TARGETS_OWN})
 if(GTEST_FOUND OR DOWNLOAD_GTEST)
   set_src(TESTS GLOB src/test
     bytes_be.cpp
+    compression.cpp
     datafile.cpp
     fs.cpp
     git_revision.cpp
     hash.cpp
+    io.cpp
     jsonwriter.cpp
     sorted_array.cpp
     storage.cpp
@@ -2083,6 +2085,7 @@ foreach(target ${TARGETS})
     target_compile_options(${target} PRIVATE /EHsc) # Only catch C++ exceptions with catch.
     target_compile_options(${target} PRIVATE /GS) # Protect the stack pointer.
     target_compile_options(${target} PRIVATE /wd4996) # Use of non-_s functions.
+    target_compile_options(${target} PRIVATE /utf-8) # Use UTF-8 for source files.
   endif()
   if(OUR_FLAGS)
     target_compile_options(${target} PRIVATE ${OUR_FLAGS})

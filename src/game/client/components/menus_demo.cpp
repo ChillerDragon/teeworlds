@@ -121,7 +121,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 		str_format(aBuffer, sizeof(aBuffer), "%d:%02d / %d:%02d",
 			CurrentTick/SERVER_TICK_SPEED/60, (CurrentTick/SERVER_TICK_SPEED)%60,
 			TotalTicks/SERVER_TICK_SPEED/60, (TotalTicks/SERVER_TICK_SPEED)%60);
-		UI()->DoLabel(&SeekBar, aBuffer, SeekBar.h*0.70f, TEXTALIGN_CENTER);
+		UI()->DoLabel(&SeekBar, aBuffer, SeekBar.h*0.70f, TEXTALIGN_MC);
 
 		// do the logic
 		if(UI()->CheckActiveItem(&s_PrevAmount))
@@ -151,6 +151,13 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 				s_PausedBeforeSeeking = pInfo->m_Paused;
 				if(!pInfo->m_Paused)
 					DemoPlayer()->Pause();
+			}
+			else
+			{
+				int HoveredTick = (int)(clamp((UI()->MouseX()-SeekBar.x-Rounding)/(float)(SeekBar.w-2*Rounding), 0.0f, 1.0f)*TotalTicks);
+				str_format(aBuffer, sizeof(aBuffer), "%d:%02d",
+					HoveredTick/SERVER_TICK_SPEED/60, (HoveredTick/SERVER_TICK_SPEED)%60);
+				UI()->DoTooltip(&s_PrevAmount, &SeekBar, aBuffer);
 			}
 		}
 
@@ -327,12 +334,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 		DemoPlayer()->GetDemoName(aDemoName, sizeof(aDemoName));
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), Localize("Demofile: %s"), aDemoName);
-		static CTextCursor s_Cursor;
-		s_Cursor.m_FontSize = Button.h*0.5f;
-		s_Cursor.MoveTo(NameBar.x, NameBar.y);
-		s_Cursor.Reset();
-		s_Cursor.m_MaxWidth = MainView.w;
-		TextRender()->TextOutlined(&s_Cursor, aBuf, -1);
+		UI()->DoLabel(&NameBar, aBuf, Button.h*0.5f, TEXTALIGN_TL, NameBar.w);
 	}
 
 	if(IncreaseDemoSpeed)
@@ -385,12 +387,10 @@ int CMenus::DemolistFetchCallback(const CFsFileInfo* pFileInfo, int IsDir, int S
 	if(IsDir)
 	{
 		str_format(Item.m_aName, sizeof(Item.m_aName), "%s/", pName);
-		Item.m_Valid = false;
 	}
 	else
 	{
 		str_truncate(Item.m_aName, sizeof(Item.m_aName), pName, str_length(pName) - 5);
-		Item.m_InfosLoaded = false;
 		Item.m_Date = pFileInfo->m_TimeModified;
 	}
 	Item.m_IsDir = IsDir != 0;

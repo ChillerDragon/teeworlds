@@ -34,30 +34,6 @@ public:
 
 class CMenus : public CComponent
 {
-public:
-	class CUIElementBase
-	{
-	protected:
-		static CRenderTools *m_pRenderTools;
-		static CUI *m_pUI;
-		static IInput *m_pInput;
-		static IClient *m_pClient;
-		static CConfig *m_pConfig;
-
-	public:
-		static void Init(CMenus *pMenus) { m_pRenderTools = pMenus->RenderTools(); m_pUI = pMenus->UI(); m_pInput = pMenus->Input(); m_pClient = pMenus->Client(); m_pConfig = pMenus->Config(); }
-	};
-
-	class CButtonContainer : public CUIElementBase
-	{
-		bool m_CleanBackground;
-		float m_FadeStartTime;
-	public:
-		CButtonContainer(bool CleanBackground = false) : m_FadeStartTime(0.0f) { m_CleanBackground = CleanBackground; }
-		float GetFade(bool Checked = false, float Seconds = 0.6f);
-		bool IsCleanBackground() const { return m_CleanBackground; }
-	};
-
 private:
 	typedef float (CMenus::*FDropdownCallback)(CUIRect View);
 
@@ -412,6 +388,8 @@ private:
 		bool m_Valid;
 		CDemoHeader m_Info;
 
+		CDemoItem() : m_InfosLoaded(false), m_Valid(false) {}
+
 		int GetMarkerCount() const
 		{
 			if(!m_Valid || !m_InfosLoaded)
@@ -532,16 +510,19 @@ private:
 		IServerBrowser *m_pServerBrowser;
 
 		static CServerFilterInfo ms_FilterStandard;
+		static CServerFilterInfo ms_FilterRace;
 		static CServerFilterInfo ms_FilterFavorites;
 		static CServerFilterInfo ms_FilterAll;
 
 	public:
 		enum
 		{
-			FILTER_CUSTOM=0,
+			FILTER_CUSTOM = 0,
 			FILTER_ALL,
 			FILTER_STANDARD,
 			FILTER_FAVORITES,
+			FILTER_RACE,
+			NUM_FILTERS,
 		};
 
 		CButtonContainer m_DeleteButtonContainer;
@@ -575,7 +556,7 @@ private:
 	void LoadFilters();
 	void SaveFilters();
 	void RemoveFilter(int FilterIndex);
-	void Move(bool Up, int Filter);
+	void MoveFilter(bool Up, int Filter);
 	void InitDefaultFilters();
 
 	struct CColumn
@@ -687,7 +668,6 @@ private:
 
 	// found in menus_start.cpp
 	void RenderStartMenu(CUIRect MainView);
-	void RenderLogo(CUIRect MainView);
 
 	// found in menus_ingame.cpp
 	void RenderGame(CUIRect MainView);
