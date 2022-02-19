@@ -1,6 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
+#include <engine/storage.h>
+#include <engine/shared/linereader.h>
 
 #include <game/mapitems.h>
 
@@ -1204,15 +1206,95 @@ int IGameController::GetStartTeam()
 	return TEAM_SPECTATORS;
 }
 
-/*void IGameController::Com_Example(IConsole::IResult *pResult, void *pContext)
+void IGameController::Com_Register(IConsole::IResult *pResult, void *pContext)
 {
 	CCommandManager::SCommandContext *pComContext = (CCommandManager::SCommandContext *)pContext;
 	IGameController *pSelf = (IGameController *)pComContext->m_pContext;
 
-	pSelf->GameServer()->SendBroadcast(pResult->GetString(0), -1);
-}*/
+	/*
+
+	/register foo bar
+
+	foo.txt
+
+	*/
+
+	char aBuf[128];
+	str_format(aBuf, sizeof(aBuf), "%s.txt", pResult->GetString(0));
+
+	IOHANDLE File = pSelf->GameServer()->Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
+	if(File)
+	{
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Account already exists.");
+		io_close(File);
+		return;
+	}
+
+	File = pSelf->GameServer()->Storage()->OpenFile(aBuf, IOFLAG_WRITE, IStorage::TYPE_ALL);
+	if(!File)
+	{
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Something went wrong.");
+		return;
+	}
+
+	io_write(File, pResult->GetString(0), str_length(pResult->GetString(0))); // username
+	io_write_newline(File);
+	io_write(File, pResult->GetString(1), str_length(pResult->GetString(1))); // password
+	io_write_newline(File);
+	io_write(File, "0", str_length("0")); // xp
+	io_write_newline(File);
+	io_write(File, "0", str_length("0")); // level
+	io_close(File);
+	pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Account created you can now login.");
+}
+
+void IGameController::Com_Login(IConsole::IResult *pResult, void *pContext)
+{
+	CCommandManager::SCommandContext *pComContext = (CCommandManager::SCommandContext *)pContext;
+	IGameController *pSelf = (IGameController *)pComContext->m_pContext;
+
+	/*
+
+	/login foo bar
+
+	foo.txt
+
+	*/
+
+	char aBuf[128];
+	str_format(aBuf, sizeof(aBuf), "%s.txt", pResult->GetString(0));
+
+	IOHANDLE File = pSelf->GameServer()->Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
+	if(!File)
+	{
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Account does not exists.");
+		return;
+	}
+
+	CPlayer *pPlayer = pSelf->GameServer()->m_apPlayers[pComContext->m_ClientID];
+
+
+	CLineReader lr;
+	lr.Init(File);
+
+	str_copy(pPlayer->m_AccountData.m_aUsername, lr.Get(), sizeof(pPlayer->m_AccountData.m_aUsername));
+	str_copy(pPlayer->m_AccountData.m_aPassword, lr.Get(), sizeof(pPlayer->m_AccountData.m_aPassword));
+
+	if(str_comp(pPlayer->m_AccountData.m_aPassword, pResult->GetString(1)))
+	{
+		pPlayer->m_AccountData.m_aUsername[0] = '\0';
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Wrong password.");
+		return;
+	}
+
+	pPlayer->m_AccountData.m_Xp = atoi(lr.Get());
+	pPlayer->m_AccountData.m_Level = atoi(lr.Get());
+	pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Logged in.");
+	io_close(File);
+}
 
 void IGameController::RegisterChatCommands(CCommandManager *pManager)
 {
-	//pManager->AddCommand("test", "Test the command system", "r", Com_Example, this);
+	pManager->AddCommand("register", "Register an account", "ss", Com_Register, this);
+	pManager->AddCommand("login", "Login to an account", "ss", Com_Login, this);
 }

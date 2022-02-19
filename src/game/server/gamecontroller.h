@@ -166,7 +166,7 @@ public:
 	virtual bool OnEntity(int Index, vec2 Pos);
 
 	void OnPlayerConnect(class CPlayer *pPlayer);
-	void OnPlayerDisconnect(class CPlayer *pPlayer);
+	virtual void OnPlayerDisconnect(class CPlayer *pPlayer);
 	void OnPlayerInfoChange(class CPlayer *pPlayer);
 	void OnPlayerReadyChange(class CPlayer *pPlayer);
 	void OnPlayerCommand(class CPlayer *pPlayer, const char *pCommandName, const char *pCommandArgs);
@@ -229,7 +229,8 @@ public:
 	int GetRealPlayerNum() const { return m_aTeamSize[TEAM_RED]+m_aTeamSize[TEAM_BLUE]; }
 	int GetStartTeam();
 
-	//static void Com_Example(IConsole::IResult *pResult, void *pContext);
+	static void Com_Register(IConsole::IResult *pResult, void *pContext);
+	static void Com_Login(IConsole::IResult *pResult, void *pContext);
 	virtual void RegisterChatCommands(CCommandManager *pManager);
 };
 

@@ -135,9 +135,13 @@ public:
 	struct CAccountData {
 		CAccountData()
 		{
+			m_aUsername[0] = '\0';
+			m_aPassword[0] = '\0';
 			m_Xp = 0;
 			m_Level = 0;
 		}
+		char m_aUsername[128];
+		char m_aPassword[128];
 		int m_Xp;
 		int m_Level;
 	};

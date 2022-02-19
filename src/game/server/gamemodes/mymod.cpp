@@ -4,6 +4,7 @@
 #include <game/server/player.h>
 #include <game/server/entities/character.h>
 #include <engine/server.h>
+#include <engine/storage.h>
 
 #include "mymod.h"
 
@@ -62,4 +63,34 @@ int CGameControllerMymod::OnCharacterDeath(class CCharacter *pVictim, class CPla
 
 
 	return 0;
+}
+
+void CGameControllerMymod::OnPlayerDisconnect(class CPlayer *pPlayer)
+{
+	if(pPlayer->m_AccountData.m_aUsername[0] != '\0')
+	{
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "%s.txt", pPlayer->m_AccountData.m_aUsername);
+		IOHANDLE File = GameServer()->Storage()->OpenFile(aBuf, IOFLAG_WRITE, IStorage::TYPE_ALL);
+		if(!File)
+		{
+			dbg_msg("mymod", "failed to save account");
+		}
+		else
+		{
+			io_write(File, pPlayer->m_AccountData.m_aUsername, str_length(pPlayer->m_AccountData.m_aUsername)); // username
+			io_write_newline(File);
+			io_write(File, pPlayer->m_AccountData.m_aPassword, str_length(pPlayer->m_AccountData.m_aPassword)); // username
+			io_write_newline(File);
+			str_format(aBuf, sizeof(aBuf), "%d", pPlayer->m_AccountData.m_Xp);
+			io_write(File, aBuf, str_length(aBuf)); // xp
+			io_write_newline(File);
+			str_format(aBuf, sizeof(aBuf), "%d", pPlayer->m_AccountData.m_Level);
+			io_write(File, aBuf, str_length(aBuf)); // level
+			io_close(File);
+			dbg_msg("mymod", "saved account");
+		}
+	}
+
+	IGameController::OnPlayerDisconnect(pPlayer);
 }

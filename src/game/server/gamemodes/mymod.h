@@ -13,6 +13,7 @@ public:
 	virtual void Tick();
 	virtual void OnCharacterSpawn(class CCharacter *pChr);
 	virtual int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon);
+	virtual void OnPlayerDisconnect(class CPlayer *pPlayer);
 	// add more virtual functions here if you wish
 };
 #endif
