@@ -1219,8 +1219,56 @@ void IGameController::Com_Register(IConsole::IResult *pResult, void *pContext)
 
 	*/
 
+	if(str_length(pResult->GetString(0)) > 100)
+	{
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Username can not be longer than 100 characters.");
+		return;
+	}
+	if(str_length(pResult->GetString(0)) < 2)
+	{
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Username has to be at least 3 characters long.");
+		return;
+	}
+	if(str_length(pResult->GetString(1)) > 100)
+	{
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Password can not be longer than 100 characters.");
+		return;
+	}
+	if(str_length(pResult->GetString(1)) < 4)
+	{
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Password has to be at least 5 characters long.");
+		return;
+	}
+
+	const char *pUsername = pResult->GetString(0);
+	while(pUsername != NULL && *pUsername != '\0')
+	{
+		if((*pUsername >= 'a' && *pUsername <= 'z') ||
+			(*pUsername >= 'A' && *pUsername <= 'Z') ||
+			(*pUsername >= '0' && *pUsername <= '9') ||
+			*pUsername == '_')
+		{
+			pUsername++;
+		}
+		else
+		{
+			pSelf->GameServer()->SendChat(
+				-1,
+				CHAT_ALL,
+				pComContext->m_ClientID,
+				"Username can only contain letters, numbers and underscores.");
+			return;
+		}
+	}
+
+	if(!str_comp(pUsername, pResult->GetString(1)))
+	{
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Username and password have to be different.");
+		return;
+	}
+
 	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "%s.txt", pResult->GetString(0));
+	str_format(aBuf, sizeof(aBuf), "accounts/%s.txt", pResult->GetString(0));
 
 	IOHANDLE File = pSelf->GameServer()->Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
 	if(File)
@@ -1244,6 +1292,8 @@ void IGameController::Com_Register(IConsole::IResult *pResult, void *pContext)
 	io_write(File, "0", str_length("0")); // xp
 	io_write_newline(File);
 	io_write(File, "0", str_length("0")); // level
+	io_write_newline(File);
+	io_write(File, "0", str_length("0")); // is logged in
 	io_close(File);
 	pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Account created you can now login.");
 }
@@ -1261,8 +1311,9 @@ void IGameController::Com_Login(IConsole::IResult *pResult, void *pContext)
 
 	*/
 
+
 	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "%s.txt", pResult->GetString(0));
+	str_format(aBuf, sizeof(aBuf), "accounts/%s.txt", pResult->GetString(0));
 
 	IOHANDLE File = pSelf->GameServer()->Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
 	if(!File)
@@ -1272,7 +1323,19 @@ void IGameController::Com_Login(IConsole::IResult *pResult, void *pContext)
 	}
 
 	CPlayer *pPlayer = pSelf->GameServer()->m_apPlayers[pComContext->m_ClientID];
-
+	if(pPlayer->m_LoginAttempts > 2)
+	{
+		char aAddrStr[NETADDR_MAXSTRSIZE] = {0};
+		pSelf->Server()->GetClientAddr(pComContext->m_ClientID, aAddrStr, sizeof(aAddrStr));
+		str_format(aBuf, sizeof(aBuf), "ban %s 10 Too many login attempts", aAddrStr);
+		pSelf->GameServer()->Console()->ExecuteLine(aBuf);
+		return;
+	}
+	if(pPlayer->m_AccountData.m_aUsername[0])
+	{
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "You are already logged in.");
+		return;
+	}
 
 	CLineReader lr;
 	lr.Init(File);
@@ -1283,14 +1346,46 @@ void IGameController::Com_Login(IConsole::IResult *pResult, void *pContext)
 	if(str_comp(pPlayer->m_AccountData.m_aPassword, pResult->GetString(1)))
 	{
 		pPlayer->m_AccountData.m_aUsername[0] = '\0';
+		pPlayer->m_LoginAttempts++;
 		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Wrong password.");
 		return;
 	}
 
 	pPlayer->m_AccountData.m_Xp = atoi(lr.Get());
 	pPlayer->m_AccountData.m_Level = atoi(lr.Get());
+	if(atoi(lr.Get()) != 0)
+	{
+		pPlayer->m_AccountData.m_aUsername[0] = '\0';
+		pPlayer->m_AccountData.m_Xp = 0;
+		pPlayer->m_AccountData.m_Level = 0;
+		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Account already logged in.");
+		return;
+	}
 	pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Logged in.");
 	io_close(File);
+
+	str_format(aBuf, sizeof(aBuf), "accounts/%s.txt", pPlayer->m_AccountData.m_aUsername);
+	File = pSelf->GameServer()->Storage()->OpenFile(aBuf, IOFLAG_WRITE, IStorage::TYPE_ALL);
+	if(!File)
+	{
+		dbg_msg("mymod", "failed to save account");
+	}
+	else
+	{
+		io_write(File, pPlayer->m_AccountData.m_aUsername, str_length(pPlayer->m_AccountData.m_aUsername)); // username
+		io_write_newline(File);
+		io_write(File, pPlayer->m_AccountData.m_aPassword, str_length(pPlayer->m_AccountData.m_aPassword)); // username
+		io_write_newline(File);
+		str_format(aBuf, sizeof(aBuf), "%d", pPlayer->m_AccountData.m_Xp);
+		io_write(File, aBuf, str_length(aBuf)); // xp
+		io_write_newline(File);
+		str_format(aBuf, sizeof(aBuf), "%d", pPlayer->m_AccountData.m_Level);
+		io_write(File, aBuf, str_length(aBuf)); // level
+		io_write_newline(File);
+		io_write(File, "1", str_length("1")); // is logged in
+		io_close(File);
+		dbg_msg("mymod", "set account logged in");
+	}
 }
 
 void IGameController::RegisterChatCommands(CCommandManager *pManager)

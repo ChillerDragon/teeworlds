@@ -70,7 +70,7 @@ void CGameControllerMymod::OnPlayerDisconnect(class CPlayer *pPlayer)
 	if(pPlayer->m_AccountData.m_aUsername[0] != '\0')
 	{
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "%s.txt", pPlayer->m_AccountData.m_aUsername);
+		str_format(aBuf, sizeof(aBuf), "accounts/%s.txt", pPlayer->m_AccountData.m_aUsername);
 		IOHANDLE File = GameServer()->Storage()->OpenFile(aBuf, IOFLAG_WRITE, IStorage::TYPE_ALL);
 		if(!File)
 		{
@@ -87,6 +87,8 @@ void CGameControllerMymod::OnPlayerDisconnect(class CPlayer *pPlayer)
 			io_write_newline(File);
 			str_format(aBuf, sizeof(aBuf), "%d", pPlayer->m_AccountData.m_Level);
 			io_write(File, aBuf, str_length(aBuf)); // level
+			io_write_newline(File);
+			io_write(File, "0", str_length("0")); // is logged in
 			io_close(File);
 			dbg_msg("mymod", "saved account");
 		}

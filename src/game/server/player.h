@@ -146,6 +146,7 @@ public:
 		int m_Level;
 	};
 	CAccountData m_AccountData;
+	int m_LoginAttempts;
 };
 
 #endif
