@@ -252,13 +252,6 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 		io_flush(m_DataLogRecv);
 	}
 
-	if(m_pConfig->m_Debug)
-	{
-		char aAddrStr[NETADDR_MAXSTRSIZE];
-		net_addr_str(pAddr, aAddrStr, sizeof(aAddrStr), true);
-		dbg_msg("network", "%s size=%d", aAddrStr, Size);
-	}
-
 	// check the size
 	if(Size < NET_PACKETHEADERSIZE || Size > NET_MAX_PACKETSIZE)
 	{
@@ -270,6 +263,7 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 	// read the packet
 
 	pPacket->m_Flags = (pBuffer[0]&0xfc)>>2;
+
 		// FFFFFFxx
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
 	{
@@ -341,6 +335,34 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 					| (pPacket->m_aChunkData[3]<<8) | pPacket->m_aChunkData[4];
 			}
 		}
+	}
+
+	if(m_pConfig->m_Debug)
+	{
+		char aAddrStr[NETADDR_MAXSTRSIZE];
+		net_addr_str(pAddr, aAddrStr, sizeof(aAddrStr), true);
+		char aFlags[512];
+		aFlags[0] = '\0';
+		if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
+			str_append(aFlags, "CONTROL", sizeof(aFlags));
+		if(pPacket->m_Flags&NET_PACKETFLAG_RESEND)
+			str_append(aFlags, aFlags[0] ? "|RESEND" : "RESEND", sizeof(aFlags));
+		if(pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION)
+			str_append(aFlags, aFlags[0] ? "|COMPRESSION" : "COMPRESSION", sizeof(aFlags));
+		if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
+			str_append(aFlags, aFlags[0] ? "|CONNLESS" : "CONNLESS", sizeof(aFlags));
+		char aBuf[512];
+		aBuf[0] = '\0';
+		if(aFlags[0])
+			str_format(aBuf, sizeof(aBuf), " (%s)", aFlags);
+		char aHexData[1024];
+		str_hex(aHexData, sizeof(aHexData), pPacket->m_aChunkData, pPacket->m_DataSize);
+		char aRawData[1024];
+		for(int i = 0; i < pPacket->m_DataSize; i++)
+			aRawData[i] = pPacket->m_aChunkData[i] < 32 ? '.' : pPacket->m_aChunkData[i];
+		dbg_msg("network", "%s size=%d flags=%d%s", aAddrStr, Size, pPacket->m_Flags, aBuf);
+		dbg_msg("network", "  data: %s", aHexData);
+		dbg_msg("network", "  data_raw: %s", aRawData);
 	}
 
 	// log the data
