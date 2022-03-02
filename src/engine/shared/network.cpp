@@ -252,6 +252,13 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 		io_flush(m_DataLogRecv);
 	}
 
+	if(m_pConfig->m_Debug)
+	{
+		char aAddrStr[NETADDR_MAXSTRSIZE];
+		net_addr_str(pAddr, aAddrStr, sizeof(aAddrStr), true);
+		dbg_msg("network", "%s size=%d", aAddrStr, Size);
+	}
+
 	// check the size
 	if(Size < NET_PACKETHEADERSIZE || Size > NET_MAX_PACKETSIZE)
 	{
