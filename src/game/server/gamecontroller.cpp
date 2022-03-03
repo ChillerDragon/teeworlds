@@ -1285,16 +1285,11 @@ void IGameController::Com_Register(IConsole::IResult *pResult, void *pContext)
 		return;
 	}
 
-	io_write(File, pResult->GetString(0), str_length(pResult->GetString(0))); // username
-	io_write_newline(File);
-	io_write(File, pResult->GetString(1), str_length(pResult->GetString(1))); // password
-	io_write_newline(File);
-	io_write(File, "0", str_length("0")); // xp
-	io_write_newline(File);
-	io_write(File, "0", str_length("0")); // level
-	io_write_newline(File);
-	io_write(File, "0", str_length("0")); // is logged in
-	io_close(File);
+	CAccountData Data;
+	str_copy(Data.m_aUsername, pResult->GetString(0), sizeof(Data.m_aUsername));
+	str_copy(Data.m_aPassword, pResult->GetString(1), sizeof(Data.m_aPassword));
+	pSelf->GameServer()->Accounts()->WriteAccount(Data, 0);
+
 	pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Account created you can now login.");
 }
 
@@ -1311,80 +1306,10 @@ void IGameController::Com_Login(IConsole::IResult *pResult, void *pContext)
 
 	*/
 
-
-	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "accounts/%s.txt", pResult->GetString(0));
-
-	IOHANDLE File = pSelf->GameServer()->Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
-	if(!File)
+	if(pSelf->GameServer()->Accounts()->ReadAccount(pComContext->m_ClientID, pResult->GetString(0), pResult->GetString(1)))
 	{
-		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Account does not exists.");
-		return;
-	}
-
-	CPlayer *pPlayer = pSelf->GameServer()->m_apPlayers[pComContext->m_ClientID];
-	if(pPlayer->m_LoginAttempts > 2)
-	{
-		char aAddrStr[NETADDR_MAXSTRSIZE] = {0};
-		pSelf->Server()->GetClientAddr(pComContext->m_ClientID, aAddrStr, sizeof(aAddrStr));
-		str_format(aBuf, sizeof(aBuf), "ban %s 10 Too many login attempts", aAddrStr);
-		pSelf->GameServer()->Console()->ExecuteLine(aBuf);
-		return;
-	}
-	if(pPlayer->m_AccountData.m_aUsername[0])
-	{
-		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "You are already logged in.");
-		return;
-	}
-
-	CLineReader lr;
-	lr.Init(File);
-
-	str_copy(pPlayer->m_AccountData.m_aUsername, lr.Get(), sizeof(pPlayer->m_AccountData.m_aUsername));
-	str_copy(pPlayer->m_AccountData.m_aPassword, lr.Get(), sizeof(pPlayer->m_AccountData.m_aPassword));
-
-	if(str_comp(pPlayer->m_AccountData.m_aPassword, pResult->GetString(1)))
-	{
-		pPlayer->m_AccountData.m_aUsername[0] = '\0';
-		pPlayer->m_LoginAttempts++;
-		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Wrong password.");
-		return;
-	}
-
-	pPlayer->m_AccountData.m_Xp = atoi(lr.Get());
-	pPlayer->m_AccountData.m_Level = atoi(lr.Get());
-	if(atoi(lr.Get()) != 0)
-	{
-		pPlayer->m_AccountData.m_aUsername[0] = '\0';
-		pPlayer->m_AccountData.m_Xp = 0;
-		pPlayer->m_AccountData.m_Level = 0;
-		pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Account already logged in.");
-		return;
-	}
-	pSelf->GameServer()->SendChat(-1, CHAT_ALL, pComContext->m_ClientID, "Logged in.");
-	io_close(File);
-
-	str_format(aBuf, sizeof(aBuf), "accounts/%s.txt", pPlayer->m_AccountData.m_aUsername);
-	File = pSelf->GameServer()->Storage()->OpenFile(aBuf, IOFLAG_WRITE, IStorage::TYPE_ALL);
-	if(!File)
-	{
-		dbg_msg("mymod", "failed to save account");
-	}
-	else
-	{
-		io_write(File, pPlayer->m_AccountData.m_aUsername, str_length(pPlayer->m_AccountData.m_aUsername)); // username
-		io_write_newline(File);
-		io_write(File, pPlayer->m_AccountData.m_aPassword, str_length(pPlayer->m_AccountData.m_aPassword)); // username
-		io_write_newline(File);
-		str_format(aBuf, sizeof(aBuf), "%d", pPlayer->m_AccountData.m_Xp);
-		io_write(File, aBuf, str_length(aBuf)); // xp
-		io_write_newline(File);
-		str_format(aBuf, sizeof(aBuf), "%d", pPlayer->m_AccountData.m_Level);
-		io_write(File, aBuf, str_length(aBuf)); // level
-		io_write_newline(File);
-		io_write(File, "1", str_length("1")); // is logged in
-		io_close(File);
-		dbg_msg("mymod", "set account logged in");
+		CPlayer *pPlayer = pSelf->GameServer()->m_apPlayers[pComContext->m_ClientID];
+		pSelf->GameServer()->Accounts()->WriteAccount(pPlayer->m_AccountData, 1);
 	}
 }
 

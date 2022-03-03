@@ -47,6 +47,8 @@ void CGameContext::Construct(int Resetting)
 
 	if(Resetting==NO_RESET)
 		m_pVoteOptionHeap = new CHeap();
+
+	m_pAccounts = 0;
 }
 
 CGameContext::CGameContext(int Resetting)
@@ -1560,6 +1562,8 @@ void CGameContext::OnInit()
 	m_Events.SetGameServer(this);
 	m_CommandManager.Init(m_pConsole, this, NewCommandHook, RemoveCommandHook);
 
+	m_pAccounts = new CAccounts(this);
+
 	// HACK: only set static size for items, which were available in the first 0.7 release
 	// so new items don't break the snapshot delta
 	static const int OLD_NUM_NETOBJTYPES = 23;
@@ -1635,6 +1639,8 @@ void CGameContext::OnShutdown()
 {
 	delete m_pController;
 	m_pController = 0;
+	delete m_pAccounts;
+	m_pAccounts = 0;
 	Clear();
 }
 
@@ -1693,5 +1699,8 @@ const char *CGameContext::Version() const { return GAME_VERSION; }
 const char *CGameContext::NetVersion() const { return GAME_NETVERSION; }
 const char *CGameContext::NetVersionHashUsed() const { return GAME_NETVERSION_HASH_FORCED; }
 const char *CGameContext::NetVersionHashReal() const { return GAME_NETVERSION_HASH; }
+
+CAccounts *CGameContext::Accounts() { return m_pAccounts; }
+
 
 IGameServer *CreateGameServer() { return new CGameContext; }

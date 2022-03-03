@@ -196,6 +196,13 @@ public:
 	virtual const char *NetVersion() const;
 	virtual const char *NetVersionHashUsed() const;
 	virtual const char *NetVersionHashReal() const;
+
+	// mymod
+private:
+	class CAccounts *m_pAccounts;
+
+public:
+	CAccounts *Accounts();
 };
 
 inline int64 CmaskAll() { return -1; }

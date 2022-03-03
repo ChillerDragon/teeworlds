@@ -3,6 +3,8 @@
 #ifndef GAME_SERVER_PLAYER_H
 #define GAME_SERVER_PLAYER_H
 
+#include "accounts.h"
+
 #include "alloc.h"
 
 
@@ -132,19 +134,6 @@ private:
 	bool m_ActiveSpecSwitch;
 
 public:
-	struct CAccountData {
-		CAccountData()
-		{
-			m_aUsername[0] = '\0';
-			m_aPassword[0] = '\0';
-			m_Xp = 0;
-			m_Level = 0;
-		}
-		char m_aUsername[128];
-		char m_aPassword[128];
-		int m_Xp;
-		int m_Level;
-	};
 	CAccountData m_AccountData;
 	int m_LoginAttempts;
 };
