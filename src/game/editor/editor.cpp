@@ -341,19 +341,6 @@ int CEditor::DoButton_Image(const void *pID, const char *pText, int Checked, con
 	return DoButton_Editor_Common(pID, pText, Checked, pRect, Flags, pToolTip);
 }
 
-int CEditor::DoButton_File(const void *pID, const char *pText, int Checked, const CUIRect *pRect, int Flags, const char *pToolTip)
-{
-	if(Checked)
-		pRect->Draw(GetButtonColor(pID, Checked), 3.0f);
-	else if(UI()->HotItem() == pID)
-		pRect->Draw(vec4(1,1,1,0.33f), 3.0f);
-
-	CUIRect Label = *pRect;
-	Label.VMargin(5.0f, &Label);
-	UI()->DoLabel(&Label, pText, 10.0f, TEXTALIGN_ML);
-	return DoButton_Editor_Common(pID, pText, Checked, pRect, Flags, pToolTip);
-}
-
 int CEditor::DoButton_Menu(const void *pID, const char *pText, int Checked, const CUIRect *pRect, int Flags, const char *pToolTip)
 {
 	pRect->Draw(vec4(0.5f, 0.5f, 0.5f, 1.0f), 3.0f, CUIRect::CORNER_T);
@@ -2312,161 +2299,118 @@ int CEditor::DoProperties(CUIRect *pToolBox, CProperty *pProps, int *pIDs, int *
 	return Change;
 }
 
-void CEditor::RenderLayers(CUIRect ToolBox, CUIRect View)
+void CEditor::RenderLayers(CUIRect LayersBox)
 {
-	CUIRect LayersBox = ToolBox;
-	CUIRect Slot, Button;
+	const float RowHeight = 12.0f;
 	char aBuf[64];
 
-	float LayersHeight = 12.0f;	 // Height of AddGroup button
-	static float s_ScrollValue = 0;
-
-	for(int g = 0; g < m_Map.m_lGroups.size(); g++)
-	{
-		// Each group is 19.0f
-		// Each layer is 14.0f
-		LayersHeight += 19.0f;
-		if(!m_Map.m_lGroups[g]->m_Collapse)
-			LayersHeight += m_Map.m_lGroups[g]->m_lLayers.size() * 14.0f;
-	}
-
-	float ScrollDifference = LayersHeight - LayersBox.h;
-
-	if(LayersHeight > LayersBox.h)	// Do we even need a scrollbar?
-	{
-		CUIRect Scroll;
-		LayersBox.VSplitRight(15.0f, &LayersBox, &Scroll);
-		LayersBox.VSplitRight(3.0f, &LayersBox, 0);	// extra spacing
-		s_ScrollValue = UI()->DoScrollbarV(&s_ScrollValue, &Scroll, s_ScrollValue);
-
-		if(UI()->MouseInside(&Scroll) || UI()->MouseInside(&LayersBox))
-		{
-			int ScrollNum = (int)((LayersHeight-LayersBox.h)/15.0f)+1;
-			if(ScrollNum > 0)
-			{
-				if(Input()->KeyPress(KEY_MOUSE_WHEEL_UP))
-					s_ScrollValue = clamp(s_ScrollValue - 1.0f/ScrollNum, 0.0f, 1.0f);
-				if(Input()->KeyPress(KEY_MOUSE_WHEEL_DOWN))
-					s_ScrollValue = clamp(s_ScrollValue + 1.0f/ScrollNum, 0.0f, 1.0f);
-			}
-		}
-	}
-
-	float LayerStartAt = ScrollDifference * s_ScrollValue;
-	if(LayerStartAt < 0.0f)
-		LayerStartAt = 0.0f;
-
-	float LayerStopAt = LayersHeight - ScrollDifference * (1 - s_ScrollValue);
-	float LayerCur = 0;
+	static CScrollRegion s_ScrollRegion;
+	vec2 ScrollOffset(0.0f, 0.0f);
+	CScrollRegionParams ScrollParams;
+	ScrollParams.m_ClipBgColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	ScrollParams.m_ScrollbarBgColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	ScrollParams.m_ScrollbarWidth = 10.0f;
+	ScrollParams.m_ScrollbarMargin = 3.0f;
+	ScrollParams.m_ScrollUnit = RowHeight * 5;
+	s_ScrollRegion.Begin(&LayersBox, &ScrollOffset, &ScrollParams);
+	LayersBox.y += ScrollOffset.y;
 
 	// render layers
+	for(int g = 0; g < m_Map.m_lGroups.size(); g++)
 	{
-		for(int g = 0; g < m_Map.m_lGroups.size(); g++)
+		CUIRect Slot, VisibleToggle, SaveCheck;
+		LayersBox.HSplitTop(RowHeight, &Slot, &LayersBox);
+		s_ScrollRegion.AddRect(Slot);
+
+		if(!s_ScrollRegion.IsRectClipped(Slot))
 		{
-			if(LayerCur > LayerStopAt)
-				break;
-			else if(LayerCur + m_Map.m_lGroups[g]->m_lLayers.size() * 14.0f + 19.0f < LayerStartAt)
+			Slot.VSplitLeft(12.0f, &VisibleToggle, &Slot);
+			if(DoButton_Ex(&m_Map.m_lGroups[g]->m_Visible, m_Map.m_lGroups[g]->m_Visible ? "V" : "H", m_Map.m_lGroups[g]->m_Collapse ? 1 : 0, &VisibleToggle, 0, "Toggle group visibility", CUIRect::CORNER_L))
+				m_Map.m_lGroups[g]->m_Visible = !m_Map.m_lGroups[g]->m_Visible;
+
+			Slot.VSplitRight(12.0f, &Slot, &SaveCheck);
+			if(DoButton_Ex(&m_Map.m_lGroups[g]->m_SaveToMap, "S", m_Map.m_lGroups[g]->m_SaveToMap, &SaveCheck, 0, "Enable/disable group for saving", CUIRect::CORNER_R))
+				if(!m_Map.m_lGroups[g]->m_GameGroup)
+					m_Map.m_lGroups[g]->m_SaveToMap = !m_Map.m_lGroups[g]->m_SaveToMap;
+
+			str_format(aBuf, sizeof(aBuf), "#%d %s", g, m_Map.m_lGroups[g]->m_aName);
+			const float GroupFontSize = clamp(10.0f * Slot.w / TextRender()->TextWidth(10.0f, aBuf, -1), 6.0f, 10.0f);
+			const char *pGroupTooltip = m_Map.m_lGroups[g]->m_Collapse ? "Select group. Double click to expand." : "Select group. Double click to collapse.";
+			if(int Result = DoButton_Ex(&m_Map.m_lGroups[g], aBuf, g == m_SelectedGroup, &Slot, BUTTON_CONTEXT, pGroupTooltip, 0, GroupFontSize))
 			{
-				LayerCur += m_Map.m_lGroups[g]->m_lLayers.size() * 14.0f + 19.0f;
-				continue;
+				m_SelectedGroup = g;
+				m_SelectedLayer = 0;
+
+				if(Result == 2)
+					UI()->DoPopupMenu(UI()->MouseX(), UI()->MouseY(), 145, 220, this, PopupGroup);
+
+				if(m_Map.m_lGroups[g]->m_lLayers.size() && Input()->MouseDoubleClick())
+					m_Map.m_lGroups[g]->m_Collapse ^= 1;
 			}
-
-			CUIRect VisibleToggle, SaveCheck;
-			if(LayerCur >= LayerStartAt)
-			{
-				LayersBox.HSplitTop(12.0f, &Slot, &LayersBox);
-				Slot.VSplitLeft(12, &VisibleToggle, &Slot);
-				if(DoButton_Ex(&m_Map.m_lGroups[g]->m_Visible, m_Map.m_lGroups[g]->m_Visible?"V":"H", m_Map.m_lGroups[g]->m_Collapse ? 1 : 0, &VisibleToggle, 0, "Toggle group visibility", CUIRect::CORNER_L))
-					m_Map.m_lGroups[g]->m_Visible = !m_Map.m_lGroups[g]->m_Visible;
-
-				Slot.VSplitRight(12.0f, &Slot, &SaveCheck);
-				if(DoButton_Ex(&m_Map.m_lGroups[g]->m_SaveToMap, "S", m_Map.m_lGroups[g]->m_SaveToMap, &SaveCheck, 0, "Enable/disable group for saving", CUIRect::CORNER_R))
-					if(!m_Map.m_lGroups[g]->m_GameGroup)
-						m_Map.m_lGroups[g]->m_SaveToMap = !m_Map.m_lGroups[g]->m_SaveToMap;
-
-				str_format(aBuf, sizeof(aBuf),"#%d %s", g, m_Map.m_lGroups[g]->m_aName);
-				const float FontSize = clamp(10.0f * Slot.w / TextRender()->TextWidth(10.0f, aBuf, -1), 6.0f, 10.0f);
-
-				if(int Result = DoButton_Ex(&m_Map.m_lGroups[g], aBuf, g==m_SelectedGroup, &Slot,
-					BUTTON_CONTEXT, m_Map.m_lGroups[g]->m_Collapse ? "Select group. Double click to expand." : "Select group. Double click to collapse.", 0, FontSize))
-				{
-					m_SelectedGroup = g;
-					m_SelectedLayer = 0;
-
-					if(Result == 2)
-						UI()->DoPopupMenu(UI()->MouseX(), UI()->MouseY(), 145, 220, this, PopupGroup);
-
-					if(m_Map.m_lGroups[g]->m_lLayers.size() && Input()->MouseDoubleClick())
-						m_Map.m_lGroups[g]->m_Collapse ^= 1;
-				}
-				LayersBox.HSplitTop(2.0f, &Slot, &LayersBox);
-			}
-			LayerCur += 14.0f;
-
-			for(int i = 0; i < m_Map.m_lGroups[g]->m_lLayers.size(); i++)
-			{
-				if(LayerCur > LayerStopAt)
-					break;
-				else if(LayerCur < LayerStartAt)
-				{
-					LayerCur += 14.0f;
-					continue;
-				}
-
-				if(m_Map.m_lGroups[g]->m_Collapse)
-					continue;
-
-				//visible
-				LayersBox.HSplitTop(12.0f, &Slot, &LayersBox);
-				Slot.VSplitLeft(12.0f, 0, &Button);
-				Button.VSplitLeft(15, &VisibleToggle, &Button);
-
-				if(DoButton_Ex(&m_Map.m_lGroups[g]->m_lLayers[i]->m_Visible, m_Map.m_lGroups[g]->m_lLayers[i]->m_Visible?"V":"H", 0, &VisibleToggle, 0, "Toggle layer visibility", CUIRect::CORNER_L))
-					m_Map.m_lGroups[g]->m_lLayers[i]->m_Visible = !m_Map.m_lGroups[g]->m_lLayers[i]->m_Visible;
-
-				Button.VSplitRight(12.0f, &Button, &SaveCheck);
-				if(DoButton_Ex(&m_Map.m_lGroups[g]->m_lLayers[i]->m_SaveToMap, "S", m_Map.m_lGroups[g]->m_lLayers[i]->m_SaveToMap, &SaveCheck, 0, "Enable/disable layer for saving", CUIRect::CORNER_R))
-					if(m_Map.m_lGroups[g]->m_lLayers[i] != m_Map.m_pGameLayer)
-						m_Map.m_lGroups[g]->m_lLayers[i]->m_SaveToMap = !m_Map.m_lGroups[g]->m_lLayers[i]->m_SaveToMap;
-
-				if(m_Map.m_lGroups[g]->m_lLayers[i]->m_aName[0])
-					str_format(aBuf, sizeof(aBuf), "%s", m_Map.m_lGroups[g]->m_lLayers[i]->m_aName);
-				else if(m_Map.m_lGroups[g]->m_lLayers[i]->m_Type == LAYERTYPE_TILES)
-					str_copy(aBuf, "Tiles", sizeof(aBuf));
-				else
-					str_copy(aBuf, "Quads", sizeof(aBuf));
-
-				const float FontSize = clamp(10.0f * Button.w / TextRender()->TextWidth(10.0f, aBuf, -1), 6.0f, 10.0f);
-
-				if(int Result = DoButton_Ex(m_Map.m_lGroups[g]->m_lLayers[i], aBuf, g==m_SelectedGroup&&i==m_SelectedLayer, &Button,
-					BUTTON_CONTEXT, "Select layer.", 0, FontSize))
-				{
-					m_SelectedLayer = i;
-					m_SelectedGroup = g;
-					if(Result == 2)
-						UI()->DoPopupMenu(UI()->MouseX(), UI()->MouseY(), 120, 245, this, PopupLayer);
-				}
-
-				LayerCur += 14.0f;
-				LayersBox.HSplitTop(2.0f, &Slot, &LayersBox);
-			}
-			if(LayerCur > LayerStartAt && LayerCur < LayerStopAt)
-				LayersBox.HSplitTop(5.0f, &Slot, &LayersBox);
-			LayerCur += 5.0f;
 		}
+
+		LayersBox.HSplitTop(2.0f, &Slot, &LayersBox);
+		s_ScrollRegion.AddRect(Slot);
+
+		for(int l = 0; l < m_Map.m_lGroups[g]->m_lLayers.size(); l++)
+		{
+			if(m_Map.m_lGroups[g]->m_Collapse)
+				continue;
+
+			LayersBox.HSplitTop(RowHeight+2.0f, &Slot, &LayersBox);
+			s_ScrollRegion.AddRect(Slot);
+			if(s_ScrollRegion.IsRectClipped(Slot))
+				continue;
+			Slot.HSplitTop(RowHeight, &Slot, 0);
+
+			Slot.VSplitLeft(12.0f, 0, &Slot);
+			Slot.VSplitLeft(12.0f, &VisibleToggle, &Slot);
+
+			if(DoButton_Ex(&m_Map.m_lGroups[g]->m_lLayers[l]->m_Visible, m_Map.m_lGroups[g]->m_lLayers[l]->m_Visible ? "V" : "H", 0, &VisibleToggle, 0, "Toggle layer visibility", CUIRect::CORNER_L))
+				m_Map.m_lGroups[g]->m_lLayers[l]->m_Visible = !m_Map.m_lGroups[g]->m_lLayers[l]->m_Visible;
+
+			Slot.VSplitRight(12.0f, &Slot, &SaveCheck);
+			if(DoButton_Ex(&m_Map.m_lGroups[g]->m_lLayers[l]->m_SaveToMap, "S", m_Map.m_lGroups[g]->m_lLayers[l]->m_SaveToMap, &SaveCheck, 0, "Enable/disable layer for saving", CUIRect::CORNER_R))
+				if(m_Map.m_lGroups[g]->m_lLayers[l] != m_Map.m_pGameLayer)
+					m_Map.m_lGroups[g]->m_lLayers[l]->m_SaveToMap = !m_Map.m_lGroups[g]->m_lLayers[l]->m_SaveToMap;
+
+			const char *pGroupLabel;
+			if(m_Map.m_lGroups[g]->m_lLayers[l]->m_aName[0])
+				pGroupLabel = m_Map.m_lGroups[g]->m_lLayers[l]->m_aName;
+			else if(m_Map.m_lGroups[g]->m_lLayers[l]->m_Type == LAYERTYPE_TILES)
+				pGroupLabel = "Tiles";
+			else
+				pGroupLabel = "Quads";
+
+			const float LayerFontSize = clamp(10.0f * Slot.w / TextRender()->TextWidth(10.0f, pGroupLabel, -1), 6.0f, 10.0f);
+			if(int Result = DoButton_Ex(m_Map.m_lGroups[g]->m_lLayers[l], pGroupLabel, g == m_SelectedGroup && l == m_SelectedLayer, &Slot, BUTTON_CONTEXT, "Select layer.", 0, LayerFontSize))
+			{
+				m_SelectedLayer = l;
+				m_SelectedGroup = g;
+				if(Result == 2)
+					UI()->DoPopupMenu(UI()->MouseX(), UI()->MouseY(), 120, 245, this, PopupLayer);
+			}
+		}
+
+		LayersBox.HSplitTop(5.0f, &Slot, &LayersBox);
+		s_ScrollRegion.AddRect(Slot);
 	}
 
-	if(LayerCur <= LayerStopAt)
+	CUIRect AddGroupButton;
+	LayersBox.HSplitTop(RowHeight + 1.0f, &AddGroupButton, &LayersBox);
+	s_ScrollRegion.AddRect(AddGroupButton);
+	if(!s_ScrollRegion.IsRectClipped(AddGroupButton))
 	{
-		LayersBox.HSplitTop(12.0f, &Slot, &LayersBox);
-
-		static int s_NewGroupButton = 0;
-		if(DoButton_Editor(&s_NewGroupButton, "Add group", 0, &Slot, 0, "Adds a new group"))
+		AddGroupButton.HSplitTop(RowHeight, &AddGroupButton, 0);
+		static int s_AddGroupButton = 0;
+		if(DoButton_Editor(&s_AddGroupButton, "Add group", 0, &AddGroupButton, 0, "Adds a new group"))
 		{
 			m_Map.NewGroup();
 			m_SelectedGroup = m_Map.m_lGroups.size()-1;
 		}
 	}
+
+	s_ScrollRegion.End();
 }
 
 void CEditor::ReplaceImage(const char *pFileName, int StorageType, void *pUser)
@@ -2602,69 +2546,39 @@ void CEditor::SortImages()
 
 void CEditor::RenderImagesList(CUIRect ToolBox)
 {
-	static float s_ScrollValue = 0.0f;
-	const float RowHeight = 14.0f;
-	const float HeaderHeight = RowHeight + 1.0f;
-	const float HeaderSeparatorHeight = 5.0f;
-	const float AddButtonHeight = 17.0f;
-	const float ImagesHeight = 2 * (HeaderHeight + HeaderSeparatorHeight) + RowHeight * m_Map.m_lImages.size() + AddButtonHeight;
-	const float ScrollDifference = maximum(ImagesHeight - ToolBox.h, 0.0f);
+	const float RowHeight = 12.0f;
 
-	if(ScrollDifference > 0) // Do we even need a scrollbar?
-	{
-		CUIRect Scroll;
-		ToolBox.VSplitRight(15.0f, &ToolBox, &Scroll);
-		ToolBox.VSplitRight(3.0f, &ToolBox, 0);	// extra spacing
-		s_ScrollValue = UI()->DoScrollbarV(&s_ScrollValue, &Scroll, s_ScrollValue);
-		if(UI()->MouseInside(&Scroll) || UI()->MouseInside(&ToolBox))
-		{
-			int ScrollNum = (int)((ImagesHeight-ToolBox.h)/RowHeight)+1;
-			if(ScrollNum > 0)
-			{
-				if(Input()->KeyPress(KEY_MOUSE_WHEEL_UP))
-					s_ScrollValue = clamp(s_ScrollValue - 1.0f/ScrollNum, 0.0f, 1.0f);
-				if(Input()->KeyPress(KEY_MOUSE_WHEEL_DOWN))
-					s_ScrollValue = clamp(s_ScrollValue + 1.0f/ScrollNum, 0.0f, 1.0f);
-			}
-		}
-	}
-	else
-		s_ScrollValue = 0.0f;
-
-	const float ImageStartAt = ScrollDifference * s_ScrollValue;
-	const float ImageStopAt = ImagesHeight + ScrollDifference * (s_ScrollValue - 1.0f);
-	float ImageCur = 0.0f;
+	static CScrollRegion s_ScrollRegion;
+	vec2 ScrollOffset(0.0f, 0.0f);
+	CScrollRegionParams ScrollParams;
+	ScrollParams.m_ClipBgColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	ScrollParams.m_ScrollbarBgColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	ScrollParams.m_ScrollbarWidth = 10.0f;
+	ScrollParams.m_ScrollbarMargin = 3.0f;
+	ScrollParams.m_ScrollUnit = RowHeight * 5;
+	s_ScrollRegion.Begin(&ToolBox, &ScrollOffset, &ScrollParams);
+	ToolBox.y += ScrollOffset.y;
 
 	for(int e = 0; e < 2; e++) // two passes, first embedded, then external
 	{
-		if(ImageCur + HeaderHeight > ImageStopAt)
-			return;
-
 		CUIRect Slot;
-		if(ImageCur >= ImageStartAt)
-		{
-			ToolBox.HSplitTop(HeaderHeight, &Slot, &ToolBox);
+		ToolBox.HSplitTop(RowHeight+3.0f, &Slot, &ToolBox);
+		s_ScrollRegion.AddRect(Slot);
+		if(!s_ScrollRegion.IsRectClipped(Slot))
 			UI()->DoLabel(&Slot, e == 0 ? "Embedded" : "External", 12.0f, TEXTALIGN_CENTER);
-		}
-		ImageCur += HeaderHeight;
 
 		for(int i = 0; i < m_Map.m_lImages.size(); i++)
 		{
 			if((e && !m_Map.m_lImages[i]->m_External) || (!e && m_Map.m_lImages[i]->m_External))
 				continue;
 
-			if(ImageCur + RowHeight > ImageStopAt)
-				return;
-			else if(ImageCur < ImageStartAt)
-			{
-				ImageCur += RowHeight;
+			ToolBox.HSplitTop(RowHeight+2.0f, &Slot, &ToolBox);
+			s_ScrollRegion.AddRect(Slot);
+			if(s_ScrollRegion.IsRectClipped(Slot))
 				continue;
-			}
-			ImageCur += RowHeight;
+			Slot.HSplitTop(RowHeight, &Slot, 0);
 
-			ToolBox.HSplitTop(12.0f, &Slot, &ToolBox);
-
-			// check if images is used
+			// check if image is used
 			bool Used = false;
 			for(int g = 0; !Used && (g < m_Map.m_lGroups.size()); g++)
 			{
@@ -2673,14 +2587,12 @@ void CEditor::RenderImagesList(CUIRect ToolBox)
 				{
 					if(pGroup->m_lLayers[l]->m_Type == LAYERTYPE_TILES)
 					{
-						CLayerTiles *pLayer = static_cast<CLayerTiles *>(pGroup->m_lLayers[l]);
-						if(pLayer->m_Image == i)
+						if(static_cast<CLayerTiles *>(pGroup->m_lLayers[l])->m_Image == i)
 							Used = true;
 					}
 					else if(pGroup->m_lLayers[l]->m_Type == LAYERTYPE_QUADS)
 					{
-						CLayerQuads *pLayer = static_cast<CLayerQuads *>(pGroup->m_lLayers[l]);
-						if(pLayer->m_Image == i)
+						if(static_cast<CLayerQuads *>(pGroup->m_lLayers[l])->m_Image == i)
 							Used = true;
 					}
 				}
@@ -2693,32 +2605,34 @@ void CEditor::RenderImagesList(CUIRect ToolBox)
 				if(Result == 2)
 					UI()->DoPopupMenu(UI()->MouseX(), UI()->MouseY(), 120, 80, this, PopupImage);
 			}
-
-			ToolBox.HSplitTop(2.0f, 0, &ToolBox);
 		}
 
 		// separator
-		if(ImageCur + HeaderSeparatorHeight > ImageStopAt)
-			return;
-		ToolBox.HSplitTop(HeaderSeparatorHeight, &Slot, &ToolBox);
-		ImageCur += HeaderSeparatorHeight;
-		IGraphics::CLineItem LineItem(Slot.x, Slot.y+Slot.h/2, Slot.x+Slot.w, Slot.y+Slot.h/2);
-		Graphics()->TextureClear();
-		Graphics()->LinesBegin();
-		Graphics()->LinesDraw(&LineItem, 1);
-		Graphics()->LinesEnd();
+		ToolBox.HSplitTop(5.0f, &Slot, &ToolBox);
+		s_ScrollRegion.AddRect(Slot);
+		if(!s_ScrollRegion.IsRectClipped(Slot))
+		{
+			IGraphics::CLineItem LineItem(Slot.x, Slot.y+Slot.h/2, Slot.x+Slot.w, Slot.y+Slot.h/2);
+			Graphics()->TextureClear();
+			Graphics()->LinesBegin();
+			Graphics()->LinesDraw(&LineItem, 1);
+			Graphics()->LinesEnd();
+		}
 	}
 
-	if(ImageCur + AddButtonHeight > ImageStopAt)
-		return;
-
 	// new image
-	static int s_NewImageButton = 0;
-	CUIRect Slot;
-	ToolBox.HSplitTop(5.0f, &Slot, &ToolBox);
-	ToolBox.HSplitTop(12.0f, &Slot, &ToolBox);
-	if(DoButton_Editor(&s_NewImageButton, "Add", 0, &Slot, 0, "Load a new image to use in the map"))
-		InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_IMG, "Add Image", "Add", "mapres", "", AddImage, this);
+	static int s_AddImageButton = 0;
+	CUIRect AddImageButton;
+	ToolBox.HSplitTop(5.0f + RowHeight + 1.0f, &AddImageButton, &ToolBox);
+	s_ScrollRegion.AddRect(AddImageButton);
+	if(!s_ScrollRegion.IsRectClipped(AddImageButton))
+	{
+		AddImageButton.HSplitTop(5.0f, 0, &AddImageButton);
+		AddImageButton.HSplitTop(RowHeight, &AddImageButton, 0);
+		if(DoButton_Editor(&s_AddImageButton, "Add", 0, &AddImageButton, 0, "Load a new image to use in the map"))
+			InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_IMG, "Add Image", "Add", "mapres", "", AddImage, this);
+	}
+	s_ScrollRegion.End();
 }
 
 void CEditor::RenderSelectedImage(CUIRect View)
@@ -2770,44 +2684,9 @@ static int EditorListdirCallback(const char *pName, int IsDir, int StorageType, 
 	Item.m_IsDir = IsDir != 0;
 	Item.m_IsLink = false;
 	Item.m_StorageType = StorageType;
-	pEditor->m_FileList.add(Item);
+	pEditor->m_CompleteFileList.add(Item);
 
 	return 0;
-}
-
-void CEditor::AddFileDialogEntry(int Index, CUIRect *pView)
-{
-	if(m_aFileDialogFilterString[0] && !str_find_nocase(m_FileList[Index].m_aName, m_aFileDialogFilterString))
-		return;
-	m_FilesCur++;
-	if(m_FilesCur-1 < m_FilesStartAt || m_FilesCur >= m_FilesStopAt)
-		return;
-
-	CUIRect Button, FileIcon;
-	pView->HSplitTop(15.0f, &Button, pView);
-	pView->HSplitTop(2.0f, 0, pView);
-	Button.VSplitLeft(Button.h, &FileIcon, &Button);
-	Button.VSplitLeft(5.0f, 0, &Button);
-
-	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_FILEICONS].m_Id);
-	Graphics()->QuadsBegin();
-	RenderTools()->SelectSprite(m_FileList[Index].m_IsDir?SPRITE_FILE_FOLDER:SPRITE_FILE_MAP2);
-	IGraphics::CQuadItem QuadItem(FileIcon.x, FileIcon.y, FileIcon.w, FileIcon.h);
-	Graphics()->QuadsDrawTL(&QuadItem, 1);
-	Graphics()->QuadsEnd();
-
-	if(DoButton_File(&m_FileList[Index], m_FileList[Index].m_aName, m_FilesSelectedIndex == Index, &Button, 0, 0))
-	{
-		if(!m_FileList[Index].m_IsDir)
-			str_copy(m_aFileDialogFileName, m_FileList[Index].m_aFilename, sizeof(m_aFileDialogFileName));
-		else
-			m_aFileDialogFileName[0] = 0;
-		m_FilesSelectedIndex = Index;
-		m_PreviewImageIsLoaded = false;
-
-		if(Input()->MouseDoubleClick())
-			m_aFileDialogActivate = true;
-	}
 }
 
 void CEditor::RenderFileDialog()
@@ -2846,24 +2725,41 @@ void CEditor::RenderFileDialog()
 	// pathbox
 	char aPath[128], aBuf[128];
 	if(m_FilesSelectedIndex != -1)
-		Storage()->GetCompletePath(m_FileList[m_FilesSelectedIndex].m_StorageType, m_pFileDialogPath, aPath, sizeof(aPath));
+		Storage()->GetCompletePath(m_FilteredFileList[m_FilesSelectedIndex]->m_StorageType, m_pFileDialogPath, aPath, sizeof(aPath));
 	else
 		aPath[0] = 0;
 	str_format(aBuf, sizeof(aBuf), "Current path: %s", aPath);
 	UI()->DoLabel(&PathBox, aBuf, 10.0f, TEXTALIGN_LEFT);
 
 	// filebox
+	static CListBox s_ListBox;
+
 	if(m_FileDialogStorageType == IStorage::TYPE_SAVE)
 	{
 		UI()->DoLabel(&FileBoxLabel, "Filename:", 10.0f, TEXTALIGN_LEFT);
-		static CLineInput s_FileNameInput(m_aFileDialogFileName, sizeof(m_aFileDialogFileName));
-		if(DoEditBox(&s_FileNameInput, &FileBox, 10.0f))
+		if(DoEditBox(&m_FileDialogFileNameInput, &FileBox, 10.0f))
 		{
 			// remove '/' and '\'
-			for(int i = 0; m_aFileDialogFileName[i]; ++i)
-				if(m_aFileDialogFileName[i] == '/' || m_aFileDialogFileName[i] == '\\')
-					str_copy(&m_aFileDialogFileName[i], &m_aFileDialogFileName[i+1], (int)(sizeof(m_aFileDialogFileName))-i);
+			char aTempFileName[sizeof(m_aFileDialogFileName)];
+			str_copy(aTempFileName, m_aFileDialogFileName, sizeof(aTempFileName));
+			for(int i = 0; aTempFileName[i]; ++i)
+				if(aTempFileName[i] == '/' || aTempFileName[i] == '\\')
+					str_copy(&aTempFileName[i], &aTempFileName[i+1], (int)(sizeof(aTempFileName))-i);
+			m_FileDialogFileNameInput.Set(aTempFileName);
 			m_FilesSelectedIndex = -1;
+			m_aFilesSelectedName[0] = '\0';
+			// find first valid entry, if it exists
+			for(int i = 0; i < m_FilteredFileList.size(); i++)
+			{
+				if(str_comp_nocase(m_FilteredFileList[i]->m_aName, m_aFileDialogFileName) == 0)
+				{
+					m_FilesSelectedIndex = i;
+					str_copy(m_aFilesSelectedName, m_FilteredFileList[i]->m_aName, sizeof(m_aFilesSelectedName));
+					break;
+				}
+			}
+			if(m_FilesSelectedIndex >= 0)
+				s_ListBox.ScrollToSelected();
 		}
 	}
 	else
@@ -2872,79 +2768,47 @@ void CEditor::RenderFileDialog()
 		UI()->DoLabel(&FileBoxLabel, "Search:", 10.0f, TEXTALIGN_LEFT);
 		if(DoEditBox(&m_FileDialogFilterInput, &FileBox, 10.0f))
 		{
-			// reset scrolling
-			m_FileDialogScrollValue = 0;
-			if(m_FilesSelectedIndex == -1 || (m_FilesSelectedIndex >= 0 && m_aFileDialogFilterString[0] && !str_find_nocase(m_FileList[m_FilesSelectedIndex].m_aName, m_aFileDialogFilterString)))
+			RefreshFilteredFileList();
+			if(m_FilteredFileList.size() == 0)
+			{
+				m_FilesSelectedIndex = -1;
+			}
+			else if(m_FilesSelectedIndex == -1 || (m_aFileDialogFilterString[0] && !str_find_nocase(m_FilteredFileList[m_FilesSelectedIndex]->m_aName, m_aFileDialogFilterString)))
 			{
 				// we need to refresh selection
 				m_FilesSelectedIndex = -1;
-				// find first valid entry, if it exists
-				for(int i = 0; i < m_FileList.size(); i++)
-					if(str_find_nocase(m_FileList[i].m_aName, m_aFileDialogFilterString))
+				for(int i = 0; i < m_FilteredFileList.size(); i++)
+				{
+					if(str_find_nocase(m_FilteredFileList[i]->m_aName, m_aFileDialogFilterString))
 					{
 						m_FilesSelectedIndex = i;
 						break;
 					}
-			}
-		}
-	}
-
-	int Num = (int)(View.h/17.0f)+1;
-	m_FileDialogScrollValue = UI()->DoScrollbarV(&m_FileDialogScrollValue, &Scroll, m_FileDialogScrollValue);
-
-	int ScrollNum = m_FileList.size()-Num+1;
-	if(ScrollNum > 0)
-	{
-		if(Input()->KeyPress(KEY_MOUSE_WHEEL_UP))
-			m_FileDialogScrollValue -= 3.0f/ScrollNum;
-		if(Input()->KeyPress(KEY_MOUSE_WHEEL_DOWN))
-			m_FileDialogScrollValue += 3.0f/ScrollNum;
-	}
-	else
-		ScrollNum = 0;
-
-	if(m_FilesSelectedIndex > -1)
-	{
-		for(int i = 0; i < Input()->NumEvents(); i++)
-		{
-			IInput::CEvent Event = Input()->GetEvent(i);
-			int NewIndex = -1;
-			if(Event.m_Flags&IInput::FLAG_PRESS)
-			{
-				if(Event.m_Key == KEY_DOWN) NewIndex = m_FilesSelectedIndex + 1;
-				if(Event.m_Key == KEY_UP) NewIndex = m_FilesSelectedIndex - 1;
-			}
-			if(NewIndex > -1 && NewIndex < m_FileList.size())
-			{
-				//scroll
-				float IndexY = View.y - m_FileDialogScrollValue*ScrollNum*17.0f + NewIndex*17.0f;
-				int Scroll = View.y > IndexY ? -1 : View.y+View.h < IndexY+17.0f ? 1 : 0;
-				if(Scroll)
-				{
-					if(Scroll < 0)
-						m_FileDialogScrollValue = ((float)(NewIndex)+0.5f)/ScrollNum;
-					else
-						m_FileDialogScrollValue = ((float)(NewIndex-Num)+2.5f)/ScrollNum;
 				}
-
-				if(!m_FileList[NewIndex].m_IsDir)
-					str_copy(m_aFileDialogFileName, m_FileList[NewIndex].m_aFilename, sizeof(m_aFileDialogFileName));
-				else
-					m_aFileDialogFileName[0] = 0;
-				m_FilesSelectedIndex = NewIndex;
-				m_PreviewImageIsLoaded = false;
+				if(m_FilesSelectedIndex == -1)
+				{
+					// select first item
+					m_FilesSelectedIndex = 0;
+				}
 			}
+			if(m_FilesSelectedIndex >= 0)
+				str_copy(m_aFilesSelectedName, m_FilteredFileList[m_FilesSelectedIndex]->m_aName, sizeof(m_aFilesSelectedName));
+			else
+				m_aFilesSelectedName[0] = '\0';
+			s_ListBox.ScrollToSelected();
 		}
+	}
 
-		if (m_FileDialogFileType == CEditor::FILETYPE_IMG && !m_PreviewImageIsLoaded && m_FilesSelectedIndex > -1)
+	if(m_FilesSelectedIndex >= 0 && m_FilesSelectedIndex < m_FilteredFileList.size())
+	{
+		if(m_FileDialogFileType == CEditor::FILETYPE_IMG && !m_PreviewImageIsLoaded)
 		{
-			int Length = str_length(m_FileList[m_FilesSelectedIndex].m_aFilename);
-			if (Length >= 4 && str_endswith_nocase(m_FileList[m_FilesSelectedIndex].m_aFilename, ".png"))
+			int Length = str_length(m_FilteredFileList[m_FilesSelectedIndex]->m_aFilename);
+			if(Length >= str_length(".png") && str_endswith_nocase(m_FilteredFileList[m_FilesSelectedIndex]->m_aFilename, ".png"))
 			{
-				char aBuffer[1024];
-				str_format(aBuffer, sizeof(aBuffer), "%s/%s", m_pFileDialogPath, m_FileList[m_FilesSelectedIndex].m_aFilename);
-
-				if(Graphics()->LoadPNG(&m_FilePreviewImageInfo, aBuffer, m_FileList[m_FilesSelectedIndex].m_StorageType))
+				char aBuffer[IO_MAX_PATH_LENGTH];
+				str_format(aBuffer, sizeof(aBuffer), "%s/%s", m_pFileDialogPath, m_FilteredFileList[m_FilesSelectedIndex]->m_aFilename);
+				if(Graphics()->LoadPNG(&m_FilePreviewImageInfo, aBuffer, m_FilteredFileList[m_FilesSelectedIndex]->m_StorageType))
 				{
 					Graphics()->UnloadTexture(&m_FilePreviewImage);
 					m_FilePreviewImage = Graphics()->LoadTextureRaw(m_FilePreviewImageInfo.m_Width, m_FilePreviewImageInfo.m_Height, m_FilePreviewImageInfo.m_Format, m_FilePreviewImageInfo.m_pData, m_FilePreviewImageInfo.m_Format, IGraphics::TEXLOAD_NORESAMPLE);
@@ -2953,16 +2817,16 @@ void CEditor::RenderFileDialog()
 				}
 			}
 		}
-		if (m_PreviewImageIsLoaded)
+		if(m_PreviewImageIsLoaded)
 		{
 			int w = m_FilePreviewImageInfo.m_Width;
 			int h = m_FilePreviewImageInfo.m_Height;
-			if (m_FilePreviewImageInfo.m_Width > Preview.w)
+			if(m_FilePreviewImageInfo.m_Width > Preview.w)
 			{
 				h = m_FilePreviewImageInfo.m_Height * Preview.w / m_FilePreviewImageInfo.m_Width;
 				w = Preview.w;
 			}
-			if (h > Preview.h)
+			if(h > Preview.h)
 			{
 				w = w * Preview.h / h,
 				h = Preview.h;
@@ -2977,75 +2841,75 @@ void CEditor::RenderFileDialog()
 		}
 	}
 
-	for(int i = 0; i < Input()->NumEvents(); i++)
+	s_ListBox.DoStart(15.0f, m_FilteredFileList.size(), 1, 5, m_FilesSelectedIndex, &View);
+
+	for(int i = 0; i < m_FilteredFileList.size(); i++)
 	{
-		IInput::CEvent Event = Input()->GetEvent(i);
-		if(Event.m_Flags&IInput::FLAG_PRESS)
-		{
-			if(Event.m_Key == KEY_RETURN || Event.m_Key == KEY_KP_ENTER)
-				m_aFileDialogActivate = true;
-		}
+		CListboxItem Item = s_ListBox.DoNextItem(&m_FilteredFileList[i], m_FilesSelectedIndex == i);
+		if(!Item.m_Visible)
+			continue;
+
+		CUIRect Label, FileIcon;
+		Item.m_Rect.VSplitLeft(Item.m_Rect.h, &FileIcon, &Label);
+		FileIcon.Margin(2.0f, &FileIcon);
+		Label.VSplitLeft(5.0f, 0, &Label);
+
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_FILEICONS].m_Id);
+		Graphics()->QuadsBegin();
+		RenderTools()->SelectSprite(m_FilteredFileList[i]->m_IsDir ? SPRITE_FILE_FOLDER : SPRITE_FILE_MAP2);
+		IGraphics::CQuadItem QuadItem(FileIcon.x, FileIcon.y, FileIcon.w, FileIcon.h);
+		Graphics()->QuadsDrawTL(&QuadItem, 1);
+		Graphics()->QuadsEnd();
+
+		UI()->DoLabelSelected(&Label, m_FilteredFileList[i]->m_aName, Item.m_Selected, 10.0f, TEXTALIGN_ML);
 	}
 
-	if(m_FileDialogScrollValue < 0) m_FileDialogScrollValue = 0;
-	if(m_FileDialogScrollValue > 1) m_FileDialogScrollValue = 1;
-
-	m_FilesStartAt = (int)(ScrollNum*m_FileDialogScrollValue);
-	if(m_FilesStartAt < 0)
-		m_FilesStartAt = 0;
-
-	m_FilesStopAt = m_FilesStartAt+Num;
-
-	m_FilesCur = 0;
-
-	// set clipping
-	UI()->ClipEnable(&View);
-
-	for(int i = 0; i < m_FileList.size(); i++)
-		AddFileDialogEntry(i, &View);
-
-	// disable clipping again
-	UI()->ClipDisable();
+	int NewSelection = s_ListBox.DoEnd();
+	if(NewSelection != m_FilesSelectedIndex)
+	{
+		m_FilesSelectedIndex = NewSelection;
+		str_copy(m_aFilesSelectedName, m_FilteredFileList[m_FilesSelectedIndex]->m_aName, sizeof(m_aFilesSelectedName));
+		if(!m_FilteredFileList[m_FilesSelectedIndex]->m_IsDir)
+			m_FileDialogFileNameInput.Set(m_FilteredFileList[m_FilesSelectedIndex]->m_aFilename);
+		else
+			m_FileDialogFileNameInput.Clear();
+		m_PreviewImageIsLoaded = false;
+	}
 
 	// the buttons
-	static int s_OkButton = 0;
-	static int s_CancelButton = 0;
-	static int s_NewFolderButton = 0;
-	static int s_MapInfoButton = 0;
-
 	CUIRect Button;
 	ButtonBar.VSplitRight(50.0f, &ButtonBar, &Button);
-	bool IsDir = m_FilesSelectedIndex >= 0 && m_FileList[m_FilesSelectedIndex].m_IsDir;
-	if(DoButton_Editor(&s_OkButton, IsDir ? "Open" : m_pFileDialogButtonText, 0, &Button, 0, 0) || m_aFileDialogActivate)
+	bool IsDir = m_FilesSelectedIndex >= 0 && m_FilteredFileList[m_FilesSelectedIndex]->m_IsDir;
+	static int s_OkButton = 0;
+	if(DoButton_Editor(&s_OkButton, IsDir ? "Open" : m_pFileDialogButtonText, 0, &Button, 0, 0) || s_ListBox.WasItemActivated())
 	{
-		m_aFileDialogActivate = false;
 		if(IsDir)	// folder
 		{
-			if(str_comp(m_FileList[m_FilesSelectedIndex].m_aFilename, "..") == 0)	// parent folder
+			if(str_comp(m_FilteredFileList[m_FilesSelectedIndex]->m_aFilename, "..") == 0)	// parent folder
 			{
 				if(fs_parent_dir(m_pFileDialogPath))
 					m_pFileDialogPath = m_aFileDialogCurrentFolder;	// leave the link
 			}
 			else	// sub folder
 			{
-				if(m_FileList[m_FilesSelectedIndex].m_IsLink)
+				if(m_FilteredFileList[m_FilesSelectedIndex]->m_IsLink)
 				{
 					m_pFileDialogPath = m_aFileDialogCurrentLink;	// follow the link
-					str_copy(m_aFileDialogCurrentLink, m_FileList[m_FilesSelectedIndex].m_aFilename, sizeof(m_aFileDialogCurrentLink));
+					str_copy(m_aFileDialogCurrentLink, m_FilteredFileList[m_FilesSelectedIndex]->m_aFilename, sizeof(m_aFileDialogCurrentLink));
 				}
 				else
 				{
 					char aTemp[IO_MAX_PATH_LENGTH];
 					str_copy(aTemp, m_pFileDialogPath, sizeof(aTemp));
-					str_format(m_pFileDialogPath, IO_MAX_PATH_LENGTH, "%s/%s", aTemp, m_FileList[m_FilesSelectedIndex].m_aFilename);
+					str_format(m_pFileDialogPath, IO_MAX_PATH_LENGTH, "%s/%s", aTemp, m_FilteredFileList[m_FilesSelectedIndex]->m_aFilename);
 				}
 			}
 			FilelistPopulate(!str_comp(m_pFileDialogPath, "maps") || !str_comp(m_pFileDialogPath, "mapres") ? m_FileDialogStorageType :
-				m_FileList[m_FilesSelectedIndex].m_StorageType);
-			if(m_FilesSelectedIndex >= 0 && !m_FileList[m_FilesSelectedIndex].m_IsDir)
-				str_copy(m_aFileDialogFileName, m_FileList[m_FilesSelectedIndex].m_aFilename, sizeof(m_aFileDialogFileName));
+				m_FilteredFileList[m_FilesSelectedIndex]->m_StorageType);
+			if(m_FilesSelectedIndex >= 0 && !m_FilteredFileList[m_FilesSelectedIndex]->m_IsDir)
+				m_FileDialogFileNameInput.Set(m_FilteredFileList[m_FilesSelectedIndex]->m_aFilename);
 			else
-				m_aFileDialogFileName[0] = 0;
+				m_FileDialogFileNameInput.Clear();
 		}
 		else // file
 		{
@@ -3059,25 +2923,26 @@ void CEditor::RenderFileDialog()
 					m_PopupEventType = POPEVENT_SAVE;
 					m_PopupEventActivated = true;
 				}
-				else
-					if(m_pfnFileDialogFunc)
-						m_pfnFileDialogFunc(m_aFileSaveName, m_FilesSelectedIndex >= 0 ? m_FileList[m_FilesSelectedIndex].m_StorageType : m_FileDialogStorageType, m_pFileDialogUser);
+				else if(m_pfnFileDialogFunc)
+					m_pfnFileDialogFunc(m_aFileSaveName, m_FilesSelectedIndex >= 0 ? m_FilteredFileList[m_FilesSelectedIndex]->m_StorageType : m_FileDialogStorageType, m_pFileDialogUser);
 			}
-			else
-				if(m_pfnFileDialogFunc)
-					m_pfnFileDialogFunc(m_aFileSaveName, m_FilesSelectedIndex >= 0 ? m_FileList[m_FilesSelectedIndex].m_StorageType : m_FileDialogStorageType, m_pFileDialogUser);
+			else if(m_pfnFileDialogFunc)
+				m_pfnFileDialogFunc(m_aFileSaveName, m_FilesSelectedIndex >= 0 ? m_FilteredFileList[m_FilesSelectedIndex]->m_StorageType : m_FileDialogStorageType, m_pFileDialogUser);
 		}
+		s_ListBox.ScrollToSelected();
 	}
 
 	ButtonBar.VSplitRight(40.0f, &ButtonBar, &Button);
 	ButtonBar.VSplitRight(50.0f, &ButtonBar, &Button);
-	if(DoButton_Editor(&s_CancelButton, "Cancel", 0, &Button, 0, 0) || Input()->KeyPress(KEY_ESCAPE))
+	static int s_CancelButton = 0;
+	if(DoButton_Editor(&s_CancelButton, "Cancel", 0, &Button, 0, 0) || UI()->ConsumeHotkey(CUI::HOTKEY_ESCAPE))
 		m_Dialog = DIALOG_NONE;
 
 	if(m_FileDialogStorageType == IStorage::TYPE_SAVE)
 	{
 		ButtonBar.VSplitLeft(40.0f, 0, &ButtonBar);
 		ButtonBar.VSplitLeft(70.0f, &Button, &ButtonBar);
+		static int s_NewFolderButton = 0;
 		if(DoButton_Editor(&s_NewFolderButton, "New folder", 0, &Button, 0, 0))
 		{
 			m_aFileDialogNewFolderName[0] = 0;
@@ -3085,12 +2950,10 @@ void CEditor::RenderFileDialog()
 			UI()->DoPopupMenu(Width/2.0f-200.0f, Height/2.0f-100.0f, 400.0f, 200.0f, this, PopupNewFolder);
 			UI()->SetActiveItem(0);
 		}
-	}
 
-	if(m_FileDialogStorageType == IStorage::TYPE_SAVE)
-	{
 		ButtonBar.VSplitLeft(40.0f, 0, &ButtonBar);
 		ButtonBar.VSplitLeft(70.0f, &Button, &ButtonBar);
+		static int s_MapInfoButton = 0;
 		if(DoButton_Editor(&s_MapInfoButton, "Map details", 0, &Button, 0, 0))
 		{
 			str_copy(m_Map.m_MapInfoTmp.m_aAuthor, m_Map.m_MapInfo.m_aAuthor, sizeof(m_Map.m_MapInfoTmp.m_aAuthor));
@@ -3103,9 +2966,42 @@ void CEditor::RenderFileDialog()
 	}
 }
 
+void CEditor::RefreshFilteredFileList()
+{
+	m_FilteredFileList.clear();
+	for(int i = 0; i < m_CompleteFileList.size(); i++)
+	{
+		if(!m_aFileDialogFilterString[0] || str_find_nocase(m_CompleteFileList[i].m_aName, m_aFileDialogFilterString))
+		{
+			m_FilteredFileList.add(&m_CompleteFileList[i]);
+		}
+	}
+	if(m_FilteredFileList.size() > 0)
+	{
+		if(m_aFilesSelectedName[0])
+		{
+			for(int i = 0; i < m_FilteredFileList.size(); i++)
+			{
+				if(m_aFilesSelectedName[0] && str_comp(m_FilteredFileList[i]->m_aName, m_aFilesSelectedName) == 0)
+				{
+					m_FilesSelectedIndex = i;
+					break;
+				}
+			}
+		}
+		m_FilesSelectedIndex = clamp(m_FilesSelectedIndex, 0, m_FilteredFileList.size() - 1);
+		str_copy(m_aFilesSelectedName, m_FilteredFileList[m_FilesSelectedIndex]->m_aName, sizeof(m_aFilesSelectedName));
+	}
+	else
+	{
+		m_FilesSelectedIndex = -1;
+		m_aFilesSelectedName[0] = '\0';
+	}
+}
+
 void CEditor::FilelistPopulate(int StorageType)
 {
-	m_FileList.clear();
+	m_CompleteFileList.clear();
 	if(m_FileDialogStorageType != IStorage::TYPE_SAVE && !str_comp(m_pFileDialogPath, "maps"))
 	{
 		CFilelistItem Item;
@@ -3114,12 +3010,16 @@ void CEditor::FilelistPopulate(int StorageType)
 		Item.m_IsDir = true;
 		Item.m_IsLink = true;
 		Item.m_StorageType = IStorage::TYPE_SAVE;
-		m_FileList.add(Item);
+		m_CompleteFileList.add(Item);
 	}
 	Storage()->ListDirectory(StorageType, m_pFileDialogPath, EditorListdirCallback, this);
-	m_FilesSelectedIndex = m_FileList.size() ? 0 : -1;
+	RefreshFilteredFileList();
+	m_FilesSelectedIndex = m_FilteredFileList.size() ? 0 : -1;
+	if(m_FilesSelectedIndex >= 0)
+		str_copy(m_aFilesSelectedName, m_FilteredFileList[m_FilesSelectedIndex]->m_aName, sizeof(m_aFilesSelectedName));
+	else
+		m_aFilesSelectedName[0] = '\0';
 	m_PreviewImageIsLoaded = false;
-	m_aFileDialogActivate = false;
 }
 
 void CEditor::InvokeFileDialog(int StorageType, int FileType, const char *pTitle, const char *pButtonText,
@@ -3131,18 +3031,17 @@ void CEditor::InvokeFileDialog(int StorageType, int FileType, const char *pTitle
 	m_pFileDialogButtonText = pButtonText;
 	m_pfnFileDialogFunc = pfnFunc;
 	m_pFileDialogUser = pUser;
-	m_aFileDialogFileName[0] = 0;
+	m_FileDialogFileNameInput.Clear();
 	m_aFileDialogCurrentFolder[0] = 0;
 	m_aFileDialogCurrentLink[0] = 0;
-	m_aFileDialogFilterString[0] = 0;
+	m_FileDialogFilterInput.Clear();
 	m_pFileDialogPath = m_aFileDialogCurrentFolder;
 	m_FileDialogFileType = FileType;
-	m_FileDialogScrollValue = 0.0f;
 	UI()->SetActiveItem(&m_FileDialogFilterInput);
 	m_PreviewImageIsLoaded = false;
 
 	if(pDefaultName)
-		str_copy(m_aFileDialogFileName, pDefaultName, sizeof(m_aFileDialogFileName));
+		m_FileDialogFileNameInput.Set(pDefaultName);
 	if(pBasePath)
 		str_copy(m_aFileDialogCurrentFolder, pBasePath, sizeof(m_aFileDialogCurrentFolder));
 
@@ -3973,7 +3872,7 @@ void CEditor::Render()
 	}
 
 	if(m_Mode == MODE_LAYERS && m_GuiActive)
-		RenderLayers(ToolBox, View);
+		RenderLayers(ToolBox);
 	else if(m_Mode == MODE_IMAGES)
 	{
 		if(m_GuiActive)

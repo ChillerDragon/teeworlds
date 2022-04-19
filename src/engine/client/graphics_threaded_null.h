@@ -1,4 +1,7 @@
-#pragma once
+/* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
+/* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#ifndef ENGINE_CLIENT_GRAPHICS_THREADED_NULL_H
+#define ENGINE_CLIENT_GRAPHICS_THREADED_NULL_H
 
 #include <engine/graphics.h>
 
@@ -87,3 +90,5 @@ public:
 	virtual bool IsIdle() const { return false; };
 	virtual void WaitForIdle() {};
 };
+
+#endif // ENGINE_CLIENT_GRAPHICS_THREADED_NULL_H
