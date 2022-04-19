@@ -337,7 +337,7 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 		}
 	}
 
-	if(m_pConfig->m_Debug)
+	if(m_pConfig->m_Debug > 1)
 	{
 		char aAddrStr[NETADDR_MAXSTRSIZE];
 		net_addr_str(pAddr, aAddrStr, sizeof(aAddrStr), true);
