@@ -341,28 +341,31 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 	{
 		char aAddrStr[NETADDR_MAXSTRSIZE];
 		net_addr_str(pAddr, aAddrStr, sizeof(aAddrStr), true);
-		char aFlags[512];
-		aFlags[0] = '\0';
-		if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
-			str_append(aFlags, "CONTROL", sizeof(aFlags));
-		if(pPacket->m_Flags&NET_PACKETFLAG_RESEND)
-			str_append(aFlags, aFlags[0] ? "|RESEND" : "RESEND", sizeof(aFlags));
-		if(pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION)
-			str_append(aFlags, aFlags[0] ? "|COMPRESSION" : "COMPRESSION", sizeof(aFlags));
-		if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
-			str_append(aFlags, aFlags[0] ? "|CONNLESS" : "CONNLESS", sizeof(aFlags));
-		char aBuf[512];
-		aBuf[0] = '\0';
-		if(aFlags[0])
-			str_format(aBuf, sizeof(aBuf), " (%s)", aFlags);
-		char aHexData[1024];
-		str_hex(aHexData, sizeof(aHexData), pPacket->m_aChunkData, pPacket->m_DataSize);
-		char aRawData[1024];
-		for(int i = 0; i < pPacket->m_DataSize; i++)
-			aRawData[i] = pPacket->m_aChunkData[i] < 32 ? '.' : pPacket->m_aChunkData[i];
-		dbg_msg("network", "%s size=%d flags=%d%s", aAddrStr, Size, pPacket->m_Flags, aBuf);
-		dbg_msg("network", "  data: %s", aHexData);
-		dbg_msg("network", "  data_raw: %s", aRawData);
+		if(str_startswith(aAddrStr, "[0:0:0:0:0:0:0:1]:") || str_startswith(aAddrStr, "127.0.0.1:"))
+		{
+			char aFlags[512];
+			aFlags[0] = '\0';
+			if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
+				str_append(aFlags, "CONTROL", sizeof(aFlags));
+			if(pPacket->m_Flags&NET_PACKETFLAG_RESEND)
+				str_append(aFlags, aFlags[0] ? "|RESEND" : "RESEND", sizeof(aFlags));
+			if(pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION)
+				str_append(aFlags, aFlags[0] ? "|COMPRESSION" : "COMPRESSION", sizeof(aFlags));
+			if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
+				str_append(aFlags, aFlags[0] ? "|CONNLESS" : "CONNLESS", sizeof(aFlags));
+			char aBuf[512];
+			aBuf[0] = '\0';
+			if(aFlags[0])
+				str_format(aBuf, sizeof(aBuf), " (%s)", aFlags);
+			char aHexData[1024];
+			str_hex(aHexData, sizeof(aHexData), pPacket->m_aChunkData, pPacket->m_DataSize);
+			char aRawData[1024];
+			for(int i = 0; i < pPacket->m_DataSize; i++)
+				aRawData[i] = pPacket->m_aChunkData[i] < 32 ? '.' : pPacket->m_aChunkData[i];
+			dbg_msg("network", "%s size=%d flags=%d%s", aAddrStr, Size, pPacket->m_Flags, aBuf);
+			dbg_msg("network", "  data: %s", aHexData);
+			dbg_msg("network", "  data_raw: %s", aRawData);
+		}
 	}
 
 	// log the data
