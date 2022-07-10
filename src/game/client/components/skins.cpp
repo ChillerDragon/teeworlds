@@ -29,8 +29,18 @@ int CSkins::SkinPartScan(const char *pName, int IsDir, int DirType, void *pUser)
 	if(IsDir || !str_endswith(pName, ".png"))
 		return 0;
 
+	int PartNameSize, PartNameCount;
+	str_utf8_stats(pName, str_length(pName) - str_length(".png") + 1, IO_MAX_PATH_LENGTH, &PartNameSize, &PartNameCount);
+	if(PartNameSize >= MAX_SKIN_ARRAY_SIZE || PartNameCount > MAX_SKIN_LENGTH)
+	{
+		char aBuf[IO_MAX_PATH_LENGTH + 64];
+		str_format(aBuf, sizeof(aBuf), "failed to load skin part '%s': name too long", pName);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "skins", aBuf);
+		return 0;
+	}
+
 	CSkinPart Part;
-	str_utf8_copy_num(Part.m_aName, pName, minimum(str_length(pName) - 3, int(sizeof(Part.m_aName))), MAX_SKIN_LENGTH);
+	str_copy(Part.m_aName, pName, minimum<int>(PartNameSize + 1, sizeof(Part.m_aName)));
 	if(pSelf->FindSkinPart(pSelf->m_ScanningPart, Part.m_aName, true) != -1)
 		return 0;
 
@@ -43,16 +53,23 @@ int CSkins::SkinPartScan(const char *pName, int IsDir, int DirType, void *pUser)
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "skins", aBuf);
 		return 0;
 	}
+	if(Info.m_Format != CImageInfo::FORMAT_RGBA)
+	{
+		str_format(aBuf, sizeof(aBuf), "failed to load skin part '%s': must be RGBA format", pName);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "skins", aBuf);
+		return 0;
+	}
 
 	Part.m_OrgTexture = pSelf->Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
 	Part.m_BloodColor = vec3(1.0f, 1.0f, 1.0f);
 
+	const int Step = Info.GetPixelSize();
 	unsigned char *pData = (unsigned char *)Info.m_pData;
-	int Pitch = Info.m_Width*4;
 
 	// dig out blood color
 	if(pSelf->m_ScanningPart == SKINPART_BODY)
 	{
+		int Pitch = Info.m_Width * Step;
 		int PartX = Info.m_Width/2;
 		int PartY = 0;
 		int PartWidth = Info.m_Width/2;
@@ -61,22 +78,14 @@ int CSkins::SkinPartScan(const char *pName, int IsDir, int DirType, void *pUser)
 		int aColors[3] = {0};
 		for(int y = PartY; y < PartY+PartHeight; y++)
 			for(int x = PartX; x < PartX+PartWidth; x++)
-			{
-				if(pData[y*Pitch+x*4+3] > 128)
-				{
-					aColors[0] += pData[y*Pitch+x*4+0];
-					aColors[1] += pData[y*Pitch+x*4+1];
-					aColors[2] += pData[y*Pitch+x*4+2];
-				}
-			}
+				if(pData[y*Pitch+x*Step+3] > 128)
+					for(int c = 0; c < 3; c++)
+						aColors[c] += pData[y*Pitch+x*Step+c];
 
 		Part.m_BloodColor = normalize(vec3(aColors[0], aColors[1], aColors[2]));
 	}
 
 	// create colorless version
-	const int Step = Info.GetPixelSize();
-
-	// make the texture gray scale
 	for(int i = 0; i < Info.m_Width*Info.m_Height; i++)
 	{
 		const int Average = (pData[i*Step]+pData[i*Step+1]+pData[i*Step+2])/3;
@@ -111,6 +120,16 @@ int CSkins::SkinScan(const char *pName, int IsDir, int DirType, void *pUser)
 
 	CSkins *pSelf = (CSkins *)pUser;
 
+	int SkinNameSize, SkinNameCount;
+	str_utf8_stats(pName, str_length(pName) - str_length(".json") + 1, IO_MAX_PATH_LENGTH, &SkinNameSize, &SkinNameCount);
+	if(SkinNameSize >= MAX_SKIN_ARRAY_SIZE || SkinNameCount > MAX_SKIN_LENGTH)
+	{
+		char aBuf[IO_MAX_PATH_LENGTH + 64];
+		str_format(aBuf, sizeof(aBuf), "failed to load skin '%s': name too long", pName);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "skins", aBuf);
+		return 0;
+	}
+
 	// read file data into buffer
 	char aBuf[IO_MAX_PATH_LENGTH];
 	str_format(aBuf, sizeof(aBuf), "skins/%s", pName);
@@ -124,7 +143,7 @@ int CSkins::SkinScan(const char *pName, int IsDir, int DirType, void *pUser)
 
 	// init
 	CSkin Skin = pSelf->m_DummySkin;
-	str_utf8_copy_num(Skin.m_aName, pName, minimum(str_length(pName) - 4, int(sizeof(Skin.m_aName))), MAX_SKIN_LENGTH);
+	str_copy(Skin.m_aName, pName, minimum<int>(SkinNameSize + 1, sizeof(Skin.m_aName)));
 	if(pSelf->Find(Skin.m_aName, true) != -1)
 		return 0;
 	bool SpecialSkin = pName[0] == 'x' && pName[1] == '_';
@@ -548,13 +567,13 @@ bool CSkins::ValidateSkinParts(char *apPartNames[NUM_SKINPARTS], int *pUseCustom
 	return true;
 }
 
-void CSkins::SaveSkinfile(const char *pSaveSkinName)
+bool CSkins::SaveSkinfile(const char *pSaveSkinName)
 {
 	char aBuf[IO_MAX_PATH_LENGTH];
 	str_format(aBuf, sizeof(aBuf), "skins/%s.json", pSaveSkinName);
 	IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_WRITE, IStorage::TYPE_SAVE);
 	if(!File)
-		return;
+		return false;
 
 	CJsonWriter Writer(File);
 
@@ -600,4 +619,5 @@ void CSkins::SaveSkinfile(const char *pSaveSkinName)
 
 	// add new skin to the skin list
 	AddSkin(pSaveSkinName);
+	return true;
 }

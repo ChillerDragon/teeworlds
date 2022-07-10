@@ -54,10 +54,12 @@ CMenus::CMenus()
 	m_NeedRestartSound = false;
 	m_NeedRestartPlayer = false;
 	m_TeePartSelected = SKINPART_BODY;
-	m_aSaveSkinName[0] = 0;
+	m_aSaveSkinName[0] = '\0';
+	m_SkinNameInput.SetBuffer(m_aSaveSkinName, sizeof(m_aSaveSkinName), MAX_SKIN_LENGTH);
 	m_RefreshSkinSelector = true;
 	m_pSelectedSkin = 0;
 	m_MenuActive = true;
+	m_aDemolistPreviousSelection[0] = '\0';
 	m_SeekBarActivatedTime = 0;
 	m_SeekBarActive = true;
 	m_SkinModified = false;
@@ -73,6 +75,8 @@ CMenus::CMenus()
 	m_LastInput = time_get();
 
 	str_copy(m_aCurrentDemoFolder, "demos", sizeof(m_aCurrentDemoFolder));
+	m_aCurrentDemoFile[0] = '\0';
+	m_DemoNameInput.SetBuffer(m_aCurrentDemoFile, sizeof(m_aCurrentDemoFile));
 	m_aCallvoteReason[0] = 0;
 	m_aFilterString[0] = 0;
 
@@ -1454,14 +1458,7 @@ void CMenus::RenderMenu(CUIRect Screen)
 			Box.HSplitBottom(Box.h/2.0f, 0, &Box);
 			Box.HSplitTop(20.0f, &EditBox, &Box);
 
-			static CLineInput s_DemoNameInput(m_aCurrentDemoFile, sizeof(m_aCurrentDemoFile));
-			if(UI()->GetActiveItem() == m_aCurrentDemoFile) // initially activate input and select entire name
-			{
-				s_DemoNameInput.SetCursorOffset(s_DemoNameInput.GetLength());
-				s_DemoNameInput.SetSelection(0, s_DemoNameInput.GetLength());
-				UI()->SetActiveItem(&s_DemoNameInput);
-			}
-			UI()->DoEditBoxOption(&s_DemoNameInput, &EditBox, Localize("Name"), ButtonWidth);
+			UI()->DoEditBoxOption(&m_DemoNameInput, &EditBox, Localize("Name"), ButtonWidth);
 
 			// buttons
 			CUIRect Yes, No;
@@ -1480,16 +1477,18 @@ void CMenus::RenderMenu(CUIRect Screen)
 					// rename demo
 					if(m_DemolistSelectedIndex >= 0 && !m_DemolistSelectedIsDir)
 					{
+						const char *pExt = ".demo";
+						const int ExtLength = str_length(pExt);
 						char aBufOld[IO_MAX_PATH_LENGTH];
 						str_format(aBufOld, sizeof(aBufOld), "%s/%s", m_aCurrentDemoFolder, m_lDemos[m_DemolistSelectedIndex].m_aFilename);
 						int Length = str_length(m_aCurrentDemoFile);
-						char aBufNew[IO_MAX_PATH_LENGTH];
-						if(Length <= 4 || m_aCurrentDemoFile[Length-5] != '.' || str_comp_nocase(m_aCurrentDemoFile+Length-4, "demo"))
-							str_format(aBufNew, sizeof(aBufNew), "%s/%s.demo", m_aCurrentDemoFolder, m_aCurrentDemoFile);
-						else
-							str_format(aBufNew, sizeof(aBufNew), "%s/%s", m_aCurrentDemoFolder, m_aCurrentDemoFile);
-						if(Storage()->RenameFile(aBufOld, aBufNew, m_lDemos[m_DemolistSelectedIndex].m_StorageType))
+						if(Length < ExtLength || str_comp(m_aCurrentDemoFile + Length - ExtLength, pExt))
+							str_append(m_aCurrentDemoFile, pExt, sizeof(m_aCurrentDemoFile));
+						char aPathNew[IO_MAX_PATH_LENGTH];
+						str_format(aPathNew, sizeof(aPathNew), "%s/%s", m_aCurrentDemoFolder, m_aCurrentDemoFile);
+						if(Storage()->RenameFile(aBufOld, aPathNew, m_lDemos[m_DemolistSelectedIndex].m_StorageType))
 						{
+							str_copy(m_aDemolistPreviousSelection, m_aCurrentDemoFile, sizeof(m_aDemolistPreviousSelection));
 							DemolistPopulate();
 							DemolistOnUpdate(false);
 						}
@@ -1509,14 +1508,7 @@ void CMenus::RenderMenu(CUIRect Screen)
 			Box.HSplitBottom(Box.h/2.0f, 0, &Box);
 			Box.HSplitTop(20.0f, &EditBox, &Box);
 
-			static CLineInput s_SkinNameInput(m_aSaveSkinName, sizeof(m_aSaveSkinName));
-			if(UI()->GetActiveItem() == m_aSaveSkinName) // initially activate input and select entire name
-			{
-				s_SkinNameInput.SetCursorOffset(s_SkinNameInput.GetLength());
-				s_SkinNameInput.SetSelection(0, s_SkinNameInput.GetLength());
-				UI()->SetActiveItem(&s_SkinNameInput);
-			}
-			UI()->DoEditBoxOption(&s_SkinNameInput, &EditBox, Localize("Name"), ButtonWidth);
+			UI()->DoEditBoxOption(&m_SkinNameInput, &EditBox, Localize("Name"), ButtonWidth);
 
 			// buttons
 			CUIRect Yes, No;
@@ -1529,11 +1521,20 @@ void CMenus::RenderMenu(CUIRect Screen)
 			static CButtonContainer s_ButtonYes;
 			if(DoButton_Menu(&s_ButtonYes, Localize("Yes"), !m_aSaveSkinName[0], &Yes) || UI()->ConsumeHotkey(CUI::HOTKEY_ENTER))
 			{
-				if(m_aSaveSkinName[0] && m_aSaveSkinName[0] != 'x' && m_aSaveSkinName[1] != '_')
+				if(m_aSaveSkinName[0])
 				{
-					m_Popup = POPUP_NONE;
-					m_pClient->m_pSkins->SaveSkinfile(m_aSaveSkinName);
-					m_RefreshSkinSelector = true;
+					if(m_aSaveSkinName[0] != 'x' && m_aSaveSkinName[1] != '_')
+					{
+						if(m_pClient->m_pSkins->SaveSkinfile(m_aSaveSkinName))
+						{
+							m_Popup = POPUP_NONE;
+							m_RefreshSkinSelector = true;
+						}
+						else
+							PopupMessage(Localize("Error"), Localize("Unable to save the skin"), Localize("Ok"), POPUP_SAVE_SKIN);
+					}
+					else
+						PopupMessage(Localize("Error"), Localize("Unable to save the skin with a reserved name"), Localize("Ok"), POPUP_SAVE_SKIN);
 				}
 			}
 		}

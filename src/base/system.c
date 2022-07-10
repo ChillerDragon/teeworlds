@@ -1174,7 +1174,7 @@ int net_udp_send(NETSOCKET sock, const NETADDR *addr, const void *data, int size
 			d = sendto((int)sock.ipv4sock, (const char*)data, size, 0, (struct sockaddr *)&sa, sizeof(sa));
 		}
 		else
-			dbg_msg("net", "can't sent ipv4 traffic to this socket");
+			dbg_msg("net", "can't send ipv4 traffic to this socket");
 	}
 
 	if(addr->type&NETTYPE_IPV6)
@@ -1197,11 +1197,11 @@ int net_udp_send(NETSOCKET sock, const NETADDR *addr, const void *data, int size
 			d = sendto((int)sock.ipv6sock, (const char*)data, size, 0, (struct sockaddr *)&sa, sizeof(sa));
 		}
 		else
-			dbg_msg("net", "can't sent ipv6 traffic to this socket");
+			dbg_msg("net", "can't send ipv6 traffic to this socket");
 	}
 	/*
 	else
-		dbg_msg("net", "can't sent to network of type %d", addr->type);
+		dbg_msg("net", "can't send to network of type %d", addr->type);
 		*/
 
 	/*if(d < 0)
@@ -2003,6 +2003,11 @@ int time_season()
 
 	time(&time_data);
 	time_info = localtime(&time_data);
+
+	if((time_info->tm_mon == 11 && time_info->tm_mday == 31) || (time_info->tm_mon == 0 && time_info->tm_mday == 1))
+	{
+		return SEASON_NEWYEAR;
+	}
 
 	switch(time_info->tm_mon)
 	{
