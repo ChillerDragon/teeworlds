@@ -7,6 +7,8 @@
 #include "character.h"
 #include "pickup.h"
 
+#include <engine/shared/config.h>
+
 CPickup::CPickup(CGameWorld *pGameWorld, int Type, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_PICKUP, Pos, PickupPhysSize)
 {
@@ -14,7 +16,8 @@ CPickup::CPickup(CGameWorld *pGameWorld, int Type, vec2 Pos)
 
 	Reset();
 
-	GameWorld()->InsertEntity(this);
+	if(str_comp_nocase(Config()->m_SvGametype, "mymod"))
+		GameWorld()->InsertEntity(this);
 }
 
 void CPickup::Reset()
