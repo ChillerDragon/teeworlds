@@ -824,6 +824,44 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 	if(Unpacker.Error())
 		return;
 
+	if(m_pConfig->m_Debug > 2)
+	{
+		const char *pMsg = "unkown";
+		if(Msg == NETMSG_NULL) { pMsg = "NULL"; }
+		else if(Msg == NETMSG_INFO) { pMsg = "INFO"; }
+		else if(Msg == NETMSG_MAP_CHANGE) { pMsg = "MAP_CHANGE"; }
+		else if(Msg == NETMSG_MAP_DATA) { pMsg = "MAP_DATA"; }
+		else if(Msg == NETMSG_SERVERINFO) { pMsg = "SERVERINFO"; }
+		else if(Msg == NETMSG_CON_READY) { pMsg = "CON_READY"; }
+		else if(Msg == NETMSG_SNAP) { pMsg = "SNAP"; }
+		else if(Msg == NETMSG_SNAPEMPTY) { pMsg = "SNAPEMPTY"; }
+		else if(Msg == NETMSG_SNAPSINGLE) { pMsg = "SNAPSINGLE"; }
+		else if(Msg == NETMSG_SNAPSMALL) { pMsg = "SNAPSMALL"; }
+		else if(Msg == NETMSG_INPUTTIMING) { pMsg = "INPUTTIMING"; }
+		else if(Msg == NETMSG_RCON_AUTH_ON) { pMsg = "RCON_AUTH_ON"; }
+		else if(Msg == NETMSG_RCON_AUTH_OFF) { pMsg = "RCON_AUTH_OFF"; }
+		else if(Msg == NETMSG_RCON_LINE) { pMsg = "RCON_LINE"; }
+		else if(Msg == NETMSG_RCON_CMD_ADD) { pMsg = "RCON_CMD_ADD"; }
+		else if(Msg == NETMSG_RCON_CMD_REM) { pMsg = "RCON_CMD_REM"; }
+		else if(Msg == NETMSG_AUTH_CHALLANGE) { pMsg = "AUTH_CHALLANGE"; }
+		else if(Msg == NETMSG_AUTH_RESULT) { pMsg = "AUTH_RESULT"; }
+		else if(Msg == NETMSG_READY) { pMsg = "READY"; }
+		else if(Msg == NETMSG_ENTERGAME) { pMsg = "ENTERGAME"; }
+		else if(Msg == NETMSG_INPUT) { pMsg = "INPUT"; }
+		else if(Msg == NETMSG_RCON_CMD) { pMsg = "RCON_CMD"; }
+		else if(Msg == NETMSG_RCON_AUTH) { pMsg = "RCON_AUTH"; }
+		else if(Msg == NETMSG_REQUEST_MAP_DATA) { pMsg = "REQUEST_MAP_DATA"; }
+		else if(Msg == NETMSG_AUTH_START) { pMsg = "AUTH_START"; }
+		else if(Msg == NETMSG_AUTH_RESPONSE) { pMsg = "AUTH_RESPONSE"; }
+		else if(Msg == NETMSG_PING) { pMsg = "PING"; }
+		else if(Msg == NETMSG_PING_REPLY) { pMsg = "PING_REPLY"; }
+		else if(Msg == NETMSG_ERROR) { pMsg = "ERROR"; }
+		else if(Msg == NETMSG_MAPLIST_ENTRY_ADD) { pMsg = "MAPLIST_ENTRY_ADD"; }
+		else if(Msg == NETMSG_MAPLIST_ENTRY_REM) { pMsg = "MAPLIST_ENTRY_REM"; }
+		dbg_msg("network_in", "client packet sys=%d msg=%d (%s)", Sys, Msg, pMsg);
+	}
+
+
 	if(Sys)
 	{
 		// system message
