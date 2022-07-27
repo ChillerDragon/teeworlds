@@ -2,6 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/system.h>
 
+#include <engine/shared/config.h>
+
 #include "network.h"
 
 
@@ -110,6 +112,8 @@ int CNetClient::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 
 					if(pResponseToken)
 						*pResponseToken = m_RecvUnpacker.m_Data.m_ResponseToken;
+					if(Config()->m_Debug > 2)
+						dbg_msg("network_in", "abort recieving chunk");
 					return 1;
 				}
 			}

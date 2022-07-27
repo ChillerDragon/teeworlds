@@ -1017,9 +1017,11 @@ inline void SortClients(CServerInfo *pInfo)
 
 void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 {
+	const char *pConnlessPacket = "CONNLESS_UNKOWN";
 	// version server
 	if(m_VersionInfo.m_State == CVersionInfo::STATE_READY && net_addr_comp(&pPacket->m_Address, &m_VersionInfo.m_VersionServeraddr.m_Addr, true) == 0)
 	{
+		pConnlessPacket = "CONNLESS_VERSION";
 		// version info
 		if(pPacket->m_DataSize == (int)(sizeof(VERSIONSRV_VERSION) + sizeof(GAME_RELEASE_VERSION)) &&
 			mem_comp(pPacket->m_pData, VERSIONSRV_VERSION, sizeof(VERSIONSRV_VERSION)) == 0)
@@ -1061,6 +1063,7 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 			int Size = pPacket->m_DataSize-sizeof(VERSIONSRV_MAPLIST);
 			int Num = Size/sizeof(CMapVersion);
 			m_pMapChecker->AddMaplist((CMapVersion *)((char*)pPacket->m_pData+sizeof(VERSIONSRV_MAPLIST)), Num);
+			pConnlessPacket = "CONNLESS_MAP_VERSION";
 		}
 	}
 
@@ -1083,7 +1086,11 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 			}
 		}
 		if(!Valid)
+		{
+			if(Config()->m_Debug > 2)
+				dbg_msg("network_in", "invalid master server list packet");
 			return;
+		}
 
 		int Size = pPacket->m_DataSize-sizeof(SERVERBROWSE_LIST);
 		int Num = Size/sizeof(CMastersrvAddr);
@@ -1113,6 +1120,7 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 
 			m_ServerBrowser.Set(Addr, CServerBrowser::SET_MASTER_ADD, -1, 0x0);
 		}
+		pConnlessPacket = "CONNLESS_MAP_VERSION";
 	}
 
 	// server info
@@ -1128,6 +1136,11 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 			SortClients(&Info);
 			m_ServerBrowser.Set(pPacket->m_Address, CServerBrowser::SET_TOKEN, Token, &Info);
 		}
+		pConnlessPacket = "CONNLESS_SERVER_INFO";
+	}
+	if(Config()->m_Debug > 2)
+	{
+		dbg_msg("network_in", "connless packet: %s", pConnlessPacket);
 	}
 }
 
@@ -1178,7 +1191,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 		else if(Msg == NETMSG_ERROR) { pMsg = "ERROR"; }
 		else if(Msg == NETMSG_MAPLIST_ENTRY_ADD) { pMsg = "MAPLIST_ENTRY_ADD"; }
 		else if(Msg == NETMSG_MAPLIST_ENTRY_REM) { pMsg = "MAPLIST_ENTRY_REM"; }
-		dbg_msg("network", "server packet sys=%d msg=%d (%s)", Sys, Msg, pMsg);
+		dbg_msg("network_in", "server packet sys=%d msg=%d (%s)", Sys, Msg, pMsg);
 	}
 
 	if(Sys)
