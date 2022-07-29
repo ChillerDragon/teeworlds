@@ -2505,6 +2505,45 @@ void str_hex(char *dst, int dst_size, const void *data, int data_size)
 	}
 }
 
+int min(int a, int b) { return a > b ? b : a; }
+
+void print_hex(const char *type, const char *prefix, const void *data, int data_size, int max_width)
+{
+	char aHexData[1024];
+	char aRawData[1024];
+	int hex_row_length;
+	const unsigned char *pChunkData;
+
+	int i = 0;
+	while(i < data_size)
+	{
+		// rows are usually of length max_width
+		// but the last row might be shorter if it is not filling it fully
+		int row_length = min(max_width, data_size - i);
+		str_hex(aHexData, sizeof(aHexData), data + i, row_length);
+		mem_zero(aRawData, sizeof(aRawData));
+		pChunkData = data + i;
+		for(int k = 0; k < row_length; k++)
+			aRawData[k] = (pChunkData[k] < 32 || pChunkData[k] > 126) ? '.' : pChunkData[k];
+		hex_row_length = max_width * 3; // row_length * 3;
+		dbg_msg(type, "%s%-*s    %s", prefix, hex_row_length, aHexData, aRawData);
+		i += row_length;
+	}
+
+	// for(int i = 0; i < max_width;i += 4)
+	// {
+	// 	int end = minimum(data_size, i);
+	// 	str_hex(aHexData, sizeof(aHexData), data + i, end);
+	// 	dbg_msg(type, "%s%s", prefix, aHexData);
+	// }
+	// for(int i = 0; i < max_width;i += 4)
+	// {
+	// 	char aRawData[1024] = {0};
+	// 	for(int k = 0; k < minimum(data_size, i); k++)
+	// 		aRawData[k] = ((int)data[k] < 32) ? '.' : (const char)data[k];
+	// }
+}
+
 int str_is_number(const char *str)
 {
 	while(*str)

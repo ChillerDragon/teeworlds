@@ -269,9 +269,11 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 		else if(CtrlMsg == NET_CTRLMSG_TOKEN) { pMsg = "NET_CTRLMSG_TOKEN"; }
 		// the line above should print the aHexData which is pPacket->m_aChunkData as hex
 		// so we add a hint that the first byte is the CtrlMsg as int
-		//      "network_in", "  data: %s", aHexData);
-		dbg_msg("network_in", "        ^");
-		dbg_msg("network_in", "        %d = %s", CtrlMsg, pMsg);
+		char aHexData[1024];
+		str_hex(aHexData, sizeof(aHexData), pPacket->m_aChunkData, 1);
+		dbg_msg("network_in", "  data[0]: %s", aHexData);
+		dbg_msg("network_in", "           ^");
+		dbg_msg("network_in", "           %d = %s", CtrlMsg, pMsg);
 
 		if(CtrlMsg == NET_CTRLMSG_CLOSE)
 		{

@@ -396,6 +396,7 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 			dbg_msg("network_in", "%s size=%d datasize=%d flags=%d%s", aAddrStr, Size, pPacket->m_DataSize, pPacket->m_Flags, aBuf);
 			dbg_msg("network_in", "  data_raw: %s", aRawData);
 			dbg_msg("network_in", "  data: %s", aHexData);
+			print_hex("network_in", "  ", pPacket->m_aChunkData, pPacket->m_DataSize, 4);
 		}
 	}
 

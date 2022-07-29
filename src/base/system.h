@@ -1280,6 +1280,8 @@ const char *str_find(const char *haystack, const char *needle);
 */
 void str_hex(char *dst, int dst_size, const void *data, int data_size);
 
+void print_hex(const char *type, const char *prefix, const void *data, int data_size, int max_width);
+
 /*
 	Function: str_is_number
 		Check if the string contains only digits.
