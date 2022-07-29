@@ -42,7 +42,9 @@ void CBinds::Bind(int KeyID, int Modifier, const char *pStr)
 		str_format(aBuf, sizeof(aBuf), "unbound %s%s (%d)", GetModifierName(Modifier),Input()->KeyName(KeyID), KeyID);
 	else
 		str_format(aBuf, sizeof(aBuf), "bound %s%s (%d) = %s", GetModifierName(Modifier),Input()->KeyName(KeyID), KeyID, m_aaaKeyBindings[KeyID][Modifier]);
-	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "binds", aBuf);
+
+	if(!Config()->m_Clean)
+		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "binds", aBuf);
 }
 
 int CBinds::GetModifierMask(IInput *i)

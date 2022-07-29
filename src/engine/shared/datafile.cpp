@@ -180,7 +180,7 @@ bool CDataFileReader::Open(class IStorage *pStorage, const char *pFilename, int 
 	swap_endian(m_pDataFile->m_pData, sizeof(int), minimum(static_cast<unsigned>(Header.m_Swaplen), static_cast<unsigned>(Size)) / sizeof(int));
 #endif
 
-	//if(DEBUG)
+	if(DEBUG)
 	{
 		dbg_msg("datafile", "allocsize=%d", unsigned(AllocSize));
 		dbg_msg("datafile", "readsize=%d", ReadSize);
@@ -299,7 +299,8 @@ void *CDataFileReader::GetDataImpl(int Index, int Swap)
 			unsigned long UncompressedSize = m_pDataFile->m_Info.m_pDataSizes[Index];
 			unsigned long s;
 
-			dbg_msg("datafile", "loading data index=%d size=%d uncompressed=%lu", Index, DataSize, UncompressedSize);
+			if(DEBUG)
+				dbg_msg("datafile", "loading data index=%d size=%d uncompressed=%lu", Index, DataSize, UncompressedSize);
 			m_pDataFile->m_ppDataPtrs[Index] = (char *)mem_alloc(UncompressedSize);
 			m_pDataFile->m_pDataSizes[Index] = UncompressedSize;
 
@@ -320,7 +321,8 @@ void *CDataFileReader::GetDataImpl(int Index, int Swap)
 		else
 		{
 			// load the data
-			dbg_msg("datafile", "loading data index=%d size=%d", Index, DataSize);
+			if(DEBUG)
+				dbg_msg("datafile", "loading data index=%d size=%d", Index, DataSize);
 			m_pDataFile->m_ppDataPtrs[Index] = (char *)mem_alloc(DataSize);
 			m_pDataFile->m_pDataSizes[Index] = DataSize;
 			io_seek(m_pDataFile->m_File, m_pDataFile->m_DataStartOffset+m_pDataFile->m_Info.m_pDataOffsets[Index], IOSEEK_START);

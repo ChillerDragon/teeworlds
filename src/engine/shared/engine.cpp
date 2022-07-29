@@ -167,7 +167,7 @@ public:
 
 	void AddJob(CJob *pJob, JOBFUNC pfnFunc, void *pData)
 	{
-		if(m_pConfig->m_Debug)
+		if(m_pConfig->m_Debug && !m_pConfig->m_Clean)
 			dbg_msg("engine", "job added");
 		m_JobPool.Add(pJob, pfnFunc, pData);
 	}

@@ -50,7 +50,8 @@ int CSkins::SkinPartScan(const char *pName, int IsDir, int DirType, void *pUser)
 	if(!pSelf->Graphics()->LoadPNG(&Info, aBuf, DirType))
 	{
 		str_format(aBuf, sizeof(aBuf), "failed to load skin part '%s'", pName);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "skins", aBuf);
+		if(!pSelf->Config()->m_Clean)
+			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "skins", aBuf);
 		return 0;
 	}
 	if(Info.m_Format != CImageInfo::FORMAT_RGBA)
@@ -220,7 +221,7 @@ int CSkins::SkinScan(const char *pName, int IsDir, int DirType, void *pUser)
 	Skin.m_Flags = SpecialSkin ? SKINFLAG_SPECIAL : 0;
 	if(DirType != IStorage::TYPE_SAVE)
 		Skin.m_Flags |= SKINFLAG_STANDARD;
-	if(pSelf->Config()->m_Debug)
+	if(pSelf->Config()->m_Debug && !pSelf->Config()->m_Clean)
 	{
 		str_format(aBuf, sizeof(aBuf), "load skin %s", Skin.m_aName);
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "skins", aBuf);

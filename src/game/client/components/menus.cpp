@@ -706,7 +706,7 @@ void CMenus::RenderLoading(int WorkedAmount)
 	const int64 Now = time_get();
 	const float Freq = time_freq();
 
-	if(Config()->m_Debug)
+	if(Config()->m_Debug && !Config()->m_Clean)
 	{
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), "progress: %03d/%03d (+%02d) %dms", m_LoadCurrent, m_LoadTotal, WorkedAmount, s_LastLoadRender == 0 ? 0 : int((Now-s_LastLoadRender)*1000.0f/Freq));

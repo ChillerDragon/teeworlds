@@ -83,7 +83,8 @@ void CCountryFlags::LoadCountryflagsIndexfile()
 						{
 							char aMsg[64];
 							str_format(aMsg, sizeof(aMsg), "failed to load '%s'", aBuf);
-							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "countryflags", aMsg);
+							if(!Config()->m_Clean)
+								Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "countryflags", aMsg);
 							continue;
 						}
 						CountryFlag.m_Texture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
@@ -142,7 +143,8 @@ void CCountryFlags::OnInit()
 	LoadCountryflagsIndexfile();
 	if(!m_aCountryFlags.size())
 	{
-		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "countryflags", "failed to load country flags. folder='countryflags/'");
+		if(!Config()->m_Clean)
+			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "countryflags", "failed to load country flags. folder='countryflags/'");
 		CCountryFlag DummyEntry;
 		DummyEntry.m_CountryCode = -1;
 		DummyEntry.m_Blocked = false;

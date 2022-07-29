@@ -50,7 +50,7 @@ public:
 		if(m_State != STATE_INIT && m_State != STATE_READY)
 			return -1;
 
-		dbg_msg("engine/mastersrv", "refreshing master server addresses");
+		// dbg_msg("engine/mastersrv", "refreshing master server addresses");
 
 		// add lookup jobs
 		for(int i = 0; i < MAX_MASTERSERVERS; i++)
@@ -89,7 +89,7 @@ public:
 
 		if(m_State == STATE_READY)
 		{
-			dbg_msg("engine/mastersrv", "saving addresses");
+			// dbg_msg("engine/mastersrv", "saving addresses");
 			Save();
 		}
 	}

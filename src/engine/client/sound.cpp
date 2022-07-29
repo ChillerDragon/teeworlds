@@ -477,7 +477,7 @@ ISound::CSampleHandle CSound::LoadWV(const char *pFilename)
 	io_close(s_File);
 	s_File = NULL;
 
-	if(m_pConfig->m_Debug)
+	if(m_pConfig->m_Debug && !m_pConfig->m_Clean)
 		dbg_msg("sound/wv", "loaded %s", pFilename);
 
 	RateConvert(SampleID);
