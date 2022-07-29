@@ -2505,13 +2505,45 @@ void str_hex(char *dst, int dst_size, const void *data, int data_size)
 	}
 }
 
+void str_hex_highlighted(char *dst, int dst_size, const void *data, int data_size, int highlight)
+{
+	static const char hex[] = "0123456789ABCDEF";
+	int b;
+	int i = 0;
+
+	for(b = 0; b < data_size && b < dst_size/4-4; b++)
+	{
+		dst[b*3] = hex[((const unsigned char *)data)[b]>>4];
+		dst[b*3+1] = hex[((const unsigned char *)data)[b]&0xf];
+		dst[b*3+2] = (i == highlight) ? '>' : ' ';
+		if((i + 1) == highlight)
+			dst[b*3+2] = '<';
+		dst[b*3+3] = 0;
+		++i;
+	}
+}
+
 int min(int a, int b) { return a > b ? b : a; }
+
+void print_hex_row_highlighted(const char *type, const char *prefix, const void *data, int data_size, int highlight)
+{
+	char aHexData[1024];
+	char aRawData[1024];
+	const unsigned char *pChunkData = data;
+
+	str_hex_highlighted(aHexData, sizeof(aHexData), data, data_size, highlight);
+	mem_zero(aRawData, sizeof(aRawData));
+	for(int k = 0; k < data_size; k++)
+		aRawData[k] = (pChunkData[k] < 32 || pChunkData[k] > 126) ? '.' : pChunkData[k];
+	dbg_msg(type, "%s%s    %s", prefix, aHexData, aRawData);
+}
 
 void print_hex(const char *type, const char *prefix, const void *data, int data_size, int max_width)
 {
 	char aHexData[1024];
 	char aRawData[1024];
 	int hex_row_length;
+	int row_length;
 	const unsigned char *pChunkData;
 
 	int i = 0;
@@ -2519,29 +2551,16 @@ void print_hex(const char *type, const char *prefix, const void *data, int data_
 	{
 		// rows are usually of length max_width
 		// but the last row might be shorter if it is not filling it fully
-		int row_length = min(max_width, data_size - i);
+		row_length = min(max_width, data_size - i);
 		str_hex(aHexData, sizeof(aHexData), data + i, row_length);
 		mem_zero(aRawData, sizeof(aRawData));
 		pChunkData = data + i;
 		for(int k = 0; k < row_length; k++)
 			aRawData[k] = (pChunkData[k] < 32 || pChunkData[k] > 126) ? '.' : pChunkData[k];
-		hex_row_length = max_width * 3; // row_length * 3;
+		hex_row_length = max_width * 3; // 1 raw byte is 2 characters of hex plus one seperation space
 		dbg_msg(type, "%s%-*s    %s", prefix, hex_row_length, aHexData, aRawData);
 		i += row_length;
 	}
-
-	// for(int i = 0; i < max_width;i += 4)
-	// {
-	// 	int end = minimum(data_size, i);
-	// 	str_hex(aHexData, sizeof(aHexData), data + i, end);
-	// 	dbg_msg(type, "%s%s", prefix, aHexData);
-	// }
-	// for(int i = 0; i < max_width;i += 4)
-	// {
-	// 	char aRawData[1024] = {0};
-	// 	for(int k = 0; k < minimum(data_size, i); k++)
-	// 		aRawData[k] = ((int)data[k] < 32) ? '.' : (const char)data[k];
-	// }
 }
 
 int str_is_number(const char *str)
