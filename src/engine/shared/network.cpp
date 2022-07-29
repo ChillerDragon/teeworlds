@@ -394,8 +394,8 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 			for(int i = 0; i < pPacket->m_DataSize; i++)
 				aRawData[i] = pPacket->m_aChunkData[i] < 32 ? '.' : pPacket->m_aChunkData[i];
 			dbg_msg("network_in", "%s size=%d flags=%d%s", aAddrStr, Size, pPacket->m_Flags, aBuf);
-			dbg_msg("network_in", "  data: %s", aHexData);
 			dbg_msg("network_in", "  data_raw: %s", aRawData);
+			dbg_msg("network_in", "  data: %s", aHexData);
 		}
 	}
 
