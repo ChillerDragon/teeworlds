@@ -2505,6 +2505,20 @@ void str_hex(char *dst, int dst_size, const void *data, int data_size)
 	}
 }
 
+void str_hex_spaced(char *dst, int dst_size, const void *data, int data_size)
+{
+	char aChunk[64];
+	int b = 0;
+	int i = 0;
+	dst[0] = '\0';
+	for(int i = 0; i < data_size && i < dst_size/4-4; i+=4)
+	{
+		str_hex(aChunk, sizeof(aChunk), data + i, 4);
+		str_append(dst, aChunk, dst_size);
+		str_append(dst, " ", dst_size);
+	}
+}
+
 void str_hex_highlighted(char *dst, int dst_size, const void *data, int data_size, int from, int to)
 {
 	static const char hex[] = "0123456789ABCDEF";
@@ -2590,7 +2604,7 @@ void print_hex(const char *type, const char *prefix, const void *data, int data_
 		// rows are usually of length max_width
 		// but the last row might be shorter if it is not filling it fully
 		row_length = min(max_width, data_size - i);
-		str_hex(aHexData, sizeof(aHexData), data + i, row_length);
+		str_hex_spaced(aHexData, sizeof(aHexData), data + i, row_length);
 		mem_zero(aRawData, sizeof(aRawData));
 		pChunkData = data + i;
 		for(int k = 0; k < row_length; k++)

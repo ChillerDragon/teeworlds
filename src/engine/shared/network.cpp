@@ -457,7 +457,7 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, int Size, const NETADDR
 		else
 		{
 			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  data:");
-			print_hex(Direction == NETWORK_IN ? "network_in" : "network_out", "    ", pPacket->m_aChunkData, pPacket->m_DataSize, 4);
+			print_hex(Direction == NETWORK_IN ? "network_in" : "network_out", "    ", pPacket->m_aChunkData, pPacket->m_DataSize, 12);
 		}
 	}
 }

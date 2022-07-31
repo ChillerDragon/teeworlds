@@ -1280,6 +1280,12 @@ const char *str_find(const char *haystack, const char *needle);
 */
 void str_hex(char *dst, int dst_size, const void *data, int data_size);
 
+/*
+	str_hex_spaced
+
+	str_hex but groups of 4 bytes are space seperated
+*/
+void str_hex_spaced(char *dst, int dst_size, const void *data, int data_size);
 void str_hex_highlighted(char *dst, int dst_size, const void *data, int data_size, int from, int to);
 void print_hex(const char *type, const char *prefix, const void *data, int data_size, int max_width);
 void print_hex_row_highlighted(const char *type, const char *prefix, const void *data, int data_size, int from, int to, const char *note, ...);
