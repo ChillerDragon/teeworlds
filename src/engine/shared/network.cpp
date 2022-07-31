@@ -255,12 +255,20 @@ void CNetBase::SendPacket(const NETADDR *pAddr, CNetPacketConstruct *pPacket)
 				str_format(aBuf, sizeof(aBuf), " (%s)", aFlags);
 			char aHexData[1024];
 			str_hex(aHexData, sizeof(aHexData), pPacket->m_aChunkData, pPacket->m_DataSize);
-			char aRawData[1024];
+			char aRawData[1024] = {0};
 			for(int i = 0; i < pPacket->m_DataSize; i++)
-				aRawData[i] = pPacket->m_aChunkData[i] < 32 ? '.' : pPacket->m_aChunkData[i];
-			dbg_msg("network_out", "%s size=%d flags=%d%s", aAddrStr, FinalSize, pPacket->m_Flags, aBuf);
-			dbg_msg("network_out", "  data: %s", aHexData);
-			dbg_msg("network_out", "  data_raw: %s", aRawData);
+				aRawData[i] = (pPacket->m_aChunkData[i] < 32 || pPacket->m_aChunkData[i] < 126) ? '.' : pPacket->m_aChunkData[i];
+			dbg_msg("network_out", "%s size=%d datasize=%d flags=%d%s", aAddrStr, FinalSize, pPacket->m_DataSize, pPacket->m_Flags, aBuf);
+			if(pPacket->m_DataSize < 20)
+			{
+				dbg_msg("network_out", "  data_raw: %s", aRawData);
+				dbg_msg("network_out", "  data: %s", aHexData);
+			}
+			else
+			{
+				dbg_msg("network_out", "  data:");
+				print_hex("network_out", "    ", pPacket->m_aChunkData, pPacket->m_DataSize, 4);
+			}
 		}
 	}
 }
@@ -394,9 +402,16 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 			for(int i = 0; i < pPacket->m_DataSize; i++)
 				aRawData[i] = pPacket->m_aChunkData[i] < 32 ? '.' : pPacket->m_aChunkData[i];
 			dbg_msg("network_in", "%s size=%d datasize=%d flags=%d%s", aAddrStr, Size, pPacket->m_DataSize, pPacket->m_Flags, aBuf);
-			dbg_msg("network_in", "  data_raw: %s", aRawData);
-			dbg_msg("network_in", "  data: %s", aHexData);
-			print_hex("network_in", "  ", pPacket->m_aChunkData, pPacket->m_DataSize, 4);
+			if(pPacket->m_DataSize < 20)
+			{
+				dbg_msg("network_in", "  data_raw: %s", aRawData);
+				dbg_msg("network_in", "  data: %s", aHexData);
+			}
+			else
+			{
+				dbg_msg("network_in", "  data:");
+				print_hex("network_in", "    ", pPacket->m_aChunkData, pPacket->m_DataSize, 4);
+			}
 		}
 	}
 

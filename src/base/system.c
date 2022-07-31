@@ -2505,7 +2505,7 @@ void str_hex(char *dst, int dst_size, const void *data, int data_size)
 	}
 }
 
-void str_hex_highlighted(char *dst, int dst_size, const void *data, int data_size, int highlight)
+void str_hex_highlighted(char *dst, int dst_size, const void *data, int data_size, int from, int to)
 {
 	static const char hex[] = "0123456789ABCDEF";
 	int b;
@@ -2513,29 +2513,67 @@ void str_hex_highlighted(char *dst, int dst_size, const void *data, int data_siz
 
 	for(b = 0; b < data_size && b < dst_size/4-4; b++)
 	{
-		dst[b*3] = hex[((const unsigned char *)data)[b]>>4];
-		dst[b*3+1] = hex[((const unsigned char *)data)[b]&0xf];
-		dst[b*3+2] = (i == highlight) ? '>' : ' ';
-		if((i + 1) == highlight)
-			dst[b*3+2] = '<';
-		dst[b*3+3] = 0;
+		dst[b*4] = (i == from) ? '<' : ' ';
+		dst[b*4+1] = hex[((const unsigned char *)data)[b]>>4];
+		dst[b*4+2] = hex[((const unsigned char *)data)[b]&0xf];
+		dst[b*4+3] = (i == to) ? '>' : ' ';
+		dst[b*4+4] = 0;
 		++i;
 	}
 }
 
 int min(int a, int b) { return a > b ? b : a; }
 
-void print_hex_row_highlighted(const char *type, const char *prefix, const void *data, int data_size, int highlight)
+void print_hex_row_highlighted(const char *type, const char *prefix, const void *data, int data_size, int from, int to, const char *note, ...)
 {
 	char aHexData[1024];
 	char aRawData[1024];
 	const unsigned char *pChunkData = data;
+	int offset;
+	va_list args;
+	int len = 0;
+	size_t size = 0;
+	char *msg = NULL;
+	char str[1024];
 
-	str_hex_highlighted(aHexData, sizeof(aHexData), data, data_size, highlight);
+	str_hex_highlighted(aHexData, sizeof(aHexData), data, data_size, from, to);
 	mem_zero(aRawData, sizeof(aRawData));
 	for(int k = 0; k < data_size; k++)
 		aRawData[k] = (pChunkData[k] < 32 || pChunkData[k] > 126) ? '.' : pChunkData[k];
 	dbg_msg(type, "%s%s    %s", prefix, aHexData, aRawData);
+	offset = from * 4;
+	dbg_msg(type, "%s%*s%s", prefix, offset, " ", "^");
+
+
+	/* Determine required size */
+
+	va_start(args, note);
+	len = vsnprintf(msg, size, note, args);
+	va_end(args);
+
+	if (len < 0)
+		return;
+
+	/* One extra byte for '\0' */
+
+	size = (size_t) len + 1;
+	msg = malloc(size);
+	if (msg == NULL)
+		return;
+
+	va_start(args, note);
+	len = vsnprintf(msg, size, note, args);
+	va_end(args);
+
+	if (len < 0)
+	{
+		free(msg);
+		return;
+	}
+	str_copy(str, msg, sizeof(str));
+	dbg_msg(type, "%s%*s%s", prefix, offset, " ", str);
+
+	free(msg);
 }
 
 void print_hex(const char *type, const char *prefix, const void *data, int data_size, int max_width)

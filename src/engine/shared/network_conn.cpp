@@ -271,10 +271,10 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 		// so we add a hint that the first byte is the CtrlMsg as int
 		char aHexData[1024];
 		str_hex(aHexData, sizeof(aHexData), pPacket->m_aChunkData, 1);
-		print_hex_row_highlighted("nxxwork_in", "  ", pPacket->m_aChunkData, 4, 1);
-		dbg_msg("network_in", "  data[0]: %s", aHexData);
-		dbg_msg("network_in", "           ^");
-		dbg_msg("network_in", "           %d = %s", CtrlMsg, pMsg);
+		print_hex_row_highlighted("network_in", "  data[0]: ", pPacket->m_aChunkData, minimum(pPacket->m_DataSize, 4), 0, 0, "%d = %s", CtrlMsg, pMsg);
+		// dbg_msg("network_in", "  data[0]: %s", aHexData);
+		// dbg_msg("network_in", "           ^");
+		// dbg_msg("network_in", "           %d = %s", CtrlMsg, pMsg);
 
 		if(CtrlMsg == NET_CTRLMSG_CLOSE)
 		{
