@@ -484,10 +484,12 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 	for(int i = 0; i < PrintDataLen; i++)
 		aRawData[i] = (pPacket->m_aChunkData[i] < 32 || pPacket->m_aChunkData[i] > 126) ? '.' : pPacket->m_aChunkData[i];
 	dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "%s packetsize=%d datasize=%d flags=%d%s", aAddrStr, PacketSize, pPacket->m_DataSize, pPacket->m_Flags, aFlags);
+	char aInfo[512];
+	aInfo[0] = '\0';
+	if(NullBytes)
+		str_format(aInfo, sizeof(aInfo), "  [CUT OFF %d NULL BYTES AFTER THE FIRST ROW]", NullBytes);
 	if(pPacket->m_DataSize < 20 || NullBytes)
 	{
-		if(NullBytes)
-			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  [CUT OFF %d NULL BYTES AFTER THE FIRST ROW]", NullBytes);
 		if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
 		{
 			int CtrlMsg = pPacket->m_aChunkData[0];
@@ -508,7 +510,8 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 				0, PacketHeaderSize - 1, /* print_hex_row_highlighted expects indecies so from 0 - 6 = 7 chunks */
 				aPacketHeader,
 				PacketHeaderSize, PacketHeaderSize,
-				aCtrlMsg);
+				aCtrlMsg,
+				aInfo);
 		}
 		else
 		{

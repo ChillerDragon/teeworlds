@@ -2554,7 +2554,7 @@ void str_hex_highlight_two(char *dst, int dst_size, const void *data, int data_s
 
 int min(int a, int b) { return a > b ? b : a; }
 
-void print_hex_row_highlight_two(const char *type, const char *prefix, const void *data, int data_size, int from1, int to1, const char *note1, int from2, int to2, const char *note2)
+void print_hex_row_highlight_two(const char *type, const char *prefix, const void *data, int data_size, int from1, int to1, const char *note1, int from2, int to2, const char *note2, const char *info)
 {
 	char aHexData[1024];
 	char aRawData[1024];
@@ -2568,7 +2568,7 @@ void print_hex_row_highlight_two(const char *type, const char *prefix, const voi
 	mem_zero(aRawData, sizeof(aRawData));
 	for(int k = 0; k < data_size; k++)
 		aRawData[k] = (pChunkData[k] < 32 || pChunkData[k] > 126) ? '.' : pChunkData[k];
-	dbg_msg(type, "%s%s    %s", prefix, aHexData, aRawData);
+	dbg_msg(type, "%s%s    %s  %s", prefix, aHexData, aRawData, info);
 	offset1 = from1 * 4;
 	offset2 = from2 * 4;
 	offset_arrow_2 = (offset2 - offset1) - 1;
