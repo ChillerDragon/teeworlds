@@ -858,7 +858,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		else if(Msg == NETMSG_ERROR) { pMsg = "ERROR"; }
 		else if(Msg == NETMSG_MAPLIST_ENTRY_ADD) { pMsg = "MAPLIST_ENTRY_ADD"; }
 		else if(Msg == NETMSG_MAPLIST_ENTRY_REM) { pMsg = "MAPLIST_ENTRY_REM"; }
-		dbg_msg("network_in", "client packet sys=%d msg=%d (%s)", Sys, Msg, pMsg);
+		dbg_msg("network_in", "  client packet datasize=%d sys=%d msg=%d (%s)", pPacket->m_DataSize, Sys, Msg, pMsg);
 	}
 
 

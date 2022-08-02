@@ -230,7 +230,7 @@ public:
 		NETWORK_OUT
 	};
 
-	void PrintPacket(CNetPacketConstruct *pPacket, int Size, const NETADDR *pAddr, ENetDirection Direction);
+	void PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int PacketSize, const NETADDR *pAddr, ENetDirection Direction);
 	static bool ShowAddr(const NETADDR *pAddr);
 };
 
