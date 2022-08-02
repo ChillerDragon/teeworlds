@@ -486,7 +486,7 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 					Direction == NETWORK_IN ? "network_in" : "network_out",
 					"  full_packet_compressed: ",
 					pPacketData, PacketSize,
-					PacketSize - 1, PacketSize - 1,
+					PacketHeaderSize, PacketHeaderSize,
 					"CtrlMsg = %d (%s)", CtrlMsg, pMsg);
 			}
 			else
