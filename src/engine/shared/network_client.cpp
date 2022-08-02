@@ -112,8 +112,8 @@ int CNetClient::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 
 					if(pResponseToken)
 						*pResponseToken = m_RecvUnpacker.m_Data.m_ResponseToken;
-					if(Config()->m_Debug > 2)
-						dbg_msg("network_in", "abort recieving chunk");
+					// if(Config()->m_Debug > 2)
+					// 	dbg_msg("network_in", "abort recieving chunk");
 					return 1;
 				}
 			}

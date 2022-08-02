@@ -247,6 +247,14 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 	if(Size <= 0)
 		return 1;
 
+	if(ShowAddr(pAddr))
+	{
+		char aHex[1024];
+		str_hex(aHex, sizeof(aHex), pPacket->m_aChunkData, pPacket->m_DataSize);
+		dbg_msg("network", "unpack conless=%d size=%d raw=%s", pPacket->m_Flags & NET_PACKETFLAG_CONNLESS, pPacket->m_DataSize, aHex);
+	}
+
+
 	// log the data
 	if(m_DataLogRecv)
 	{
@@ -286,7 +294,14 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 			// xxxxxxVV
 
 		if(Version != NET_PACKETVERSION)
+		{
+			if(m_pConfig->m_Debug > 2)
+			{
+				if(ShowAddr(pAddr))
+					dbg_msg("network_in", "got invalid version %d expected %d", Version, NET_PACKETVERSION);
+			}
 			return -1;
+		}
 
 		pPacket->m_DataSize = Size - NET_PACKETHEADERSIZE_CONNLESS;
 		pPacket->m_Token = (pBuffer[1] << 24) | (pBuffer[2] << 16) | (pBuffer[3] << 8) | pBuffer[4];
@@ -423,12 +438,19 @@ void CNetBase::UpdateLogHandles()
 		Engine()->QueryNetLogHandles(&m_DataLogSent, &m_DataLogRecv);
 }
 
-void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, int Size, const NETADDR *pAddr, ENetDirection Direction)
+bool CNetBase::ShowAddr(const NETADDR *pAddr)
 {
 	char aAddrStr[NETADDR_MAXSTRSIZE];
 	net_addr_str(pAddr, aAddrStr, sizeof(aAddrStr), true);
-	if(str_startswith(aAddrStr, "[0:0:0:0:0:0:0:1]:") || str_startswith(aAddrStr, "127.0.0.1:"))
+	return str_startswith(aAddrStr, "[0:0:0:0:0:0:0:1]:") || str_startswith(aAddrStr, "127.0.0.1:");
+}
+
+void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, int Size, const NETADDR *pAddr, ENetDirection Direction)
+{
+	if(ShowAddr(pAddr))
 	{
+		char aAddrStr[NETADDR_MAXSTRSIZE];
+		net_addr_str(pAddr, aAddrStr, sizeof(aAddrStr), true);
 		char aFlags[512];
 		aFlags[0] = '\0';
 		if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)

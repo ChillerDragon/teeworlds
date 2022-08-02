@@ -1140,7 +1140,8 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 	}
 	if(Config()->m_Debug > 2)
 	{
-		dbg_msg("network_in", "connless packet: %s", pConnlessPacket);
+		if(CNetBase::ShowAddr(&pPacket->m_Address))
+			dbg_msg("network_in", "connless packet: %s", pConnlessPacket);
 	}
 }
 
@@ -1821,7 +1822,8 @@ void CClient::Update()
 	MasterServer()->Update();
 
 	// update the server browser
-	m_ServerBrowser.Update();
+	if(Config()->m_Debug < 3)
+		m_ServerBrowser.Update();
 
 	// update gameclient
 	if(!m_EditorActive)

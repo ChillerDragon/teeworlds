@@ -231,6 +231,7 @@ public:
 	};
 
 	void PrintPacket(CNetPacketConstruct *pPacket, int Size, const NETADDR *pAddr, ENetDirection Direction);
+	static bool ShowAddr(const NETADDR *pAddr);
 };
 
 class CNetTokenManager

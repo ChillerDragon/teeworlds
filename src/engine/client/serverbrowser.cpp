@@ -281,6 +281,9 @@ void CServerBrowser::SetType(int Type)
 
 void CServerBrowser::Refresh(int RefreshFlags)
 {
+	if(Config()->m_Debug > 2)
+		return;
+
 	m_RefreshFlags |= RefreshFlags;
 
 	if(RefreshFlags&IServerBrowser::REFRESHFLAG_LAN)
