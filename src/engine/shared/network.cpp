@@ -464,15 +464,29 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 		aFlags[0] = '\0';
 		if(aFlags[0])
 			str_format(aFlags, sizeof(aFlags), " (%s)", aFlags);
+		int PacketHeaderSize = pPacket->m_Flags&NET_PACKETFLAG_CONNLESS ? NET_PACKETHEADERSIZE_CONNLESS : NET_PACKETHEADERSIZE;
+		int RowLen = 12;
+		int NullBytes = maximum(pPacket->m_DataSize - RowLen, 0);
+		for(int i = RowLen; i < pPacket->m_DataSize; i++)
+		{
+			if(pPacket->m_aChunkData[i] != 0x0)
+			{
+				NullBytes = 0;
+				break;
+			}
+		}
+		int PrintPacketLen = minimum(NullBytes ? RowLen : PacketSize, PacketSize);
+		int PrintDataLen = minimum(NullBytes ? RowLen : pPacket->m_DataSize, pPacket->m_DataSize);
 		char aHexData[1024];
-		str_hex(aHexData, sizeof(aHexData), pPacket->m_aChunkData, pPacket->m_DataSize);
+		str_hex(aHexData, sizeof(aHexData), pPacket->m_aChunkData, PrintDataLen);
 		char aRawData[1024] = {0};
-		for(int i = 0; i < pPacket->m_DataSize; i++)
+		for(int i = 0; i < PrintDataLen; i++)
 			aRawData[i] = (pPacket->m_aChunkData[i] < 32 || pPacket->m_aChunkData[i] > 126) ? '.' : pPacket->m_aChunkData[i];
 		dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "%s packetsize=%d datasize=%d flags=%d%s", aAddrStr, PacketSize, pPacket->m_DataSize, pPacket->m_Flags, aFlags);
-		int PacketHeaderSize = pPacket->m_Flags&NET_PACKETFLAG_CONNLESS ? NET_PACKETHEADERSIZE_CONNLESS : NET_PACKETHEADERSIZE;
-		if(pPacket->m_DataSize < 20)
+		if(pPacket->m_DataSize < 20 || NullBytes)
 		{
+			if(NullBytes)
+				dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  [CUT OFF %d NULL BYTES AFTER THE FIRST ROW]", NullBytes);
 			if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
 			{
 				int CtrlMsg = pPacket->m_aChunkData[0];
@@ -489,7 +503,7 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 				print_hex_row_highlight_two(
 					Direction == NETWORK_IN ? "network_in" : "network_out",
 					"  full_packet_compressed: ",
-					pPacketData, PacketSize,
+					pPacketData, PrintPacketLen,
 					0, PacketHeaderSize - 1, /* print_hex_row_highlighted expects indecies so from 0 - 6 = 7 chunks */
 					aPacketHeader,
 					PacketHeaderSize, PacketHeaderSize,
@@ -500,7 +514,7 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 				print_hex_row_highlighted(
 					Direction == NETWORK_IN ? "network_in" : "network_out",
 					"  full_packet_compressed: ",
-					pPacketData, PacketSize,
+					pPacketData, PrintPacketLen,
 					0, PacketHeaderSize - 1, /* print_hex_row_highlighted expects indecies so from 0 - 6 = 7 chunks */
 					"PacketHeader: size=%d flags = %d%s", PacketHeaderSize, pPacket->m_Flags, aFlags);
 			}
@@ -525,7 +539,7 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 				print_hex_row_highlighted(
 					Direction == NETWORK_IN ? "network_in" : "network_out",
 					"  decompressed_data_hex: ",
-					pPacket->m_aChunkData, pPacket->m_DataSize,
+					pPacket->m_aChunkData, PrintDataLen,
 					0, 1, // TODO: chunk header is 3 long if flag vital is set
 					"ChunkHeader: size = %d flags = %d (%s)", ChunkHeaderSize, ChunkHeaderFlags, pFlags);
 			}
@@ -536,7 +550,7 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 				print_hex_row_highlighted(
 					Direction == NETWORK_IN ? "network_in" : "network_out",
 					"  decompressed_data_hex: ",
-					pPacket->m_aChunkData, pPacket->m_DataSize,
+					pPacket->m_aChunkData, PrintDataLen,
 					0, 0,
 					"TODO: no idea what this is");
 			}
@@ -544,7 +558,7 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 		else
 		{
 			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  decompressed_data:");
-			print_hex(Direction == NETWORK_IN ? "network_in" : "network_out", "    ", pPacket->m_aChunkData, pPacket->m_DataSize, 12);
+			print_hex(Direction == NETWORK_IN ? "network_in" : "network_out", "    ", pPacket->m_aChunkData, pPacket->m_DataSize, RowLen);
 		}
 	}
 }
