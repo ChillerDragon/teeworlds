@@ -448,6 +448,7 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 {
 	if(!ShowAddr(pAddr))
 		return;
+
 	char aAddrStr[NETADDR_MAXSTRSIZE];
 	net_addr_str(pAddr, aAddrStr, sizeof(aAddrStr), true);
 	char aBuf[512];
@@ -498,7 +499,7 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 			else if(CtrlMsg == NET_CTRLMSG_TOKEN) { pMsg = "NET_CTRLMSG_TOKEN"; }
 			char aPacketHeader[1024];
 			char aCtrlMsg[1024];
-			str_format(aPacketHeader, sizeof(aPacketHeader), "PHeader: size=%d flags=%d%s", PacketHeaderSize, pPacket->m_Flags, aFlags);
+			str_format(aPacketHeader, sizeof(aPacketHeader), "PHeader: size=%d flags=%d", PacketHeaderSize, pPacket->m_Flags);
 			str_format(aCtrlMsg, sizeof(aCtrlMsg), "CtrlMsg = %d (%s)", CtrlMsg, pMsg);
 			print_hex_row_highlight_two(
 				Direction == NETWORK_IN ? "network_in" : "network_out",

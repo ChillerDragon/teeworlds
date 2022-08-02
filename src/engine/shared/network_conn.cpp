@@ -261,21 +261,6 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
 	{
 		int CtrlMsg = pPacket->m_aChunkData[0];
-		const char *pMsg = "unkown";
-		if(CtrlMsg == NET_CTRLMSG_KEEPALIVE) { pMsg = "NET_CTRLMSG_KEEPALIVE"; }
-		else if(CtrlMsg == NET_CTRLMSG_CONNECT) { pMsg = "NET_CTRLMSG_CONNECT"; }
-		else if(CtrlMsg == NET_CTRLMSG_ACCEPT) { pMsg = "NET_CTRLMSG_ACCEPT"; }
-		else if(CtrlMsg == NET_CTRLMSG_CLOSE) { pMsg = "NET_CTRLMSG_CLOSE"; }
-		else if(CtrlMsg == NET_CTRLMSG_TOKEN) { pMsg = "NET_CTRLMSG_TOKEN"; }
-		// the line above should print the aHexData which is pPacket->m_aChunkData as hex
-		// so we add a hint that the first byte is the CtrlMsg as int
-		char aHexData[1024];
-		str_hex(aHexData, sizeof(aHexData), pPacket->m_aChunkData, 1);
-		print_hex_row_highlighted("network_in", "  data[0]: ", pPacket->m_aChunkData, minimum(pPacket->m_DataSize, 4), 0, 0, "%d = %s", CtrlMsg, pMsg);
-		// dbg_msg("network_in", "  data[0]: %s", aHexData);
-		// dbg_msg("network_in", "           ^");
-		// dbg_msg("network_in", "           %d = %s", CtrlMsg, pMsg);
-
 		if(CtrlMsg == NET_CTRLMSG_CLOSE)
 		{
 			if(net_addr_comp(&m_PeerAddr, pAddr, true) == 0)
