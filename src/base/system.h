@@ -1287,8 +1287,10 @@ void str_hex(char *dst, int dst_size, const void *data, int data_size);
 */
 void str_hex_spaced(char *dst, int dst_size, const void *data, int data_size);
 void str_hex_highlighted(char *dst, int dst_size, const void *data, int data_size, int from, int to);
+void str_hex_highlight_two(char *dst, int dst_size, const void *data, int data_size, int from1, int to1, int from2, int to2);
 void print_hex(const char *type, const char *prefix, const void *data, int data_size, int max_width);
 void print_hex_row_highlighted(const char *type, const char *prefix, const void *data, int data_size, int from, int to, const char *note, ...);
+void print_hex_row_highlight_two(const char *type, const char *prefix, const void *data, int data_size, int from1, int to1, const char *note1, int from2, int to2, const char *note2);
 
 /*
 	Function: str_is_number

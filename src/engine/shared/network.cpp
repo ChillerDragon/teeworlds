@@ -450,26 +450,26 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 	{
 		char aAddrStr[NETADDR_MAXSTRSIZE];
 		net_addr_str(pAddr, aAddrStr, sizeof(aAddrStr), true);
-		char aFlags[512];
-		aFlags[0] = '\0';
-		if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
-			str_append(aFlags, "CONTROL", sizeof(aFlags));
-		if(pPacket->m_Flags&NET_PACKETFLAG_RESEND)
-			str_append(aFlags, aFlags[0] ? "|RESEND" : "RESEND", sizeof(aFlags));
-		if(pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION)
-			str_append(aFlags, aFlags[0] ? "|COMPRESSION" : "COMPRESSION", sizeof(aFlags));
-		if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
-			str_append(aFlags, aFlags[0] ? "|CONNLESS" : "CONNLESS", sizeof(aFlags));
 		char aBuf[512];
 		aBuf[0] = '\0';
+		if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
+			str_append(aBuf, "CONTROL", sizeof(aBuf));
+		if(pPacket->m_Flags&NET_PACKETFLAG_RESEND)
+			str_append(aBuf, aBuf[0] ? "|RESEND" : "RESEND", sizeof(aBuf));
+		if(pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION)
+			str_append(aBuf, aBuf[0] ? "|COMPRESSION" : "COMPRESSION", sizeof(aBuf));
+		if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
+			str_append(aBuf, aBuf[0] ? "|CONNLESS" : "CONNLESS", sizeof(aBuf));
+		char aFlags[512];
+		aFlags[0] = '\0';
 		if(aFlags[0])
-			str_format(aBuf, sizeof(aBuf), " (%s)", aFlags);
+			str_format(aFlags, sizeof(aFlags), " (%s)", aFlags);
 		char aHexData[1024];
 		str_hex(aHexData, sizeof(aHexData), pPacket->m_aChunkData, pPacket->m_DataSize);
 		char aRawData[1024] = {0};
 		for(int i = 0; i < pPacket->m_DataSize; i++)
 			aRawData[i] = (pPacket->m_aChunkData[i] < 32 || pPacket->m_aChunkData[i] > 126) ? '.' : pPacket->m_aChunkData[i];
-		dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "%s packetsize=%d datasize=%d flags=%d%s", aAddrStr, PacketSize, pPacket->m_DataSize, pPacket->m_Flags, aBuf);
+		dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "%s packetsize=%d datasize=%d flags=%d%s", aAddrStr, PacketSize, pPacket->m_DataSize, pPacket->m_Flags, aFlags);
 		int PacketHeaderSize = pPacket->m_Flags&NET_PACKETFLAG_CONNLESS ? NET_PACKETHEADERSIZE_CONNLESS : NET_PACKETHEADERSIZE;
 		if(pPacket->m_DataSize < 20)
 		{
@@ -482,12 +482,18 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 				else if(CtrlMsg == NET_CTRLMSG_ACCEPT) { pMsg = "NET_CTRLMSG_ACCEPT"; }
 				else if(CtrlMsg == NET_CTRLMSG_CLOSE) { pMsg = "NET_CTRLMSG_CLOSE"; }
 				else if(CtrlMsg == NET_CTRLMSG_TOKEN) { pMsg = "NET_CTRLMSG_TOKEN"; }
-				print_hex_row_highlighted(
+				char aPacketHeader[1024];
+				char aCtrlMsg[1024];
+				str_format(aPacketHeader, sizeof(aPacketHeader), "PHeader: size=%d flags=%d%s", PacketHeaderSize, pPacket->m_Flags, aFlags);
+				str_format(aCtrlMsg, sizeof(aCtrlMsg), "CtrlMsg = %d (%s)", CtrlMsg, pMsg);
+				print_hex_row_highlight_two(
 					Direction == NETWORK_IN ? "network_in" : "network_out",
 					"  full_packet_compressed: ",
 					pPacketData, PacketSize,
+					0, PacketHeaderSize - 1, /* print_hex_row_highlighted expects indecies so from 0 - 6 = 7 chunks */
+					aPacketHeader,
 					PacketHeaderSize, PacketHeaderSize,
-					"CtrlMsg = %d (%s)", CtrlMsg, pMsg);
+					aCtrlMsg);
 			}
 			else
 			{
@@ -496,7 +502,7 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 					"  full_packet_compressed: ",
 					pPacketData, PacketSize,
 					0, PacketHeaderSize - 1, /* print_hex_row_highlighted expects indecies so from 0 - 6 = 7 chunks */
-					"PacketHeader: size=%d flags = %d%s", PacketHeaderSize, pPacket->m_Flags, aBuf);
+					"PacketHeader: size=%d flags = %d%s", PacketHeaderSize, pPacket->m_Flags, aFlags);
 			}
 			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  decompressed_data_raw: %s", aRawData);
 			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  decompressed_data_hex: %s", aHexData);
@@ -523,7 +529,7 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 					0, 1, // TODO: chunk header is 3 long if flag vital is set
 					"ChunkHeader: size = %d flags = %d (%s)", ChunkHeaderSize, ChunkHeaderFlags, pFlags);
 			}
-			else
+			else if(!(pPacket->m_Flags&NET_PACKETFLAG_CONTROL))
 			{
 				// seems like when there is no compression
 				// there is no chunk header

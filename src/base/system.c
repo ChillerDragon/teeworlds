@@ -2507,11 +2507,10 @@ void str_hex(char *dst, int dst_size, const void *data, int data_size)
 
 void str_hex_spaced(char *dst, int dst_size, const void *data, int data_size)
 {
+	int i;
 	char aChunk[64];
-	int b = 0;
-	int i = 0;
 	dst[0] = '\0';
-	for(int i = 0; i < data_size && i < dst_size/4-4; i+=4)
+	for(i = 0; i < data_size && i < dst_size/4-4; i+=4)
 	{
 		str_hex(aChunk, sizeof(aChunk), data + i, 4);
 		str_append(dst, aChunk, dst_size);
@@ -2536,7 +2535,50 @@ void str_hex_highlighted(char *dst, int dst_size, const void *data, int data_siz
 	}
 }
 
+void str_hex_highlight_two(char *dst, int dst_size, const void *data, int data_size, int from1, int to1, int from2, int to2)
+{
+	static const char hex[] = "0123456789ABCDEF";
+	int b;
+	int i = 0;
+
+	for(b = 0; b < data_size && b < dst_size/4-4; b++)
+	{
+		dst[b*4] = (i == from1 || i == from2) ? '<' : ' ';
+		dst[b*4+1] = hex[((const unsigned char *)data)[b]>>4];
+		dst[b*4+2] = hex[((const unsigned char *)data)[b]&0xf];
+		dst[b*4+3] = (i == to1 || i == to2) ? '>' : ' ';
+		dst[b*4+4] = 0;
+		++i;
+	}
+}
+
 int min(int a, int b) { return a > b ? b : a; }
+
+void print_hex_row_highlight_two(const char *type, const char *prefix, const void *data, int data_size, int from1, int to1, const char *note1, int from2, int to2, const char *note2)
+{
+	char aHexData[1024];
+	char aRawData[1024];
+	const unsigned char *pChunkData = data;
+	int offset1;
+	int offset2;
+	int offset_arrow_2;
+	int offset_note_2;
+
+	str_hex_highlight_two(aHexData, sizeof(aHexData), data, data_size, from1, to1, from2, to2);
+	mem_zero(aRawData, sizeof(aRawData));
+	for(int k = 0; k < data_size; k++)
+		aRawData[k] = (pChunkData[k] < 32 || pChunkData[k] > 126) ? '.' : pChunkData[k];
+	dbg_msg(type, "%s%s    %s", prefix, aHexData, aRawData);
+	offset1 = from1 * 4;
+	offset2 = from2 * 4;
+	offset_arrow_2 = (offset2 - offset1) - 1;
+	offset_note_2 = (offset_arrow_2 - str_length(note1)) + 1;
+	dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", "^", offset_arrow_2, " ", "^");
+	// dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", note2); // single line comment
+	// dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", note2); // single line
+	dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", "|"); // multi line comment
+	dbg_msg(type, "%s%*s%s", prefix, offset2, " ", note2);
+}
 
 void print_hex_row_highlighted(const char *type, const char *prefix, const void *data, int data_size, int from, int to, const char *note, ...)
 {
