@@ -415,13 +415,13 @@ unsigned char *CNetChunkHeader::Unpack(unsigned char *pData)
 {
 	m_Flags = (pData[0]>>6)&0x03;
 	m_Size = ((pData[0]&0x3F)<<6) | (pData[1]&0x3F);
-	const char *pFlags = "none";
-	if(m_Flags&NET_CHUNKFLAG_VITAL)
-		pFlags = "NET_CHUNKFLAG_VITAL";
-	else if(m_Flags&NET_CHUNKFLAG_RESEND)
-		pFlags = "NET_CHUNKFLAG_RESEND";
-	print_hex_row_highlighted("network_in", "  ChunkHeader[0-1]: ", pData, 2, 0, 0, "flags = %d (%s)", (pData[0]>>6)&0x03, pFlags);
-	print_hex_row_highlighted("network_in", "  ChunkHeader[0-1]: ", pData, 2, 0, 1, "size = %d ((header[0]&0x3F)<<6) | (header[1]&0x3F)", ((pData[0]&0x3F)<<6) | (pData[1]&0x3F));
+	// const char *pFlags = "none";
+	// if(m_Flags&NET_CHUNKFLAG_VITAL)
+	// 	pFlags = "NET_CHUNKFLAG_VITAL";
+	// else if(m_Flags&NET_CHUNKFLAG_RESEND)
+	// 	pFlags = "NET_CHUNKFLAG_RESEND";
+	// print_hex_row_highlighted("network_in", "  ChunkHeader[0-1]: ", pData, 2, 0, 0, "flags = %d (%s)", (pData[0]>>6)&0x03, pFlags);
+	// print_hex_row_highlighted("network_in", "  ChunkHeader[0-1]: ", pData, 2, 0, 1, "size = %d ((header[0]&0x3F)<<6) | (header[1]&0x3F)", ((pData[0]&0x3F)<<6) | (pData[1]&0x3F));
 	m_Sequence = -1;
 	if(m_Flags&NET_CHUNKFLAG_VITAL)
 	{
@@ -468,23 +468,76 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 		str_hex(aHexData, sizeof(aHexData), pPacket->m_aChunkData, pPacket->m_DataSize);
 		char aRawData[1024] = {0};
 		for(int i = 0; i < pPacket->m_DataSize; i++)
-			aRawData[i] = pPacket->m_aChunkData[i] < 32 ? '.' : pPacket->m_aChunkData[i];
+			aRawData[i] = (pPacket->m_aChunkData[i] < 32 || pPacket->m_aChunkData[i] > 126) ? '.' : pPacket->m_aChunkData[i];
 		dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "%s packetsize=%d datasize=%d flags=%d%s", aAddrStr, PacketSize, pPacket->m_DataSize, pPacket->m_Flags, aBuf);
 		int PacketHeaderSize = pPacket->m_Flags&NET_PACKETFLAG_CONNLESS ? NET_PACKETHEADERSIZE_CONNLESS : NET_PACKETHEADERSIZE;
 		if(pPacket->m_DataSize < 20)
 		{
-			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  data_raw: %s", aRawData);
-			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  data: %s", aHexData);
-			print_hex_row_highlighted(
-				Direction == NETWORK_IN ? "network_in" : "network_out",
-				"  full_packet: ",
-				pPacketData, PacketSize,
-				0, PacketHeaderSize - 1, /* print_hex_row_highlighted expects indecies so from 0 - 6 = 7 chunks */
-				"PacketHeader: size=%d flags = %d%s", PacketHeaderSize, pPacket->m_Flags, aBuf);
+			if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
+			{
+				int CtrlMsg = pPacket->m_aChunkData[0];
+				const char *pMsg = "unkown";
+				if(CtrlMsg == NET_CTRLMSG_KEEPALIVE) { pMsg = "NET_CTRLMSG_KEEPALIVE"; }
+				else if(CtrlMsg == NET_CTRLMSG_CONNECT) { pMsg = "NET_CTRLMSG_CONNECT"; }
+				else if(CtrlMsg == NET_CTRLMSG_ACCEPT) { pMsg = "NET_CTRLMSG_ACCEPT"; }
+				else if(CtrlMsg == NET_CTRLMSG_CLOSE) { pMsg = "NET_CTRLMSG_CLOSE"; }
+				else if(CtrlMsg == NET_CTRLMSG_TOKEN) { pMsg = "NET_CTRLMSG_TOKEN"; }
+				print_hex_row_highlighted(
+					Direction == NETWORK_IN ? "network_in" : "network_out",
+					"  full_packet_compressed: ",
+					pPacketData, PacketSize,
+					PacketSize - 1, PacketSize - 1,
+					"CtrlMsg = %d (%s)", CtrlMsg, pMsg);
+			}
+			else
+			{
+				print_hex_row_highlighted(
+					Direction == NETWORK_IN ? "network_in" : "network_out",
+					"  full_packet_compressed: ",
+					pPacketData, PacketSize,
+					0, PacketHeaderSize - 1, /* print_hex_row_highlighted expects indecies so from 0 - 6 = 7 chunks */
+					"PacketHeader: size=%d flags = %d%s", PacketHeaderSize, pPacket->m_Flags, aBuf);
+			}
+			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  decompressed_data_raw: %s", aRawData);
+			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  decompressed_data_hex: %s", aHexData);
+			// TODO: fix the condition when we parse the chunk header
+			//		 the compression flags seems more like correlation than actual cause
+			// 		 for the chunk header to exist
+			//		 to fix this make sure this branch is only called when
+			// 		 CNetChunkHeader::Unpack() is being called
+			if(pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION)
+			{
+				// from CNetChunkHeader::Unpack
+				// TODO: these values are probably somewhere in pPacket
+				int ChunkHeaderFlags = (pPacket->m_aChunkData[0]>>6)&0x03;
+				int ChunkHeaderSize = ((pPacket->m_aChunkData[0]&0x3F)<<6) | (pPacket->m_aChunkData[1]&0x3F);
+				const char *pFlags = "none";
+				if(ChunkHeaderFlags&NET_CHUNKFLAG_VITAL)
+					pFlags = "NET_CHUNKFLAG_VITAL";
+				else if(ChunkHeaderFlags&NET_CHUNKFLAG_RESEND)
+					pFlags = "NET_CHUNKFLAG_RESEND";
+				print_hex_row_highlighted(
+					Direction == NETWORK_IN ? "network_in" : "network_out",
+					"  decompressed_data_hex: ",
+					pPacket->m_aChunkData, pPacket->m_DataSize,
+					0, 1, // TODO: chunk header is 3 long if flag vital is set
+					"ChunkHeader: size = %d flags = %d (%s)", ChunkHeaderSize, ChunkHeaderFlags, pFlags);
+			}
+			else
+			{
+				// seems like when there is no compression
+				// there is no chunk header
+				print_hex_row_highlighted(
+					Direction == NETWORK_IN ? "network_in" : "network_out",
+					"  decompressed_data_hex: ",
+					pPacket->m_aChunkData, pPacket->m_DataSize,
+					0, 0,
+					"TODO: no idea what this is");
+			}
 		}
 		else
 		{
-			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  data:");
+			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  decompressed_data:");
 			print_hex(Direction == NETWORK_IN ? "network_in" : "network_out", "    ", pPacket->m_aChunkData, pPacket->m_DataSize, 12);
 		}
 	}
