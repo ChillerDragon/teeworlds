@@ -379,7 +379,25 @@ void CNetBase::SendControlMsg(const NETADDR *pAddr, TOKEN Token, int Ack, int Co
 	Construct.m_DataSize = 1+ExtraSize;
 	Construct.m_aChunkData[0] = ControlMsg;
 	if(ExtraSize > 0)
+	{
 		mem_copy(&Construct.m_aChunkData[1], pExtra, ExtraSize);
+		/*
+			When SendControlMsgWithToken() is called
+			the ExtraSize is 4 and the pExtra is the token
+
+			so the first packet the server sends is
+			
+			packet header - 1 byte indicating its control message - 4 byte token
+
+			and the client answers in the same format
+		*/
+		// if(Config()->m_Debug > 2 && ExtraSize < 512)
+		// {
+		// 	char aHex[512];
+		// 	str_hex(aHex, sizeof(aHex), pExtra, ExtraSize);
+		// 	dbg_msg("network_out", "SendControlMsg with extrasize=%d data=%s", ExtraSize, aHex);
+		// }
+	}
 
 	// send the control message
 	SendPacket(pAddr, &Construct);
@@ -503,15 +521,33 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 			char aCtrlMsg[1024];
 			str_format(aPacketHeader, sizeof(aPacketHeader), "PHeader: size=%d flags=%d", PacketHeaderSize, pPacket->m_Flags);
 			str_format(aCtrlMsg, sizeof(aCtrlMsg), "CtrlMsg = %d (%s)", CtrlMsg, pMsg);
-			print_hex_row_highlight_two(
-				Direction == NETWORK_IN ? "network_in" : "network_out",
-				pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION ? "  full_packet_compressed: " : "  full_packet: ",
-				pPacketData, PrintPacketLen,
-				0, PacketHeaderSize - 1, /* print_hex_row_highlighted expects indecies so from 0 - 6 = 7 chunks */
-				aPacketHeader,
-				PacketHeaderSize, PacketHeaderSize,
-				aCtrlMsg,
-				aInfo);
+			if(CtrlMsg == NET_CTRLMSG_TOKEN || CtrlMsg == NET_CTRLMSG_CONNECT)
+			{
+				print_hex_row_highlight_three(
+					Direction == NETWORK_IN ? "network_in" : "network_out",
+					pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION ? "  full_packet_compressed: " : "  full_packet: ",
+					pPacketData, PrintPacketLen,
+					0, PacketHeaderSize - 1, /* print_hex_row_highlighted expects indecies so from 0 - 6 = 7 chunks */
+					aPacketHeader,
+					PacketHeaderSize, PacketHeaderSize,
+					aCtrlMsg,
+					PacketHeaderSize + 1,
+					PrintPacketLen - 1,
+					"token",
+					aInfo);
+			}
+			else
+			{
+				print_hex_row_highlight_two(
+					Direction == NETWORK_IN ? "network_in" : "network_out",
+					pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION ? "  full_packet_compressed: " : "  full_packet: ",
+					pPacketData, PrintPacketLen,
+					0, PacketHeaderSize - 1, /* print_hex_row_highlighted expects indecies so from 0 - 6 = 7 chunks */
+					aPacketHeader,
+					PacketHeaderSize, PacketHeaderSize,
+					aCtrlMsg,
+					aInfo);
+			}
 		}
 		else
 		{

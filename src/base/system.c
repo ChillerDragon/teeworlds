@@ -2552,6 +2552,23 @@ void str_hex_highlight_two(char *dst, int dst_size, const void *data, int data_s
 	}
 }
 
+void str_hex_highlight_three(char *dst, int dst_size, const void *data, int data_size, int from1, int to1, int from2, int to2, int from3, int to3)
+{
+	static const char hex[] = "0123456789ABCDEF";
+	int b;
+	int i = 0;
+
+	for(b = 0; b < data_size && b < dst_size/4-4; b++)
+	{
+		dst[b*4] = (i == from1 || i == from2 || i == from3) ? '<' : ' ';
+		dst[b*4+1] = hex[((const unsigned char *)data)[b]>>4];
+		dst[b*4+2] = hex[((const unsigned char *)data)[b]&0xf];
+		dst[b*4+3] = (i == to1 || i == to2 || i == to3) ? '>' : ' ';
+		dst[b*4+4] = 0;
+		++i;
+	}
+}
+
 int min(int a, int b) { return a > b ? b : a; }
 
 void print_hex_row_highlight_two(const char *type, const char *prefix, const void *data, int data_size, int from1, int to1, const char *note1, int from2, int to2, const char *note2, const char *info)
@@ -2577,6 +2594,48 @@ void print_hex_row_highlight_two(const char *type, const char *prefix, const voi
 	// dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", note2); // single line comment
 	// dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", note2); // single line
 	dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", "|"); // multi line comment
+	dbg_msg(type, "%s%*s%s", prefix, offset2, " ", note2);
+}
+
+void print_hex_row_highlight_three(
+	const char *type,
+	const char *prefix,
+	const void *data,
+	int data_size,
+	int from1,
+	int to1,
+	const char *note1,
+	int from2,
+	int to2,
+	const char *note2,
+	int from3,
+	int to3,
+	const char *note3,
+	const char *info)
+{
+	char aHexData[1024];
+	char aRawData[1024];
+	const unsigned char *pChunkData = data;
+	int offset1;
+	int offset2;
+	int offset3;
+	int offset_arrow_2;
+	int offset_arrow_3;
+	int offset_note_2;
+
+	str_hex_highlight_three(aHexData, sizeof(aHexData), data, data_size, from1, to1, from2, to2, from3, to3);
+	mem_zero(aRawData, sizeof(aRawData));
+	for(int k = 0; k < data_size; k++)
+		aRawData[k] = (pChunkData[k] < 32 || pChunkData[k] > 126) ? '.' : pChunkData[k];
+	dbg_msg(type, "%s%s    %s  %s", prefix, aHexData, aRawData, info);
+	offset1 = from1 * 4;
+	offset2 = from2 * 4;
+	offset3 = from3 * 4;
+	offset_arrow_2 = (offset2 - offset1) - 1;
+	offset_note_2 = (offset_arrow_2 - str_length(note1)) + 1;
+	offset_arrow_3 = (offset3 - (offset_arrow_2 + offset1 + 1)) - 1;
+	dbg_msg(type, "%s%*s^%*s^%*s^", prefix, offset1, " ", offset_arrow_2, " ", offset_arrow_3, " ");
+	dbg_msg(type, "%s%*s%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", "|", offset_arrow_3, " ", note3);
 	dbg_msg(type, "%s%*s%s", prefix, offset2, " ", note2);
 }
 
