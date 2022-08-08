@@ -232,6 +232,8 @@ void CNetConnection::Disconnect(const char *pReason)
 
 int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 {
+	print_state("network_in", "CNetConnection::Feed ", State());
+
 	// check if actual ack value is valid(own sequence..latest peer ack)
 	if(m_Sequence >= m_PeerAck)
 	{

@@ -574,4 +574,6 @@ public:
 	const char *ErrorString() const;
 };
 
+void print_state(const char *type, const char *note, int State);
+
 #endif

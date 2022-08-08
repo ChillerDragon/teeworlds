@@ -607,3 +607,21 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 		print_hex(Direction == NETWORK_IN ? "network_in" : "network_out", "    ", pPacket->m_aChunkData, pPacket->m_DataSize, RowLen);
 	}
 }
+
+void print_state(const char *type, const char *note, int State)
+{
+	const char *pState = "unknown";
+	if (State == NET_CONNSTATE_OFFLINE)
+		pState = "NET_CONNSTATE_OFFLINE";
+	if (State == NET_CONNSTATE_TOKEN)
+		pState = "NET_CONNSTATE_TOKEN";
+	if (State == NET_CONNSTATE_CONNECT)
+		pState = "NET_CONNSTATE_CONNECT";
+	if (State == NET_CONNSTATE_PENDING)
+		pState = "NET_CONNSTATE_PENDING";
+	if (State == NET_CONNSTATE_ONLINE)
+		pState = "NET_CONNSTATE_ONLINE";
+	if (State == NET_CONNSTATE_ERROR)
+		pState = "NET_CONNSTATE_ERROR";
+	dbg_msg(type, "%s state=%d (%s)", note, State, pState);
+}
