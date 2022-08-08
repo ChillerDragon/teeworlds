@@ -299,6 +299,12 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 		pPacket->m_Token = (pBuffer[1] << 24) | (pBuffer[2] << 16) | (pBuffer[3] << 8) | pBuffer[4];
 			// TTTTTTTT TTTTTTTT TTTTTTTT TTTTTTTT
 		pPacket->m_ResponseToken = (pBuffer[5]<<24) | (pBuffer[6]<<16) | (pBuffer[7]<<8) | pBuffer[8];
+		if(ShowAddr(pAddr))
+		{
+			dbg_msg("network_in", "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+			dbg_msg("network_in", "X         GOT RESPONSE ToKEN   X");
+			dbg_msg("network_in", "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+		}
 			// RRRRRRRR RRRRRRRR RRRRRRRR RRRRRRRR
 		mem_copy(pPacket->m_aChunkData, &pBuffer[NET_PACKETHEADERSIZE_CONNLESS], pPacket->m_DataSize);
 	}

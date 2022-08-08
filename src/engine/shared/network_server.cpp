@@ -131,6 +131,7 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 
 				if(net_addr_comp(m_aSlots[i].m_Connection.PeerAddress(), &Addr, true) == 0)
 				{
+					dbg_msg("network", "we feed from there i=%d", i);
 					if(m_aSlots[i].m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr))
 					{
 						if(m_RecvUnpacker.m_Data.m_DataSize)
@@ -155,11 +156,18 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 			}
 
 			if(Found)
+			{
+				dbg_msg("network_in", "CNetServer::Recv not found");
 				continue;
+			}
 
 			int Accept = m_TokenManager.ProcessMessage(&Addr, &m_RecvUnpacker.m_Data);
 			if(Accept <= 0)
+			{
+				dbg_msg("network_in", "CNetServer::Recv token manager dropped accept = %d", Accept);
 				continue;
+			}
+			dbg_msg("network_in", "CNetServer::Recv flags=%d %s", m_RecvUnpacker.m_Data.m_Flags, m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONTROL ? "control" : "unkown");
 
 			if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONTROL)
 			{
@@ -198,12 +206,15 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 					if(Continue)
 						continue;
 
+					int State = m_aSlots[0].m_Connection.State();
+					dbg_msg("network_in", "slots[%d].connection.state = %d %s", 0, State, State == NET_CONNSTATE_OFFLINE ? "offline" : "");
 					for(int i = 0; i < NET_MAX_CLIENTS; i++)
 					{
 						if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
 						{
 							m_NumClients++;
 							m_aSlots[i].m_Connection.SetToken(m_RecvUnpacker.m_Data.m_Token);
+							dbg_msg("network_in", "we feed from here i=%d", i);
 							m_aSlots[i].m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr);
 							if(m_pfnNewClient)
 								m_pfnNewClient(i, m_UserPtr);
