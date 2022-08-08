@@ -37,39 +37,27 @@ int CNetTokenManager::ProcessMessage(const NETADDR *pAddr, const CNetPacketConst
 	bool BroadcastResponse = false;
 	if(pPacket->m_Token != NET_TOKEN_NONE
 		&& !CheckToken(pAddr, pPacket->m_Token, pPacket->m_ResponseToken, &BroadcastResponse))
-	{
-		dbg_msg("network_in", "CNetTokenManager::ProcessMessage wrong token, silent ignore");
 		return 0; // wrong token, silent ignore
-	}
 
 	bool Verified = pPacket->m_Token != NET_TOKEN_NONE;
 	bool TokenMessage = (pPacket->m_Flags & NET_PACKETFLAG_CONTROL)
 		&& pPacket->m_aChunkData[0] == NET_CTRLMSG_TOKEN;
 
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
-	{
-		dbg_msg("network_in", "CNetTokenManager::ProcessMessage conless valid=%d", (Verified && !BroadcastResponse) ? 1 : 0);
 		return (Verified && !BroadcastResponse) ? 1 : 0; // connless packets without token are not allowed
-	}
 
 	if(!TokenMessage)
 	{
 		if(Verified && !BroadcastResponse)
 			return 1; // verified packet
 		else
-		{
-			dbg_msg("network_in", "CNetTokenManager::ProcessMessage the only allowed not connless packet without token is NET_CTRLMSG_TOKEN");
 			// the only allowed not connless packet
 			// without token is NET_CTRLMSG_TOKEN
 			return 0;
-		}
 	}
 
 	if(Verified && TokenMessage)
-	{
-		dbg_msg("network_in", "CNetTokenManager::ProcessMessage token exchange complete result = %d", BroadcastResponse ? -1 : 1);
 		return BroadcastResponse ? -1 : 1; // everything is fine, token exchange complete
-	}
 
 	// client requesting token
 	if(pPacket->m_DataSize >= NET_TOKENREQUEST_DATASIZE)
@@ -124,7 +112,6 @@ TOKEN CNetTokenManager::GenerateToken(const NETADDR *pAddr, int64 Seed)
 bool CNetTokenManager::CheckToken(const NETADDR *pAddr, TOKEN Token, TOKEN ResponseToken, bool *BroadcastResponse)
 {
 	TOKEN CurrentToken = GenerateToken(pAddr, m_Seed);
-	dbg_msg("network_in", "CNetTokenManager::CheckToken Token=%x ResponseToken=%x CurrentToken=%x", Token, ResponseToken, CurrentToken);
 	if(CurrentToken == Token)
 		return true;
 

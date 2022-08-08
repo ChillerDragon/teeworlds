@@ -232,33 +232,23 @@ void CNetConnection::Disconnect(const char *pReason)
 
 int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 {
-	dbg_msg("network_in", "feed flags=%d", pPacket->m_Flags);
 	// check if actual ack value is valid(own sequence..latest peer ack)
 	if(m_Sequence >= m_PeerAck)
 	{
 		if(pPacket->m_Ack < m_PeerAck || pPacket->m_Ack > m_Sequence)
-		{
-			dbg_msg("network_in", "feed abort due to invalid ack=%d peerack=%d seq=%d", pPacket->m_Ack, m_PeerAck, m_Sequence);
 			return 0;
-		}
 	}
 	else
 	{
 		if(pPacket->m_Ack < m_PeerAck && pPacket->m_Ack > m_Sequence)
-		{
-			dbg_msg("network_in", "feed abort due to invalid ack=%d peerack=%d seq=%d", pPacket->m_Ack, m_PeerAck, m_Sequence);
 			return 0;
-		}
 	}
 	m_PeerAck = pPacket->m_Ack;
 
 	int64 Now = time_get();
 
 	if(pPacket->m_Token == NET_TOKEN_NONE || pPacket->m_Token != m_Token)
-	{
-		dbg_msg("network_in", "feed abort due to empty token");
 		return 0;
-	}
 
 	// check if resend is requested
 	if(pPacket->m_Flags&NET_PACKETFLAG_RESEND)
@@ -267,12 +257,10 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
 		return 1;
 
-	dbg_msg("network_in", "feed check control");
 	//
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
 	{
 		int CtrlMsg = pPacket->m_aChunkData[0];
-		dbg_msg("network_in", "got control=%d state=%d", CtrlMsg, State());
 		if(CtrlMsg == NET_CTRLMSG_CLOSE)
 		{
 			if(net_addr_comp(&m_PeerAddr, pAddr, true) == 0)
@@ -394,8 +382,6 @@ int CNetConnection::Update()
 		m_State = NET_CONNSTATE_ERROR;
 		SetError("Unable to connect to the server");
 	}
-
-	dbg_msg("network", "updating connection state = %d", State());
 
 	// fix resends
 	if(m_Buffer.First())
