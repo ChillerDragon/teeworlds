@@ -238,26 +238,40 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 	if(m_Sequence >= m_PeerAck)
 	{
 		if(pPacket->m_Ack < m_PeerAck || pPacket->m_Ack > m_Sequence)
+		{
+			dbg_msg("network_in", "feed wrong ack 1");
 			return 0;
+		}
 	}
 	else
 	{
 		if(pPacket->m_Ack < m_PeerAck && pPacket->m_Ack > m_Sequence)
+		{
+			dbg_msg("network_in", "feed wrong ack 2");
 			return 0;
+		}
 	}
 	m_PeerAck = pPacket->m_Ack;
 
 	int64 Now = time_get();
 
 	if(pPacket->m_Token == NET_TOKEN_NONE || pPacket->m_Token != m_Token)
+	{
+		dbg_msg("network_in", "feed wrong token=%x expected=%x or_none=%x", pPacket->m_Token, m_Token, NET_TOKEN_NONE);
 		return 0;
+	}
 
 	// check if resend is requested
 	if(pPacket->m_Flags&NET_PACKETFLAG_RESEND)
 		Resend();
 
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
+	{
+		dbg_msg("network_in", "feed not connless");
 		return 1;
+	}
+
+	dbg_msg("network_in", "feed flags = %d", pPacket->m_Flags);
 
 	//
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
