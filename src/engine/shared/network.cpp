@@ -462,51 +462,6 @@ bool CNetBase::ShowAddr(const NETADDR *pAddr)
 	return str_startswith(aAddrStr, "[0:0:0:0:0:0:0:1]:") || str_startswith(aAddrStr, "127.0.0.1:");
 }
 
-static const unsigned char *VariableIntUnpack(const unsigned char *pSrc, int *pInOut)
-{
-	const int Sign = (*pSrc >> 6) & 1;
-	*pInOut = *pSrc & 0x3F;
-
-	do
-	{
-		if(!(*pSrc & 0x80))
-			break;
-		pSrc++;
-		*pInOut |= (*pSrc & 0x7F) << 6;
-
-		if(!(*pSrc & 0x80))
-			break;
-		pSrc++;
-		*pInOut |= (*pSrc & 0x7F) << (6 + 7);
-
-		if(!(*pSrc & 0x80))
-			break;
-		pSrc++;
-		*pInOut |= (*pSrc & 0x7F) << (6 + 7 + 7);
-
-		if(!(*pSrc & 0x80))
-			break;
-		pSrc++;
-		*pInOut |= (*pSrc & 0x0F) << (6 + 7 + 7 + 7);
-	} while(false);
-
-	pSrc++;
-	*pInOut ^= -Sign; // if(sign) *i = ~(*i)
-	return pSrc;
-}
-
-static int UnpackerGetInt(const unsigned char *pCurrent, const unsigned char *pEnd)
-{
-	if(pCurrent >= pEnd)
-		return 0;
-
-	int i;
-	pCurrent = VariableIntUnpack(pCurrent, &i);
-	if(pCurrent > pEnd)
-		return 0;
-	return i;
-}
-
 void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int PacketSize, const NETADDR *pAddr, ENetDirection Direction)
 {
 	if(!ShowAddr(pAddr))
@@ -637,68 +592,14 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 		}
 		else if(!(pPacket->m_Flags&NET_PACKETFLAG_CONTROL))
 		{
-			// Unpacker.Reset(pPacket->m_pData, pPacket->m_DataSize);
-
-			const unsigned char *pStart = (const unsigned char *)pPacket->m_aChunkData;
-			const unsigned char *pEnd = pStart + pPacket->m_DataSize;
-			const unsigned char *pCurrent = pStart;
-
-			int Msg = UnpackerGetInt(pCurrent, pEnd);
-			int Sys = Msg&1;
-			Msg >>= 1;
 			// seems like when there is no compression
-			if(pPacket->m_DataSize == 4)
-			{
-				char aMsgInfo[512];
-				const char *pMsg = "unkown";
-				if(Msg == NETMSG_NULL) { pMsg = "NULL"; }
-				else if(Msg == NETMSG_INFO) { pMsg = "INFO"; }
-				else if(Msg == NETMSG_MAP_CHANGE) { pMsg = "MAP_CHANGE"; }
-				else if(Msg == NETMSG_MAP_DATA) { pMsg = "MAP_DATA"; }
-				else if(Msg == NETMSG_SERVERINFO) { pMsg = "SERVERINFO"; }
-				else if(Msg == NETMSG_CON_READY) { pMsg = "CON_READY"; }
-				else if(Msg == NETMSG_SNAP) { pMsg = "SNAP"; }
-				else if(Msg == NETMSG_SNAPEMPTY) { pMsg = "SNAPEMPTY"; }
-				else if(Msg == NETMSG_SNAPSINGLE) { pMsg = "SNAPSINGLE"; }
-				else if(Msg == NETMSG_SNAPSMALL) { pMsg = "SNAPSMALL"; }
-				else if(Msg == NETMSG_INPUTTIMING) { pMsg = "INPUTTIMING"; }
-				else if(Msg == NETMSG_RCON_AUTH_ON) { pMsg = "RCON_AUTH_ON"; }
-				else if(Msg == NETMSG_RCON_AUTH_OFF) { pMsg = "RCON_AUTH_OFF"; }
-				else if(Msg == NETMSG_RCON_LINE) { pMsg = "RCON_LINE"; }
-				else if(Msg == NETMSG_RCON_CMD_ADD) { pMsg = "RCON_CMD_ADD"; }
-				else if(Msg == NETMSG_RCON_CMD_REM) { pMsg = "RCON_CMD_REM"; }
-				else if(Msg == NETMSG_AUTH_CHALLANGE) { pMsg = "AUTH_CHALLANGE"; }
-				else if(Msg == NETMSG_AUTH_RESULT) { pMsg = "AUTH_RESULT"; }
-				else if(Msg == NETMSG_READY) { pMsg = "READY"; }
-				else if(Msg == NETMSG_ENTERGAME) { pMsg = "ENTERGAME"; }
-				else if(Msg == NETMSG_INPUT) { pMsg = "INPUT"; }
-				else if(Msg == NETMSG_RCON_CMD) { pMsg = "RCON_CMD"; }
-				else if(Msg == NETMSG_RCON_AUTH) { pMsg = "RCON_AUTH"; }
-				else if(Msg == NETMSG_REQUEST_MAP_DATA) { pMsg = "REQUEST_MAP_DATA"; }
-				else if(Msg == NETMSG_AUTH_START) { pMsg = "AUTH_START"; }
-				else if(Msg == NETMSG_AUTH_RESPONSE) { pMsg = "AUTH_RESPONSE"; }
-				else if(Msg == NETMSG_PING) { pMsg = "PING"; }
-				else if(Msg == NETMSG_PING_REPLY) { pMsg = "PING_REPLY"; }
-				else if(Msg == NETMSG_ERROR) { pMsg = "ERROR"; }
-				else if(Msg == NETMSG_MAPLIST_ENTRY_ADD) { pMsg = "MAPLIST_ENTRY_ADD"; }
-				else if(Msg == NETMSG_MAPLIST_ENTRY_REM) { pMsg = "MAPLIST_ENTRY_REM"; }
-				str_format(aMsgInfo, sizeof(aMsgInfo), "MsgID = %d (%s)", Msg, pMsg);
-				print_hex_row_highlight_two(
-					Direction == NETWORK_IN ? "network_in" : "network_out",
-					"  data_hex: ",
-					pPacket->m_aChunkData, PrintDataLen,
-					0, 2,
-					"CHeader",
-					3, 3,
-					aMsgInfo, "");
-			}
-			else
-				print_hex_row_highlighted(
-					Direction == NETWORK_IN ? "network_in" : "network_out",
-					"  data_hex: ",
-					pPacket->m_aChunkData, PrintDataLen,
-					0, 0,
-					"TODO: no idea what this is");
+			// there is no chunk header
+			print_hex_row_highlighted(
+				Direction == NETWORK_IN ? "network_in" : "network_out",
+				"  data_hex: ",
+				pPacket->m_aChunkData, PrintDataLen,
+				0, 0,
+				"TODO: no idea what this is");
 		}
 	}
 	else
