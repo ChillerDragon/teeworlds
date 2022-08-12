@@ -2505,6 +2505,22 @@ void str_hex(char *dst, int dst_size, const void *data, int data_size)
 	}
 }
 
+void str_raw(char *dst, int dst_size, const void *data, int data_size)
+{
+	int i;
+	const unsigned char * pdat = data;
+	for(i = 0; i < data_size && i < dst_size - 1; i++)
+		dst[i] = (pdat[i] < 32 || pdat[i] > 126) ? '.' : pdat[i];
+	dst[i] = '\0';
+}
+
+void print_raw(const char *sys, const char *prefix, const void *data, int data_size)
+{
+	char aRaw[1024];
+	str_raw(aRaw, sizeof(aRaw), data, data_size);
+	dbg_msg(sys, "%s%s", prefix, aRaw);
+}
+
 void str_hex_spaced(char *dst, int dst_size, const void *data, int data_size)
 {
 	int i;
@@ -2582,9 +2598,7 @@ void print_hex_row_highlight_two(const char *type, const char *prefix, const voi
 	int offset_note_2;
 
 	str_hex_highlight_two(aHexData, sizeof(aHexData), data, data_size, from1, to1, from2, to2);
-	mem_zero(aRawData, sizeof(aRawData));
-	for(int k = 0; k < data_size; k++)
-		aRawData[k] = (pChunkData[k] < 32 || pChunkData[k] > 126) ? '.' : pChunkData[k];
+	str_raw(aRawData, sizeof(aRawData), pChunkData, data_size);
 	dbg_msg(type, "%s%s    %s  %s", prefix, aHexData, aRawData, info);
 	offset1 = from1 * 4;
 	offset2 = from2 * 4;
@@ -2624,9 +2638,7 @@ void print_hex_row_highlight_three(
 	int offset_note_2;
 
 	str_hex_highlight_three(aHexData, sizeof(aHexData), data, data_size, from1, to1, from2, to2, from3, to3);
-	mem_zero(aRawData, sizeof(aRawData));
-	for(int k = 0; k < data_size; k++)
-		aRawData[k] = (pChunkData[k] < 32 || pChunkData[k] > 126) ? '.' : pChunkData[k];
+	str_raw(aRawData, sizeof(aRawData), pChunkData, data_size);
 	dbg_msg(type, "%s%s    %s  %s", prefix, aHexData, aRawData, info);
 	offset1 = from1 * 4;
 	offset2 = from2 * 4;
@@ -2652,9 +2664,7 @@ void print_hex_row_highlighted(const char *type, const char *prefix, const void 
 	char str[1024];
 
 	str_hex_highlighted(aHexData, sizeof(aHexData), data, data_size, from, to);
-	mem_zero(aRawData, sizeof(aRawData));
-	for(int k = 0; k < data_size; k++)
-		aRawData[k] = (pChunkData[k] < 32 || pChunkData[k] > 126) ? '.' : pChunkData[k];
+	str_raw(aRawData, sizeof(aRawData), pChunkData, data_size);
 	dbg_msg(type, "%s%s    %s", prefix, aHexData, aRawData);
 	offset = from * 4;
 	dbg_msg(type, "%s%*s%s", prefix, offset, " ", "^");
@@ -2706,10 +2716,8 @@ void print_hex(const char *type, const char *prefix, const void *data, int data_
 		// but the last row might be shorter if it is not filling it fully
 		row_length = min(max_width, data_size - i);
 		str_hex_spaced(aHexData, sizeof(aHexData), data + i, row_length);
-		mem_zero(aRawData, sizeof(aRawData));
 		pChunkData = data + i;
-		for(int k = 0; k < row_length; k++)
-			aRawData[k] = (pChunkData[k] < 32 || pChunkData[k] > 126) ? '.' : pChunkData[k];
+		str_raw(aRawData, sizeof(aRawData), pChunkData, row_length);
 		hex_row_length = max_width * 3; // 1 raw byte is 2 characters of hex plus one seperation space
 		dbg_msg(type, "%s%-*s    %s", prefix, hex_row_length, aHexData, aRawData);
 		i += row_length;

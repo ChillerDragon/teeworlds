@@ -1281,11 +1281,26 @@ const char *str_find(const char *haystack, const char *needle);
 void str_hex(char *dst, int dst_size, const void *data, int data_size);
 
 /*
-	str_hex_spaced
-
-	str_hex but groups of 4 bytes are space seperated
+	Function: str_hex_spaced
+		str_hex but groups of 4 bytes are space seperated
 */
 void str_hex_spaced(char *dst, int dst_size, const void *data, int data_size);
+/*
+	Function: str_raw
+		get all printable chars of raw data
+		and use dot for unprintables
+
+	Parameters:
+		dst - Buffer to fill with raw data
+		dst_size - size of the buffer
+		data - Data to turn into raw
+		data - Size of the data
+
+	Remarks:
+		- The destination buffer will be zero-terminated
+*/
+void str_raw(char *dst, int dst_size, const void *data, int data_size);
+void print_raw(const char *sys, const char *prefix, const void *data, int data_size);
 void str_hex_highlighted(char *dst, int dst_size, const void *data, int data_size, int from, int to);
 void str_hex_highlight_two(char *dst, int dst_size, const void *data, int data_size, int from1, int to1, int from2, int to2);
 void str_hex_highlight_three(char *dst, int dst_size, const void *data, int data_size, int from1, int to1, int from2, int to2, int from3, int to3);

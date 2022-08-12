@@ -499,8 +499,7 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 	char aHexData[1024];
 	str_hex(aHexData, sizeof(aHexData), pPacket->m_aChunkData, PrintDataLen);
 	char aRawData[1024] = {0};
-	for(int i = 0; i < PrintDataLen; i++)
-		aRawData[i] = (pPacket->m_aChunkData[i] < 32 || pPacket->m_aChunkData[i] > 126) ? '.' : pPacket->m_aChunkData[i];
+	str_raw(aRawData, sizeof(aRawData), pPacket->m_aChunkData, PrintDataLen);
 	dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "%s packetsize=%d datasize=%d flags=%d%s", aAddrStr, PacketSize, pPacket->m_DataSize, pPacket->m_Flags, aFlags);
 	char aInfo[512];
 	aInfo[0] = '\0';
