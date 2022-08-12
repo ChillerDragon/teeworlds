@@ -511,7 +511,9 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 		{
 			int CtrlMsg = pPacket->m_aChunkData[0];
 			const char *pMsg = "unkown";
-			if(CtrlMsg == NET_CTRLMSG_KEEPALIVE) { pMsg = "NET_CTRLMSG_KEEPALIVE"; }
+			// Hide keepalive if debug is lower than 4
+			// It gets spammy and makes it harder to read the more interesting messages
+			if(CtrlMsg == NET_CTRLMSG_KEEPALIVE) { pMsg = "NET_CTRLMSG_KEEPALIVE"; if (Config()->m_Debug < 4) return; }
 			else if(CtrlMsg == NET_CTRLMSG_CONNECT) { pMsg = "NET_CTRLMSG_CONNECT"; }
 			else if(CtrlMsg == NET_CTRLMSG_ACCEPT) { pMsg = "NET_CTRLMSG_ACCEPT"; }
 			else if(CtrlMsg == NET_CTRLMSG_CLOSE) { pMsg = "NET_CTRLMSG_CLOSE"; }
