@@ -593,13 +593,26 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 		else if(!(pPacket->m_Flags&NET_PACKETFLAG_CONTROL))
 		{
 			// seems like when there is no compression
-			// there is no chunk header
-			print_hex_row_highlighted(
-				Direction == NETWORK_IN ? "network_in" : "network_out",
-				"  data_hex: ",
-				pPacket->m_aChunkData, PrintDataLen,
-				0, 0,
-				"TODO: no idea what this is");
+			if(pPacket->m_DataSize == 4)
+			{
+				char aMsgInfo[512];
+				str_format(aMsgInfo, sizeof(aMsgInfo), "MsgID = TODO");
+				print_hex_row_highlight_two(
+					Direction == NETWORK_IN ? "network_in" : "network_out",
+					"  data_hex: ",
+					pPacket->m_aChunkData, PrintDataLen,
+					0, 2,
+					"CHeader",
+					3, 3,
+					aMsgInfo, "");
+			}
+			else
+				print_hex_row_highlighted(
+					Direction == NETWORK_IN ? "network_in" : "network_out",
+					"  data_hex: ",
+					pPacket->m_aChunkData, PrintDataLen,
+					0, 0,
+					"TODO: no idea what this is");
 		}
 	}
 	else
