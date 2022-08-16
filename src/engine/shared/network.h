@@ -224,14 +224,6 @@ public:
 	void SendPacketConnless(const NETADDR *pAddr, TOKEN Token, TOKEN ResponseToken, const void *pData, int DataSize);
 	void SendPacket(const NETADDR *pAddr, CNetPacketConstruct *pPacket);
 	int UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketConstruct *pPacket);
-
-	enum ENetDirection {
-		NETWORK_IN,
-		NETWORK_OUT
-	};
-
-	void PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int PacketSize, const NETADDR *pAddr, ENetDirection Direction);
-	static bool ShowAddr(const NETADDR *pAddr);
 };
 
 class CNetTokenManager
@@ -573,7 +565,5 @@ public:
 	bool GotProblems() const;
 	const char *ErrorString() const;
 };
-
-void print_state(const char *type, const char *note, int State);
 
 #endif

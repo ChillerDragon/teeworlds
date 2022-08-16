@@ -1274,6 +1274,8 @@ set_src(BASE GLOB_RECURSE src/base
   dissector/byte_printer.h
   dissector/dissector.cpp
   dissector/dissector.h
+  dissector/snapshot.cpp
+  dissector/snapshot.h
   hash.c
   hash.h
   hash_bundled.c
