@@ -232,8 +232,6 @@ void CNetConnection::Disconnect(const char *pReason)
 
 int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 {
-	print_state("network_in", "CNetConnection::Feed ", State());
-
 	// check if actual ack value is valid(own sequence..latest peer ack)
 	if(m_Sequence >= m_PeerAck)
 	{
@@ -270,8 +268,6 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 		dbg_msg("network_in", "feed not connless");
 		return 1;
 	}
-
-	dbg_msg("network_in", "feed flags = %d", pPacket->m_Flags);
 
 	//
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)

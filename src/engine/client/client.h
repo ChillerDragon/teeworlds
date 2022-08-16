@@ -331,5 +331,8 @@ public:
 	bool ToggleFullscreen();
 	void ToggleWindowBordered();
 	void ToggleWindowVSync();
+
+	// chillers verbose network printer
+	void PrintSnapshot(int Msg, CUnpacker &Unpacker);
 };
 #endif

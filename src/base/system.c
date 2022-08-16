@@ -2596,19 +2596,39 @@ void print_hex_row_highlight_two(const char *type, const char *prefix, const voi
 	int offset2;
 	int offset_arrow_2;
 	int offset_note_2;
+	int note1_len = str_length(note1);
+	int dist = from2 - from1;
+	int space = dist * 4;
+	// int note2_len = str_length(note2);
 
 	str_hex_highlight_two(aHexData, sizeof(aHexData), data, data_size, from1, to1, from2, to2);
 	str_raw(aRawData, sizeof(aRawData), pChunkData, data_size);
 	dbg_msg(type, "%s%s    %s  %s", prefix, aHexData, aRawData, info);
-	offset1 = from1 * 4;
-	offset2 = from2 * 4;
-	offset_arrow_2 = (offset2 - offset1) - 1;
-	offset_note_2 = (offset_arrow_2 - str_length(note1)) + 1;
-	dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", "^", offset_arrow_2, " ", "^");
-	// dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", note2); // single line comment
-	// dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", note2); // single line
-	dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", "|"); // multi line comment
-	dbg_msg(type, "%s%*s%s", prefix, offset2, " ", note2);
+
+	// dbg_msg("d", "note1len=%d f1=%d f2=%d dist=%d space=%d", note1_len, from1, from2, dist, space);
+	// if note1 has no space put it in the second line
+	if(note1_len > space)
+	{
+		offset1 = from1 * 4;
+		offset2 = from2 * 4;
+		offset_arrow_2 = (offset2 - offset1) - 1;
+		offset_note_2 = offset_arrow_2;
+		dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", "^", offset_arrow_2, " ", "^");
+		dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", "|", offset_note_2, " ", note2);
+		dbg_msg(type, "%s%*s%s", prefix, offset1, " ", note1);
+	}
+	else
+	{
+		offset1 = from1 * 4;
+		offset2 = from2 * 4;
+		offset_arrow_2 = (offset2 - offset1) - 1;
+		offset_note_2 = (offset_arrow_2 - note1_len) + 1;
+		dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", "^", offset_arrow_2, " ", "^");
+		// dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", note2); // single line comment
+		// dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", note2); // single line
+		dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", "|"); // multi line comment
+		dbg_msg(type, "%s%*s%s", prefix, offset2, " ", note2);
+	}
 }
 
 void print_hex_row_highlight_three(
