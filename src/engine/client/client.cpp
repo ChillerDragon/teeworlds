@@ -2793,6 +2793,8 @@ int main(int argc, const char **argv) // ignore_convention
 	return 0;
 }
 
+#include <generated/protocol.h>
+#include <engine/shared/protocol.h>
 #include <limits.h>
 
 static int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const void *pSrcData, int DataSize, short *ppItemSizes)
@@ -2917,11 +2919,38 @@ static int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, co
 		pData += ItemSize/4;
 
 		dbg_msg("network_in", "    UnpackItem of size=%d", ItemSize);
+		const char *pType = "unkown";
+		if(Type == NETOBJ_INVALID) pType = "NETOBJ_INVALID";
+		if(Type == NETOBJTYPE_PLAYERINPUT) pType = "NETOBJTYPE_PLAYERINPUT";
+		if(Type == NETOBJTYPE_PROJECTILE) pType = "NETOBJTYPE_PROJECTILE";
+		if(Type == NETOBJTYPE_LASER) pType = "NETOBJTYPE_LASER";
+		if(Type == NETOBJTYPE_PICKUP) pType = "NETOBJTYPE_PICKUP";
+		if(Type == NETOBJTYPE_FLAG) pType = "NETOBJTYPE_FLAG";
+		if(Type == NETOBJTYPE_GAMEDATA) pType = "NETOBJTYPE_GAMEDATA";
+		if(Type == NETOBJTYPE_GAMEDATATEAM) pType = "NETOBJTYPE_GAMEDATATEAM";
+		if(Type == NETOBJTYPE_GAMEDATAFLAG) pType = "NETOBJTYPE_GAMEDATAFLAG";
+		if(Type == NETOBJTYPE_CHARACTERCORE) pType = "NETOBJTYPE_CHARACTERCORE";
+		if(Type == NETOBJTYPE_CHARACTER) pType = "NETOBJTYPE_CHARACTER";
+		if(Type == NETOBJTYPE_PLAYERINFO) pType = "NETOBJTYPE_PLAYERINFO";
+		if(Type == NETOBJTYPE_SPECTATORINFO) pType = "NETOBJTYPE_SPECTATORINFO";
+		if(Type == NETOBJTYPE_DE_CLIENTINFO) pType = "NETOBJTYPE_DE_CLIENTINFO";
+		if(Type == NETOBJTYPE_DE_GAMEINFO) pType = "NETOBJTYPE_DE_GAMEINFO";
+		if(Type == NETOBJTYPE_DE_TUNEPARAMS) pType = "NETOBJTYPE_DE_TUNEPARAMS";
+		if(Type == NETEVENTTYPE_COMMON) pType = "NETEVENTTYPE_COMMON";
+		if(Type == NETEVENTTYPE_EXPLOSION) pType = "NETEVENTTYPE_EXPLOSION";
+		if(Type == NETEVENTTYPE_SPAWN) pType = "NETEVENTTYPE_SPAWN";
+		if(Type == NETEVENTTYPE_HAMMERHIT) pType = "NETEVENTTYPE_HAMMERHIT";
+		if(Type == NETEVENTTYPE_DEATH) pType = "NETEVENTTYPE_DEATH";
+		if(Type == NETEVENTTYPE_SOUNDWORLD) pType = "NETEVENTTYPE_SOUNDWORLD";
+		if(Type == NETEVENTTYPE_DAMAGE) pType = "NETEVENTTYPE_DAMAGE";
+		if(Type == NETOBJTYPE_PLAYERINFORACE) pType = "NETOBJTYPE_PLAYERINFORACE";
+		if(Type == NETOBJTYPE_GAMEDATARACE) pType = "NETOBJTYPE_GAMEDATARACE";
+		if(Type == NUM_NETOBJTYPES) pType = "NUM_NETOBJTYPES";
 		int PrintItemLen = minimum(20, ItemSize);
 		char aCutNote[512];
 		char aTypeNote[512];
 		char aIdNote[512];
-		str_format(aTypeNote, sizeof(aTypeNote), "Type=%d", Type);
+		str_format(aTypeNote, sizeof(aTypeNote), "Type=%d (%s)", Type, pType);
 		str_format(aIdNote, sizeof(aIdNote), "ID=%d", ID);
 		aCutNote[0] = '\0';
 		if(ItemSize != PrintItemLen)

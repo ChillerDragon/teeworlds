@@ -624,9 +624,9 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 					0, PacketHeaderSize - 1, /* print_hex_row_highlighted expects indecies so from 0 - 6 = 7 chunks */
 					"header",
 					PacketHeaderSize, PacketHeaderSize,
-					"who dis?",
+					pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION ? "compressed data from here on" : "who dis?",
 					"[ONLY FIRST ROW DISPLAYED]");
-		dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  decompressed_data:");
+		dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION ? "  decompressed_data:" : "  data:");
 		print_hex(Direction == NETWORK_IN ? "network_in" : "network_out", "    ", pPacket->m_aChunkData, pPacket->m_DataSize, RowLen);
 	}
 }
