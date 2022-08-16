@@ -8,6 +8,8 @@
 #include <base/math.h>
 #include <engine/shared/config.h>
 
+#include "compat.h"
+
 void print_packet(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int PacketSize, const NETADDR *pAddr, ENetDirection Direction, const CConfig *pConfig)
 {
 	if(!show_addr(pAddr))
@@ -29,7 +31,7 @@ void print_packet(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int 
 	aFlags[0] = '\0';
 	if(aBuf[0])
 		str_format(aFlags, sizeof(aFlags), " (%s)", aBuf);
-	int PacketHeaderSize = pPacket->m_Flags&NET_PACKETFLAG_CONNLESS ? NET_PACKETHEADERSIZE_CONNLESS : NET_PACKETHEADERSIZE;
+	int PacketHeaderSize = pPacket->m_Flags&NET_PACKETFLAG_CONNLESS ? _NET_PACKETHEADERSIZE_CONNLESS : _NET_PACKETHEADERSIZE;
 	int RowLen = 12;
 	int NullBytes = maximum(pPacket->m_DataSize - RowLen, 0);
 	for(int i = RowLen; i < pPacket->m_DataSize; i++)
@@ -213,24 +215,24 @@ bool show_addr(const NETADDR *pAddr)
 {
 	char aAddrStr[NETADDR_MAXSTRSIZE];
 	net_addr_str(pAddr, aAddrStr, sizeof(aAddrStr), true);
-	return str_startswith(aAddrStr, "[0:0:0:0:0:0:0:1]:") || str_startswith(aAddrStr, "127.0.0.1:");
+	return str_startswith(aAddrStr, "[0:0:0:0:0:0:0:1]:") || str_startswith(aAddrStr, "127.0.0.1:") || str_startswith(aAddrStr, "[::1]:");
 }
 
 void netmsg_to_s(int Msg, char *pBuf, int Size)
 {
-    if(Msg == NETMSG_NULL) { str_copy(pBuf, "NETMSG_NULL", Size); }
+    if(Msg == _NETMSG_NULL) { str_copy(pBuf, "NETMSG_NULL", Size); }
     else if(Msg == NETMSG_INFO) { str_copy(pBuf, "NETMSG_INFO", Size); }
     else if(Msg == NETMSG_MAP_CHANGE) { str_copy(pBuf, "NETMSG_MAP_CHANGE", Size); }
     else if(Msg == NETMSG_MAP_DATA) { str_copy(pBuf, "NETMSG_MAP_DATA", Size); }
-    else if(Msg == NETMSG_SERVERINFO) { str_copy(pBuf, "NETMSG_SERVERINFO", Size); }
+    else if(Msg == _NETMSG_SERVERINFO) { str_copy(pBuf, "NETMSG_SERVERINFO", Size); }
     else if(Msg == NETMSG_CON_READY) { str_copy(pBuf, "NETMSG_CON_READY", Size); }
     else if(Msg == NETMSG_SNAP) { str_copy(pBuf, "NETMSG_SNAP", Size); }
     else if(Msg == NETMSG_SNAPEMPTY) { str_copy(pBuf, "NETMSG_SNAPEMPTY", Size); }
     else if(Msg == NETMSG_SNAPSINGLE) { str_copy(pBuf, "NETMSG_SNAPSINGLE", Size); }
     else if(Msg == NETMSG_SNAPSMALL) { str_copy(pBuf, "NETMSG_SNAPSMALL", Size); }
     else if(Msg == NETMSG_INPUTTIMING) { str_copy(pBuf, "NETMSG_INPUTTIMING", Size); }
-    else if(Msg == NETMSG_RCON_AUTH_ON) { str_copy(pBuf, "NETMSG_RCON_AUTH_ON", Size); }
-    else if(Msg == NETMSG_RCON_AUTH_OFF) { str_copy(pBuf, "NETMSG_RCON_AUTH_OFF", Size); }
+    else if(Msg == _NETMSG_RCON_AUTH_ON) { str_copy(pBuf, "NETMSG_RCON_AUTH_ON", Size); }
+    else if(Msg == _NETMSG_RCON_AUTH_OFF) { str_copy(pBuf, "NETMSG_RCON_AUTH_OFF", Size); }
     else if(Msg == NETMSG_RCON_LINE) { str_copy(pBuf, "NETMSG_RCON_LINE", Size); }
     else if(Msg == NETMSG_RCON_CMD_ADD) { str_copy(pBuf, "NETMSG_RCON_CMD_ADD", Size); }
     else if(Msg == NETMSG_RCON_CMD_REM) { str_copy(pBuf, "NETMSG_RCON_CMD_REM", Size); }
@@ -247,8 +249,8 @@ void netmsg_to_s(int Msg, char *pBuf, int Size)
     else if(Msg == NETMSG_PING) { str_copy(pBuf, "NETMSG_PING", Size); }
     else if(Msg == NETMSG_PING_REPLY) { str_copy(pBuf, "NETMSG_PING_REPLY", Size); }
     else if(Msg == NETMSG_ERROR) { str_copy(pBuf, "NETMSG_ERROR", Size); }
-    else if(Msg == NETMSG_MAPLIST_ENTRY_ADD) { str_copy(pBuf, "NETMSG_MAPLIST_ENTRY_ADD", Size); }
-    else if(Msg == NETMSG_MAPLIST_ENTRY_REM) { str_copy(pBuf, "NETMSG_MAPLIST_ENTRY_REM", Size); }
+    else if(Msg == _NETMSG_MAPLIST_ENTRY_ADD) { str_copy(pBuf, "NETMSG_MAPLIST_ENTRY_ADD", Size); }
+    else if(Msg == _NETMSG_MAPLIST_ENTRY_REM) { str_copy(pBuf, "NETMSG_MAPLIST_ENTRY_REM", Size); }
     else { str_copy(pBuf, "unknown", Size); }
 }
 

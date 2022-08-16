@@ -25,7 +25,13 @@
 #include <engine/input.h>
 #include <engine/keys.h>
 #include <engine/map.h>
+
+// #if __has_include("dissector.h") && __has_include(<engine/masterserver.h>)
+
+#if __has_include(<engine/masterserver.h>)
 #include <engine/masterserver.h>
+#endif
+
 #include <engine/serverbrowser.h>
 #include <engine/sound.h>
 #include <engine/storage.h>
@@ -36,7 +42,9 @@
 #include <engine/shared/datafile.h>
 #include <engine/shared/demo.h>
 #include <engine/shared/filecollection.h>
+#if __has_include(<engine/shared/mapchecker.h>)
 #include <engine/shared/mapchecker.h>
+#endif
 #include <engine/shared/network.h>
 #include <engine/shared/packer.h>
 #include <engine/shared/protocol.h>
@@ -45,29 +53,49 @@
 
 #include <game/version.h>
 
+#if __has_include(<mastersrv/mastersrv.h>)
 #include <mastersrv/mastersrv.h>
+#endif
+#if __has_include(<versionsrv/versionsrv.h>)
 #include <versionsrv/versionsrv.h>
+#endif
 
+#if __has_include(<engine/contacts.h>)
 #include <engine/contacts.h>
+#endif
 #include <engine/serverbrowser.h>
 #include <engine/client/serverbrowser.h>
+#if __has_include(<engine/client/contacts.h>)
 #include <engine/client/contacts.h>
+#endif
 #include <engine/client.h>
 #include <engine/client/client.h>
 
+#if __has_include(<generated/protocol.h>)
 #include <generated/protocol.h>
+#endif
 #include <engine/shared/protocol.h>
 #include <limits.h>
+
+#include "compat.h"
 
 int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const void *pSrcData, int DataSize, const short *ppItemSizes)
 {
 	const int MAX_NETOBJSIZES = 64;
 	CSnapshotBuilder Builder;
 	const CSnapshotDelta::CData *pDelta = (const CSnapshotDelta::CData *)pSrcData;
+#ifdef _PROTOCOL_VERSION_7
 	const int *pData = (const int *)pDelta->m_pData;
+#else
+	const int *pData = (const int *)pDelta->m_aData;
+#endif
 	const int *pEnd = (const int *)(((const char *)pSrcData + DataSize));
 
+#ifdef _PROTOCOL_VERSION_7
 	const CSnapshotItem *pFromItem;
+#else
+	CSnapshotItem *pFromItem;
+#endif
 	int Keep, ItemSize;
 	const int *pDeleted;
 	int ID, Type, Key;
@@ -142,6 +170,9 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 		if(ID < 0 || ID > CSnapshot::MAX_ID)
 			return -3;
 
+#ifndef _PROTOCOL_VERSION_7
+#pragma message("item size only implemented for 0.7")
+#else
 		if(Type < MAX_NETOBJSIZES && ppItemSizes[Type])
 			ItemSize = ppItemSizes[Type];
 		else
@@ -152,6 +183,7 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 				return -3;
 			ItemSize = (*pData++) * 4;
 		}
+#endif
 
 		// if(RangeCheck(pEnd, pData, ItemSize) || ItemSize < 0) return -3;
 
@@ -182,31 +214,31 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 
 		dbg_msg("network_in", "    UnpackItem of size=%d", ItemSize);
 		const char *pType = "unkown";
-		if(Type == NETOBJ_INVALID) pType = "NETOBJ_INVALID";
+		if(Type == _NETOBJ_INVALID) pType = "NETOBJ_INVALID";
 		if(Type == NETOBJTYPE_PLAYERINPUT) pType = "NETOBJTYPE_PLAYERINPUT";
 		if(Type == NETOBJTYPE_PROJECTILE) pType = "NETOBJTYPE_PROJECTILE";
 		if(Type == NETOBJTYPE_LASER) pType = "NETOBJTYPE_LASER";
 		if(Type == NETOBJTYPE_PICKUP) pType = "NETOBJTYPE_PICKUP";
 		if(Type == NETOBJTYPE_FLAG) pType = "NETOBJTYPE_FLAG";
 		if(Type == NETOBJTYPE_GAMEDATA) pType = "NETOBJTYPE_GAMEDATA";
-		if(Type == NETOBJTYPE_GAMEDATATEAM) pType = "NETOBJTYPE_GAMEDATATEAM";
-		if(Type == NETOBJTYPE_GAMEDATAFLAG) pType = "NETOBJTYPE_GAMEDATAFLAG";
+		if(Type == _NETOBJTYPE_GAMEDATATEAM) pType = "NETOBJTYPE_GAMEDATATEAM";
+		if(Type == _NETOBJTYPE_GAMEDATAFLAG) pType = "NETOBJTYPE_GAMEDATAFLAG";
 		if(Type == NETOBJTYPE_CHARACTERCORE) pType = "NETOBJTYPE_CHARACTERCORE";
 		if(Type == NETOBJTYPE_CHARACTER) pType = "NETOBJTYPE_CHARACTER";
 		if(Type == NETOBJTYPE_PLAYERINFO) pType = "NETOBJTYPE_PLAYERINFO";
 		if(Type == NETOBJTYPE_SPECTATORINFO) pType = "NETOBJTYPE_SPECTATORINFO";
-		if(Type == NETOBJTYPE_DE_CLIENTINFO) pType = "NETOBJTYPE_DE_CLIENTINFO";
-		if(Type == NETOBJTYPE_DE_GAMEINFO) pType = "NETOBJTYPE_DE_GAMEINFO";
-		if(Type == NETOBJTYPE_DE_TUNEPARAMS) pType = "NETOBJTYPE_DE_TUNEPARAMS";
+		if(Type == _NETOBJTYPE_DE_CLIENTINFO) pType = "NETOBJTYPE_DE_CLIENTINFO";
+		if(Type == _NETOBJTYPE_DE_GAMEINFO) pType = "NETOBJTYPE_DE_GAMEINFO";
+		if(Type == _NETOBJTYPE_DE_TUNEPARAMS) pType = "NETOBJTYPE_DE_TUNEPARAMS";
 		if(Type == NETEVENTTYPE_COMMON) pType = "NETEVENTTYPE_COMMON";
 		if(Type == NETEVENTTYPE_EXPLOSION) pType = "NETEVENTTYPE_EXPLOSION";
 		if(Type == NETEVENTTYPE_SPAWN) pType = "NETEVENTTYPE_SPAWN";
 		if(Type == NETEVENTTYPE_HAMMERHIT) pType = "NETEVENTTYPE_HAMMERHIT";
 		if(Type == NETEVENTTYPE_DEATH) pType = "NETEVENTTYPE_DEATH";
 		if(Type == NETEVENTTYPE_SOUNDWORLD) pType = "NETEVENTTYPE_SOUNDWORLD";
-		if(Type == NETEVENTTYPE_DAMAGE) pType = "NETEVENTTYPE_DAMAGE";
-		if(Type == NETOBJTYPE_PLAYERINFORACE) pType = "NETOBJTYPE_PLAYERINFORACE";
-		if(Type == NETOBJTYPE_GAMEDATARACE) pType = "NETOBJTYPE_GAMEDATARACE";
+		if(Type == _NETEVENTTYPE_DAMAGE) pType = "NETEVENTTYPE_DAMAGE";
+		if(Type == _NETOBJTYPE_PLAYERINFORACE) pType = "NETOBJTYPE_PLAYERINFORACE";
+		if(Type == _NETOBJTYPE_GAMEDATARACE) pType = "NETOBJTYPE_GAMEDATARACE";
 		if(Type == NUM_NETOBJTYPES) pType = "NUM_NETOBJTYPES";
 		int PrintItemLen = minimum(20, ItemSize);
 		char aCutNote[512];
@@ -240,7 +272,11 @@ void print_snapshot(int Msg,
     unsigned int m_SnapshotParts,
     const CSnapshotDelta &m_SnapshotDelta,
     int m_CurrentRecvTick,
+#ifdef _PROTOCOL_VERSION_7
     const CSnapshotStorage &m_SnapshotStorage,
+#else
+    CSnapshotStorage &m_SnapshotStorage,
+#endif
     int m_SnapCrcErrors,
     // const CSmoothTime &GameTime,
     const char *m_aSnapshotIncomingData,
@@ -385,7 +421,16 @@ void print_snapshot(int Msg,
 
 			// unpack delta
 			// SnapSize = m_SnapshotDelta.UnpackDelta(pDeltaShot, pTmpBuffer3, pDeltaData, DeltaSize);
-			SnapSize = CSnapshotDelta_UnpackDelta(pDeltaShot, pTmpBuffer3, pDeltaData, DeltaSize, m_SnapshotDelta.m_aItemSizes);
+			SnapSize = CSnapshotDelta_UnpackDelta(
+                pDeltaShot,
+                pTmpBuffer3,
+                pDeltaData,
+                DeltaSize,
+#ifdef _PROTOCOL_VERSION_7
+                m_SnapshotDelta.m_aItemSizes);
+#else
+                nullptr);
+#endif
 			if(SnapSize < 0)
 			{
 				dbg_msg("network_in", "  delta unpack failed! (%d)", SnapSize);
