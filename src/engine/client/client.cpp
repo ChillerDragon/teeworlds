@@ -54,6 +54,8 @@
 #undef main
 #endif
 
+#include <base/dissector/byte_printer.h>
+
 void CGraph::Init(float Min, float Max)
 {
 	m_MinRange = m_Min = Min;

@@ -10,6 +10,7 @@
 #include "network.h"
 #include "huffman.h"
 
+#include <base/dissector/byte_printer.h>
 
 static void ConchainDbgLognetwork(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
 {
@@ -462,6 +463,8 @@ bool CNetBase::ShowAddr(const NETADDR *pAddr)
 	return str_startswith(aAddrStr, "[0:0:0:0:0:0:0:1]:") || str_startswith(aAddrStr, "127.0.0.1:");
 }
 
+#include <engine/shared/packer.h>
+
 void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int PacketSize, const NETADDR *pAddr, ENetDirection Direction)
 {
 	if(!ShowAddr(pAddr))
@@ -626,8 +629,38 @@ void CNetBase::PrintPacket(CNetPacketConstruct *pPacket, unsigned char *pPacketD
 					PacketHeaderSize, PacketHeaderSize,
 					pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION ? "compressed data from here on" : "who dis?",
 					"[ONLY FIRST ROW DISPLAYED]");
-		dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION ? "  decompressed_data:" : "  data:");
-		print_hex(Direction == NETWORK_IN ? "network_in" : "network_out", "    ", pPacket->m_aChunkData, pPacket->m_DataSize, RowLen);
+		if(pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION)
+		{
+			// unpack msg and sys code from CClient::ProcessServerPacket()
+			CUnpacker Unpacker;
+			// first two bytes are Flags and Size ignore those and skip to byte 3
+			Unpacker.Reset(pPacket->m_aChunkData + 2, pPacket->m_DataSize - 2);
+
+			// unpack msgid and system flag
+			int Msg = Unpacker.GetInt();
+			int Sys = Msg&1;
+			Msg >>= 1;
+
+			char aMsg[512];
+			str_format(aMsg, sizeof(aMsg), "Msg=%d Sys=%d", Msg, Sys);
+
+			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  decompressed_data:");
+			print_hex_row_highlight_two(
+					Direction == NETWORK_IN ? "network_in" : "network_out",
+					"    ",
+					pPacket->m_aChunkData, RowLen,
+					0, 1,
+					"Flags & Size",
+					2, 2,
+					aMsg,
+					"");
+			print_hex(Direction == NETWORK_IN ? "network_in" : "network_out", "    ", pPacket->m_aChunkData + RowLen, pPacket->m_DataSize - RowLen, RowLen);
+		}
+		else
+		{
+			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  data:");
+			print_hex(Direction == NETWORK_IN ? "network_in" : "network_out", "    ", pPacket->m_aChunkData, pPacket->m_DataSize, RowLen);
+		}
 	}
 }
 
