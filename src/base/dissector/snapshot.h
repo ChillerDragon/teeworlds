@@ -3,9 +3,16 @@
 
 #include "compat.h"
 
-int CSnapshotDelta_UnpackDelta(const class CSnapshot *pFrom, class CSnapshot *pTo, const void *pSrcData, int DataSize, const short *ppItemSizes);
+int CSnapshotDelta_UnpackDelta(
+    const class CSnapshot *pFrom,
+    class CSnapshot *pTo,
+    const void *pSrcData,
+    int DataSize,
+    const short *ppItemSizes,
+    bool Sixup);
 
-void print_snapshot(int Msg,
+void print_snapshot(
+    int Msg,
     CUnpacker &Unpacker,
     const class CConfig *pConfig,
     int m_ReceivedSnapshots,
@@ -21,6 +28,7 @@ void print_snapshot(int Msg,
     // const class CSmoothTime &GameTime,
     const char *m_aSnapshotIncomingData,
     class CSnapshotStorage::CHolder **m_aSnapshots, // TODO: const this
-    class CClient *pClient);
+    class CClient *pClient,
+    bool Sixup);
 
 #endif

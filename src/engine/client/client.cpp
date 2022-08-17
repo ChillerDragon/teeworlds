@@ -1397,7 +1397,8 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 				// const class CSmoothTime &GameTime,
 				m_aSnapshotIncomingData,
 				m_aSnapshots,
-				this);
+				this,
+				true);
 
 			int NumParts = 1;
 			int Part = 0;
