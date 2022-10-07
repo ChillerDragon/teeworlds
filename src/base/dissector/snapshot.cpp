@@ -79,6 +79,10 @@
 
 #include "compat.h"
 
+#include "debug_dump_snapshot.h"
+
+#include "num_to_str.h"
+
 static int _RangeCheck(const void *pEnd, const void *pPtr, int Size)
 {
 	if((const char *)pPtr + Size > (const char *)pEnd)
@@ -238,37 +242,13 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 		pData += ItemSize/4;
 
 		dbg_msg("network_in", "    UnpackItem of size=%d", ItemSize);
-		const char *pType = "unkown";
-		if(Type == _NETOBJ_INVALID) pType = "NETOBJ_INVALID";
-		if(Type == _NETOBJTYPE_PLAYERINPUT) pType = "NETOBJTYPE_PLAYERINPUT";
-		if(Type == _NETOBJTYPE_PROJECTILE) pType = "NETOBJTYPE_PROJECTILE";
-		if(Type == _NETOBJTYPE_LASER) pType = "NETOBJTYPE_LASER";
-		if(Type == _NETOBJTYPE_PICKUP) pType = "NETOBJTYPE_PICKUP";
-		if(Type == _NETOBJTYPE_FLAG) pType = "NETOBJTYPE_FLAG";
-		if(Type == _NETOBJTYPE_GAMEDATA) pType = "NETOBJTYPE_GAMEDATA";
-		if(Type == _NETOBJTYPE_GAMEDATATEAM) pType = "NETOBJTYPE_GAMEDATATEAM";
-		if(Type == _NETOBJTYPE_GAMEDATAFLAG) pType = "NETOBJTYPE_GAMEDATAFLAG";
-		if(Type == _NETOBJTYPE_CHARACTERCORE) pType = "NETOBJTYPE_CHARACTERCORE";
-		if(Type == _NETOBJTYPE_CHARACTER) pType = "NETOBJTYPE_CHARACTER";
-		if(Type == _NETOBJTYPE_PLAYERINFO) pType = "NETOBJTYPE_PLAYERINFO";
-		if(Type == _NETOBJTYPE_SPECTATORINFO) pType = "NETOBJTYPE_SPECTATORINFO";
-		if(Type == _NETOBJTYPE_DE_CLIENTINFO) pType = "NETOBJTYPE_DE_CLIENTINFO";
-		if(Type == _NETOBJTYPE_DE_GAMEINFO) pType = "NETOBJTYPE_DE_GAMEINFO";
-		if(Type == _NETOBJTYPE_DE_TUNEPARAMS) pType = "NETOBJTYPE_DE_TUNEPARAMS";
-		if(Type == _NETEVENTTYPE_COMMON) pType = "NETEVENTTYPE_COMMON";
-		if(Type == _NETEVENTTYPE_EXPLOSION) pType = "NETEVENTTYPE_EXPLOSION";
-		if(Type == _NETEVENTTYPE_SPAWN) pType = "NETEVENTTYPE_SPAWN";
-		if(Type == _NETEVENTTYPE_HAMMERHIT) pType = "NETEVENTTYPE_HAMMERHIT";
-		if(Type == _NETEVENTTYPE_DEATH) pType = "NETEVENTTYPE_DEATH";
-		if(Type == _NETEVENTTYPE_SOUNDWORLD) pType = "NETEVENTTYPE_SOUNDWORLD";
-		if(Type == _NETEVENTTYPE_DAMAGE) pType = "NETEVENTTYPE_DAMAGE";
-		if(Type == _NETOBJTYPE_PLAYERINFORACE) pType = "NETOBJTYPE_PLAYERINFORACE";
-		if(Type == _NETOBJTYPE_GAMEDATARACE) pType = "NETOBJTYPE_GAMEDATARACE";
+    char aType[128];
+		netobj_to_str(Type, aType, sizeof(aType));
 		int PrintItemLen = minimum(20, ItemSize);
 		char aCutNote[512];
 		char aTypeNote[512];
 		char aIdNote[512];
-		str_format(aTypeNote, sizeof(aTypeNote), "Type=%d (%s)", Type, pType);
+		str_format(aTypeNote, sizeof(aTypeNote), "Type=%d (%s)", Type, aType);
 		str_format(aIdNote, sizeof(aIdNote), "ID=%d", ID);
 		aCutNote[0] = '\0';
 		if(ItemSize != PrintItemLen)
@@ -410,7 +390,8 @@ void print_snapshot(int Msg,
 				int DeltashotSize = m_SnapshotStorage.Get(DeltaTick, 0, &pDeltaShot, 0);
 
 				dbg_msg("network_in", "  pDeltaShot->DebugDump():");
-				pDeltaShot->DebugDump();
+				// pDeltaShot->DebugDump();
+        debug_dump(pDeltaShot);
 
 				if(DeltashotSize < 0)
 				{
