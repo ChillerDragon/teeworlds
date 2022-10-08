@@ -3,6 +3,10 @@
 
 #include "compat.h"
 
+void debug_dump(class CSnapshot *pSnapShot);
+
+void netobj_to_str(int Type, char *pBuf, int Size);
+
 int CSnapshotDelta_UnpackDelta(
     const class CSnapshot *pFrom,
     class CSnapshot *pTo,

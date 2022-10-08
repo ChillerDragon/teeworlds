@@ -79,15 +79,61 @@
 
 #include "compat.h"
 
-#include "debug_dump_snapshot.h"
-
-#include "num_to_str.h"
+#include "snapshot.h"
 
 static int _RangeCheck(const void *pEnd, const void *pPtr, int Size)
 {
 	if((const char *)pPtr + Size > (const char *)pEnd)
 		return -1;
 	return 0;
+}
+
+void debug_dump(CSnapshot *pSnapShot)
+{
+	dbg_msg("snapshot", "num_items=%d", pSnapShot->NumItems());
+	for(int i = 0; i < pSnapShot->NumItems(); i++)
+	{
+		const CSnapshotItem *pItem = pSnapShot->GetItem(i);
+		int Size = pSnapShot->GetItemSize(i);
+		char aType[128];
+		netobj_to_str(pItem->Type(), aType, sizeof(aType));
+		dbg_msg("snapshot", "\ttype=%d (%s)  id=%d", pItem->Type(), aType, pItem->ID());
+		for(int b = 0; b < Size / 4; b++)
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x", b, pItem->Data()[b], pItem->Data()[b]);
+	}
+}
+
+void netobj_to_str(int Type, char *pBuf, int Size)
+{
+  init_compat();
+  const char *pType = "unkown";
+  if(Type == _NETOBJ_INVALID) pType = "NETOBJ_INVALID";
+  if(Type == _NETOBJTYPE_PLAYERINPUT) pType = "NETOBJTYPE_PLAYERINPUT";
+  if(Type == _NETOBJTYPE_PROJECTILE) pType = "NETOBJTYPE_PROJECTILE";
+  if(Type == _NETOBJTYPE_LASER) pType = "NETOBJTYPE_LASER";
+  if(Type == _NETOBJTYPE_PICKUP) pType = "NETOBJTYPE_PICKUP";
+  if(Type == _NETOBJTYPE_FLAG) pType = "NETOBJTYPE_FLAG";
+  if(Type == _NETOBJTYPE_GAMEDATA) pType = "NETOBJTYPE_GAMEDATA";
+  if(Type == _NETOBJTYPE_GAMEDATATEAM) pType = "NETOBJTYPE_GAMEDATATEAM";
+  if(Type == _NETOBJTYPE_GAMEDATAFLAG) pType = "NETOBJTYPE_GAMEDATAFLAG";
+  if(Type == _NETOBJTYPE_CHARACTERCORE) pType = "NETOBJTYPE_CHARACTERCORE";
+  if(Type == _NETOBJTYPE_CHARACTER) pType = "NETOBJTYPE_CHARACTER";
+  if(Type == _NETOBJTYPE_PLAYERINFO) pType = "NETOBJTYPE_PLAYERINFO";
+  if(Type == _NETOBJTYPE_SPECTATORINFO) pType = "NETOBJTYPE_SPECTATORINFO";
+  if(Type == _NETOBJTYPE_DE_CLIENTINFO) pType = "NETOBJTYPE_DE_CLIENTINFO";
+  if(Type == _NETOBJTYPE_DE_GAMEINFO) pType = "NETOBJTYPE_DE_GAMEINFO";
+  if(Type == _NETOBJTYPE_DE_TUNEPARAMS) pType = "NETOBJTYPE_DE_TUNEPARAMS";
+  if(Type == _NETEVENTTYPE_COMMON) pType = "NETEVENTTYPE_COMMON";
+  if(Type == _NETEVENTTYPE_EXPLOSION) pType = "NETEVENTTYPE_EXPLOSION";
+  if(Type == _NETEVENTTYPE_SPAWN) pType = "NETEVENTTYPE_SPAWN";
+  if(Type == _NETEVENTTYPE_HAMMERHIT) pType = "NETEVENTTYPE_HAMMERHIT";
+  if(Type == _NETEVENTTYPE_DEATH) pType = "NETEVENTTYPE_DEATH";
+  if(Type == _NETEVENTTYPE_SOUNDWORLD) pType = "NETEVENTTYPE_SOUNDWORLD";
+  if(Type == _NETEVENTTYPE_DAMAGE) pType = "NETEVENTTYPE_DAMAGE";
+  if(Type == _NETOBJTYPE_PLAYERINFORACE) pType = "NETOBJTYPE_PLAYERINFORACE";
+  if(Type == _NETOBJTYPE_GAMEDATARACE) pType = "NETOBJTYPE_GAMEDATARACE";
+
+  str_copy(pBuf, pType, Size);
 }
 
 int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const void *pSrcData, int DataSize, const short *ppItemSizes, bool Sixup)
