@@ -99,7 +99,34 @@ void debug_dump(CSnapshot *pSnapShot)
 		netobj_to_str(pItem->Type(), aType, sizeof(aType));
 		dbg_msg("snapshot", "\ttype=%d (%s)  id=%d", pItem->Type(), aType, pItem->ID());
 
-		if(pItem->Type() == _NETOBJTYPE_CHARACTER)
+		int b = 0;
+		if(pItem->Type() == _NETOBJTYPE_PLAYERINFO)
+		{
+			if(Size != 12)
+			{
+				dbg_msg("snapshot", "\t\tInvalid Size=%d Expected=12", Size);
+				exit(1);
+			}
+			const CNetObj_PlayerInfo *pChr = ((const CNetObj_PlayerInfo *)pItem->Data());
+
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_PlayerFlags=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_PlayerFlags);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Score=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Score);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Latency=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Latency);b++;
+		}
+		else if(pItem->Type() == _NETOBJTYPE_GAMEDATA)
+		{
+			if(Size != 12)
+			{
+				dbg_msg("snapshot", "\t\tInvalid Size=%d Expected=12", Size);
+				exit(1);
+			}
+			const CNetObj_GameData *pChr = ((const CNetObj_GameData *)pItem->Data());
+
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStartTick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_GameStartTick);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStateFlags=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_GameStateFlags);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStateEndTick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_GameStateEndTick);b++;
+		}
+		else if(pItem->Type() == _NETOBJTYPE_CHARACTER)
 		{
 			if(Size != 88)
 			{
@@ -107,7 +134,6 @@ void debug_dump(CSnapshot *pSnapShot)
 				exit(1);
 			}
 			const CNetObj_Character *pChr = ((const CNetObj_Character *)pItem->Data());
-			int b = 0;
 
 			// CNetObj_CharacterCore
 			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Tick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Tick);b++;
@@ -137,7 +163,7 @@ void debug_dump(CSnapshot *pSnapShot)
 		}
 		else
 		{
-			for(int b = 0; b < Size / 4; b++)
+			for(b = 0; b < Size / 4; b++)
 				dbg_msg("snapshot", "\t\t%3d %12d\t%08x", b, pItem->Data()[b], pItem->Data()[b]);
 		}
 	}
