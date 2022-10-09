@@ -13,9 +13,9 @@ class CMsgPacker : public CPacker
 public:
 	CMsgPacker(int Type, bool System=false)
 	{
-		char aMsg[512];
-		netmsg_to_s(Type, aMsg, sizeof(aMsg));
-		dbg_msg("network_out", "pack sys=%d msg=%d (%s)", System, Type, aMsg);
+		// char aMsg[512];
+		// netmsg_to_s(Type, aMsg, sizeof(aMsg));
+		// dbg_msg("network_out", "pack sys=%d msg=%d (%s)", System, Type, aMsg);
 		Reset();
 		AddInt((Type<<1)|(System?1:0));
 	}
