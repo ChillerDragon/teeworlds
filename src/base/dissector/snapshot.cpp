@@ -102,8 +102,37 @@ void debug_dump(CSnapshot *pSnapShot)
 		char aType[128];
 		netobj_to_str(pItem->Type(), aType, sizeof(aType));
 		dbg_msg("snapshot", "\ttype=%d (%s)  id=%d", pItem->Type(), aType, pItem->ID());
-		for(int b = 0; b < Size / 4; b++)
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x", b, pItem->Data()[b], pItem->Data()[b]);
+
+		if(pItem->Type() == _NETOBJTYPE_CHARACTER)
+		{
+			if(Size != 88)
+			{
+				dbg_msg("snapshot", "\t\tInvalid Size=%d Expected=88", Size);
+				exit(1);
+			}
+			const CNetObj_Character *pChr = ((const CNetObj_Character *)pItem->Data());
+			int b = 0;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Tick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Tick);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_X=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_X);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Y=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Y);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_VelX=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_VelX);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_VelY=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_VelY);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Angle=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Angle);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Direction=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Direction);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Jumped=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Jumped);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookedPlayer=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookedPlayer);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookState=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookState);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookTick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookTick);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookX=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookX);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookY=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookY);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookDx=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookDx);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookDy=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookDy);b++;
+		}
+		else
+		{
+			for(int b = 0; b < Size / 4; b++)
+				dbg_msg("snapshot", "\t\t%3d %12d\t%08x", b, pItem->Data()[b], pItem->Data()[b]);
+		}
 	}
 }
 
