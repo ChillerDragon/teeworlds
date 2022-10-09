@@ -107,11 +107,15 @@ void debug_dump(CSnapshot *pSnapShot)
 				dbg_msg("snapshot", "\t\tInvalid Size=%d Expected=12", Size);
 				exit(1);
 			}
-			const CNetObj_PlayerInfo *pChr = ((const CNetObj_PlayerInfo *)pItem->Data());
+#ifdef _PROTOCOL_VERSION_6
+			const protocol7::CNetObj_PlayerInfo *pInfo = ((const protocol7::CNetObj_PlayerInfo *)pItem->Data());
+#else
+			const CNetObj_PlayerInfo *pInfo = ((const CNetObj_PlayerInfo *)pItem->Data());
+#endif
 
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_PlayerFlags=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_PlayerFlags);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Score=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Score);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Latency=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Latency);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_PlayerFlags=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_PlayerFlags);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Score=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_Score);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Latency=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_Latency);b++;
 		}
 		else if(pItem->Type() == _NETOBJTYPE_GAMEDATA)
 		{
@@ -120,11 +124,15 @@ void debug_dump(CSnapshot *pSnapShot)
 				dbg_msg("snapshot", "\t\tInvalid Size=%d Expected=12", Size);
 				exit(1);
 			}
-			const CNetObj_GameData *pChr = ((const CNetObj_GameData *)pItem->Data());
+#ifdef _PROTOCOL_VERSION_6
+			const protocol7::CNetObj_GameData *pGameData = ((const protocol7::CNetObj_GameData *)pItem->Data());
+#else
+			const CNetObj_GameData *pGameData = ((const CNetObj_GameData *)pItem->Data());
+#endif
 
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStartTick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_GameStartTick);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStateFlags=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_GameStateFlags);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStateEndTick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_GameStateEndTick);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStartTick=%d", b, pItem->Data()[b], pItem->Data()[b], pGameData->m_GameStartTick);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStateFlags=%d", b, pItem->Data()[b], pItem->Data()[b], pGameData->m_GameStateFlags);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStateEndTick=%d", b, pItem->Data()[b], pItem->Data()[b], pGameData->m_GameStateEndTick);b++;
 		}
 		else if(pItem->Type() == _NETOBJTYPE_CHARACTER)
 		{
@@ -133,7 +141,11 @@ void debug_dump(CSnapshot *pSnapShot)
 				dbg_msg("snapshot", "\t\tInvalid Size=%d Expected=88", Size);
 				exit(1);
 			}
+#ifdef _PROTOCOL_VERSION_6
+			const protocol7::CNetObj_Character *pChr = ((const protocol7::CNetObj_Character *)pItem->Data());
+#else
 			const CNetObj_Character *pChr = ((const CNetObj_Character *)pItem->Data());
+#endif
 
 			// CNetObj_CharacterCore
 			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Tick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Tick);b++;
