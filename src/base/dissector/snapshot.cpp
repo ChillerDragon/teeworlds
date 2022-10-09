@@ -108,6 +108,8 @@ void debug_dump(CSnapshot *pSnapShot)
 			}
 			const CNetObj_Character *pChr = ((const CNetObj_Character *)pItem->Data());
 			int b = 0;
+
+			// CNetObj_CharacterCore
 			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Tick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Tick);b++;
 			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_X=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_X);b++;
 			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Y=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Y);b++;
@@ -123,6 +125,15 @@ void debug_dump(CSnapshot *pSnapShot)
 			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookY=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookY);b++;
 			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookDx=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookDx);b++;
 			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookDy=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookDy);b++;
+
+			// CNetObj_Character
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Health=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Health);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Armor=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Armor);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_AmmoCount=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_AmmoCount);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Weapon=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Weapon);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Emote=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Emote);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_AttackTick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_AttackTick);b++;
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_TriggeredEvents=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_TriggeredEvents);b++;
 		}
 		else
 		{
