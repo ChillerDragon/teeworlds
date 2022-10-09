@@ -338,7 +338,7 @@ void print_snapshot(int Msg,
     CClient *pClient,
 	bool Sixup)
 {
-	if(pConfig->m_Debug < 2)
+	if(pConfig->m_Debug < 2 && pConfig->m_VerboseSnap < 0)
 		return;
 
 	init_compat();
@@ -441,7 +441,7 @@ void print_snapshot(int Msg,
 
 				dbg_msg("network_in", "  pDeltaShot->DebugDump():");
 				// pDeltaShot->DebugDump();
-        debug_dump(pDeltaShot);
+				debug_dump(pDeltaShot);
 
 				if(DeltashotSize < 0)
 				{
