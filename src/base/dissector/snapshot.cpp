@@ -338,7 +338,7 @@ void print_snapshot(int Msg,
     CClient *pClient,
 	bool Sixup)
 {
-	if(pConfig->m_Debug < 2 && pConfig->m_VerboseSnap < 0)
+	if(pConfig->m_Debug < 2 && pConfig->m_DbgSnap < 1)
 		return;
 
 	init_compat();
