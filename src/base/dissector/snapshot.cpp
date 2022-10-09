@@ -93,11 +93,7 @@ void debug_dump(CSnapshot *pSnapShot)
 	dbg_msg("snapshot", "num_items=%d", pSnapShot->NumItems());
 	for(int i = 0; i < pSnapShot->NumItems(); i++)
 	{
-#ifdef _PROTOCOL_VERSION_6
-		CSnapshotItem *pItem = pSnapShot->GetItem(i);
-#else
 		const CSnapshotItem *pItem = pSnapShot->GetItem(i);
-#endif
 		int Size = pSnapShot->GetItemSize(i);
 		char aType[128];
 		netobj_to_str(pItem->Type(), aType, sizeof(aType));
@@ -180,11 +176,7 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 #endif
 	const int *pEnd = (const int *)(((const char *)pSrcData + DataSize));
 
-#ifdef _PROTOCOL_VERSION_7
 	const CSnapshotItem *pFromItem;
-#else
-	CSnapshotItem *pFromItem;
-#endif
 	int Keep, ItemSize;
 	const int *pDeleted;
 	int ID, Type, Key;
