@@ -77,6 +77,12 @@ void str_hex_spaced(char *dst, int dst_size, const void *data, int data_size);
 		- The destination buffer will be zero-terminated
 */
 void str_raw(char *dst, int dst_size, const void *data, int data_size);
+/*
+	Function: str_bin
+		format raw data as a binary string
+*/
+void str_bin(char *dst, int dst_size, const void *data, int data_size);
+void print_ints(const char *data, int data_size);
 void print_raw(const char *sys, const char *prefix, const void *data, int data_size);
 void str_hex_highlighted(char *dst, int dst_size, const void *data, int data_size, int from, int to);
 void str_hex_highlight_two(char *dst, int dst_size, const void *data, int data_size, int from1, int to1, int from2, int to2);

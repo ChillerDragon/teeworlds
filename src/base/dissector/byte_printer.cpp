@@ -2,6 +2,27 @@
 
 #include "byte_printer.h"
 
+void str_bin(char *dst, int dst_size, const void *data, int data_size)
+{
+	int i;
+	for (i = 0; i < data_size; i++)
+	{
+		if(i + 1 * 9 > dst_size)
+			break;
+		str_format(dst + i * 9, 9, "%08b ", ((unsigned char *)data)[i]);
+		dst[-1 + i * 9] = ' '; // delete null terminator
+	}
+	dst[-1 + i * 9] = '\0';
+}
+
+void print_ints(const char *data, int data_size)
+{
+	int i;
+	for(i = 0; i < data_size; i++)
+	{
+	}
+}
+
 void str_raw(char *dst, int dst_size, const void *data, int data_size)
 {
 	int i;

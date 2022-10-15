@@ -3,6 +3,7 @@
 
 #include "compat.h"
 
+void dump_snapshot_data(const void *pData, int Size);
 void debug_dump(class CSnapshot *pSnapShot);
 
 void netobj_to_str(int Type, char *pBuf, int Size);

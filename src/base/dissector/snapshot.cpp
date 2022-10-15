@@ -88,6 +88,15 @@ static int _RangeCheck(const void *pEnd, const void *pPtr, int Size)
 	return 0;
 }
 
+void dump_snapshot_data(const void *pData, int Size)
+{
+	char aHex[128];
+	str_hex(aHex, sizeof(aHex), pData, Size);
+	char aBin[128];
+	str_bin(aBin, sizeof(aBin), pData, Size);
+	dbg_msg("item", "%s | %s", aHex, aBin);
+}
+
 void debug_dump(CSnapshot *pSnapShot)
 {
 	dbg_msg("snapshot", "num_items=%d", pSnapShot->NumItems());
@@ -146,6 +155,8 @@ void debug_dump(CSnapshot *pSnapShot)
 #else
 			const CNetObj_Character *pChr = ((const CNetObj_Character *)pItem->Data());
 #endif
+
+			// dump_snapshot_data(pItem->Data(), Size);
 
 			// CNetObj_CharacterCore
 			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Tick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Tick);b++;
@@ -511,7 +522,7 @@ void print_snapshot(int Msg,
 
 				dbg_msg("network_in", "  pDeltaShot->DebugDump():");
 				// pDeltaShot->DebugDump();
-				debug_dump(pDeltaShot);
+				// debug_dump(pDeltaShot);
 
 				if(DeltashotSize < 0)
 				{
