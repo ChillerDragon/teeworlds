@@ -522,7 +522,7 @@ void print_snapshot(int Msg,
 
 				dbg_msg("network_in", "  pDeltaShot->DebugDump():");
 				// pDeltaShot->DebugDump();
-				// debug_dump(pDeltaShot);
+				debug_dump(pDeltaShot);
 
 				if(DeltashotSize < 0)
 				{
