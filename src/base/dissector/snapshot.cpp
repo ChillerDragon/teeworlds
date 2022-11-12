@@ -419,6 +419,8 @@ void print_snapshot(int Msg,
     CClient *pClient,
 	bool Sixup)
 {
+	// either debug 3 or higher
+	// or dbg_snap 1 or higher to see full snap dumps
 	if(pConfig->m_Debug < 2 && pConfig->m_DbgSnap < 1)
 		return;
 
@@ -522,7 +524,7 @@ void print_snapshot(int Msg,
 
 				dbg_msg("network_in", "  pDeltaShot->DebugDump():");
 				// pDeltaShot->DebugDump();
-				// debug_dump(pDeltaShot);
+				debug_dump(pDeltaShot);
 
 				if(DeltashotSize < 0)
 				{
