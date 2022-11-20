@@ -269,6 +269,8 @@ void CMapLayers::OnRender()
 	for(int g = 0; g < pLayers->NumGroups(); g++)
 	{
 		CMapItemGroup *pGroup = pLayers->GetGroup(g);
+		if(!pGroup)
+			continue;
 
 		if(!Config()->m_GfxNoclip && pGroup->m_Version >= 2 && pGroup->m_UseClipping)
 		{
