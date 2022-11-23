@@ -65,12 +65,12 @@ void print_packet(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int 
 			else if(CtrlMsg == NET_CTRLMSG_CONNECT) { pMsg = "NET_CTRLMSG_CONNECT"; }
 			else if(CtrlMsg == NET_CTRLMSG_ACCEPT) { pMsg = "NET_CTRLMSG_ACCEPT"; }
 			else if(CtrlMsg == NET_CTRLMSG_CLOSE) { pMsg = "NET_CTRLMSG_CLOSE"; }
-			else if(CtrlMsg == NET_CTRLMSG_TOKEN) { pMsg = "NET_CTRLMSG_TOKEN"; }
+			else if(CtrlMsg == _NET_CTRLMSG_TOKEN) { pMsg = "NET_CTRLMSG_TOKEN"; }
 			char aPacketHeader[1024];
 			char aCtrlMsg[1024];
 			str_format(aPacketHeader, sizeof(aPacketHeader), "PHeader: size=%d flags=%d", PacketHeaderSize, pPacket->m_Flags);
 			str_format(aCtrlMsg, sizeof(aCtrlMsg), "CtrlMsg = %d (%s)", CtrlMsg, pMsg);
-			if(CtrlMsg == NET_CTRLMSG_TOKEN || CtrlMsg == NET_CTRLMSG_CONNECT)
+			if(CtrlMsg == _NET_CTRLMSG_TOKEN || CtrlMsg == NET_CTRLMSG_CONNECT)
 			{
 				print_hex_row_highlight_three(
 					Direction == NETWORK_IN ? "network_in" : "network_out",
@@ -260,7 +260,7 @@ void print_state(const char *type, const char *note, int State)
 	const char *pState = "unknown";
 	if (State == NET_CONNSTATE_OFFLINE)
 		pState = "NET_CONNSTATE_OFFLINE";
-	if (State == NET_CONNSTATE_TOKEN)
+	if (State == _NET_CONNSTATE_TOKEN)
 		pState = "NET_CONNSTATE_TOKEN";
 	if (State == NET_CONNSTATE_CONNECT)
 		pState = "NET_CONNSTATE_CONNECT";
