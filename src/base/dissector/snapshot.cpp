@@ -97,6 +97,111 @@ void dump_snapshot_data(const void *pData, int Size)
 	dbg_msg("item", "%s | %s", aHex, aBin);
 }
 
+bool dump_snap_item7(const CSnapshotItem *pItem, int Size)
+{
+#ifdef _PROTOCOL_VERSION_7
+	int b = 0;
+	if(pItem->Type() == NETOBJTYPE_PLAYERINFO)
+	{
+		if(Size != 12)
+		{
+			dbg_msg("snapshot", "\t\tInvalid Size=%d Expected=12 Type=%d", Size, pItem->Type());
+			dbg_break();
+		}
+		const CNetObj_PlayerInfo *pInfo = ((const CNetObj_PlayerInfo *)pItem->Data());
+
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_PlayerFlags=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_PlayerFlags);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Score=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_Score);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Latency=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_Latency);b++;
+	}
+	else if(pItem->Type() == NETOBJTYPE_GAMEDATA)
+	{
+		if(Size != 12)
+		{
+			dbg_msg("snapshot", "\t\tInvalid Size=%d Expected=12 XType=%d", Size, pItem->Type());
+			dbg_break();
+		}
+		const CNetObj_GameData *pGameData = ((const CNetObj_GameData *)pItem->Data());
+
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStartTick=%d", b, pItem->Data()[b], pItem->Data()[b], pGameData->m_GameStartTick);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStateFlags=%d", b, pItem->Data()[b], pItem->Data()[b], pGameData->m_GameStateFlags);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStateEndTick=%d", b, pItem->Data()[b], pItem->Data()[b], pGameData->m_GameStateEndTick);b++;
+	}
+	else if(pItem->Type() == NETOBJTYPE_CHARACTER)
+	{
+		if(Size != 88)
+		{
+			dbg_msg("snapshot", "\t\tInvalid Size=%d Expected=88 Type=%d", Size, pItem->Type());
+			exit(1);
+		}
+		const CNetObj_Character *pChr = ((const CNetObj_Character *)pItem->Data());
+
+		// dump_snapshot_data(pItem->Data(), Size);
+
+		// CNetObj_CharacterCore
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Tick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Tick);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_X=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_X);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Y=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Y);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_VelX=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_VelX);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_VelY=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_VelY);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Angle=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Angle);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Direction=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Direction);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Jumped=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Jumped);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookedPlayer=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookedPlayer);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookState=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookState);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookTick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookTick);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookX=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookX);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookY=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookY);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookDx=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookDx);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookDy=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookDy);b++;
+
+		// CNetObj_Character
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Health=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Health);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Armor=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Armor);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_AmmoCount=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_AmmoCount);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Weapon=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Weapon);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Emote=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Emote);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_AttackTick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_AttackTick);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_TriggeredEvents=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_TriggeredEvents);b++;
+	}
+	else
+	{
+		return false;
+	}
+	return true;
+#endif
+	return false;
+}
+
+bool dump_snap_item6(const CSnapshotItem *pItem, int Size)
+{
+#ifdef _PROTOCOL_VERSION_6
+	int b = 0;
+	if(pItem->Type() == NETOBJTYPE_PLAYERINFO)
+	{
+		constexpr int ExpectedSize = 5 * 4;
+		if(Size != ExpectedSize)
+		{
+			dbg_msg("snapshot", "\t\tInvalid Size=%d Expected=%d Type=%d", Size, ExpectedSize, pItem->Type());
+			dbg_break();
+		}
+		const CNetObj_PlayerInfo *pInfo = ((const CNetObj_PlayerInfo *)pItem->Data());
+
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Local=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_Local);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_ClientID=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_ClientID);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Team=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_Team);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Score=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_Score);b++;
+		dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Latency=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_Latency);b++;
+	}
+	else
+	{
+		return false;
+	}
+	return true;
+#endif
+	return false;
+}
+
 void debug_dump(CSnapshot *pSnapShot)
 {
 	dbg_msg("snapshot", "num_items=%d", pSnapShot->NumItems());
@@ -108,121 +213,78 @@ void debug_dump(CSnapshot *pSnapShot)
 		netobj_to_str(pItem->Type(), aType, sizeof(aType));
 		dbg_msg("snapshot", "\ttype=%d (%s)  id=%d", pItem->Type(), aType, pItem->ID());
 
-		int b = 0;
-		if(pItem->Type() == _NETOBJTYPE_PLAYERINFO)
-		{
-			if(Size != 12)
-			{
-				dbg_msg("snapshot", "\t\tInvalid Size=%d Expected=12", Size);
-				exit(1);
-			}
 #ifdef _PROTOCOL_VERSION_6
-			const protocol7::CNetObj_PlayerInfo *pInfo = ((const protocol7::CNetObj_PlayerInfo *)pItem->Data());
 #else
-			const CNetObj_PlayerInfo *pInfo = ((const CNetObj_PlayerInfo *)pItem->Data());
+		if(dump_snap_item7(pItem, Size))
+			return;
 #endif
 
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_PlayerFlags=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_PlayerFlags);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Score=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_Score);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Latency=%d", b, pItem->Data()[b], pItem->Data()[b], pInfo->m_Latency);b++;
-		}
-		else if(pItem->Type() == _NETOBJTYPE_GAMEDATA)
-		{
-			if(Size != 12)
-			{
-				dbg_msg("snapshot", "\t\tInvalid Size=%d Expected=12", Size);
-				exit(1);
-			}
-#ifdef _PROTOCOL_VERSION_6
-			const protocol7::CNetObj_GameData *pGameData = ((const protocol7::CNetObj_GameData *)pItem->Data());
-#else
-			const CNetObj_GameData *pGameData = ((const CNetObj_GameData *)pItem->Data());
-#endif
 
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStartTick=%d", b, pItem->Data()[b], pItem->Data()[b], pGameData->m_GameStartTick);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStateFlags=%d", b, pItem->Data()[b], pItem->Data()[b], pGameData->m_GameStateFlags);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_GameStateEndTick=%d", b, pItem->Data()[b], pItem->Data()[b], pGameData->m_GameStateEndTick);b++;
-		}
-		else if(pItem->Type() == _NETOBJTYPE_CHARACTER)
-		{
-			if(Size != 88)
-			{
-				dbg_msg("snapshot", "\t\tInvalid Size=%d Expected=88", Size);
-				exit(1);
-			}
-#ifdef _PROTOCOL_VERSION_6
-			const protocol7::CNetObj_Character *pChr = ((const protocol7::CNetObj_Character *)pItem->Data());
-#else
-			const CNetObj_Character *pChr = ((const CNetObj_Character *)pItem->Data());
-#endif
+// #ifdef _PROTOCOL_VERSION_6
+// 			const protocol7::CNetObj_PlayerInfo *pInfo = ((const protocol7::CNetObj_PlayerInfo *)pItem->Data());
+// #else
+// 			const CNetObj_PlayerInfo *pInfo = ((const CNetObj_PlayerInfo *)pItem->Data());
+// #endif
 
-			// dump_snapshot_data(pItem->Data(), Size);
-
-			// CNetObj_CharacterCore
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Tick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Tick);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_X=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_X);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Y=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Y);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_VelX=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_VelX);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_VelY=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_VelY);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Angle=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Angle);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Direction=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Direction);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Jumped=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Jumped);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookedPlayer=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookedPlayer);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookState=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookState);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookTick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookTick);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookX=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookX);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookY=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookY);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookDx=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookDx);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_HookDy=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_HookDy);b++;
-
-			// CNetObj_Character
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Health=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Health);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Armor=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Armor);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_AmmoCount=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_AmmoCount);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Weapon=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Weapon);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_Emote=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_Emote);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_AttackTick=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_AttackTick);b++;
-			dbg_msg("snapshot", "\t\t%3d %12d\t%08x\t m_TriggeredEvents=%d", b, pItem->Data()[b], pItem->Data()[b], pChr->m_TriggeredEvents);b++;
-		}
-		else
-		{
-			for(b = 0; b < Size / 4; b++)
-				dbg_msg("snapshot", "\t\t%3d %12d\t%08x", b, pItem->Data()[b], pItem->Data()[b]);
-		}
+		for(int b = 0; b < Size / 4; b++)
+			dbg_msg("snapshot", "\t\t%3d %12d\t%08x", b, pItem->Data()[b], pItem->Data()[b]);
 	}
 }
 
 void netobj_to_str(int Type, char *pBuf, int Size)
 {
-  init_compat();
-  const char *pType = "unkown";
-  if(Type == _NETOBJ_INVALID) pType = "NETOBJ_INVALID";
-  if(Type == _NETOBJTYPE_PLAYERINPUT) pType = "NETOBJTYPE_PLAYERINPUT";
-  if(Type == _NETOBJTYPE_PROJECTILE) pType = "NETOBJTYPE_PROJECTILE";
-  if(Type == _NETOBJTYPE_LASER) pType = "NETOBJTYPE_LASER";
-  if(Type == _NETOBJTYPE_PICKUP) pType = "NETOBJTYPE_PICKUP";
-  if(Type == _NETOBJTYPE_FLAG) pType = "NETOBJTYPE_FLAG";
-  if(Type == _NETOBJTYPE_GAMEDATA) pType = "NETOBJTYPE_GAMEDATA";
-  if(Type == _NETOBJTYPE_GAMEDATATEAM) pType = "NETOBJTYPE_GAMEDATATEAM";
-  if(Type == _NETOBJTYPE_GAMEDATAFLAG) pType = "NETOBJTYPE_GAMEDATAFLAG";
-  if(Type == _NETOBJTYPE_CHARACTERCORE) pType = "NETOBJTYPE_CHARACTERCORE";
-  if(Type == _NETOBJTYPE_CHARACTER) pType = "NETOBJTYPE_CHARACTER";
-  if(Type == _NETOBJTYPE_PLAYERINFO) pType = "NETOBJTYPE_PLAYERINFO";
-  if(Type == _NETOBJTYPE_SPECTATORINFO) pType = "NETOBJTYPE_SPECTATORINFO";
-  if(Type == _NETOBJTYPE_DE_CLIENTINFO) pType = "NETOBJTYPE_DE_CLIENTINFO";
-  if(Type == _NETOBJTYPE_DE_GAMEINFO) pType = "NETOBJTYPE_DE_GAMEINFO";
-  if(Type == _NETOBJTYPE_DE_TUNEPARAMS) pType = "NETOBJTYPE_DE_TUNEPARAMS";
-  if(Type == _NETEVENTTYPE_COMMON) pType = "NETEVENTTYPE_COMMON";
-  if(Type == _NETEVENTTYPE_EXPLOSION) pType = "NETEVENTTYPE_EXPLOSION";
-  if(Type == _NETEVENTTYPE_SPAWN) pType = "NETEVENTTYPE_SPAWN";
-  if(Type == _NETEVENTTYPE_HAMMERHIT) pType = "NETEVENTTYPE_HAMMERHIT";
-  if(Type == _NETEVENTTYPE_DEATH) pType = "NETEVENTTYPE_DEATH";
-  if(Type == _NETEVENTTYPE_SOUNDWORLD) pType = "NETEVENTTYPE_SOUNDWORLD";
-  if(Type == _NETEVENTTYPE_DAMAGE) pType = "NETEVENTTYPE_DAMAGE";
-  if(Type == _NETOBJTYPE_PLAYERINFORACE) pType = "NETOBJTYPE_PLAYERINFORACE";
-  if(Type == _NETOBJTYPE_GAMEDATARACE) pType = "NETOBJTYPE_GAMEDATARACE";
-
-  str_copy(pBuf, pType, Size);
+	init_compat();
+	const char *pType = "unkown";
+#ifdef _PROTOCOL_VERSION_6
+	if(Type == NETOBJTYPE_EX) pType = "NETOBJTYPE_EX";
+	if(Type == NETOBJTYPE_PLAYERINPUT) pType = "NETOBJTYPE_PLAYERINPUT";
+	if(Type == NETOBJTYPE_PROJECTILE) pType = "NETOBJTYPE_PROJECTILE";
+	if(Type == NETOBJTYPE_LASER) pType = "NETOBJTYPE_LASER";
+	if(Type == NETOBJTYPE_PICKUP) pType = "NETOBJTYPE_PICKUP";
+	if(Type == NETOBJTYPE_FLAG) pType = "NETOBJTYPE_FLAG";
+	if(Type == NETOBJTYPE_GAMEINFO) pType = "NETOBJTYPE_GAMEINFO";
+	if(Type == NETOBJTYPE_GAMEDATA) pType = "NETOBJTYPE_GAMEDATA";
+	if(Type == NETOBJTYPE_CHARACTERCORE) pType = "NETOBJTYPE_CHARACTERCORE";
+	if(Type == NETOBJTYPE_CHARACTER) pType = "NETOBJTYPE_CHARACTER";
+	if(Type == NETOBJTYPE_PLAYERINFO) pType = "NETOBJTYPE_PLAYERINFO";
+	if(Type == NETOBJTYPE_CLIENTINFO) pType = "NETOBJTYPE_CLIENTINFO";
+	if(Type == NETOBJTYPE_SPECTATORINFO) pType = "NETOBJTYPE_SPECTATORINFO";
+	if(Type == NETEVENTTYPE_COMMON) pType = "NETEVENTTYPE_COMMON";
+	if(Type == NETEVENTTYPE_EXPLOSION) pType = "NETEVENTTYPE_EXPLOSION";
+	if(Type == NETEVENTTYPE_SPAWN) pType = "NETEVENTTYPE_SPAWN";
+	if(Type == NETEVENTTYPE_HAMMERHIT) pType = "NETEVENTTYPE_HAMMERHIT";
+	if(Type == NETEVENTTYPE_DEATH) pType = "NETEVENTTYPE_DEATH";
+	if(Type == NETEVENTTYPE_SOUNDGLOBAL) pType = "NETEVENTTYPE_SOUNDGLOBAL";
+	if(Type == NETEVENTTYPE_SOUNDWORLD) pType = "NETEVENTTYPE_SOUNDWORLD";
+	if(Type == NETEVENTTYPE_DAMAGEIND) pType = "NETEVENTTYPE_DAMAGEIND";
+#else
+	if(Type == NETOBJ_INVALID) pType = "NETOBJ_INVALID";
+	if(Type == NETOBJTYPE_PLAYERINPUT) pType = "NETOBJTYPE_PLAYERINPUT";
+	if(Type == NETOBJTYPE_PROJECTILE) pType = "NETOBJTYPE_PROJECTILE";
+	if(Type == NETOBJTYPE_LASER) pType = "NETOBJTYPE_LASER";
+	if(Type == NETOBJTYPE_PICKUP) pType = "NETOBJTYPE_PICKUP";
+	if(Type == NETOBJTYPE_FLAG) pType = "NETOBJTYPE_FLAG";
+	if(Type == NETOBJTYPE_GAMEDATA) pType = "NETOBJTYPE_GAMEDATA";
+	if(Type == NETOBJTYPE_GAMEDATATEAM) pType = "NETOBJTYPE_GAMEDATATEAM";
+	if(Type == NETOBJTYPE_GAMEDATAFLAG) pType = "NETOBJTYPE_GAMEDATAFLAG";
+	if(Type == NETOBJTYPE_CHARACTERCORE) pType = "NETOBJTYPE_CHARACTERCORE";
+	if(Type == NETOBJTYPE_CHARACTER) pType = "NETOBJTYPE_CHARACTER";
+	if(Type == NETOBJTYPE_PLAYERINFO) pType = "NETOBJTYPE_PLAYERINFO";
+	if(Type == NETOBJTYPE_SPECTATORINFO) pType = "NETOBJTYPE_SPECTATORINFO";
+	if(Type == NETOBJTYPE_DE_CLIENTINFO) pType = "NETOBJTYPE_DE_CLIENTINFO";
+	if(Type == NETOBJTYPE_DE_GAMEINFO) pType = "NETOBJTYPE_DE_GAMEINFO";
+	if(Type == NETOBJTYPE_DE_TUNEPARAMS) pType = "NETOBJTYPE_DE_TUNEPARAMS";
+	if(Type == NETEVENTTYPE_COMMON) pType = "NETEVENTTYPE_COMMON";
+	if(Type == NETEVENTTYPE_EXPLOSION) pType = "NETEVENTTYPE_EXPLOSION";
+	if(Type == NETEVENTTYPE_SPAWN) pType = "NETEVENTTYPE_SPAWN";
+	if(Type == NETEVENTTYPE_HAMMERHIT) pType = "NETEVENTTYPE_HAMMERHIT";
+	if(Type == NETEVENTTYPE_DEATH) pType = "NETEVENTTYPE_DEATH";
+	if(Type == NETEVENTTYPE_SOUNDWORLD) pType = "NETEVENTTYPE_SOUNDWORLD";
+	if(Type == NETEVENTTYPE_DAMAGE) pType = "NETEVENTTYPE_DAMAGE";
+	if(Type == NETOBJTYPE_PLAYERINFORACE) pType = "NETOBJTYPE_PLAYERINFORACE";
+	if(Type == NETOBJTYPE_GAMEDATARACE) pType = "NETOBJTYPE_GAMEDATARACE";
+#endif
+	str_copy(pBuf, pType, Size);
 }
 
 int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const void *pSrcData, int DataSize, const short *ppItemSizes, bool Sixup)
@@ -365,7 +427,7 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 		}
 		else // no previous, just copy the pData
 		{
-			mem_copy(pNewData, pData, ItemSize);
+			// mem_copy(pNewData, pData, ItemSize);
 			// m_aSnapshotDataRate[Type] += ItemSize * 8;
 			// m_aSnapshotDataUpdates[Type]++;
 		}
