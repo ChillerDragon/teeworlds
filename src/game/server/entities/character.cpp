@@ -245,6 +245,8 @@ void CCharacter::HandleWeaponSwitch()
 	DoWeaponSwitch();
 }
 
+#include <game/server/entities/laser_text.h>
+
 void CCharacter::FireWeapon()
 {
 	if(m_ReloadTimer != 0)
@@ -268,6 +270,8 @@ void CCharacter::FireWeapon()
 
 	if(!WillFire)
 		return;
+
+	new CLaserText(GameWorld(), vec2(GetPos().x, GetPos().y - 1 * 32), "hello");
 
 	// check for ammo
 	if(!m_aWeapons[m_ActiveWeapon].m_Ammo)

@@ -1609,6 +1609,8 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   entities/flag.h
   entities/laser.cpp
   entities/laser.h
+  entities/laser_text.cpp
+  entities/laser_text.h
   entities/pickup.cpp
   entities/pickup.h
   entities/projectile.cpp
