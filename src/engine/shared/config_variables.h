@@ -110,6 +110,7 @@ MACRO_CONFIG_INT(NetTcpAbortOnClose, net_tcp_abort_on_close, 0, 0, 1, CFGFLAG_SA
 
 MACRO_CONFIG_INT(Debug, debug, 0, 0, 4, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Debug mode")
 MACRO_CONFIG_INT(Clean, Clean, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Clean log output to hide all non network related messages")
+MACRO_CONFIG_INT(DbgMaster, dbg_master, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Verbose master data logging")
 MACRO_CONFIG_INT(DbgSnap, dbg_snap, 0, 0, 4, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Verbose snap data logging")
 MACRO_CONFIG_INT(DbgStress, dbg_stress, 0, 0, 0, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Stress systems")
 MACRO_CONFIG_INT(DbgStressNetwork, dbg_stress_network, 0, 0, 0, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Stress network")

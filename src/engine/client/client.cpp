@@ -40,6 +40,8 @@
 #include <mastersrv/mastersrv.h>
 #include <versionsrv/versionsrv.h>
 
+#include <engine/shared/config.h>
+
 #include "contacts.h"
 #include "serverbrowser.h"
 #include "client.h"
@@ -1073,6 +1075,11 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 	if(pPacket->m_DataSize >= (int)sizeof(SERVERBROWSE_LIST) &&
 		mem_comp(pPacket->m_pData, SERVERBROWSE_LIST, sizeof(SERVERBROWSE_LIST)) == 0)
 	{
+		if(Config()->m_DbgMaster)
+		{
+			dbg_msg("network_in", "WE GOT A SERVER LIST SERVERBROWSE_LIST");
+			print_hex("network_in", "    ", pPacket->m_pData, pPacket->m_DataSize, 12);
+		}
 		// check for valid master server address
 		bool Valid = false;
 		for(int i = 0; i < IMasterServer::MAX_MASTERSERVERS; ++i)
