@@ -1067,7 +1067,7 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 			int Size = pPacket->m_DataSize-sizeof(VERSIONSRV_MAPLIST);
 			int Num = Size/sizeof(CMapVersion);
 			m_pMapChecker->AddMaplist((CMapVersion *)((char*)pPacket->m_pData+sizeof(VERSIONSRV_MAPLIST)), Num);
-			pConnlessPacket = "CONNLESS_MAP_VERSION";
+			pConnlessPacket = "VERSIONSRV_MAPLIST";
 		}
 	}
 
@@ -1075,6 +1075,7 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 	if(pPacket->m_DataSize >= (int)sizeof(SERVERBROWSE_LIST) &&
 		mem_comp(pPacket->m_pData, SERVERBROWSE_LIST, sizeof(SERVERBROWSE_LIST)) == 0)
 	{
+		pConnlessPacket = "SERVERBROWSE_LIST";
 		if(Config()->m_DbgMaster)
 		{
 			dbg_msg("network_in", "WE GOT A SERVER LIST SERVERBROWSE_LIST");
@@ -1129,7 +1130,6 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 
 			m_ServerBrowser.Set(Addr, CServerBrowser::SET_MASTER_ADD, -1, 0x0);
 		}
-		pConnlessPacket = "CONNLESS_MAP_VERSION";
 	}
 
 	// server info
