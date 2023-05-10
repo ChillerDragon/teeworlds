@@ -1129,6 +1129,25 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 			Addr.port = (pAddrs[i].m_aPort[0]<<8) | pAddrs[i].m_aPort[1];
 
 			m_ServerBrowser.Set(Addr, CServerBrowser::SET_MASTER_ADD, -1, 0x0);
+
+			if(Config()->m_DbgMaster)
+			{
+				const void *pServerData = (char *)pPacket->m_pData + i * sizeof(CMastersrvAddr);
+
+				char aAddrStr[NETADDR_MAXSTRSIZE];
+				net_addr_str(&Addr, aAddrStr, sizeof(aAddrStr), true);
+
+				CMastersrvAddr *pAddr = (CMastersrvAddr *)pServerData;
+				unsigned short ReparsedPort = (pAddr->m_aPort[0]<<8) | pAddr->m_aPort[1];
+
+				dbg_msg("network_in", "--------------------------------------");
+				dbg_msg("network_in", "i=%d", i);
+				dbg_msg("network_in", "ip=%s reparsedport=%u", aAddrStr, ReparsedPort);
+				print_hex("network_in", "raw: ", pServerData, sizeof(CMastersrvAddr), 12);
+				print_hex("network_in", "adr: ", &pAddrs[i], sizeof(CMastersrvAddr), 12);
+				dbg_msg("WHAT TJHE FUCL", "IS A JPEG %d", Addr.port);
+				print_hex("network_in", "OF A FUCKIN HOGTJ: ", pAddrs[i].m_aPort, 2, 12);
+			}
 		}
 	}
 
