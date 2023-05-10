@@ -1132,7 +1132,7 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 
 			if(Config()->m_DbgMaster)
 			{
-				const void *pServerData = (char *)pPacket->m_pData + i * sizeof(CMastersrvAddr);
+				const void *pServerData = (char *)pPacket->m_pData + sizeof(SERVERBROWSE_LIST) + i * sizeof(CMastersrvAddr);
 
 				char aAddrStr[NETADDR_MAXSTRSIZE];
 				net_addr_str(&Addr, aAddrStr, sizeof(aAddrStr), true);
