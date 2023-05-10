@@ -39,6 +39,8 @@ void print_raw(const char *sys, const char *prefix, const void *data, int data_s
 	dbg_msg(sys, "%s%s", prefix, aRaw);
 }
 
+int min(int a, int b) { return a > b ? b : a; }
+
 void str_hex_spaced(char *dst, int dst_size, const void *data, int data_size)
 {
 	int i;
@@ -46,7 +48,8 @@ void str_hex_spaced(char *dst, int dst_size, const void *data, int data_size)
 	dst[0] = '\0';
 	for(i = 0; i < data_size && i < dst_size/4-4; i+=4)
 	{
-		str_hex(aChunk, sizeof(aChunk), (const unsigned char *)data + i, 4);
+		int size = min(4, data_size - i);
+		str_hex(aChunk, sizeof(aChunk), (const unsigned char *)data + i, size);
 		str_append(dst, aChunk, dst_size);
 		str_append(dst, " ", dst_size);
 	}
@@ -102,8 +105,6 @@ void str_hex_highlight_three(char *dst, int dst_size, const void *data, int data
 		++i;
 	}
 }
-
-int min(int a, int b) { return a > b ? b : a; }
 
 void print_hex_row_highlight_two(const char *type, const char *prefix, const void *data, int data_size, int from1, int to1, const char *note1, int from2, int to2, const char *note2, const char *info)
 {
