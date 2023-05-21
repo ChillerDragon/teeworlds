@@ -73,6 +73,7 @@ if(TARGET_OS STREQUAL "windows")
 endif()
 
 option(CLIENT "Compile client" ON)
+option(HEADLESS_CLIENT "Build the client without graphics" OFF)
 option(PREFER_BUNDLED_LIBS "Prefer bundled libraries over system libraries" ${AUTO_DEPENDENCIES_DEFAULT})
 option(DEV "Don't generate stuff necessary for packaging" OFF)
 
@@ -566,6 +567,7 @@ if(CLIENT)
     graphics.h
     graphics_threaded.cpp
     graphics_threaded.h
+    graphics_threaded_null.h
     input.cpp
     input.h
     keynames.h
@@ -1231,6 +1233,9 @@ foreach(target ${TARGETS_OWN})
   target_compile_definitions(${target} PRIVATE $<$<CONFIG:Debug>:CONF_DEBUG>)
   target_include_directories(${target} PRIVATE ${CURL_INCLUDE_DIRS})
   target_include_directories(${target} PRIVATE ${ZLIB_INCLUDE_DIRS})
+  if(HEADLESS_CLIENT)
+    target_compile_definitions(${target} PRIVATE CONF_HEADLESS_CLIENT)
+  endif()
 endforeach()
 
 foreach(target ${TARGETS_DEP})
