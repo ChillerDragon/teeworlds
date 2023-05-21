@@ -55,6 +55,24 @@
 #undef main
 #endif
 
+#include <csignal>
+
+volatile sig_atomic_t InterruptSignaled = 0;
+
+bool IsInterrupted()
+{
+	return InterruptSignaled;
+}
+
+void HandleSigIntTerm(int Param)
+{
+	InterruptSignaled = 1;
+
+	// Exit the next time a signal is received
+	signal(SIGINT, SIG_DFL);
+	signal(SIGTERM, SIG_DFL);
+}
+
 void CGraph::Init(float Min, float Max)
 {
 	m_Min = Min;
@@ -1735,10 +1753,14 @@ void CClient::Run()
 
 	// init graphics
 	{
+#ifdef CONF_HEADLESS_CLIENT
+		m_pGraphics = CreateEngineGraphicsThreaded();
+#else
 		if(g_Config.m_GfxThreaded)
 			m_pGraphics = CreateEngineGraphicsThreaded();
 		else
 			m_pGraphics = CreateEngineGraphics();
+#endif
 
 		bool RegisterFail = false;
 		RegisterFail = RegisterFail || !Kernel()->RegisterInterface(static_cast<IEngineGraphics*>(m_pGraphics)); // register graphics as both
@@ -1837,6 +1859,12 @@ void CClient::Run()
 		// update input
 		if(Input()->Update())
 			break;	// SDL_QUIT
+		if(IsInterrupted())
+		{
+			m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "client", "interrupted");
+			break;
+		}
+
 
 		// update sound
 		Sound()->Update();
@@ -2308,6 +2336,8 @@ int main(int argc, const char **argv) // ignore_convention
 		dbg_msg("secure", "could not initialize secure RNG");
 		return -1;
 	}
+	signal(SIGINT, HandleSigIntTerm);
+	signal(SIGTERM, HandleSigIntTerm);
 
 	CClient *pClient = CreateClient();
 	IKernel *pKernel = IKernel::Create();
