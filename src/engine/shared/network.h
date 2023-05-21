@@ -417,7 +417,7 @@ public:
 	static void SendControlMsg(NETSOCKET Socket, NETADDR *pAddr, int Ack, bool UseToken, unsigned Token, int ControlMsg, const void *pExtra, int ExtraSize);
 	static void SendPacketConnless(NETSOCKET Socket, NETADDR *pAddr, const void *pData, int DataSize);
 	static void SendPacket(NETSOCKET Socket, NETADDR *pAddr, CNetPacketConstruct *pPacket);
-	static int UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct *pPacket);
+	static int UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, int Size, CNetPacketConstruct *pPacket);
 
 	// The backroom is ack-NET_MAX_SEQUENCE/2. Used for knowing if we acked a packet or not
 	static int IsSeqInBackroom(int Seq, int Ack);

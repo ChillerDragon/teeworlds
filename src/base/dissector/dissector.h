@@ -13,7 +13,7 @@ enum ENetDirection {
 void flags_to_str(int Flags, char *pBuf, int Size);
 
 bool show_addr(const NETADDR *pAddr);
-void print_packet(class CNetPacketConstruct *pPacket, unsigned char *pPacketData, int PacketSize, const NETADDR *pAddr, ENetDirection Direction, const class CConfig *pConfig);
+void print_packet(class CNetPacketConstruct *pPacket, unsigned char *pPacketData, int PacketSize, const NETADDR *pAddr, ENetDirection Direction);
 
 void netmsg_to_s(int Msg, char *pBuf, int Size);
 void print_state(const char *type, const char *note, int State);

@@ -170,19 +170,13 @@ void CNetBase::SendPacket(NETSOCKET Socket, NETADDR *pAddr, CNetPacketConstruct 
 			io_write(ms_DataLogSent, aBuffer, FinalSize);
 			io_flush(ms_DataLogSent);
 		}
-		if (g_Config.m_Debug > 2)
-		{
-			dbg_msg("network_out", ">>>> Sending packet");
-			char aBuf[512];
-			flags_to_str(pPacket->m_Flags, aBuf, sizeof(aBuf));
-			dbg_msg("network_out", "  flags=%d (%s)", pPacket->m_Flags, aBuf);
-			print_hex("network_out", "  raw: ", aBuffer, FinalSize, 12);
-		}
+		if(g_Config.m_Debug > 2)
+			print_packet(pPacket, aBuffer, FinalSize, pAddr, NETWORK_OUT);
 	}
 }
 
 // TODO: rename this function
-int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct *pPacket)
+int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, int Size, CNetPacketConstruct *pPacket)
 {
 	// check the size
 	if(Size < NET_PACKETHEADERSIZE_WITHOUT_TOKEN || Size > NET_MAX_PACKETSIZE)
@@ -268,6 +262,9 @@ int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct
 		io_write(ms_DataLogRecv, pPacket->m_aChunkData, pPacket->m_DataSize);
 		io_flush(ms_DataLogRecv);
 	}
+
+	if(g_Config.m_Debug > 2)
+		print_packet(pPacket, pBuffer, Size, pAddr, NETWORK_IN);
 
 	// return success
 	return 0;

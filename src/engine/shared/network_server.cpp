@@ -205,7 +205,7 @@ int CNetServer::Recv(CNetChunk *pChunk)
 		if(Bytes <= 0)
 			break;
 
-		if(CNetBase::UnpackPacket(m_RecvUnpacker.m_aBuffer, Bytes, &m_RecvUnpacker.m_Data) == 0)
+		if(CNetBase::UnpackPacket(&Addr, m_RecvUnpacker.m_aBuffer, Bytes, &m_RecvUnpacker.m_Data) == 0)
 		{
 			bool UseToken = false;
 			unsigned Token = 0;

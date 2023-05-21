@@ -25,7 +25,7 @@ void flags_to_str(int Flags, char *pBuf, int Size)
 		str_append(pBuf, pBuf[0] ? "|COMPRESSION" : "COMPRESSION", Size);
 }
 
-void print_packet(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int PacketSize, const NETADDR *pAddr, ENetDirection Direction, const CConfig *pConfig)
+void print_packet(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int PacketSize, const NETADDR *pAddr, ENetDirection Direction)
 {
 	if(!show_addr(pAddr))
 		return;
