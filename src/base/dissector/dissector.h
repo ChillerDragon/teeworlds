@@ -10,6 +10,8 @@ enum ENetDirection {
     NETWORK_OUT
 };
 
+void flags_to_str(int Flags, char *pBuf, int Size);
+
 bool show_addr(const NETADDR *pAddr);
 void print_packet(class CNetPacketConstruct *pPacket, unsigned char *pPacketData, int PacketSize, const NETADDR *pAddr, ENetDirection Direction, const class CConfig *pConfig);
 

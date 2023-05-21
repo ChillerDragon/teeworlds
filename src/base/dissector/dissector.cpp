@@ -10,6 +10,21 @@
 
 #include "compat.h"
 
+void flags_to_str(int Flags, char *pBuf, int Size)
+{
+	pBuf[0] = '\0';
+	if(Flags&NET_PACKETFLAG_TOKEN)
+		str_append(pBuf, "TOKEN", Size);
+	if(Flags&NET_PACKETFLAG_CONTROL)
+		str_append(pBuf, pBuf[0] ? "|CONTROL" : "CONTROL", Size);
+	if(Flags&NET_PACKETFLAG_CONNLESS)
+		str_append(pBuf, pBuf[0] ? "|CONNLESS" : "CONNLESS", Size);
+	if(Flags&NET_PACKETFLAG_RESEND)
+		str_append(pBuf, pBuf[0] ? "|RESEND" : "RESEND", Size);
+	if(Flags&NET_PACKETFLAG_COMPRESSION)
+		str_append(pBuf, pBuf[0] ? "|COMPRESSION" : "COMPRESSION", Size);
+}
+
 void print_packet(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int PacketSize, const NETADDR *pAddr, ENetDirection Direction, const CConfig *pConfig)
 {
 	if(!show_addr(pAddr))
@@ -18,15 +33,7 @@ void print_packet(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int 
 	char aAddrStr[NETADDR_MAXSTRSIZE];
 	net_addr_str(pAddr, aAddrStr, sizeof(aAddrStr), true);
 	char aBuf[512];
-	aBuf[0] = '\0';
-	if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
-		str_append(aBuf, "CONTROL", sizeof(aBuf));
-	if(pPacket->m_Flags&NET_PACKETFLAG_RESEND)
-		str_append(aBuf, aBuf[0] ? "|RESEND" : "RESEND", sizeof(aBuf));
-	if(pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION)
-		str_append(aBuf, aBuf[0] ? "|COMPRESSION" : "COMPRESSION", sizeof(aBuf));
-	if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
-		str_append(aBuf, aBuf[0] ? "|CONNLESS" : "CONNLESS", sizeof(aBuf));
+	flags_to_str(pPacket->m_Flags, aBuf, sizeof(aBuf));
 	char aFlags[512];
 	aFlags[0] = '\0';
 	if(aBuf[0])

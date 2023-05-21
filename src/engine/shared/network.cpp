@@ -173,6 +173,9 @@ void CNetBase::SendPacket(NETSOCKET Socket, NETADDR *pAddr, CNetPacketConstruct 
 		if (g_Config.m_Debug > 2)
 		{
 			dbg_msg("network_out", ">>>> Sending packet");
+			char aBuf[512];
+			flags_to_str(pPacket->m_Flags, aBuf, sizeof(aBuf));
+			dbg_msg("network_out", "  flags=%d (%s)", pPacket->m_Flags, aBuf);
 			print_hex("network_out", "  raw: ", aBuffer, FinalSize, 12);
 		}
 	}
