@@ -239,7 +239,12 @@ function build(settings)
 	-- apply freetype settings
 	config.freetype:Apply(client_settings)
 
-	engine = Compile(engine_settings, Collect("src/engine/shared/*.cpp", "src/base/*.c"))
+	engine = Compile(engine_settings, Collect(
+		"src/engine/shared/*.cpp",
+		"src/base/*.c",
+		"src/base/dissector/*.c",
+		"src/base/dissector/*.cpp"
+	))
 	client = Compile(client_settings, Collect("src/engine/client/*.cpp"))
 	server = Compile(server_settings, Collect("src/engine/server/*.cpp"))
 

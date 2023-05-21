@@ -7,6 +7,8 @@
 #include "network.h"
 #include "huffman.h"
 
+#include <base/dissector/dissector.h>
+
 void CNetRecvUnpacker::Clear()
 {
 	m_Valid = false;
@@ -167,6 +169,11 @@ void CNetBase::SendPacket(NETSOCKET Socket, NETADDR *pAddr, CNetPacketConstruct 
 			io_write(ms_DataLogSent, &FinalSize, sizeof(FinalSize));
 			io_write(ms_DataLogSent, aBuffer, FinalSize);
 			io_flush(ms_DataLogSent);
+		}
+		if (g_Config.m_Debug > 2)
+		{
+			dbg_msg("network_out", ">>>> Sending packet");
+			print_hex("network_out", "  raw: ", aBuffer, FinalSize, 12);
 		}
 	}
 }
