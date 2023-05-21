@@ -1,5 +1,7 @@
-
-#pragma once
+/* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
+/* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#ifndef BASE_TL_THREADING_H
+#define BASE_TL_THREADING_H
 
 #include "../system.h"
 
@@ -35,14 +37,16 @@
 #elif defined(_MSC_VER)
 	#include <intrin.h>
 
-	#define WIN32_LEAN_AND_MEAN
+	#ifndef WIN32_LEAN_AND_MEAN
+		#define WIN32_LEAN_AND_MEAN
+	#endif
 	#include <windows.h>
 
 	inline unsigned atomic_inc(volatile unsigned *pValue)
 	{
 		return _InterlockedIncrement((volatile long *)pValue);
 	}
-	
+
 	inline unsigned atomic_dec(volatile unsigned *pValue)
 	{
 		return _InterlockedDecrement((volatile long *)pValue);
@@ -113,3 +117,5 @@ public:
 		var->release();
 	}
 };
+
+#endif // BASE_TL_THREADING_H

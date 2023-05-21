@@ -30,15 +30,21 @@ public:
 
 	void sort_range()
 	{
-		sort(all());
+		if(parent::size() > 0)
+			sort(all());
 	}
 
+	template<class R>
+	void sort_range_by(R cmp)
+	{
+		sort(all(), cmp);
+	}
 
 	/*
 		Function: all
 			Returns a sorted range that contains the whole array.
 	*/
-	range all() { return range(parent::list, parent::list+parent::num_elements); }
+	range all() const { return range(parent::list, parent::list+parent::num_elements); }
 };
 
-#endif // TL_FILE_SORTED_ARRAY_HPP
+#endif // BASE_TL_SORTED_ARRAY_H

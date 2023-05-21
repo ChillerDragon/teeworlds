@@ -64,7 +64,7 @@ public:
 
 	void Resort()
 	{
-		sort(m_lPoints.all());
+		std::stable_sort(&m_lPoints[0], &m_lPoints[m_lPoints.size()]);
 		FindTopBottom(0xf);
 	}
 
@@ -332,7 +332,7 @@ public:
 		if(Index1 < 0 || Index1 >= m_lGroups.size()) return Index0;
 		if(Index0 == Index1) return Index0;
 		m_Modified = true;
-		swap(m_lGroups[Index0], m_lGroups[Index1]);
+		std::swap(m_lGroups[Index0], m_lGroups[Index1]);
 		return Index1;
 	}
 

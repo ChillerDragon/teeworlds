@@ -188,7 +188,7 @@ class CMenus : public CComponent
 		bool m_Valid;
 		CDemoHeader m_Info;
 
-		bool operator<(const CDemoItem &Other) { return !str_comp(m_aFilename, "..") ? true : !str_comp(Other.m_aFilename, "..") ? false :
+		bool operator<(const CDemoItem &Other) const { return !str_comp(m_aFilename, "..") ? true : !str_comp(Other.m_aFilename, "..") ? false :
 														m_IsDir && !Other.m_IsDir ? true : !m_IsDir && Other.m_IsDir ? false :
 														str_comp_filenames(m_aFilename, Other.m_aFilename) < 0; }
 	};
@@ -210,7 +210,7 @@ class CMenus : public CComponent
 		const CFriendInfo *m_pFriendInfo;
 		int m_NumFound;
 
-		bool operator<(const CFriendItem &Other)
+		bool operator<(const CFriendItem &Other) const
 		{
 			if(m_NumFound && !Other.m_NumFound)
 				return true;
