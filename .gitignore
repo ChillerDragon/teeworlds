@@ -76,3 +76,6 @@ install_manifest.txt
 pack_*/
 rules.ninja
 
+# ChillerDragon
+build-*
+
