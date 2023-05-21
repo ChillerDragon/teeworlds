@@ -268,7 +268,7 @@ public:
 
 	/*
 		Function: optimize
-			Removes unnessasary data, returns how many bytes was earned.
+			Removes unnecessary data, returns how many bytes was earned.
 
 		Remarks:
 			- Invalidates ranges
@@ -284,7 +284,7 @@ public:
 		Function: memusage
 			Returns how much memory this dynamic array is using
 	*/
-	int memusage()
+	int memusage() const
 	{
 		return sizeof(array) + sizeof(T)*list_size;
 	}
@@ -307,7 +307,7 @@ public:
 		Function: all
 			Returns a range that contains the whole array.
 	*/
-	range all() { return range(list, list+num_elements); }
+	range all() const { return range(list, list+num_elements); }
 protected:
 
 	void incsize()
@@ -341,4 +341,4 @@ protected:
 	int num_elements;
 };
 
-#endif // TL_FILE_ARRAY_HPP
+#endif // BASE_TL_ARRAY_H
