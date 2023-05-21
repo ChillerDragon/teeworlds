@@ -433,6 +433,13 @@ generate_source("src/game/generated/server_data.h" "server_content_header")
 # Sources
 set_glob(BASE GLOB_RECURSE src/base
   detect.h
+  dissector/byte_printer.cpp
+  dissector/byte_printer.h
+  dissector/compat.cpp
+  dissector/compat.h
+  dissector/dissector.cpp
+  dissector/dissector.h
+  dissector/snapshot.h
   math.h
   system.c
   system.h
