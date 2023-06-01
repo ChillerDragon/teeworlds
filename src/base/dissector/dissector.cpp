@@ -70,6 +70,7 @@ void print_packet(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int 
 			// It gets spammy and makes it harder to read the more interesting messages
 			if(CtrlMsg == NET_CTRLMSG_KEEPALIVE) { pMsg = "NET_CTRLMSG_KEEPALIVE"; if (g_Config.m_Debug < 4) return; }
 			else if(CtrlMsg == NET_CTRLMSG_CONNECT) { pMsg = "NET_CTRLMSG_CONNECT"; }
+			else if(CtrlMsg == NET_CTRLMSG_CONNECTACCEPT) { pMsg = "NET_CTRLMSG_CONNECTACCEPT"; }
 			else if(CtrlMsg == NET_CTRLMSG_CLOSE) { pMsg = "NET_CTRLMSG_CLOSE"; }
 			else if(CtrlMsg == _NET_CTRLMSG_TOKEN) { pMsg = "NET_CTRLMSG_TOKEN"; }
 			char aPacketHeader[1024];
