@@ -963,6 +963,11 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		m_ServerSettings.m_TeamLock = pMsg->m_TeamLock;
 		m_ServerSettings.m_TeamBalance = pMsg->m_TeamBalance;
 		m_ServerSettings.m_PlayerSlots = pMsg->m_PlayerSlots;
+		dbg_msg(
+			"network_in",
+			"NETMSGTYPE_SV_SERVERSETTINGS playerslots=%d",
+			pMsg->m_PlayerSlots
+		);
 	}
 	else if(MsgId == NETMSGTYPE_SV_TEAM)
 	{
