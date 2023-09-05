@@ -965,8 +965,9 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		m_ServerSettings.m_PlayerSlots = pMsg->m_PlayerSlots;
 		dbg_msg(
 			"network_in",
-			"NETMSGTYPE_SV_SERVERSETTINGS playerslots=%d",
-			pMsg->m_PlayerSlots
+			"NETMSGTYPE_SV_SERVERSETTINGS playerslots=%d specvote=%d",
+			pMsg->m_PlayerSlots,
+			pMsg->m_SpecVote
 		);
 	}
 	else if(MsgId == NETMSGTYPE_SV_TEAM)
