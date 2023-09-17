@@ -86,8 +86,7 @@ void CNetConnection::SignalResend()
 
 int CNetConnection::Flush()
 {
-	int NumChunks = m_Construct.m_NumChunks;
-	if(!NumChunks && !m_Construct.m_Flags)
+	if(!m_Construct.m_DataSize)
 		return 0;
 
 	// send of the packets
@@ -100,7 +99,7 @@ int CNetConnection::Flush()
 
 	// clear construct so we can start building a new package
 	mem_zero(&m_Construct, sizeof(m_Construct));
-	return NumChunks;
+	return m_Construct.m_NumChunks;
 }
 
 int CNetConnection::QueueChunkEx(int Flags, int DataSize, const void *pData, int Sequence)
