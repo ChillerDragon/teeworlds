@@ -355,28 +355,47 @@ int CSnapshotDelta::UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const vo
 	for(int i = 0; i < pDelta->m_NumUpdateItems; i++)
 	{
 		if(pData+2 > pEnd)
+		{
+			dbg_msg("network_in", "pData=%p+2 > pEnd=%p", pData+2, pEnd);
 			return -1;
+		}
 
 		Type = *pData++;
 		if(Type < 0 || Type > CSnapshot::MAX_TYPE)
+		{
+			dbg_msg("network_in", "snap Type=%d out of range (max=%d)", Type, CSnapshot::MAX_TYPE);
 			return -3;
+		}
 
 		ID = *pData++;
 		if(ID < 0 || ID > CSnapshot::MAX_ID)
+		{
+			dbg_msg("network_in", "snap ID=%d out of range (max=%d)", ID, CSnapshot::MAX_ID);
 			return -3;
+		}
 
 		if(Type < MAX_NETOBJSIZES && m_aItemSizes[Type])
 			ItemSize = m_aItemSizes[Type];
 		else
 		{
 			if(pData+1 > pEnd)
+			{
+				dbg_msg("network_in", "pData=%p+1 > pEnd=%p", pData+1, pEnd);
 				return -2;
+			}
 			if(*pData < 0 || *pData > INT_MAX / 4)
+			{
+				dbg_msg("network_in", "*pData=%d < 0 || *pData=%d > INT_MAX/4 (%d)", *pData, *pData, INT_MAX / 4);
 				return -3;
+			}
 			ItemSize = (*pData++) * 4;
 		}
 
-		if(RangeCheck(pEnd, pData, ItemSize) || ItemSize < 0) return -3;
+		if(RangeCheck(pEnd, pData, ItemSize) || ItemSize < 0)
+		{
+			dbg_msg("network_in", "snap RangeCheck(pEnd=%p, pData=%p, ItemSize=%d) failed", pEnd, pData, ItemSize);
+			return -3;
+		}
 
 		Key = (Type<<16)|(ID&0xffff);
 
