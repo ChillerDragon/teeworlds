@@ -1,5 +1,4 @@
 import shutil, os, re, sys, zipfile
-from distutils.dir_util import copy_tree
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])) + "/..")
 import twlib
 
@@ -31,9 +30,9 @@ def downloadAll(targets):
 	libs_dir = "teeworlds-libs-{}".format(version)
 
 	if "sdl" in targets:
-		copy_tree(libs_dir + "/sdl/", "other/sdl/")
+		twlib.copy_tree(libs_dir + "/sdl/", "other/sdl/")
 	if "freetype" in targets:
-		copy_tree(libs_dir + "/freetype/", "other/freetype/")
+		twlib.copy_tree(libs_dir + "/freetype/", "other/freetype/")
 
 	# cleanup
 	try:

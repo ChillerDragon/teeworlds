@@ -1,5 +1,4 @@
 import shutil, optparse, os, re, sys, zipfile
-from distutils.dir_util import copy_tree
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])) + "/..")
 import twlib
 
@@ -131,9 +130,9 @@ shutil.copy("license.txt", package_dir)
 shutil.copy("storage.cfg", package_dir)
 
 if include_data and not use_bundle:
-	copy_tree(source_package_dir+"data", package_dir+"/data")
-	copy_tree(languages_dir, package_dir+"/data/languages")
-	copy_tree(maps_dir, package_dir+"/data/maps")
+	twlib.copy_tree(source_package_dir+"data", package_dir+"/data")
+	twlib.copy_tree(languages_dir, package_dir+"/data/languages")
+	twlib.copy_tree(maps_dir, package_dir+"/data/maps")
 	if platform[:3] == "win":
 		shutil.copy("other/config_directory.bat", package_dir)
 		shutil.copy(source_package_dir+"SDL2.dll", package_dir)
@@ -174,9 +173,9 @@ if use_bundle:
 	os.mkdir(clientbundle_bin_dir)
 	os.mkdir(clientbundle_resource_dir)
 	os.mkdir(clientbundle_framework_dir)
-	copy_tree(source_package_dir+"data", clientbundle_resource_dir+"/data")
-	copy_tree(languages_dir, clientbundle_resource_dir+"/data/languages")
-	copy_tree(maps_dir, clientbundle_resource_dir+"/data/maps")
+	twlib.copy_tree(source_package_dir+"data", clientbundle_resource_dir+"/data")
+	twlib.copy_tree(languages_dir, clientbundle_resource_dir+"/data/languages")
+	twlib.copy_tree(maps_dir, clientbundle_resource_dir+"/data/maps")
 	shutil.copy("other/icons/Teeworlds.icns", clientbundle_resource_dir)
 	shutil.copy(source_package_dir+name+exe_ext, clientbundle_bin_dir)
 	shell("install_name_tool -change /usr/local/opt/freetype/lib/libfreetype.6.dylib @executable_path/../Frameworks/libfreetype.6.dylib " + binary_path)
@@ -224,7 +223,7 @@ if use_bundle:
 	os.mkdir(os.path.join(serverbundle_resource_dir, "data"))
 	os.mkdir(os.path.join(serverbundle_resource_dir, "data/maps"))
 	os.mkdir(os.path.join(serverbundle_resource_dir, "data/mapres"))
-	copy_tree(maps_dir, serverbundle_resource_dir+"/data/maps")
+	twlib.copy_tree(maps_dir, serverbundle_resource_dir+"/data/maps")
 	shutil.copy("other/icons/Teeworlds_srv.icns", serverbundle_resource_dir)
 	shutil.copy(source_package_dir+name+"_srv"+exe_ext, serverbundle_bin_dir)
 	shutil.copy(source_package_dir+"serverlaunch"+exe_ext, serverbundle_bin_dir + "/"+name+"_server")
