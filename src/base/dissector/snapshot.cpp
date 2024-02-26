@@ -32,7 +32,6 @@
 #endif
 
 #include <engine/serverbrowser.h>
-#include <engine/sound.h>
 #include <engine/storage.h>
 #include <engine/textrender.h>
 

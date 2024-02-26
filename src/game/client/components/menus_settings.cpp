@@ -16,8 +16,6 @@
 #include <generated/client_data.h>
 
 #include <game/client/components/maplayers.h>
-#include <game/client/components/sounds.h>
-#include <game/client/components/stats.h>
 #include <game/client/ui.h>
 #include <game/client/render.h>
 #include <game/client/gameclient.h>
@@ -135,10 +133,6 @@ void CMenus::ResetSettingsControls()
 }
 
 void CMenus::ResetSettingsGraphics()
-{
-}
-
-void CMenus::ResetSettingsSound()
 {
 }
 

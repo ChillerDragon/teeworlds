@@ -198,7 +198,6 @@ public:
 
 	// QoL APIs
 	virtual int CharToGlyph(CTextCursor *pCursor, int NumChars, float *pLineWidth = 0) = 0;
-	virtual vec2 CaretPosition(CTextCursor *pCursor, int NumChars) = 0;
 };
 
 class IEngineTextRender : public ITextRender

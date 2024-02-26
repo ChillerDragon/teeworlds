@@ -577,7 +577,6 @@ private:
 	void ResetSettingsGeneral();
 	void ResetSettingsControls();
 	void ResetSettingsGraphics();
-	void ResetSettingsSound();
 	void PopupConfirmPlayerCountry();
 
 	bool DoResolutionList(CUIRect* pRect, CListBox* pListBox,

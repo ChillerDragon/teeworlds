@@ -22,11 +22,6 @@ enum
 	FONT_NAME_SIZE = 128,
 };
 
-// TODO: use SDF or MSDF font instead of multiple font sizes
-static int s_aFontSizes[] = {8,9,10,11,12,13,14,15,16,17,18,19,20,24,36,64};
-#define NUM_FONT_SIZES (sizeof(s_aFontSizes)/sizeof(int))
-#define PAGE_SIZE (TEXTURE_SIZE/NUM_PAGES_PER_DIM)
-
 struct CGlyph
 {
 	int m_FontSizeIndex;
@@ -173,7 +168,6 @@ class CTextRender : public IEngineTextRender
 		return Chr >= 0x0020 && Chr <= 0x218F;
 	}
 
-	CWordWidthHint MakeWord(CTextCursor *pCursor, const char *pText, const char *pEnd, int FontSizeIndex, float Size, int PixelSize, vec2 ScreenScale);
 	void TextRefreshGlyphs(CTextCursor *pCursor);
 
 	void DrawText(CTextCursor *pCursor, vec2 Offset, int Texture, bool IsSecondary, float Alpha, int StartGlyph, int NumGlyphs);
@@ -207,7 +201,6 @@ public:
 	void DrawTextShadowed(CTextCursor *pCursor, vec2 ShadowOffset, float Alpha, int StartGlyph, int NumGlyphs);
 
 	int CharToGlyph(CTextCursor *pCursor, int NumChars, float *pLineWidth = 0);
-	vec2 CaretPosition(CTextCursor *pCursor, int NumChars);
 };
 
 #endif

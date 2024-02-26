@@ -9,8 +9,6 @@
 
 #include <game/client/components/particles.h>
 #include <game/client/components/skins.h>
-#include <game/client/components/damageind.h>
-#include <game/client/components/sounds.h>
 #include <game/client/gameclient.h>
 
 #include "effects.h"

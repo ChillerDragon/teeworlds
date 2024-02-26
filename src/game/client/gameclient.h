@@ -81,7 +81,6 @@ public:
 	class IGraphics *Graphics() const { return m_pGraphics; }
 	class IClient *Client() const { return m_pClient; }
 	class CUI *UI() { return &m_UI; }
-	class ISound *Sound() const { return m_pSound; }
 	class IInput *Input() const { return m_pInput; }
 	class IStorage *Storage() const { return m_pStorage; }
 	class CConfig *Config() const { return m_pConfig; }
@@ -330,7 +329,6 @@ public:
 	class CCamera *m_pCamera;
 	class CControls *m_pControls;
 	class CEffects *m_pEffects;
-	class CSounds *m_pSounds;
 	class CMotd *m_pMotd;
 	class CMapImages *m_pMapimages;
 	class CVoting *m_pVoting;

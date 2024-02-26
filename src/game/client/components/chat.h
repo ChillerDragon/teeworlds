@@ -45,7 +45,6 @@ class CChat : public CComponent
 		CHAT_CLIENT,
 		CHAT_NUM,
 	};
-	int GetChatSound(int ChatType);
 
 	int m_Mode;
 	int m_WhisperTarget;

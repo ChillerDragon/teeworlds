@@ -1311,7 +1311,6 @@ set_src(ENGINE_INTERFACE GLOB src/engine
   message.h
   server.h
   serverbrowser.h
-  sound.h
   storage.h
   textrender.h
 )
@@ -1424,8 +1423,6 @@ if(CLIENT)
     serverbrowser_fav.h
     serverbrowser_filter.cpp
     serverbrowser_filter.h
-    sound.cpp
-    sound.h
     textrender.cpp
     textrender.h
   )
@@ -1487,8 +1484,6 @@ if(CLIENT)
     components/scoreboard.h
     components/skins.cpp
     components/skins.h
-    components/sounds.cpp
-    components/sounds.h
     components/spectator.cpp
     components/spectator.h
     components/stats.cpp

@@ -57,7 +57,9 @@ enum
 
 	VOTE_CHOICE_NO = -1,
 	VOTE_CHOICE_PASS = 0,
-	VOTE_CHOICE_YES = 1
+	VOTE_CHOICE_YES = 1,
+
+    NUM_SOUNDS = 41 // sans io tw added this
 };
 '''
 

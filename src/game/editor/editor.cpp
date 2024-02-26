@@ -2604,26 +2604,6 @@ void CEditor::RenderFileDialog()
 
 	s_ListBox.DoStart(15.0f, m_FilteredFileList.size(), 1, 5, m_FilesSelectedIndex, &View);
 
-	for(int i = 0; i < m_FilteredFileList.size(); i++)
-	{
-		CListboxItem Item = s_ListBox.DoNextItem(&m_FilteredFileList[i], m_FilesSelectedIndex == i);
-		if(!Item.m_Visible)
-			continue;
-
-		CUIRect Label, FileIcon;
-		Item.m_Rect.VSplitLeft(Item.m_Rect.h, &FileIcon, &Label);
-		FileIcon.Margin(2.0f, &FileIcon);
-		Label.VSplitLeft(5.0f, 0, &Label);
-
-		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_FILEICONS].m_Id);
-		Graphics()->QuadsBegin();
-		RenderTools()->SelectSprite(m_FilteredFileList[i]->m_IsDir ? SPRITE_FILE_FOLDER : SPRITE_FILE_MAP2);
-		IGraphics::CQuadItem QuadItem(FileIcon.x, FileIcon.y, FileIcon.w, FileIcon.h);
-		Graphics()->QuadsDrawTL(&QuadItem, 1);
-		Graphics()->QuadsEnd();
-
-		UI()->DoLabelSelected(&Label, m_FilteredFileList[i]->m_aName, Item.m_Selected, 10.0f, TEXTALIGN_ML);
-	}
 
 	int NewSelection = s_ListBox.DoEnd();
 	if(NewSelection != m_FilesSelectedIndex)

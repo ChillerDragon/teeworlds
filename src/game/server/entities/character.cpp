@@ -91,450 +91,62 @@ void CCharacter::Destroy()
 
 void CCharacter::SetWeapon(int W)
 {
-	if(W == m_ActiveWeapon)
-		return;
-
-	m_LastWeapon = m_ActiveWeapon;
-	m_QueuedWeapon = -1;
-	m_ActiveWeapon = W;
-	GameServer()->CreateSound(m_Pos, SOUND_WEAPON_SWITCH);
-
-	if(m_ActiveWeapon < 0 || m_ActiveWeapon >= NUM_WEAPONS)
-		m_ActiveWeapon = 0;
-	m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart = -1;
 }
 
 bool CCharacter::IsGrounded()
 {
-	if(GameServer()->Collision()->CheckPoint(m_Pos.x+GetProximityRadius()/2, m_Pos.y+GetProximityRadius()/2+5))
-		return true;
-	if(GameServer()->Collision()->CheckPoint(m_Pos.x-GetProximityRadius()/2, m_Pos.y+GetProximityRadius()/2+5))
-		return true;
 	return false;
 }
 
 
 void CCharacter::HandleNinja()
 {
-	if(m_ActiveWeapon != WEAPON_NINJA)
-		return;
-
-	if((Server()->Tick() - m_Ninja.m_ActivationTick) > (g_pData->m_Weapons.m_Ninja.m_Duration * Server()->TickSpeed() / 1000))
-	{
-		// time's up, return
-		m_aWeapons[WEAPON_NINJA].m_Got = false;
-		m_ActiveWeapon = m_LastWeapon;
-
-		// reset velocity and current move
-		if(m_Ninja.m_CurrentMoveTime > 0)
-			m_Core.m_Vel = m_Ninja.m_ActivationDir*m_Ninja.m_OldVelAmount;
-		m_Ninja.m_CurrentMoveTime = -1;
-
-		SetWeapon(m_ActiveWeapon);
-		return;
-	}
-
-	// force ninja Weapon
-	SetWeapon(WEAPON_NINJA);
-
-	m_Ninja.m_CurrentMoveTime--;
-
-	if(m_Ninja.m_CurrentMoveTime == 0)
-	{
-		// reset velocity
-		m_Core.m_Vel = m_Ninja.m_ActivationDir*m_Ninja.m_OldVelAmount;
-	}
-	else if(m_Ninja.m_CurrentMoveTime > 0)
-	{
-		// Set velocity
-		m_Core.m_Vel = m_Ninja.m_ActivationDir * g_pData->m_Weapons.m_Ninja.m_Velocity;
-		vec2 OldPos = m_Pos;
-		GameServer()->Collision()->MoveBox(&m_Core.m_Pos, &m_Core.m_Vel, vec2(GetProximityRadius(), GetProximityRadius()), 0.f);
-
-		// reset velocity so the client doesn't predict stuff
-		m_Core.m_Vel = vec2(0.f, 0.f);
-
-		// check if we hit anything along the way
-		const float Radius = GetProximityRadius() * 2.0f;
-		const vec2 Center = OldPos + (m_Pos - OldPos) * 0.5f;
-		CCharacter *aEnts[MAX_CLIENTS];
-		const int Num = GameWorld()->FindEntities(Center, Radius, (CEntity**)aEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
-
-		for(int i = 0; i < Num; ++i)
-		{
-			if(aEnts[i] == this)
-				continue;
-
-			// make sure we haven't hit this object before
-			bool AlreadyHit = false;
-			for(int j = 0; j < m_NumObjectsHit; j++)
-			{
-				if(m_apHitObjects[j] == aEnts[i])
-				{
-					AlreadyHit = true;
-					break;
-				}
-			}
-			if(AlreadyHit)
-				continue;
-
-			// check so we are sufficiently close
-			if(distance(aEnts[i]->m_Pos, m_Pos) > Radius)
-				continue;
-
-			// Hit a player, give him damage and stuffs...
-			GameServer()->CreateSound(aEnts[i]->m_Pos, SOUND_NINJA_HIT);
-			if(m_NumObjectsHit < MAX_PLAYERS)
-				m_apHitObjects[m_NumObjectsHit++] = aEnts[i];
-
-			// set his velocity to fast upward (for now)
-			aEnts[i]->TakeDamage(vec2(0, -10.0f), m_Ninja.m_ActivationDir*-1, g_pData->m_Weapons.m_Ninja.m_pBase->m_Damage, m_pPlayer->GetCID(), WEAPON_NINJA);
-		}
-	}
 }
 
 
 void CCharacter::DoWeaponSwitch()
 {
-	// make sure we can switch
-	if(m_ReloadTimer != 0 || m_QueuedWeapon == -1 || m_aWeapons[WEAPON_NINJA].m_Got)
-		return;
-
-	// switch Weapon
-	SetWeapon(m_QueuedWeapon);
 }
 
 void CCharacter::HandleWeaponSwitch()
 {
-	int WantedWeapon = m_ActiveWeapon;
-	if(m_QueuedWeapon != -1)
-		WantedWeapon = m_QueuedWeapon;
-
-	// select Weapon
-	int Next = CountInput(m_LatestPrevInput.m_NextWeapon, m_LatestInput.m_NextWeapon).m_Presses;
-	int Prev = CountInput(m_LatestPrevInput.m_PrevWeapon, m_LatestInput.m_PrevWeapon).m_Presses;
-
-	if(Next < 128) // make sure we only try sane stuff
-	{
-		while(Next) // Next Weapon selection
-		{
-			WantedWeapon = (WantedWeapon+1)%NUM_WEAPONS;
-			if(m_aWeapons[WantedWeapon].m_Got)
-				Next--;
-		}
-	}
-
-	if(Prev < 128) // make sure we only try sane stuff
-	{
-		while(Prev) // Prev Weapon selection
-		{
-			WantedWeapon = (WantedWeapon-1)<0?NUM_WEAPONS-1:WantedWeapon-1;
-			if(m_aWeapons[WantedWeapon].m_Got)
-				Prev--;
-		}
-	}
-
-	// Direct Weapon selection
-	if(m_LatestInput.m_WantedWeapon)
-		WantedWeapon = m_Input.m_WantedWeapon-1;
-
-	// check for insane values
-	if(WantedWeapon >= 0 && WantedWeapon < NUM_WEAPONS && WantedWeapon != m_ActiveWeapon && m_aWeapons[WantedWeapon].m_Got)
-		m_QueuedWeapon = WantedWeapon;
-
-	DoWeaponSwitch();
 }
 
 void CCharacter::FireWeapon()
 {
-	if(m_ReloadTimer != 0)
-		return;
-
-	DoWeaponSwitch();
-	vec2 Direction = normalize(vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY));
-
-	bool FullAuto = false;
-	if(m_ActiveWeapon == WEAPON_GRENADE || m_ActiveWeapon == WEAPON_SHOTGUN || m_ActiveWeapon == WEAPON_LASER)
-		FullAuto = true;
-
-
-	// check if we gonna fire
-	bool WillFire = false;
-	if(CountInput(m_LatestPrevInput.m_Fire, m_LatestInput.m_Fire).m_Presses)
-		WillFire = true;
-
-	if(FullAuto && (m_LatestInput.m_Fire&1) && m_aWeapons[m_ActiveWeapon].m_Ammo)
-		WillFire = true;
-
-	if(!WillFire)
-		return;
-
-	// check for ammo
-	if(!m_aWeapons[m_ActiveWeapon].m_Ammo)
-	{
-		// 125ms is a magical limit of how fast a human can click
-		m_ReloadTimer = 125 * Server()->TickSpeed() / 1000;
-		if(m_LastNoAmmoSound+Server()->TickSpeed() <= Server()->Tick())
-		{
-			GameServer()->CreateSound(m_Pos, SOUND_WEAPON_NOAMMO);
-			m_LastNoAmmoSound = Server()->Tick();
-		}
-		return;
-	}
-
-	vec2 ProjStartPos = m_Pos+Direction*GetProximityRadius()*0.75f;
-
-	if(Config()->m_Debug)
-	{
-		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "shot player='%d:%s' team=%d weapon=%d", m_pPlayer->GetCID(), Server()->ClientName(m_pPlayer->GetCID()), m_pPlayer->GetTeam(), m_ActiveWeapon);
-		GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-	}
-
-	switch(m_ActiveWeapon)
-	{
-		case WEAPON_HAMMER:
-		{
-			GameServer()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);
-
-			CCharacter *apEnts[MAX_CLIENTS];
-			int Hits = 0;
-			int Num = GameWorld()->FindEntities(ProjStartPos, GetProximityRadius()*0.5f, (CEntity**)apEnts,
-														MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
-
-			for(int i = 0; i < Num; ++i)
-			{
-				CCharacter *pTarget = apEnts[i];
-
-				if((pTarget == this) || GameServer()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
-					continue;
-
-				// set his velocity to fast upward (for now)
-				if(length(pTarget->m_Pos-ProjStartPos) > 0.0f)
-					GameServer()->CreateHammerHit(pTarget->m_Pos-normalize(pTarget->m_Pos-ProjStartPos)*GetProximityRadius()*0.5f);
-				else
-					GameServer()->CreateHammerHit(ProjStartPos);
-
-				vec2 Dir;
-				if(length(pTarget->m_Pos - m_Pos) > 0.0f)
-					Dir = normalize(pTarget->m_Pos - m_Pos);
-				else
-					Dir = vec2(0.f, -1.f);
-
-				pTarget->TakeDamage(vec2(0.f, -1.f) + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f, Dir*-1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage,
-					m_pPlayer->GetCID(), m_ActiveWeapon);
-				Hits++;
-			}
-
-			// if we Hit anything, we have to wait for the reload
-			if(Hits)
-				m_ReloadTimer = Server()->TickSpeed()/3;
-
-		} break;
-
-		case WEAPON_GUN:
-		{
-			new CProjectile(GameWorld(), WEAPON_GUN,
-				m_pPlayer->GetCID(),
-				ProjStartPos,
-				Direction,
-				(int)(Server()->TickSpeed()*GameServer()->Tuning()->m_GunLifetime),
-				g_pData->m_Weapons.m_Gun.m_pBase->m_Damage, false, 0, -1, WEAPON_GUN);
-
-			GameServer()->CreateSound(m_Pos, SOUND_GUN_FIRE);
-		} break;
-
-		case WEAPON_SHOTGUN:
-		{
-			int ShotSpread = 2;
-
-			for(int i = -ShotSpread; i <= ShotSpread; ++i)
-			{
-				float Spreading[] = {-0.185f, -0.070f, 0, 0.070f, 0.185f};
-				float a = angle(Direction);
-				a += Spreading[i+2];
-				float v = 1-(absolute(i)/(float)ShotSpread);
-				float Speed = mix((float)GameServer()->Tuning()->m_ShotgunSpeeddiff, 1.0f, v);
-				new CProjectile(GameWorld(), WEAPON_SHOTGUN,
-					m_pPlayer->GetCID(),
-					ProjStartPos,
-					vec2(cosf(a), sinf(a))*Speed,
-					(int)(Server()->TickSpeed()*GameServer()->Tuning()->m_ShotgunLifetime),
-					g_pData->m_Weapons.m_Shotgun.m_pBase->m_Damage, false, 0, -1, WEAPON_SHOTGUN);
-			}
-
-			GameServer()->CreateSound(m_Pos, SOUND_SHOTGUN_FIRE);
-		} break;
-
-		case WEAPON_GRENADE:
-		{
-			new CProjectile(GameWorld(), WEAPON_GRENADE,
-				m_pPlayer->GetCID(),
-				ProjStartPos,
-				Direction,
-				(int)(Server()->TickSpeed()*GameServer()->Tuning()->m_GrenadeLifetime),
-				g_pData->m_Weapons.m_Grenade.m_pBase->m_Damage, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE);
-
-			GameServer()->CreateSound(m_Pos, SOUND_GRENADE_FIRE);
-		} break;
-
-		case WEAPON_LASER:
-		{
-			new CLaser(GameWorld(), m_Pos, Direction, GameServer()->Tuning()->m_LaserReach, m_pPlayer->GetCID());
-			GameServer()->CreateSound(m_Pos, SOUND_LASER_FIRE);
-		} break;
-
-		case WEAPON_NINJA:
-		{
-			m_NumObjectsHit = 0;
-
-			m_Ninja.m_ActivationDir = Direction;
-			m_Ninja.m_CurrentMoveTime = g_pData->m_Weapons.m_Ninja.m_Movetime * Server()->TickSpeed() / 1000;
-			m_Ninja.m_OldVelAmount = length(m_Core.m_Vel);
-
-			GameServer()->CreateSound(m_Pos, SOUND_NINJA_FIRE);
-		} break;
-
-	}
-
-	m_AttackTick = Server()->Tick();
-
-	if(m_aWeapons[m_ActiveWeapon].m_Ammo > 0) // -1 == unlimited
-		m_aWeapons[m_ActiveWeapon].m_Ammo--;
-
-	if(!m_ReloadTimer)
-		m_ReloadTimer = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Firedelay * Server()->TickSpeed() / 1000;
 }
 
 void CCharacter::HandleWeapons()
 {
-	//ninja
-	HandleNinja();
-
-	// check reload timer
-	if(m_ReloadTimer)
-	{
-		m_ReloadTimer--;
-		return;
-	}
-
-	// fire Weapon, if wanted
-	FireWeapon();
-
-	// ammo regen
-	int AmmoRegenTime = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Ammoregentime;
-	if(AmmoRegenTime && m_aWeapons[m_ActiveWeapon].m_Ammo >= 0)
-	{
-		// If equipped and not active, regen ammo?
-		if(m_ReloadTimer <= 0)
-		{
-			if(m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart < 0)
-				m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart = Server()->Tick();
-
-			if((Server()->Tick() - m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart) >= AmmoRegenTime * Server()->TickSpeed() / 1000)
-			{
-				// Add some ammo
-				m_aWeapons[m_ActiveWeapon].m_Ammo = minimum(m_aWeapons[m_ActiveWeapon].m_Ammo + 1,
-					g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Maxammo);
-				m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart = -1;
-			}
-		}
-		else
-		{
-			m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart = -1;
-		}
-	}
-
-	return;
 }
 
 bool CCharacter::GiveWeapon(int Weapon, int Ammo)
 {
-	if(m_aWeapons[Weapon].m_Ammo < g_pData->m_Weapons.m_aId[Weapon].m_Maxammo || !m_aWeapons[Weapon].m_Got)
-	{
-		m_aWeapons[Weapon].m_Got = true;
-		m_aWeapons[Weapon].m_Ammo = minimum(g_pData->m_Weapons.m_aId[Weapon].m_Maxammo, Ammo);
-		return true;
-	}
 	return false;
 }
 
 void CCharacter::GiveNinja()
 {
-	m_Ninja.m_ActivationTick = Server()->Tick();
-	m_aWeapons[WEAPON_NINJA].m_Got = true;
-	m_aWeapons[WEAPON_NINJA].m_Ammo = -1;
-	if(m_ActiveWeapon != WEAPON_NINJA)
-		m_LastWeapon = m_ActiveWeapon;
-	m_ActiveWeapon = WEAPON_NINJA;
-
-	GameServer()->CreateSound(m_Pos, SOUND_PICKUP_NINJA);
 }
 
 void CCharacter::SetEmote(int Emote, int Tick)
 {
-	m_EmoteType = Emote;
-	m_EmoteStop = Tick;
 }
 
 void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 {
-	// check for changes
-	if(mem_comp(&m_Input, pNewInput, sizeof(CNetObj_PlayerInput)) != 0)
-		m_LastAction = Server()->Tick();
-
-	// copy new input
-	mem_copy(&m_Input, pNewInput, sizeof(m_Input));
-	m_NumInputs++;
-
-	// it is not allowed to aim in the center
-	if(m_Input.m_TargetX == 0 && m_Input.m_TargetY == 0)
-		m_Input.m_TargetY = -1;
 }
 
 void CCharacter::OnDirectInput(CNetObj_PlayerInput *pNewInput)
 {
-	mem_copy(&m_LatestPrevInput, &m_LatestInput, sizeof(m_LatestInput));
-	mem_copy(&m_LatestInput, pNewInput, sizeof(m_LatestInput));
-
-	// it is not allowed to aim in the center
-	if(m_LatestInput.m_TargetX == 0 && m_LatestInput.m_TargetY == 0)
-		m_LatestInput.m_TargetY = -1;
-
-	if(m_NumInputs > 2 && m_pPlayer->GetTeam() != TEAM_SPECTATORS)
-	{
-		HandleWeaponSwitch();
-		FireWeapon();
-	}
-
-	mem_copy(&m_LatestPrevInput, &m_LatestInput, sizeof(m_LatestInput));
 }
 
 void CCharacter::ResetInput()
 {
-	m_Input.m_Direction = 0;
-	m_Input.m_Hook = 0;
-	// simulate releasing the fire button
-	if((m_Input.m_Fire&1) != 0)
-		m_Input.m_Fire++;
-	m_Input.m_Fire &= INPUT_STATE_MASK;
-	m_Input.m_Jump = 0;
-	m_LatestPrevInput = m_LatestInput = m_Input;
 }
 
 void CCharacter::Tick()
 {
-	m_Core.m_Input = m_Input;
-	m_Core.Tick(true);
-
-	// handle leaving gamelayer
-	if(GameLayerClipped(m_Pos))
-	{
-		Die(m_pPlayer->GetCID(), WEAPON_WORLD);
-	}
-
-	// handle Weapons
-	HandleWeapons();
 }
 
 void CCharacter::TickDefered()

@@ -64,10 +64,6 @@ if gen_server_content_header:
 
 
 if gen_client_content_header or gen_server_content_header:
-	# print some includes
-	print('#include <engine/graphics.h>')
-	print('#include <engine/sound.h>')
-
 	# emit the type declarations
 	contentlines = open("datasrc/content.py", "rb").readlines()
 	order = []
@@ -82,9 +78,7 @@ if gen_client_content_header or gen_server_content_header:
 	print('extern CDataContainer *g_pData;')
 
 	# enums
-	EmitEnum(["IMAGE_%s"%i.name.value.upper() for i in content.container.images.items], "NUM_IMAGES")
 	EmitEnum(["ANIM_%s"%i.name.value.upper() for i in content.container.animations.items], "NUM_ANIMS")
-	EmitEnum(["SPRITE_%s"%i.name.value.upper() for i in content.container.sprites.items], "NUM_SPRITES")
 
 if gen_client_content_source or gen_server_content_source:
 	if gen_client_content_source:
@@ -119,7 +113,6 @@ if gen_network_header:
 			print(line)
 		print("")
 
-	EmitEnum(["SOUND_%s"%i.name.value.upper() for i in content.container.sounds.items], "NUM_SOUNDS")
 	EmitEnum(["WEAPON_%s"%i.name.value.upper() for i in content.container.weapons.id.items], "NUM_WEAPONS")
 
 	print("""
@@ -145,7 +138,7 @@ public:
 	int GetObjSize(int Type) const;
 	const char *FailedObjOn() const;
 	int NumObjFailures() const;
-	
+
 	const char *GetMsgName(int Type) const;
 	void *SecureUnpackMsg(int Type, CUnpacker *pUnpacker);
 	const char *FailedMsgOn() const;

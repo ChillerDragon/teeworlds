@@ -19,7 +19,6 @@
 #include <engine/map.h>
 #include <engine/masterserver.h>
 #include <engine/serverbrowser.h>
-#include <engine/sound.h>
 #include <engine/storage.h>
 #include <engine/textrender.h>
 
@@ -244,7 +243,6 @@ CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotD
 	m_pEditor = 0;
 	m_pInput = 0;
 	m_pGraphics = 0;
-	m_pSound = 0;
 	m_pGameClient = 0;
 	m_pMap = 0;
 	m_pMapChecker = 0;
@@ -1892,8 +1890,6 @@ void CClient::InitInterfaces()
 	// fetch interfaces
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
 	m_pEditor = Kernel()->RequestInterface<IEditor>();
-	//m_pGraphics = Kernel()->RequestInterface<IEngineGraphics>();
-	m_pSound = Kernel()->RequestInterface<IEngineSound>();
 	m_pTextRender = Kernel()->RequestInterface<IEngineTextRender>();
 	m_pGameClient = Kernel()->RequestInterface<IGameClient>();
 	m_pInput = Kernel()->RequestInterface<IEngineInput>();
@@ -2023,10 +2019,6 @@ void CClient::Run()
 		}
 	}
 
-	// init sound, allowed to fail
-	m_SoundInitFailed = Sound()->Init() != 0;
-	Sound()->SetMaxDistance(1.5f*Graphics()->ScreenWidth()/2.0f);
-
 	// open socket
 	{
 		NETADDR BindAddr;
@@ -2099,9 +2091,6 @@ void CClient::Run()
 		if(Input()->Update())
 			break;	// SDL_QUIT
 
-		// update sound
-		Sound()->Update();
-
 		// release focus
 		if(!m_pGraphics->WindowActive())
 		{
@@ -2170,7 +2159,7 @@ void CClient::Run()
 			}
 			else if(m_EditorActive)
 				m_EditorActive = false;
-			
+
 			m_pTextRender->Update();
 
 			Update();
@@ -2243,10 +2232,6 @@ void CClient::Run()
 
 	GameClient()->OnShutdown();
 	Disconnect();
-
-	m_pGraphics->Shutdown();
-	m_pSound->Shutdown();
-	m_pTextRender->Shutdown();
 
 	m_ServerBrowser.SaveServerlist();
 
@@ -2662,7 +2647,6 @@ int main(int argc, const char **argv) // ignore_convention
 	IConsole *pConsole = CreateConsole(FlagMask);
 	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_CLIENT, argc, argv); // ignore_convention
 	IConfigManager *pConfigManager = CreateConfigManager();
-	IEngineSound *pEngineSound = CreateEngineSound();
 	IEngineInput *pEngineInput = CreateEngineInput();
 	IEngineTextRender *pEngineTextRender = CreateEngineTextRender();
 	IEngineMap *pEngineMap = CreateEngineMap();
@@ -2682,8 +2666,6 @@ int main(int argc, const char **argv) // ignore_convention
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConsole);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConfigManager);
 
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IEngineSound*>(pEngineSound)); // register as both
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<ISound*>(pEngineSound));
 
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IEngineInput*>(pEngineInput)); // register as both
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IInput*>(pEngineInput));
@@ -2793,7 +2775,6 @@ int main(int argc, const char **argv) // ignore_convention
 	delete pConsole;
 	delete pStorage;
 	delete pConfigManager;
-	delete pEngineSound;
 	delete pEngineInput;
 	delete pEngineTextRender;
 	delete pEngineMap;

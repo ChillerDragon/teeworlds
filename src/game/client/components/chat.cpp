@@ -15,7 +15,6 @@
 #include <game/client/localization.h>
 
 #include <game/client/components/scoreboard.h>
-#include <game/client/components/sounds.h>
 
 #include "menus.h"
 #include "chat.h"
@@ -137,17 +136,6 @@ void CChat::AddLine(const char *pLine, int ClientID, int Mode, int TargetID)
 		char aBuf[1024];
 		str_format(aBuf, sizeof(aBuf), "%2d: %s: %s", ClientID, "name", pLine);
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, GetModeName(Mode), aBuf, Mode == CHAT_WHISPER);
-}
-
-int CChat::GetChatSound(int ChatType)
-{
-	switch(ChatType)
-	{
-		case CHAT_SERVER: return SOUND_CHAT_SERVER;
-		case CHAT_HIGHLIGHT: return SOUND_CHAT_HIGHLIGHT;
-		case CHAT_CLIENT: return SOUND_CHAT_CLIENT;
-		default: return -1;
-	}
 }
 
 const char *CChat::GetModeName(int Mode) const

@@ -8,7 +8,6 @@
 #include <engine/demo.h>
 #include <engine/map.h>
 #include <engine/storage.h>
-#include <engine/sound.h>
 #include <engine/serverbrowser.h>
 #include <engine/shared/demo.h>
 #include <engine/shared/config.h>
@@ -47,7 +46,6 @@
 #include "components/nameplates.h"
 #include "components/scoreboard.h"
 #include "components/skins.h"
-#include "components/sounds.h"
 #include "components/spectator.h"
 #include "components/stats.h"
 #include "components/voting.h"
@@ -106,7 +104,6 @@ static CNotifications gs_Notifications;
 static CControls gs_Controls;
 static CEffects gs_Effects;
 static CScoreboard gs_Scoreboard;
-static CSounds gs_Sounds;
 static CEmoticon gs_Emoticon;
 static CDamageInd gsDamageInd;
 static CVoting gs_Voting;
@@ -218,7 +215,6 @@ void CGameClient::OnConsoleInit()
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
 	m_pClient = Kernel()->RequestInterface<IClient>();
 	m_pTextRender = Kernel()->RequestInterface<ITextRender>();
-	m_pSound = Kernel()->RequestInterface<ISound>();
 	m_pInput = Kernel()->RequestInterface<IInput>();
 	m_pConfig = Kernel()->RequestInterface<IConfigManager>()->Values();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
@@ -242,7 +238,6 @@ void CGameClient::OnConsoleInit()
 	m_pCamera = &::gs_Camera;
 	m_pControls = &::gs_Controls;
 	m_pEffects = &::gs_Effects;
-	m_pSounds = &::gs_Sounds;
 	m_pMotd = &::gs_Motd;
 	m_pDamageind = &::gsDamageInd;
 	m_pMapimages = &::gs_MapImages;
@@ -263,7 +258,6 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(&m_pBinds->m_SpecialBinds);
 	m_All.Add(m_pControls);
 	m_All.Add(m_pCamera);
-	m_All.Add(m_pSounds);
 	m_All.Add(m_pVoting);
 
 	m_All.Add(&gs_MapLayersBackGround); // first to render
@@ -368,7 +362,7 @@ void CGameClient::OnInit()
 		Client()->SnapSetStaticsize(i, m_NetObjHandler.GetObjSize(i));
 
 	// determine total work for loading all components
-	int TotalWorkAmount = g_pData->m_NumImages + 4 + 1 + 1 + 2; // +4=load init, +1=font, +1=localization, +2=editor
+	int TotalWorkAmount = 0;
 	for(int i = m_All.m_Num-1; i >= 0; --i)
 		TotalWorkAmount += m_All.m_paComponents[i]->GetInitAmount();
 
@@ -386,13 +380,6 @@ void CGameClient::OnInit()
 	// init all components
 	for(int i = m_All.m_Num-1; i >= 0; --i)
 		m_All.m_paComponents[i]->OnInit(); // this will call RenderLoading again
-
-	// load textures
-	for(int i = 0; i < g_pData->m_NumImages; i++)
-	{
-		g_pData->m_aImages[i].m_Id = Graphics()->LoadTexture(g_pData->m_aImages[i].m_pFilename, IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, g_pData->m_aImages[i].m_Flag ? IGraphics::TEXLOAD_LINEARMIPMAPS : 0);
-		m_pMenus->RenderLoading(1);
-	}
 
 	// init the editor
 	m_pEditor->Init();
@@ -694,10 +681,10 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 			switch(GameMsgID)
 			{
 			case GAMEMSG_CTF_DROP:
-				m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_DROP);
+				dbg_msg("sound", "CSounds::CHN_GLOBAL, SOUND_CTF_DROP);");
 				break;
 			case GAMEMSG_CTF_RETURN:
-				m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_RETURN);
+				dbg_msg("sound", "CSounds::CHN_GLOBAL, SOUND_CTF_RETURN);");
 				break;
 			case GAMEMSG_TEAM_ALL:
 				{
@@ -728,9 +715,9 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 								((m_Snap.m_SpecInfo.m_SpectatorID != -1 && m_aClients[m_Snap.m_SpecInfo.m_SpectatorID].m_Team != aParaI[0]) ||
 								(m_Snap.m_SpecInfo.m_SpecMode == SPEC_FLAGRED && aParaI[0] != TEAM_RED) ||
 								(m_Snap.m_SpecInfo.m_SpecMode == SPEC_FLAGBLUE && aParaI[0] != TEAM_BLUE)))))
-					m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_GRAB_PL);
+					dbg_msg("sound", "CSounds::CHN_GLOBAL, SOUND_CTF_GRAB_PL);");
 				else
-					m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_GRAB_EN);
+					dbg_msg("sound", "CSounds::CHN_GLOBAL, SOUND_CTF_GRAB_EN);");
 				break;
 			case GAMEMSG_GAME_PAUSED:
 				{
@@ -742,7 +729,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 				}
 				break;
 			case GAMEMSG_CTF_CAPTURE:
-				m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_CAPTURE);
+				dbg_msg("sound", "CSounds::CHN_GLOBAL, SOUND_CTF_CAPTURE);");
 				int ClientID = clamp(aParaI[1], 0, MAX_CLIENTS - 1);
 				m_pStats->OnFlagCapture(ClientID);
 				char aLabel[64];
@@ -1095,7 +1082,7 @@ void CGameClient::ProcessEvents()
 		else if(Item.m_Type == NETEVENTTYPE_SOUNDWORLD)
 		{
 			CNetEvent_SoundWorld *ev = (CNetEvent_SoundWorld *)pData;
-			m_pSounds->PlayAt(CSounds::CHN_WORLD, ev->m_SoundID, 1.0f, vec2(ev->m_X, ev->m_Y));
+			dbg_msg("sound", "(CSounds::CHN_WORLD, ev->m_SoundID=%d, 1.0f, vec2(ev->m_X, ev->m_Y));", ev->m_SoundID);
 		}
 	}
 }
@@ -1106,19 +1093,19 @@ void CGameClient::ProcessTriggeredEvents(int Events, vec2 Pos)
 		return;
 
 	if(Events&COREEVENTFLAG_GROUND_JUMP)
-		m_pSounds->PlayAt(CSounds::CHN_WORLD, SOUND_PLAYER_JUMP, 1.0f, Pos);
+		dbg_msg("sound", "(CSounds::CHN_WORLD, SOUND_PLAYER_JUMP, 1.0f, Pos);");
 	if(Events&COREEVENTFLAG_AIR_JUMP)
 		m_pEffects->AirJump(Pos);
 	if(Events&COREEVENTFLAG_HOOK_ATTACH_PLAYER)
-		m_pSounds->PlayAt(CSounds::CHN_WORLD, SOUND_HOOK_ATTACH_PLAYER, 1.0f, Pos);
+		dbg_msg("sound", "(CSounds::CHN_WORLD, SOUND_HOOK_ATTACH_PLAYER, 1.0f, Pos);");
 	if(Events&COREEVENTFLAG_HOOK_ATTACH_GROUND)
-		m_pSounds->PlayAt(CSounds::CHN_WORLD, SOUND_HOOK_ATTACH_GROUND, 1.0f, Pos);
+		dbg_msg("sound", "(CSounds::CHN_WORLD, SOUND_HOOK_ATTACH_GROUND, 1.0f, Pos);");
 	if(Events&COREEVENTFLAG_HOOK_HIT_NOHOOK)
-		m_pSounds->PlayAt(CSounds::CHN_WORLD, SOUND_HOOK_NOATTACH, 1.0f, Pos);
+		dbg_msg("sound", "(CSounds::CHN_WORLD, SOUND_HOOK_NOATTACH, 1.0f, Pos);");
 	/*if(Events&COREEVENTFLAG_HOOK_LAUNCH)
-		m_pSounds->PlayAt(CSounds::CHN_WORLD, SOUND_HOOK_LOOP, 1.0f, Pos);
+		dbg_msg("sound", "(CSounds::CHN_WORLD, SOUND_HOOK_LOOP, 1.0f, Pos);");
 	if(Events&COREEVENTFLAG_HOOK_RETRACT)
-		m_pSounds->PlayAt(CSounds::CHN_WORLD, SOUND_PLAYER_JUMP, 1.0f, Pos);*/
+		dbg_msg("sound", "(CSounds::CHN_WORLD, SOUND_PLAYER_JUMP, 1.0f, Pos);*/
 }
 
 typedef bool (*FCompareFunc)(const CNetObj_PlayerInfo*, const CNetObj_PlayerInfo*);

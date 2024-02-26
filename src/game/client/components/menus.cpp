@@ -23,7 +23,6 @@
 #include <game/client/components/binds.h>
 #include <game/client/components/camera.h>
 #include <game/client/components/console.h>
-#include <game/client/components/sounds.h>
 #include <game/client/gameclient.h>
 #include <game/client/lineinput.h>
 #include <mastersrv/mastersrv.h>

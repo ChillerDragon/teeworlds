@@ -3,7 +3,6 @@
 #include <engine/serverbrowser.h>
 #include <game/client/animstate.h>
 #include <game/client/components/menus.h>
-#include <game/client/components/sounds.h>
 #include <game/client/gameclient.h>
 #include <generated/client_data.h>
 #include "stats.h"
