@@ -75,6 +75,7 @@ void CConsole::SetPrintOutputLevel(int Index, int OutputLevel)
 
 void CConsole::Print(int Level, const char *pFrom, const char *pStr, bool Highlighted)
 {
+	dbg_msg(pFrom, "%s", pStr);
 }
 
 bool CConsole::LineIsValid(const char *pStr)
