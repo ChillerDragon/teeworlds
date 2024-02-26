@@ -2730,21 +2730,6 @@ int main(int argc, const char **argv) // ignore_convention
 			}
 		}
 	}
-#if defined(CONF_FAMILY_WINDOWS)
-	CConfig *pConfig = pConfigManager->Values();
-	bool HideConsole = false;
-	#ifdef CONF_RELEASE
-	if(!(pConfig->m_ShowConsoleWindow&2))
-	#else
-	if(!(pConfig->m_ShowConsoleWindow&1))
-	#endif
-	{
-		HideConsole = true;
-		FreeConsole();
-	}
-	else if(!QuickEditMode)
-		dbg_console_init();
-#endif
 
 	pClient->DoVersionSpecificActions();
 
@@ -2760,13 +2745,6 @@ int main(int argc, const char **argv) // ignore_convention
 	// wait for background jobs to finish
 	pEngine->ShutdownJobs();
 
-	// write down the config and quit
-	pConfigManager->Save();
-
-#if defined(CONF_FAMILY_WINDOWS)
-	if(!HideConsole && !QuickEditMode)
-		dbg_console_cleanup();
-#endif
 	// free components
 	pClient->~CClient();
 	mem_free(pClient);
