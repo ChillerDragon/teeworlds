@@ -2,6 +2,17 @@
 
 #include "byte_printer.h"
 
+#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
+#define BYTE_TO_BINARY(byte)  \
+  ((byte) & 0x80 ? '1' : '0'), \
+  ((byte) & 0x40 ? '1' : '0'), \
+  ((byte) & 0x20 ? '1' : '0'), \
+  ((byte) & 0x10 ? '1' : '0'), \
+  ((byte) & 0x08 ? '1' : '0'), \
+  ((byte) & 0x04 ? '1' : '0'), \
+  ((byte) & 0x02 ? '1' : '0'), \
+  ((byte) & 0x01 ? '1' : '0')
+
 void str_bin(char *dst, int dst_size, const void *data, int data_size)
 {
 	int i;
@@ -9,7 +20,10 @@ void str_bin(char *dst, int dst_size, const void *data, int data_size)
 	{
 		if(i + 1 * 9 > dst_size)
 			break;
-		str_format(dst + i * 9, 9, "%08b ", ((unsigned char *)data)[i]);
+		// %b is non posix so it fails on some systems and warns in the CI
+		// replace by some manual macro
+		// str_format(dst + i * 9, 9, "%08b ", ((unsigned char *)data)[i]);
+		str_format(dst + i * 9, 9, BYTE_TO_BINARY_PATTERN" ", BYTE_TO_BINARY(((unsigned char *)data)[i]));
 		dst[-1 + i * 9] = ' '; // delete null terminator
 	}
 	dst[-1 + i * 9] = '\0';
