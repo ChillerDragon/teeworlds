@@ -69,10 +69,6 @@ void CMenus::DoSettingsControlsButtons(int Start, int Stop, CUIRect View, float 
 {
 }
 
-static void UpdateBindKeys(CBinds* pBinds)
-{
-}
-
 float CMenus::RenderSettingsControlsMouse(CUIRect View)
 {
 	return 0.0f;

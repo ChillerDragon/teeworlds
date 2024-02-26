@@ -34,7 +34,6 @@ public:
 	int Version() const { return m_CurrentVersion; }
 
 	void AddString(const char *pOrgStr, const char *pNewStr, const char *pContext);
-	const char *FindString(unsigned Hash, unsigned ContextHash) const;
 };
 
 extern CLocalizationDatabase g_Localization;

@@ -787,14 +787,6 @@ void CMenus::PopupConfirmCountryFilter()
 {
 }
 
-static void FormatScore(char *pBuf, int BufSize, bool TimeScore, const CServerInfo::CClient *pClient)
-{
-	if(TimeScore)
-		FormatTime(pBuf, BufSize, pClient->m_Score * 1000, 0);
-	else
-		str_format(pBuf, BufSize, "%d", pClient->m_Score);
-}
-
 void CMenus::RenderServerbrowserServerList(CUIRect View)
 {
 }
