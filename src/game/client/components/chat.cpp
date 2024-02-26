@@ -103,7 +103,7 @@ void CChat::OnMessage(int MsgType, void *pRawMsg)
 	if(MsgType == NETMSGTYPE_SV_CHAT)
 	{
 		CNetMsg_Sv_Chat *pMsg = (CNetMsg_Sv_Chat *)pRawMsg;
-		if(pMsg->m_Mode == CHAT_WHISPER && Config()->m_ClDisableWhisper)
+		if(pMsg->m_Mode == CHAT_WHISPER)
 			return;
 		AddLine(pMsg->m_pMessage, pMsg->m_ClientID, pMsg->m_Mode, pMsg->m_TargetID);
 	}
@@ -134,6 +134,9 @@ bool CChat::IsClientIgnored(int ClientID)
 
 void CChat::AddLine(const char *pLine, int ClientID, int Mode, int TargetID)
 {
+		char aBuf[1024];
+		str_format(aBuf, sizeof(aBuf), "%2d: %s: %s", ClientID, "name", pLine);
+		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, GetModeName(Mode), aBuf, Mode == CHAT_WHISPER);
 }
 
 int CChat::GetChatSound(int ChatType)
