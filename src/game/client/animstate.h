@@ -19,8 +19,6 @@ public:
 	CAnimKeyframe *GetAttach() { return &m_Attach; }
 	void Set(CAnimation *pAnim, float Time);
 	void Add(CAnimation *pAdded, float Time, float Amount);
-
-	static CAnimState *GetIdle();
 };
 
 #endif

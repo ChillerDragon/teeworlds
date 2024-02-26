@@ -30,9 +30,7 @@ public:
 	bool m_TakeKey;
 	bool m_GotKey;
 	int m_Modifier;
-	IInput::CEvent m_Key;
 	CMenusKeyBinder();
-	virtual bool OnInput(IInput::CEvent Event);
 };
 
 class CMenus : public CComponent
@@ -638,7 +636,6 @@ public:
 	virtual void OnStateChange(int NewState, int OldState);
 	virtual void OnReset();
 	virtual void OnRender();
-	virtual bool OnInput(IInput::CEvent Event);
 	virtual bool OnCursorMove(float x, float y, int CursorType);
 
 	static void Con_Play(IConsole::IResult *pResult, void *pUserData);

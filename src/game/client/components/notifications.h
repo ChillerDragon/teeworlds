@@ -6,8 +6,6 @@
 
 class CNotifications : public CComponent
 {
-	float m_SoundToggleTime;
-
 	void OnConsoleInit();
 	void RenderSoundNotification();
 

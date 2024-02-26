@@ -22,8 +22,6 @@ class CSounds : public CComponent
 	int64 m_QueueWaitTime;
 	class CJob m_SoundJob;
 	bool m_WaitForSoundJob;
-	
-	ISound::CSampleHandle GetSampleId(int SetId);
 
 public:
 	// sound channels
