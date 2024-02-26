@@ -133,9 +133,7 @@ bool CChat::IsClientIgnored(int ClientID)
 
 void CChat::AddLine(const char *pLine, int ClientID, int Mode, int TargetID)
 {
-		char aBuf[1024];
-		str_format(aBuf, sizeof(aBuf), "%2d: %s: %s", ClientID, "name", pLine);
-		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, GetModeName(Mode), aBuf, Mode == CHAT_WHISPER);
+	dbg_msg(GetModeName(Mode), "%2d: %s: %s", ClientID, "name", pLine);
 }
 
 const char *CChat::GetModeName(int Mode) const
