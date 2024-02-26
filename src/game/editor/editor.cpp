@@ -35,125 +35,42 @@ enum
 
 CEditorImage::~CEditorImage()
 {
-	m_pEditor->Graphics()->UnloadTexture(&m_Texture);
-	if(m_pData)
-	{
-		mem_free(m_pData);
-		m_pData = 0;
-	}
-	if(m_pAutoMapper)
-	{
-		delete m_pAutoMapper;
-		m_pAutoMapper = 0;
-	}
 }
 
 CLayerGroup::CLayerGroup()
 {
-	m_aName[0] = 0;
-	m_Visible = true;
-	m_SaveToMap = true;
-	m_Collapse = false;
-	m_GameGroup = false;
-	m_OffsetX = 0;
-	m_OffsetY = 0;
-	m_ParallaxX = 100;
-	m_ParallaxY = 100;
-
-	m_UseClipping = 0;
-	m_ClipX = 0;
-	m_ClipY = 0;
-	m_ClipW = 0;
-	m_ClipH = 0;
 }
 
 CLayerGroup::~CLayerGroup()
 {
-	Clear();
 }
 
 void CLayerGroup::Convert(CUIRect *pRect)
 {
-	pRect->x += m_OffsetX;
-	pRect->y += m_OffsetY;
 }
 
 void CLayerGroup::Mapping(float *pPoints)
 {
-	m_pMap->m_pEditor->RenderTools()->MapScreenToWorld(
-		m_pMap->m_pEditor->m_WorldOffsetX, m_pMap->m_pEditor->m_WorldOffsetY,
-		m_ParallaxX/100.0f, m_ParallaxY/100.0f,
-		m_OffsetX, m_OffsetY,
-		m_pMap->m_pEditor->Graphics()->ScreenAspect(), m_pMap->m_pEditor->m_WorldZoom, pPoints);
-
-	pPoints[0] += m_pMap->m_pEditor->m_EditorOffsetX;
-	pPoints[1] += m_pMap->m_pEditor->m_EditorOffsetY;
-	pPoints[2] += m_pMap->m_pEditor->m_EditorOffsetX;
-	pPoints[3] += m_pMap->m_pEditor->m_EditorOffsetY;
 }
 
 void CLayerGroup::MapScreen()
 {
-	float aPoints[4];
-	Mapping(aPoints);
-	m_pMap->m_pEditor->Graphics()->MapScreen(aPoints[0], aPoints[1], aPoints[2], aPoints[3]);
 }
 
 void CLayerGroup::Render()
 {
-	MapScreen();
-	IGraphics *pGraphics = m_pMap->m_pEditor->Graphics();
-
-	if(m_UseClipping)
-	{
-		float aPoints[4];
-		m_pMap->m_pGameGroup->Mapping(aPoints);
-		float x0 = (m_ClipX - aPoints[0]) / (aPoints[2]-aPoints[0]);
-		float y0 = (m_ClipY - aPoints[1]) / (aPoints[3]-aPoints[1]);
-		float x1 = ((m_ClipX+m_ClipW) - aPoints[0]) / (aPoints[2]-aPoints[0]);
-		float y1 = ((m_ClipY+m_ClipH) - aPoints[1]) / (aPoints[3]-aPoints[1]);
-
-		pGraphics->ClipEnable((int)(x0*pGraphics->ScreenWidth()), (int)(y0*pGraphics->ScreenHeight()),
-			(int)((x1-x0)*pGraphics->ScreenWidth()), (int)((y1-y0)*pGraphics->ScreenHeight()));
-	}
-
-	for(int i = 0; i < m_lLayers.size(); i++)
-	{
-		if(m_lLayers[i]->m_Visible && m_lLayers[i] != m_pMap->m_pGameLayer)
-		{
-			if(m_pMap->m_pEditor->m_ShowDetail || !(m_lLayers[i]->m_Flags&LAYERFLAG_DETAIL))
-				m_lLayers[i]->Render();
-		}
-	}
-
-	if(m_UseClipping)
-		pGraphics->ClipDisable();
 }
 
 void CLayerGroup::AddLayer(CLayer *l)
 {
-	m_pMap->m_Modified = true;
-	m_lLayers.add(l);
 }
 
 void CLayerGroup::DeleteLayer(int Index)
 {
-	if(Index < 0 || Index >= m_lLayers.size()) return;
-	delete m_lLayers[Index];
-	m_lLayers.remove_index(Index);
-	m_pMap->m_Modified = true;
 }
 
 void CLayerGroup::GetSize(float *w, float *h) const
 {
-	*w = 0; *h = 0;
-	for(int i = 0; i < m_lLayers.size(); i++)
-	{
-		float lw, lh;
-		m_lLayers[i]->GetSize(&lw, &lh);
-		*w = maximum(*w, lw);
-		*h = maximum(*h, lh);
-	}
 }
 
 
@@ -264,25 +181,8 @@ void CEditorImage::LoadAutoMapper()
 
 void CEditor::EnvelopeEval(float TimeOffset, int Env, float *pChannels, void *pUser)
 {
-	CEditor *pThis = (CEditor *)pUser;
-	if(Env < 0 || Env >= pThis->m_Map.m_lEnvelopes.size())
-	{
-		pChannels[0] = 0;
-		pChannels[1] = 0;
-		pChannels[2] = 0;
-		pChannels[3] = 0;
-		return;
-	}
 
-	CEnvelope *e = pThis->m_Map.m_lEnvelopes[Env];
-	float t = pThis->m_AnimateTime+TimeOffset;
-	t *= pThis->m_AnimateSpeed;
-	e->Eval(t, pChannels);
 }
-
-/********************************************************
- OTHER
-*********************************************************/
 
 vec4 CEditor::GetButtonColor(const void *pID, int Checked)
 {
@@ -330,198 +230,59 @@ int CEditor::DoButton_Editor(const void *pID, const char *pText, int Checked, co
 
 int CEditor::DoButton_Image(const void *pID, const char *pText, int Checked, const CUIRect *pRect, int Flags, const char *pToolTip, bool Used)
 {
-	// darken the button if not used
-	vec4 ButtonColor = GetButtonColor(pID, Checked);
-	if(!Used)
-		ButtonColor *= vec4(0.5f, 0.5f, 0.5f, 1.0f);
-
-	const float FontSize = clamp(8.0f * pRect->w / TextRender()->TextWidth(10.0f, pText, -1), 6.0f, 10.0f);
-	pRect->Draw(ButtonColor, 3.0f);
-	UI()->DoLabel(pRect, pText, FontSize, TEXTALIGN_MC);
 	return DoButton_Editor_Common(pID, pText, Checked, pRect, Flags, pToolTip);
 }
 
 int CEditor::DoButton_Menu(const void *pID, const char *pText, int Checked, const CUIRect *pRect, int Flags, const char *pToolTip)
 {
-	pRect->Draw(vec4(0.5f, 0.5f, 0.5f, 1.0f), 3.0f, CUIRect::CORNER_T);
-
-	CUIRect Label = *pRect;
-	Label.VMargin(5.0f, &Label);
-	UI()->DoLabel(&Label, pText, 10.0f, TEXTALIGN_ML);
 	return DoButton_Editor_Common(pID, pText, Checked, pRect, Flags, pToolTip);
 }
 
 int CEditor::DoButton_MenuItem(const void *pID, const char *pText, int Checked, const CUIRect *pRect, int Flags, const char *pToolTip)
 {
-	if(UI()->HotItem() == pID || Checked)
-		pRect->Draw(GetButtonColor(pID, Checked), 3.0f);
-
-	CUIRect Label = *pRect;
-	Label.VMargin(5.0f, &Label);
-	UI()->DoLabel(&Label, pText, 10.0f, TEXTALIGN_ML);
 	return DoButton_Editor_Common(pID, pText, Checked, pRect, Flags, pToolTip);
 }
 
 int CEditor::DoButton_Tab(const void *pID, const char *pText, int Checked, const CUIRect *pRect, int Flags, const char *pToolTip)
 {
-	pRect->Draw(GetButtonColor(pID, Checked), 5.0f, CUIRect::CORNER_T);
-	UI()->DoLabel(pRect, pText, 10.0f, TEXTALIGN_MC);
 	return DoButton_Editor_Common(pID, pText, Checked, pRect, Flags, pToolTip);
 }
 
 int CEditor::DoButton_Ex(const void *pID, const char *pText, int Checked, const CUIRect *pRect, int Flags, const char *pToolTip, int Corners, float FontSize)
 {
-	pRect->Draw(GetButtonColor(pID, Checked), 3.0f, Corners);
-	UI()->DoLabel(pRect, pText, FontSize, TEXTALIGN_MC);
 	return DoButton_Editor_Common(pID, pText, Checked, pRect, Flags, pToolTip);
 }
 
 int CEditor::DoButton_ButtonInc(const void *pID, const char *pText, int Checked, const CUIRect *pRect, int Flags, const char *pToolTip)
 {
-	pRect->Draw(GetButtonColor(pID, Checked), 3.0f, CUIRect::CORNER_R);
-	UI()->DoLabel(pRect, pText?pText:"+", 10.0f, TEXTALIGN_MC);
 	return DoButton_Editor_Common(pID, pText, Checked, pRect, Flags, pToolTip);
 }
 
 int CEditor::DoButton_ButtonDec(const void *pID, const char *pText, int Checked, const CUIRect *pRect, int Flags, const char *pToolTip)
 {
-	pRect->Draw(GetButtonColor(pID, Checked), 3.0f, CUIRect::CORNER_L);
-	UI()->DoLabel(pRect, pText?pText:"-", 10.0f, TEXTALIGN_MC);
 	return DoButton_Editor_Common(pID, pText, Checked, pRect, Flags, pToolTip);
 }
 
 void CEditor::RenderGrid(CLayerGroup *pGroup)
 {
-	if(!m_GridActive)
-		return;
-
-	vec4 GridColor;
-	float aGroupPoints[4];
-	pGroup->Mapping(aGroupPoints);
-
-	float w = UI()->Screen()->w;
-	float h = UI()->Screen()->h;
-
-	int LineDistance = GetLineDistance();
-
-	int XOffset = aGroupPoints[0]/LineDistance;
-	int YOffset = aGroupPoints[1]/LineDistance;
-	int XGridOffset = XOffset % m_GridFactor;
-	int YGridOffset = YOffset % m_GridFactor;
-
-	Graphics()->TextureClear();
-	Graphics()->LinesBegin();
-
-	for(int i = 0; i < (int)w; i++)
-	{
-		if((i+YGridOffset) % m_GridFactor == 0)
-			GridColor = HexToRgba(Config()->m_EdColorGridOuter);
-		else
-			GridColor = HexToRgba(Config()->m_EdColorGridInner);
-
-		Graphics()->SetColor(GridColor.r, GridColor.g, GridColor.b, GridColor.a);
-		IGraphics::CLineItem Line = IGraphics::CLineItem(LineDistance*XOffset, LineDistance*i+LineDistance*YOffset, w+aGroupPoints[2], LineDistance*i+LineDistance*YOffset);
-		Graphics()->LinesDraw(&Line, 1);
-
-		if((i+XGridOffset) % m_GridFactor == 0)
-			GridColor = HexToRgba(Config()->m_EdColorGridOuter);
-		else
-			GridColor = HexToRgba(Config()->m_EdColorGridInner);
-
-		Graphics()->SetColor(GridColor.r, GridColor.g, GridColor.b, GridColor.a);
-		Line = IGraphics::CLineItem(LineDistance*i+LineDistance*XOffset, LineDistance*YOffset, LineDistance*i+LineDistance*XOffset, h+aGroupPoints[3]);
-		Graphics()->LinesDraw(&Line, 1);
-	}
-	Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
-	Graphics()->LinesEnd();
 }
 
 void CEditor::RenderBackground(CUIRect View, IGraphics::CTextureHandle Texture, float Size, float Brightness)
 {
-	Graphics()->TextureSet(Texture);
-	Graphics()->BlendNormal();
-	Graphics()->QuadsBegin();
-	Graphics()->SetColor(Brightness, Brightness, Brightness, 1.0f);
-	Graphics()->QuadsSetSubset(0,0, View.w/Size, View.h/Size);
-	IGraphics::CQuadItem QuadItem(View.x, View.y, View.w, View.h);
-	Graphics()->QuadsDrawTL(&QuadItem, 1);
-	Graphics()->QuadsEnd();
 }
 
 int CEditor::UiDoValueSelector(void *pID, CUIRect *pRect, const char *pLabel, int Current, int Min, int Max, int Step, float Scale, const char *pToolTip)
 {
-	// logic
-	static float s_Value;
-	bool Inside = UI()->MouseInside(pRect);
-
-	if(UI()->CheckActiveItem(pID))
-	{
-		if(!UI()->MouseButton(0) || Input()->KeyPress(KEY_ESCAPE))
-		{
-			m_LockMouse = false;
-			UI()->SetActiveItem(0);
-		}
-		else
-		{
-			if(Input()->KeyIsPressed(KEY_LSHIFT) || Input()->KeyIsPressed(KEY_RSHIFT))
-				s_Value += m_MouseDeltaX*0.05f;
-			else
-				s_Value += m_MouseDeltaX;
-
-			if(absolute(s_Value) > Scale)
-			{
-				int Count = (int)(s_Value/Scale);
-				s_Value = fmod(s_Value, Scale);
-				Current += Step*Count;
-				if(Current < Min)
-					Current = Min;
-				if(Current > Max)
-					Current = Max;
-			}
-		}
-		if(pToolTip)
-			m_pTooltip = pToolTip;
-	}
-	else if(UI()->HotItem() == pID)
-	{
-		if(UI()->MouseButton(0))
-		{
-			m_LockMouse = true;
-			s_Value = 0;
-			UI()->SetActiveItem(pID);
-		}
-		if(pToolTip)
-			m_pTooltip = pToolTip;
-	}
-
-	if(Inside)
-		UI()->SetHotItem(pID);
-
-	// render
-	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf),"%s %d", pLabel, Current);
-	pRect->Draw(GetButtonColor(pID, 0));
-	pRect->y += pRect->h/2.0f-7.0f;
-	UI()->DoLabel(pRect, aBuf, 10, TEXTALIGN_CENTER);
-
-	return Current;
+	return 0;
 }
 
 CLayerGroup *CEditor::GetSelectedGroup()
 {
-	if(m_SelectedGroup >= 0 && m_SelectedGroup < m_Map.m_lGroups.size())
-		return m_Map.m_lGroups[m_SelectedGroup];
 	return 0x0;
 }
 
 CLayer *CEditor::GetSelectedLayer(int Index)
 {
-	CLayerGroup *pGroup = GetSelectedGroup();
-	if(!pGroup)
-		return 0x0;
-
-	if(m_SelectedLayer >= 0 && m_SelectedLayer < m_Map.m_lGroups[m_SelectedGroup]->m_lLayers.size())
-		return pGroup->m_lLayers[m_SelectedLayer];
 	return 0x0;
 }
 

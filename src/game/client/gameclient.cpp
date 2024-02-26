@@ -34,7 +34,6 @@
 #include "components/debughud.h"
 #include "components/effects.h"
 #include "components/emoticon.h"
-#include "components/flow.h"
 #include "components/hud.h"
 #include "components/items.h"
 #include "components/infomessages.h"
@@ -101,7 +100,6 @@ static CParticles gs_Particles;
 static CMenus gs_Menus;
 static CSkins gs_Skins;
 static CCountryFlags gs_CountryFlags;
-static CFlow gs_Flow;
 static CHud gs_Hud;
 static CDebugHud gs_DebugHud;
 static CNotifications gs_Notifications;
@@ -241,7 +239,6 @@ void CGameClient::OnConsoleInit()
 	m_pSkins = &::gs_Skins;
 	m_pCountryFlags = &::gs_CountryFlags;
 	m_pChat = &::gs_Chat;
-	m_pFlow = &::gs_Flow;
 	m_pCamera = &::gs_Camera;
 	m_pControls = &::gs_Controls;
 	m_pEffects = &::gs_Effects;
@@ -401,7 +398,7 @@ void CGameClient::OnInit()
 	m_pEditor->Init();
 	m_pMenus->RenderLoading(2);
 
-	OnReset();	
+	OnReset();
 
 	m_ServerMode = SERVERMODE_PURE;
 
@@ -1318,7 +1315,7 @@ void CGameClient::OnNewSnapshot()
 							EvolveCharacter(&pCharInfo->m_Prev, EvolvePrevTick);
 						if(pCharInfo->m_Cur.m_Tick)
 							EvolveCharacter(&pCharInfo->m_Cur, EvolveCurTick);
-						
+
 						m_aClients[Item.m_ID].m_Evolved = m_Snap.m_aCharacters[Item.m_ID].m_Cur;
 					}
 
