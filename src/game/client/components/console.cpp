@@ -8,8 +8,8 @@
 
 #include <engine/shared/ringbuffer.h>
 #include <engine/shared/config.h>
-#include <engine/graphics.h>
-#include <engine/textrender.h>
+
+
 #include <engine/storage.h>
 #include <engine/keys.h>
 #include <engine/console.h>
@@ -18,8 +18,6 @@
 
 #include <game/version.h>
 
-#include <game/client/lineinput.h>
-#include <game/client/render.h>
 #include <game/client/components/controls.h>
 #include <game/client/components/menus.h>
 
@@ -61,10 +59,6 @@ void CGameConsole::CInstance::PossibleArgumentsCompleteCallback(int Index, const
 {
 }
 
-void CGameConsole::CInstance::OnInput(IInput::CEvent Event)
-{
-}
-
 void CGameConsole::CInstance::PrintLine(const char *pLine, bool Highlighted)
 {
 }
@@ -91,7 +85,6 @@ void CGameConsole::OnReset()
 struct CCompletionOptionRenderInfo
 {
 	CGameConsole *m_pSelf;
-	CTextCursor *m_pCursor;
 	const char *m_pCurrentCmd;
 	int m_WantedCompletion;
 	int m_EnumCount;
@@ -109,10 +102,6 @@ void CGameConsole::OnRender()
 {
 }
 
-bool CGameConsole::OnInput(IInput::CEvent Event)
-{
-	return true;
-}
 
 void CGameConsole::Toggle(int Type)
 {

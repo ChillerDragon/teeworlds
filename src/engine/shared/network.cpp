@@ -12,12 +12,6 @@
 
 #include <base/dissector/dissector.h>
 
-static void ConchainDbgLognetwork(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
-{
-	pfnCallback(pResult, pCallbackUserData);
-	((CNetBase *)pUserData)->UpdateLogHandles();
-}
-
 void CNetRecvUnpacker::Clear()
 {
 	m_Valid = false;
@@ -128,8 +122,6 @@ void CNetBase::Init(NETSOCKET Socket, CConfig *pConfig, IConsole *pConsole, IEng
 	m_pEngine = pEngine;
 	m_Huffman.Init();
 	mem_zero(m_aRequestTokenBuf, sizeof(m_aRequestTokenBuf));
-	if(pEngine)
-		pConsole->Chain("dbg_lognetwork", ConchainDbgLognetwork, this);
 }
 
 void CNetBase::Shutdown()
@@ -387,7 +379,7 @@ void CNetBase::SendControlMsg(const NETADDR *pAddr, TOKEN Token, int Ack, int Co
 			the ExtraSize is 4 and the pExtra is the token
 
 			so the first packet the server sends is
-			
+
 			packet header - 1 byte indicating its control message - 4 byte token
 
 			and the client answers in the same format

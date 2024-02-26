@@ -47,9 +47,6 @@ void CConfigManager::Init(int FlagMask)
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_FlagMask = FlagMask;
 	Reset();
-
-	if(m_pConsole)
-		m_pConsole->Register("save_config", "?s[file]", CFGFLAG_SERVER|CFGFLAG_CLIENT|CFGFLAG_STORE, Con_SaveConfig, this, "Save config to file");
 }
 
 void CConfigManager::Reset()
@@ -109,13 +106,6 @@ void CConfigManager::Save(const char *pFilename)
 		m_aCallbacks[i].m_pfnFunc(this, m_aCallbacks[i].m_pUserData);
 
 	io_close(m_ConfigFile);
-
-	if(m_pConsole)
-	{
-		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "saved config to '%s'", pFilename);
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "config", aBuf);
-	}
 }
 
 void CConfigManager::RegisterCallback(SAVECALLBACKFUNC pfnFunc, void *pUserData)

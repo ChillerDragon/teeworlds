@@ -33,11 +33,7 @@ class CGameClient : public IGameClient
 	CNetObjHandler m_NetObjHandler;
 
 	class IEngine *m_pEngine;
-	class IInput *m_pInput;
-	class IGraphics *m_pGraphics;
-	class ITextRender *m_pTextRender;
 	class IClient *m_pClient;
-	class ISound *m_pSound;
 	class CConfig *m_pConfig;
 	class IConsole *m_pConsole;
 	class IStorage *m_pStorage;
@@ -49,7 +45,6 @@ class CGameClient : public IGameClient
 
 	CLayers m_Layers;
 	class CCollision m_Collision;
-	CUI m_UI;
 
 	void ProcessEvents();
 	void ProcessTriggeredEvents(int Events, vec2 Pos);
@@ -77,18 +72,13 @@ class CGameClient : public IGameClient
 public:
 	IKernel *Kernel() { return IInterface::Kernel(); }
 	IEngine *Engine() const { return m_pEngine; }
-	class IGraphics *Graphics() const { return m_pGraphics; }
 	class IClient *Client() const { return m_pClient; }
-	class CUI *UI() { return &m_UI; }
-	class IInput *Input() const { return m_pInput; }
 	class IStorage *Storage() const { return m_pStorage; }
 	class CConfig *Config() const { return m_pConfig; }
 	class IConsole *Console() { return m_pConsole; }
-	class ITextRender *TextRender() const { return m_pTextRender; }
 	class IDemoPlayer *DemoPlayer() const { return m_pDemoPlayer; }
 	class IDemoRecorder *DemoRecorder() const { return m_pDemoRecorder; }
 	class IServerBrowser *ServerBrowser() const { return m_pServerBrowser; }
-	class CRenderTools *RenderTools() { return &m_RenderTools; }
 	class CLayers *Layers() { return &m_Layers; }
 	class CCollision *Collision() { return &m_Collision; }
 	class IFriends *Friends() { return m_pFriends; }
@@ -210,8 +200,6 @@ public:
 		CCharacterCore m_Predicted;
 		CCharacterCore m_PrevPredicted;
 
-		CTeeRenderInfo m_SkinInfo; // this is what the server reports
-		CTeeRenderInfo m_RenderInfo; // this is what we use
 
 		CNetObj_Character m_Evolved;
 
@@ -258,8 +246,6 @@ public:
 		bool m_TeamBalance;
 		int m_PlayerSlots;
 	} m_ServerSettings;
-
-	CRenderTools m_RenderTools;
 
 	void OnReset();
 
@@ -318,7 +304,6 @@ public:
 	class CBinds *m_pBinds;
 	class CBroadcast *m_pBroadcast;
 	class CParticles *m_pParticles;
-	class CMenus *m_pMenus;
 	class CSkins *m_pSkins;
 	class CCountryFlags *m_pCountryFlags;
 	class CChat *m_pChat;
@@ -327,7 +312,6 @@ public:
 	class CControls *m_pControls;
 	class CEffects *m_pEffects;
 	class CMotd *m_pMotd;
-	class CMapImages *m_pMapimages;
 	class CVoting *m_pVoting;
 	class CScoreboard *m_pScoreboard;
 	class CStats *m_pStats;

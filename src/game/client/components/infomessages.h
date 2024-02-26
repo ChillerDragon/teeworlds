@@ -11,16 +11,12 @@ class CInfoMessages : public CComponent
 	{
 		int m_Type;
 		int m_Tick;
-	
+
 		// victim / finishing player
 		int m_Player1ID;
-		CTextCursor m_Player1NameCursor;
-		CTeeRenderInfo m_Player1RenderInfo;
 
 		// killer
 		int m_Player2ID;
-		CTextCursor m_Player2NameCursor;
-		CTeeRenderInfo m_Player2RenderInfo;
 
 		// kill msg
 		int m_Weapon;
@@ -30,8 +26,6 @@ class CInfoMessages : public CComponent
 		// finish msg
 		int m_Time;
 		int m_Diff;
-		CTextCursor m_TimeCursor;
-		CTextCursor m_DiffCursor;
 		int m_RecordPersonal;
 		int m_RecordServer;
 	};

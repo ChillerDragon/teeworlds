@@ -24,7 +24,6 @@ public:
 	{
 	public:
 		CBinds *m_pBinds;
-		virtual bool OnInput(IInput::CEvent Event);
 	};
 
 	enum
@@ -48,12 +47,10 @@ public:
 	void GetKey(const char *pBindStr, char aKey[64], unsigned BufSize, int KeyID, int Modifier);
 	void GetKey(const char *pBindStr, char aKey[64], unsigned BufSize);
 	static const char *GetModifierName(int m);
-	static int GetModifierMask(IInput *i);
 	static int GetModifierMaskOfKey(int Key);
 	static bool ModifierMatchesKey(int Modifier, int Key);
 
 	virtual void OnConsoleInit();
-	virtual bool OnInput(IInput::CEvent Event);
 
 private:
 	char m_aaaKeyBindings[KEY_LAST][MODIFIER_COUNT][BIND_LENGTH];

@@ -5,7 +5,7 @@
 
 #include <engine/console.h>
 #include <engine/storage.h>
-#include <engine/textrender.h>
+
 #include <engine/external/json-parser/json.h>
 #include <engine/shared/config.h>
 

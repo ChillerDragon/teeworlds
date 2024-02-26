@@ -38,7 +38,7 @@ int CDemoRecorder::Start(const char *pFilename, const char *pNetVersion, const c
 	CDemoHeader Header;
 	if(m_File)
 	{
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_recorder", "Demo recording is already active");
+		dbg_msg("demo_recorder", "Demo recording is already active");
 		return -1;
 	}
 
@@ -73,7 +73,7 @@ int CDemoRecorder::Start(const char *pFilename, const char *pNetVersion, const c
 	{
 		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf), "Unable to open mapfile '%s'", pMap);
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_recorder", aBuf);
+		dbg_msg("demo_recorder", aBuf);
 		return -1;
 	}
 
@@ -84,7 +84,7 @@ int CDemoRecorder::Start(const char *pFilename, const char *pNetVersion, const c
 		MapFile = 0;
 		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf), "Unable to open '%s' for recording", pFilename);
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_recorder", aBuf);
+		dbg_msg("demo_recorder", aBuf);
 		return -1;
 	}
 
@@ -122,7 +122,7 @@ int CDemoRecorder::Start(const char *pFilename, const char *pNetVersion, const c
 
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "Recording to '%s'", pFilename);
-	m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_recorder", aBuf);
+	dbg_msg("demo_recorder", aBuf);
 	m_File = DemoFile;
 
 	return 0;
@@ -197,13 +197,11 @@ void CDemoRecorder::Write(int Type, const void *pData, int Size)
 	Size = CVariableInt::Compress(aBuffer2, Size, aBuffer, sizeof(aBuffer)); // buffer2 -> buffer
 	if(Size < 0)
 	{
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_recorder", "error during intpack compression");
 		return;
 	}
 	Size = m_Huffman.Compress(aBuffer, Size, aBuffer2, sizeof(aBuffer2)); // buffer -> buffer2
 	if(Size < 0)
 	{
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_recorder", "error during network compression");
 		return;
 	}
 
@@ -275,7 +273,7 @@ int CDemoRecorder::Stop()
 {
 	if(!m_File)
 	{
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_recorder", "No active demo recording to stop");
+		dbg_msg("demo_recorder", "No active demo recording to stop");
 		return -1;
 	}
 
@@ -303,7 +301,7 @@ int CDemoRecorder::Stop()
 	m_LastTickMarker = -1;
 	m_FirstTick = -1;
 	m_NumTimelineMarkers = 0;
-	m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_recorder", "Stopped recording");
+	dbg_msg("demo_recorder", "Stopped recording");
 
 	return 0;
 }
@@ -312,12 +310,12 @@ void CDemoRecorder::AddDemoMarker()
 {
 	if(m_LastTickMarker < 0)
 	{
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_recorder", "Cannot add timeline marker: demo recording not active");
+		dbg_msg("demo_recorder", "Cannot add timeline marker: demo recording not active");
 		return;
 	}
 	else if(m_NumTimelineMarkers >= MAX_TIMELINE_MARKERS)
 	{
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_recorder", "Cannot add timeline marker: too many markers in the demo file");
+		dbg_msg("demo_recorder", "Cannot add timeline marker: too many markers in the demo file");
 		return;
 	}
 
@@ -327,14 +325,14 @@ void CDemoRecorder::AddDemoMarker()
 		int Diff = m_LastTickMarker - m_aTimelineMarkers[m_NumTimelineMarkers-1];
 		if(Diff < SERVER_TICK_SPEED*1.0f)
 		{
-			m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_recorder", "Cannot add timeline marker: marker is too close to previous marker");
+			dbg_msg("demo_recorder", "Cannot add timeline marker: marker is too close to previous marker");
 			return;
 		}
 	}
 
 	m_aTimelineMarkers[m_NumTimelineMarkers++] = m_LastTickMarker;
 
-	m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_recorder", "Added timeline marker");
+	dbg_msg("demo_recorder", "Added timeline marker");
 }
 
 
@@ -489,10 +487,8 @@ void CDemoPlayer::DoTick()
 		if(ReadChunkHeader(&ChunkType, &ChunkSize, &ChunkTick))
 		{
 			// stop on error or eof
-			m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_player", "end of file");
 			if(m_Info.m_PreviousTick == -1)
 			{
-				m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_player", "empty demo");
 				Stop();
 			}
 			else
@@ -506,7 +502,6 @@ void CDemoPlayer::DoTick()
 			if(io_read(m_File, aCompressedData, ChunkSize) != (unsigned)ChunkSize)
 			{
 				// stop on error or eof
-				m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_player", "error reading chunk");
 				Stop();
 				break;
 			}
@@ -515,7 +510,6 @@ void CDemoPlayer::DoTick()
 			if(DataSize < 0)
 			{
 				// stop on error or eof
-				m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_player", "error during network decompression");
 				Stop();
 				break;
 			}
@@ -523,7 +517,6 @@ void CDemoPlayer::DoTick()
 			DataSize = CVariableInt::Decompress(aDecompressed, DataSize, aData, sizeof(aData));
 			if(DataSize < 0)
 			{
-				m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_player", "error during intpack decompression");
 				Stop();
 				break;
 			}
@@ -551,7 +544,6 @@ void CDemoPlayer::DoTick()
 			{
 				char aBuf[64];
 				str_format(aBuf, sizeof(aBuf), "error during unpacking of delta, err=%d", DataSize);
-				m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_player", aBuf);
 			}
 		}
 		else if(ChunkType == CHUNKTYPE_SNAPSHOT)
@@ -576,7 +568,6 @@ void CDemoPlayer::DoTick()
 			{
 				char aBuf[64];
 				str_format(aBuf, sizeof(aBuf), "error during unpacking of snapshot, err=%d", DataSize);
-				m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_player", aBuf);
 			}
 		}
 		else
@@ -619,7 +610,6 @@ const char *CDemoPlayer::Load(const char *pFilename, int StorageType, const char
 	if(!m_File)
 	{
 		str_format(m_aErrorMsg, sizeof(m_aErrorMsg), "could not open '%s'", pFilename);
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_player", m_aErrorMsg);
 		return m_aErrorMsg;
 	}
 
@@ -642,7 +632,6 @@ const char *CDemoPlayer::Load(const char *pFilename, int StorageType, const char
 	if(mem_comp(m_Info.m_Header.m_aMarker, gs_aHeaderMarker, sizeof(gs_aHeaderMarker)) != 0)
 	{
 		str_format(m_aErrorMsg, sizeof(m_aErrorMsg), "'%s' is not a demo file", pFilename);
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_player", m_aErrorMsg);
 		io_close(m_File);
 		m_File = 0;
 		return m_aErrorMsg;
@@ -651,7 +640,6 @@ const char *CDemoPlayer::Load(const char *pFilename, int StorageType, const char
 	if(m_Info.m_Header.m_Version != gs_ActVersion)
 	{
 		str_format(m_aErrorMsg, sizeof(m_aErrorMsg), "demo version %d is not supported", m_Info.m_Header.m_Version);
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_player", m_aErrorMsg);
 		io_close(m_File);
 		m_File = 0;
 		return m_aErrorMsg;
@@ -660,7 +648,6 @@ const char *CDemoPlayer::Load(const char *pFilename, int StorageType, const char
 	if(str_comp(m_Info.m_Header.m_aNetversion, pNetversion) != 0)
 	{
 		str_format(m_aErrorMsg, sizeof(m_aErrorMsg), "net version '%s' is not supported", m_Info.m_Header.m_aNetversion);
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_player", m_aErrorMsg);
 		io_close(m_File);
 		m_File = 0;
 		return m_aErrorMsg;
@@ -813,7 +800,6 @@ int CDemoPlayer::Update()
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "tick error prev=%d cur=%d next=%d",
 			m_Info.m_PreviousTick, m_Info.m_Info.m_CurrentTick, m_Info.m_NextTick);
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_player", aBuf);
 	}
 
 	return 0;
@@ -824,7 +810,6 @@ int CDemoPlayer::Stop()
 	if(!m_File)
 		return -1;
 
-	m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_player", "Stopped playback");
 	io_close(m_File);
 	m_File = 0;
 	mem_free(m_pKeyFrames);

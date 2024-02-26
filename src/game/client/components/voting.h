@@ -41,7 +41,6 @@ public:
 	virtual void OnMessage(int Msgtype, void *pRawMsg);
 
 	void AddOption(const char *pDescription);
-	void RenderBars(CUIRect Bars);
 
 	void CallvoteSpectate(int ClientID, const char *pReason, bool ForceVote = false);
 	void CallvoteKick(int ClientID, const char *pReason, bool ForceVote = false);

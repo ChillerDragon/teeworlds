@@ -23,7 +23,6 @@ public:
 
 	void Scale();
 	void Add(float v, float r, float g, float b);
-	void Render(IGraphics *pGraphics, IGraphics::CTextureHandle FontTexture, float x, float y, float w, float h, const char *pDescription);
 };
 
 
@@ -55,9 +54,6 @@ class CClient : public IClient, public CDemoPlayer::IListener
 {
 	// needed interfaces
 	IEngine *m_pEngine;
-	IEngineInput *m_pInput;
-	IEngineGraphics *m_pGraphics;
-	IEngineTextRender *m_pTextRender;
 	IGameClient *m_pGameClient;
 	IEngineMap *m_pMap;
 	IMapChecker *m_pMapChecker;
@@ -191,8 +187,6 @@ class CClient : public IClient, public CDemoPlayer::IListener
 
 public:
 	IEngine *Engine() { return m_pEngine; }
-	IEngineGraphics *Graphics() { return m_pGraphics; }
-	IEngineInput *Input() { return m_pInput; }
 	IGameClient *GameClient() { return m_pGameClient; }
 	IEngineMasterServer *MasterServer() { return m_pMasterServer; }
 	IConfigManager *ConfigManager() { return m_pConfigManager; }
@@ -321,12 +315,6 @@ public:
 	void AutoScreenshot_Cleanup();
 
 	void ServerBrowserUpdate();
-
-	// gfx
-	void SwitchWindowScreen(int Index);
-	bool ToggleFullscreen();
-	void ToggleWindowBordered();
-	void ToggleWindowVSync();
 
 	// chillers verbose network printer
 	void PrintSnapshot(int Msg, CUnpacker &Unpacker);

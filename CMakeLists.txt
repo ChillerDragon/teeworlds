@@ -1300,8 +1300,6 @@ set_src(ENGINE_INTERFACE GLOB src/engine
   contacts.h
   demo.h
   engine.h
-  graphics.h
-  input.h
   kernel.h
   keys.h
   map.h
@@ -1311,7 +1309,6 @@ set_src(ENGINE_INTERFACE GLOB src/engine
   server.h
   serverbrowser.h
   storage.h
-  textrender.h
 )
 set_src(ENGINE_SHARED GLOB src/engine/shared
   compression.cpp
@@ -1409,11 +1406,6 @@ if(CLIENT)
     client.h
     contacts.cpp
     contacts.h
-    graphics_threaded.cpp
-    graphics_threaded.h
-    graphics_threaded_null.h
-    input.cpp
-    input.h
     keynames.h
     serverbrowser.cpp
     serverbrowser.h
@@ -1422,8 +1414,6 @@ if(CLIENT)
     serverbrowser_fav.h
     serverbrowser_filter.cpp
     serverbrowser_filter.h
-    textrender.cpp
-    textrender.h
   )
   set_src(GAME_CLIENT GLOB_RECURSE src/game/client
     animstate.cpp
@@ -1457,15 +1447,12 @@ if(CLIENT)
     components/infomessages.h
     components/items.cpp
     components/items.h
-    components/mapimages.cpp
-    components/mapimages.h
     components/maplayers.cpp
     components/maplayers.h
     components/menus.cpp
     components/menus.h
     components/menus_browser.cpp
     components/menus_callback.cpp
-    components/menus_demo.cpp
     components/menus_ingame.cpp
     components/menus_settings.cpp
     components/menus_start.cpp
@@ -1491,21 +1478,16 @@ if(CLIENT)
     components/voting.h
     gameclient.cpp
     gameclient.h
-    lineinput.cpp
-    lineinput.h
     localization.cpp
     localization.h
     render.cpp
     render.h
-    render_map.cpp
     ui.cpp
     ui.h
     ui_listbox.cpp
     ui_listbox.h
     ui_rect.cpp
     ui_rect.h
-    ui_scrollregion.cpp
-    ui_scrollregion.h
   )
   set_src(GAME_EDITOR GLOB src/game/editor
     io.cpp

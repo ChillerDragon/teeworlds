@@ -27,8 +27,6 @@ public:
 	{
 		int m_Flags;
 		char m_aName[MAX_SKIN_ARRAY_SIZE];
-		IGraphics::CTextureHandle m_OrgTexture;
-		IGraphics::CTextureHandle m_ColorTexture;
 		vec3 m_BloodColor;
 
 		bool operator<(const CSkinPart &Other) { return str_comp_nocase(m_aName, Other.m_aName) < 0; }
@@ -52,8 +50,6 @@ public:
 	static char *ms_apSkinVariables[NUM_SKINPARTS];
 	static int *ms_apUCCVariables[NUM_SKINPARTS]; // use custom color
 	static int *ms_apColorVariables[NUM_SKINPARTS];
-	IGraphics::CTextureHandle m_XmasHatTexture;
-	IGraphics::CTextureHandle m_BotTexture;
 
 	int GetInitAmount() const;
 	void OnInit();

@@ -302,38 +302,3 @@ void CVoting::OnMessage(int MsgType, void *pRawMsg)
 		}
 	}
 }
-
-void CVoting::RenderBars(CUIRect Bars)
-{
-	Bars.Draw(vec4(0.8f,0.8f,0.8f,0.5f), Bars.h/3);
-
-	CUIRect Splitter = Bars;
-	Splitter.x = Splitter.x+Splitter.w/2;
-	Splitter.w = Splitter.h/2.0f;
-	Splitter.x -= Splitter.w/2;
-	Splitter.Draw(vec4(0.4f,0.4f,0.4f,0.5f), Splitter.h/4);
-
-	if(m_Total)
-	{
-		CUIRect PassArea = Bars;
-		if(m_Yes)
-		{
-			CUIRect YesArea = Bars;
-			YesArea.w *= m_Yes/(float)m_Total;
-			YesArea.Draw(vec4(0.2f,0.9f,0.2f,0.85f), Bars.h/3);
-
-			PassArea.x += YesArea.w;
-			PassArea.w -= YesArea.w;
-		}
-
-		if(m_No)
-		{
-			CUIRect NoArea = Bars;
-			NoArea.w *= m_No/(float)m_Total;
-			NoArea.x = (Bars.x + Bars.w)-NoArea.w;
-			NoArea.Draw(vec4(0.9f,0.2f,0.2f,0.85f), Bars.h/3);
-
-			PassArea.w -= NoArea.w;
-		}
-	}
-}

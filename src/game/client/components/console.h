@@ -4,7 +4,6 @@
 #define GAME_CLIENT_COMPONENTS_CONSOLE_H
 #include <engine/shared/ringbuffer.h>
 #include <game/client/component.h>
-#include <game/client/lineinput.h>
 
 class CGameConsole : public CComponent
 {
@@ -22,7 +21,6 @@ class CGameConsole : public CComponent
 		char *m_pHistoryEntry;
 
 		char m_aInputBuf[256];
-		CLineInput m_Input;
 		const char *m_pName;
 		int m_Type;
 		int m_BacklogActPage;
@@ -51,10 +49,9 @@ class CGameConsole : public CComponent
 
 		void ExecuteLine(const char *pLine);
 
-		void OnInput(IInput::CEvent Event);
 		void PrintLine(const char *pLine, bool Highlighted);
 
-		const char *GetString() const { return m_Input.GetString(); }
+		const char *GetString() const { return 0; }
 		static void PossibleCommandsCompleteCallback(int Index, const char *pStr, void *pUser);
 		static void PossibleArgumentsCompleteCallback(int Index, const char *pStr, void *pUser);
 	};
@@ -106,6 +103,5 @@ public:
 	virtual void OnConsoleInit();
 	virtual void OnReset();
 	virtual void OnRender();
-	virtual bool OnInput(IInput::CEvent Events);
 };
 #endif

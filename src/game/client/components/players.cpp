@@ -12,7 +12,6 @@
 void CPlayers::RenderHook(
 	const CNetObj_Character *pPrevChar,
 	const CNetObj_Character *pPlayerChar,
-	const CTeeRenderInfo *pRenderInfo,
 	int ClientID
 	) const
 {
@@ -22,7 +21,6 @@ void CPlayers::RenderPlayer(
 	const CNetObj_Character *pPrevChar,
 	const CNetObj_Character *pPlayerChar,
 	const CNetObj_PlayerInfo *pPlayerInfo,
-	const CTeeRenderInfo *pRenderInfo,
 	int ClientID
 	) const
 {

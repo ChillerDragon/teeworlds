@@ -2,7 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/tl/array.h>
 
-#include <engine/graphics.h>
+
 #include <engine/keys.h>
 #include <engine/demo.h>
 #include <engine/serverbrowser.h>
@@ -15,7 +15,6 @@
 #include <game/client/render.h>
 
 #include "camera.h"
-#include "mapimages.h"
 #include "menus.h"
 #include "maplayers.h"
 

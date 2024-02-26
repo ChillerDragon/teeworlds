@@ -7,7 +7,6 @@
 class CBroadcast : public CComponent
 {
 	// client broadcast
-	CTextCursor m_ClientBroadcastCursor;
 	float m_BroadcastTime;
 
 	void RenderClientBroadcast();
@@ -26,7 +25,6 @@ class CBroadcast : public CComponent
 
 	CBroadcastSegment m_aServerBroadcastSegments[MAX_BROADCAST_MSG_SIZE];
 	int m_NumSegments;
-	CTextCursor m_ServerBroadcastCursor;
 	float m_ServerBroadcastReceivedTime;
 	bool m_MuteServerBroadcast;
 

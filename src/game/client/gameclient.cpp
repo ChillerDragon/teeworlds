@@ -2,8 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/engine.h>
 #include <engine/contacts.h>
-#include <engine/graphics.h>
-#include <engine/textrender.h>
 #include <engine/demo.h>
 #include <engine/map.h>
 #include <engine/storage.h>
@@ -15,7 +13,6 @@
 #include <generated/client_data.h>
 
 #include <game/version.h>
-#include "lineinput.h"
 #include "localization.h"
 #include "render.h"
 
@@ -35,7 +32,6 @@
 #include "components/hud.h"
 #include "components/items.h"
 #include "components/infomessages.h"
-#include "components/mapimages.h"
 #include "components/maplayers.h"
 #include "components/menus.h"
 #include "components/motd.h"
@@ -94,7 +90,6 @@ static CBroadcast gs_Broadcast;
 static CGameConsole gs_GameConsole;
 static CBinds gs_Binds;
 static CParticles gs_Particles;
-static CMenus gs_Menus;
 static CSkins gs_Skins;
 static CCountryFlags gs_CountryFlags;
 static CHud gs_Hud;
@@ -112,7 +107,6 @@ static CStats gs_Stats;
 static CPlayers gs_Players;
 static CNamePlates gs_NamePlates;
 static CItems gs_Items;
-static CMapImages gs_MapImages;
 
 static CMapLayers gs_MapLayersBackGround(CMapLayers::TYPE_BACKGROUND);
 static CMapLayers gs_MapLayersForeGround(CMapLayers::TYPE_FOREGROUND);
@@ -213,8 +207,6 @@ void CGameClient::OnConsoleInit()
 	m_InitComplete = false;
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
 	m_pClient = Kernel()->RequestInterface<IClient>();
-	m_pTextRender = Kernel()->RequestInterface<ITextRender>();
-	m_pInput = Kernel()->RequestInterface<IInput>();
 	m_pConfig = Kernel()->RequestInterface<IConfigManager>()->Values();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
@@ -229,7 +221,6 @@ void CGameClient::OnConsoleInit()
 	m_pBroadcast = &::gs_Broadcast;
 	m_pGameConsole = &::gs_GameConsole;
 	m_pParticles = &::gs_Particles;
-	m_pMenus = &::gs_Menus;
 	m_pSkins = &::gs_Skins;
 	m_pCountryFlags = &::gs_CountryFlags;
 	m_pChat = &::gs_Chat;
@@ -238,7 +229,6 @@ void CGameClient::OnConsoleInit()
 	m_pEffects = &::gs_Effects;
 	m_pMotd = &::gs_Motd;
 	m_pDamageind = &::gsDamageInd;
-	m_pMapimages = &::gs_MapImages;
 	m_pVoting = &::gs_Voting;
 	m_pScoreboard = &::gs_Scoreboard;
 	m_pItems = &::gs_Items;
@@ -249,7 +239,6 @@ void CGameClient::OnConsoleInit()
 	// make a list of all the systems, make sure to add them in the corrent render order
 	m_All.Add(m_pSkins);
 	m_All.Add(m_pCountryFlags);
-	m_All.Add(m_pMapimages);
 	m_All.Add(m_pEffects); // doesn't render anything, just updates effects
 	m_All.Add(m_pParticles); // doesn't render anything, just updates all the particles
 	m_All.Add(m_pBinds);
@@ -278,21 +267,7 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(&gs_Scoreboard);
 	m_All.Add(m_pStats);
 	m_All.Add(m_pMotd);
-	m_All.Add(m_pMenus);
-	m_All.Add(&m_pMenus->m_Binder);
 	m_All.Add(m_pGameConsole);
-
-	// build the input stack
-	m_Input.Add(&m_pMenus->m_Binder); // this will take over all input when we want to bind a key
-	m_Input.Add(&m_pBinds->m_SpecialBinds);
-	m_Input.Add(m_pGameConsole);
-	m_Input.Add(m_pChat); // chat has higher prio due to tha you can quit it by pressing esc
-	m_Input.Add(m_pMotd); // for pressing esc to remove it
-	m_Input.Add(m_pMenus);
-	m_Input.Add(&gs_Spectator);
-	m_Input.Add(&gs_Emoticon);
-	m_Input.Add(m_pControls);
-	m_Input.Add(m_pBinds);
 
 	// add the some console commands
 	Console()->Register("team", "i[team]", CFGFLAG_CLIENT, ConTeam, this, "Switch team");
@@ -337,19 +312,7 @@ void CGameClient::OnConsoleInit()
 
 void CGameClient::OnInit()
 {
-	m_pGraphics = Kernel()->RequestInterface<IGraphics>();
-
-	// propagate pointers
-	m_UI.Init(Kernel());
-	m_RenderTools.Init(Config(), Graphics());
-
 	int64 Start = time_get();
-
-	// Render load screen at 0% to get graphics sooner.
-	// Swap again to minimize initial flashing color.
-	m_pMenus->InitLoading(1);
-	m_pMenus->RenderLoading();
-	m_pGraphics->Swap();
 
 	// TODO: this should be different
 	// setup item sizes
@@ -364,20 +327,12 @@ void CGameClient::OnInit()
 	for(int i = m_All.m_Num-1; i >= 0; --i)
 		TotalWorkAmount += m_All.m_paComponents[i]->GetInitAmount();
 
-	m_pMenus->InitLoading(TotalWorkAmount);
-	m_pMenus->RenderLoading(4);
-
-	m_pTextRender->LoadFonts(Storage(), Console());
-	m_pTextRender->SetFontLanguageVariant(Config()->m_ClLanguagefile);
-	m_pMenus->RenderLoading(1);
-
 	// set the language
 	g_Localization.Load(Config()->m_ClLanguagefile, Storage(), Console());
-	m_pMenus->RenderLoading(1);
 
 	// init all components
 	for(int i = m_All.m_Num-1; i >= 0; --i)
-		m_All.m_paComponents[i]->OnInit(); // this will call RenderLoading again
+		m_All.m_paComponents[i]->OnInit();
 
 	OnReset();
 
@@ -385,7 +340,6 @@ void CGameClient::OnInit()
 
 	m_IsXmasDay = time_isxmasday();
 	m_IsEasterDay = time_iseasterday();
-	m_pMenus->RenderLoading();
 	m_InitComplete = true;
 
 	int64 End = time_get();
@@ -396,31 +350,6 @@ void CGameClient::OnInit()
 
 void CGameClient::OnUpdate()
 {
-	// handle mouse and joystick movement, prefer mouse movement
-	float x = 0.0f, y = 0.0f;
-	int CursorType = Input()->CursorRelative(&x, &y);
-	if(CursorType != IInput::CURSOR_NONE)
-	{
-		for(int h = 0; h < m_Input.m_Num; h++)
-		{
-			if(m_Input.m_paComponents[h]->OnCursorMove(x, y, CursorType))
-				break;
-		}
-	}
-
-	// handle key presses
-	for(int i = 0; i < Input()->NumEvents(); i++)
-	{
-		IInput::CEvent e = Input()->GetEvent(i);
-		if(!Input()->IsEventValid(&e))
-			continue;
-
-		for(int h = 0; h < m_Input.m_Num; h++)
-		{
-			if(m_Input.m_paComponents[h]->OnInput(e))
-				break;
-		}
-	}
 }
 
 int CGameClient::OnSnapInput(int *pData)
@@ -554,34 +483,10 @@ void CGameClient::EvolveCharacter(CNetObj_Character *pCharacter, int Tick)
 
 void CGameClient::StartRendering()
 {
-	if(Config()->m_GfxClear)
-	{
-		if(m_pMenus->IsBackgroundNeeded())
-			Graphics()->Clear(0.45f, 0.45f, 0.45f);
-		else
-			Graphics()->Clear(1.0f, 1.0f, 0.0f);
-	}
-	else if(m_pMenus->IsBackgroundNeeded())
-	{
-		// render background color
-		const float ScreenHeight = 300.0f;
-		const float ScreenWidth = ScreenHeight * Graphics()->ScreenAspect();
-		const vec4 Bottom(0.45f, 0.45f, 0.45f, 1.0f);
-		const vec4 Top(0.45f, 0.45f, 0.45f, 1.0f);
-		Graphics()->MapScreen(0, 0, ScreenWidth, ScreenHeight);
-		Graphics()->TextureClear();
-		Graphics()->QuadsBegin();
-		Graphics()->SetColor4(Top, Top, Bottom, Bottom);
-		IGraphics::CQuadItem QuadItem(0, 0, ScreenWidth, ScreenHeight);
-		Graphics()->QuadsDrawTL(&QuadItem, 1);
-		Graphics()->QuadsEnd();
-	}
 }
 
 void CGameClient::OnRender()
 {
-	CUIElementBase::Init(UI());
-
 	// update the local character and spectate position
 	UpdatePositions();
 
@@ -591,10 +496,6 @@ void CGameClient::OnRender()
 	for(int i = 0; i < m_All.m_Num; i++)
 		m_All.m_paComponents[i]->OnRender();
 
-	// clear all events/input for this frame
-	Input()->Clear();
-
-	CLineInput::RenderCandidates();
 }
 
 void CGameClient::OnRelease()
@@ -1675,110 +1576,10 @@ vec2 CGameClient::GetCharPos(int ClientID, bool Predicted) const
 
 void CGameClient::CClientData::UpdateBotRenderInfo(CGameClient *pGameClient, int ClientID)
 {
-	static const unsigned char s_aBotColors[][3] = {
-		{0xff,0x00,0x00},
-		{0xff,0x66,0x00},
-		{0x4d,0x9f,0x45},
-		{0xd5,0x9e,0x29},
-		{0x9f,0xd3,0xa9},
-		{0xbd,0xd8,0x5e},
-		{0xc0,0x7f,0x94},
-		{0xc3,0xa2,0x67},
-		{0xf8,0xa8,0x3b},
-		{0xcc,0xe2,0xbf},
-		{0xe6,0xb4,0x98},
-		{0x74,0xc7,0xa3},
-	};
-
-	if(pGameClient->m_Snap.m_paPlayerInfos[ClientID] && pGameClient->m_Snap.m_paPlayerInfos[ClientID]->m_PlayerFlags&PLAYERFLAG_BOT)
-	{
-		m_RenderInfo.m_BotTexture = pGameClient->m_pSkins->m_BotTexture;
-		if(!m_RenderInfo.m_BotColor.a) // bot color has not been set; pick a random color once
-		{
-			const unsigned char *pBotColor = s_aBotColors[random_int() % (sizeof(s_aBotColors) / sizeof(s_aBotColors[0]))];
-			m_RenderInfo.m_BotColor = vec4(pBotColor[0]/255.f, pBotColor[1]/255.f, pBotColor[2]/255.f, 1.0f);
-		}
-	}
-	else
-	{
-		m_RenderInfo.m_BotTexture.Invalidate();
-		m_RenderInfo.m_BotColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-	}
 }
 
 void CGameClient::CClientData::UpdateRenderInfo(CGameClient *pGameClient, int ClientID, bool UpdateSkinInfo)
 {
-	// update skin info
-	if(UpdateSkinInfo)
-	{
-		char* apSkinParts[NUM_SKINPARTS];
-		for(int p = 0; p < NUM_SKINPARTS; p++)
-			apSkinParts[p] = m_aaSkinPartNames[p];
-
-		pGameClient->m_pSkins->ValidateSkinParts(apSkinParts, m_aUseCustomColors, m_aSkinPartColors, pGameClient->m_GameInfo.m_GameFlags);
-
-		m_SkinInfo.m_Size = 64;
-		if(pGameClient->IsXmas())
-		{
-			m_SkinInfo.m_HatTexture = pGameClient->m_pSkins->m_XmasHatTexture;
-			m_SkinInfo.m_HatSpriteIndex = ClientID % CSkins::HAT_NUM;
-		}
-		else
-			m_SkinInfo.m_HatTexture.Invalidate();
-
-		for(int p = 0; p < NUM_SKINPARTS; p++)
-		{
-			int ID = pGameClient->m_pSkins->FindSkinPart(p, m_aaSkinPartNames[p], false);
-			if(ID < 0)
-			{
-				if(p == SKINPART_MARKING || p == SKINPART_DECORATION)
-					ID = pGameClient->m_pSkins->FindSkinPart(p, "", false);
-				else
-					ID = pGameClient->m_pSkins->FindSkinPart(p, "standard", false);
-
-				if(ID < 0)
-					m_SkinPartIDs[p] = 0;
-				else
-					m_SkinPartIDs[p] = ID;
-			}
-			else
-			{
-				if(m_SkinInfo.m_HatTexture.IsValid())
-				{
-					if(p == SKINPART_BODY && str_comp(m_aaSkinPartNames[p], "standard"))
-						m_SkinInfo.m_HatSpriteIndex = CSkins::HAT_OFFSET_SIDE + (ClientID%CSkins::HAT_NUM);
-					if(p == SKINPART_DECORATION && !str_comp(m_aaSkinPartNames[p], "twinbopp"))
-						m_SkinInfo.m_HatSpriteIndex = CSkins::HAT_OFFSET_SIDE + (ClientID%CSkins::HAT_NUM);
-				}
-				m_SkinPartIDs[p] = ID;
-			}
-
-			const CSkins::CSkinPart *pSkinPart = pGameClient->m_pSkins->GetSkinPart(p, m_SkinPartIDs[p]);
-			if(m_aUseCustomColors[p])
-			{
-				m_SkinInfo.m_aTextures[p] = pSkinPart->m_ColorTexture;
-				m_SkinInfo.m_aColors[p] = pGameClient->m_pSkins->GetColorV4(m_aSkinPartColors[p], p==SKINPART_MARKING);
-			}
-			else
-			{
-				m_SkinInfo.m_aTextures[p] = pSkinPart->m_OrgTexture;
-				m_SkinInfo.m_aColors[p] = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-			}
-		}
-	}
-
-	m_RenderInfo = m_SkinInfo;
-
-	// force team colors
-	if(pGameClient->m_GameInfo.m_GameFlags&GAMEFLAG_TEAMS)
-	{
-		for(int p = 0; p < NUM_SKINPARTS; p++)
-		{
-			m_RenderInfo.m_aTextures[p] = pGameClient->m_pSkins->GetSkinPart(p, m_SkinPartIDs[p])->m_ColorTexture;
-			int ColorVal = pGameClient->m_pSkins->GetTeamColor(m_aUseCustomColors[p], m_aSkinPartColors[p], m_Team, p);
-			m_RenderInfo.m_aColors[p] = pGameClient->m_pSkins->GetColorV4(ColorVal, p==SKINPART_MARKING);
-		}
-	}
 }
 
 void CGameClient::CClientData::Reset(CGameClient *pGameClient, int ClientID)
@@ -1794,13 +1595,6 @@ void CGameClient::CClientData::Reset(CGameClient *pGameClient, int ClientID)
 	m_ChatIgnore = false;
 	m_Friend = false;
 	m_Evolved.m_Tick = -1;
-	for(int p = 0; p < NUM_SKINPARTS; p++)
-	{
-		m_SkinPartIDs[p] = 0;
-		m_SkinInfo.m_aTextures[p] = pGameClient->m_pSkins->GetSkinPart(p, 0)->m_ColorTexture;
-		m_SkinInfo.m_aColors[p] = vec4(1.0f, 1.0f, 1.0f , 1.0f);
-	}
-	UpdateRenderInfo(pGameClient, ClientID, false);
 }
 
 void CGameClient::DoEnterMessage(const char *pName, int ClientID, int Team)
@@ -1906,19 +1700,6 @@ int CGameClient::GetClientID(const char *pName)
 
 void CGameClient::ConTeam(IConsole::IResult *pResult, void *pUserData)
 {
-	CGameClient *pClient = static_cast<CGameClient *>(pUserData);
-	if(pClient->Client()->State() != IClient::STATE_ONLINE || pClient->m_LocalClientID == -1)
-		return;
-	CMenus::CSwitchTeamInfo Info;
-	pClient->m_pMenus->GetSwitchTeamInfo(&Info);
-	int Team = pResult->GetInteger(0);
-	if(pClient->m_aClients[pClient->m_LocalClientID].m_Team == Team || (Team == TEAM_SPECTATORS && !(Info.m_AllowSpec)) || (Team != TEAM_SPECTATORS && Info.m_aNotification[0]))
-	{
-		if(Info.m_aNotification[0])
-			pClient->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "gameclient", Info.m_aNotification);
-		return;
-	}
-	pClient->SendSwitchTeam(Team);
 }
 
 void CGameClient::ConKill(IConsole::IResult *pResult, void *pUserData)

@@ -82,11 +82,6 @@ public:
 		m_pConfig = Kernel()->RequestInterface<IConfigManager>()->Values();
 		m_pConsole = Kernel()->RequestInterface<IConsole>();
 		m_pStorage = Kernel()->RequestInterface<IStorage>();
-
-		if(!m_pConsole || !m_pStorage)
-			return;
-
-		m_pConsole->Register("dbg_lognetwork", "", CFGFLAG_SERVER|CFGFLAG_CLIENT, Con_DbgLognetwork, this, "Log the network");
 	}
 
 	void ShutdownJobs()
@@ -104,7 +99,7 @@ public:
 				str_timestamp(aBuf, sizeof(aBuf));
 			else
 				aBuf[0] = 0;
-			char aLogFilename[128];			
+			char aLogFilename[128];
 			str_format(aLogFilename, sizeof(aLogFilename), "dumps/%s%s.txt", m_pConfig->m_Logfile, aBuf);
 			IOHANDLE Handle = m_pStorage->OpenFile(aLogFilename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
 			if(Handle)

@@ -3,8 +3,8 @@
 #include <limits.h>
 
 #include <engine/demo.h>
-#include <engine/graphics.h>
-#include <engine/textrender.h>
+
+
 #include <engine/shared/config.h>
 
 #include <generated/client_data.h>

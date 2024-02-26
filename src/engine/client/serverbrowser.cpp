@@ -200,7 +200,7 @@ void CServerBrowser::Update()
 		m_MasterRefreshTime = Now;
 
 		if(Config()->m_Debug)
-			m_pConsole->Print(IConsole::OUTPUT_LEVEL_DEBUG, "client_srvbrowse", "requesting server list");
+			dbg_msg("client_srvbrowse", "requesting server list");
 	}
 
 	// load server list backup from file in case the masters don't response
@@ -210,7 +210,7 @@ void CServerBrowser::Update()
 		m_MasterRefreshTime = 0;
 
 		if(Config()->m_Debug)
-			m_pConsole->Print(IConsole::OUTPUT_LEVEL_DEBUG, "client_srvbrowse", "using backup server list");
+			dbg_msg("client_srvbrowse", "using backup server list");
 	}
 
 	// do timeouts
@@ -318,7 +318,7 @@ void CServerBrowser::Refresh(int RefreshFlags)
 		}
 
 		if(Config()->m_Debug)
-			m_pConsole->Print(IConsole::OUTPUT_LEVEL_DEBUG, "client_srvbrowse", "broadcasting for servers");
+			dbg_msg("client_srvbrowse", "broadcasting for servers");
 	}
 
 	if(RefreshFlags&IServerBrowser::REFRESHFLAG_INTERNET)
@@ -564,7 +564,7 @@ void CServerBrowser::RequestImpl(const NETADDR &Addr, CServerEntry *pEntry)
 		net_addr_str(&Addr, aAddrStr, sizeof(aAddrStr), true);
 		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf),"requesting server info from %s", aAddrStr);
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_DEBUG, "client_srvbrowse", aBuf);
+		dbg_msg("client_srvbrowse", aBuf);
 	}
 
 	CPacker Packer;

@@ -20,7 +20,6 @@
 #include <engine/config.h>
 #include <engine/console.h>
 #include <engine/engine.h>
-#include <engine/input.h>
 #include <engine/keys.h>
 #include <engine/map.h>
 
@@ -32,7 +31,7 @@
 
 #include <engine/serverbrowser.h>
 #include <engine/storage.h>
-#include <engine/textrender.h>
+
 
 #include <engine/shared/config.h>
 #include <engine/shared/compression.h>

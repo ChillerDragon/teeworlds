@@ -17,10 +17,7 @@ void CMotd::Clear()
 
 bool CMotd::IsActive()
 {
-	// dont render modt if the menu is active
-	if(m_pClient->m_pMenus->IsActive())
-		return false;
-	return time_get() < m_ServerMotdTime;
+	return false;
 }
 
 void CMotd::OnMessage(int MsgType, void *pRawMsg)

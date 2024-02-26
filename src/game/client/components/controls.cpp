@@ -126,62 +126,48 @@ int CControls::SnapInput(int *pData)
 
 	m_LastData.m_PlayerFlags = m_InputData.m_PlayerFlags;
 
-	// we freeze the input if chat or menu is activated
-	if(m_pClient->m_pChat->IsActive() || m_pClient->m_pMenus->IsActive())
+	m_InputData.m_TargetX = (int)m_MousePos.x;
+	m_InputData.m_TargetY = (int)m_MousePos.y;
+	if(!m_InputData.m_TargetX && !m_InputData.m_TargetY)
 	{
-		OnReset();
-
-		mem_copy(pData, &m_InputData, sizeof(m_InputData));
-
-		// send once a second just to be sure
-		if(time_get() > s_LastSendTime + time_freq())
-			Send = true;
+		m_InputData.m_TargetX = 1;
+		m_MousePos.x = 1;
 	}
-	else
+
+	// set direction
+	m_InputData.m_Direction = 0;
+	if(m_InputDirectionLeft && !m_InputDirectionRight)
+		m_InputData.m_Direction = -1;
+	if(!m_InputDirectionLeft && m_InputDirectionRight)
+		m_InputData.m_Direction = 1;
+
+	// stress testing
+	if(Config()->m_DbgStress)
 	{
-		m_InputData.m_TargetX = (int)m_MousePos.x;
-		m_InputData.m_TargetY = (int)m_MousePos.y;
-		if(!m_InputData.m_TargetX && !m_InputData.m_TargetY)
-		{
-			m_InputData.m_TargetX = 1;
-			m_MousePos.x = 1;
-		}
+		float t = Client()->LocalTime();
+		mem_zero(&m_InputData, sizeof(m_InputData));
 
-		// set direction
-		m_InputData.m_Direction = 0;
-		if(m_InputDirectionLeft && !m_InputDirectionRight)
-			m_InputData.m_Direction = -1;
-		if(!m_InputDirectionLeft && m_InputDirectionRight)
-			m_InputData.m_Direction = 1;
-
-		// stress testing
-		if(Config()->m_DbgStress)
-		{
-			float t = Client()->LocalTime();
-			mem_zero(&m_InputData, sizeof(m_InputData));
-
-			m_InputData.m_Direction = ((int)t/2)%3-1;
-			m_InputData.m_Jump = ((int)t)&1;
-			m_InputData.m_Fire = ((int)(t*10));
-			m_InputData.m_Hook = ((int)(t*2))&1;
-			m_InputData.m_WantedWeapon = ((int)t)%NUM_WEAPONS;
-			m_InputData.m_TargetX = (int)(sinf(t*3)*100.0f);
-			m_InputData.m_TargetY = (int)(cosf(t*3)*100.0f);
-		}
-
-		// check if we need to send input
-		if(m_InputData.m_Direction != m_LastData.m_Direction) Send = true;
-		else if(m_InputData.m_Jump != m_LastData.m_Jump) Send = true;
-		else if(m_InputData.m_Fire != m_LastData.m_Fire) Send = true;
-		else if(m_InputData.m_Hook != m_LastData.m_Hook) Send = true;
-		else if(m_InputData.m_WantedWeapon != m_LastData.m_WantedWeapon) Send = true;
-		else if(m_InputData.m_NextWeapon != m_LastData.m_NextWeapon) Send = true;
-		else if(m_InputData.m_PrevWeapon != m_LastData.m_PrevWeapon) Send = true;
-
-		// send at at least 10hz
-		if(time_get() > s_LastSendTime + time_freq()/25)
-			Send = true;
+		m_InputData.m_Direction = ((int)t/2)%3-1;
+		m_InputData.m_Jump = ((int)t)&1;
+		m_InputData.m_Fire = ((int)(t*10));
+		m_InputData.m_Hook = ((int)(t*2))&1;
+		m_InputData.m_WantedWeapon = ((int)t)%NUM_WEAPONS;
+		m_InputData.m_TargetX = (int)(sinf(t*3)*100.0f);
+		m_InputData.m_TargetY = (int)(cosf(t*3)*100.0f);
 	}
+
+	// check if we need to send input
+	if(m_InputData.m_Direction != m_LastData.m_Direction) Send = true;
+	else if(m_InputData.m_Jump != m_LastData.m_Jump) Send = true;
+	else if(m_InputData.m_Fire != m_LastData.m_Fire) Send = true;
+	else if(m_InputData.m_Hook != m_LastData.m_Hook) Send = true;
+	else if(m_InputData.m_WantedWeapon != m_LastData.m_WantedWeapon) Send = true;
+	else if(m_InputData.m_NextWeapon != m_LastData.m_NextWeapon) Send = true;
+	else if(m_InputData.m_PrevWeapon != m_LastData.m_PrevWeapon) Send = true;
+
+	// send at at least 10hz
+	if(time_get() > s_LastSendTime + time_freq()/25)
+		Send = true;
 
 	// copy and return size
 	m_LastData = m_InputData;
@@ -209,32 +195,6 @@ void CControls::OnRender()
 
 bool CControls::OnCursorMove(float x, float y, int CursorType)
 {
-	if(m_pClient->IsWorldPaused() || (m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_pChat->IsActive()))
-		return false;
-
-	if(CursorType == IInput::CURSOR_JOYSTICK
-		&& Config()->m_JoystickAbsolute
-		&& m_pClient->m_Snap.m_pGameData
-		&& !m_pClient->m_Snap.m_SpecInfo.m_Active)
-	{
-		float AbsX = 0.0f, AbsY = 0.0f;
-		if(Input()->GetActiveJoystick()->Absolute(&AbsX, &AbsY))
-			m_MousePos = vec2(AbsX, AbsY) * GetMaxMouseDistance();
-		return true;
-	}
-
-	float Factor = 1.0f;
-	switch(CursorType)
-	{
-		case IInput::CURSOR_MOUSE:
-			Factor = Config()->m_InpMousesens/100.0f;
-			break;
-		case IInput::CURSOR_JOYSTICK:
-			Factor = Config()->m_JoystickSens/100.0f;
-			break;
-	}
-
-	m_MousePos += vec2(x, y) * Factor;
 	return true;
 }
 

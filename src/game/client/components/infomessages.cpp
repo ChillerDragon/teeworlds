@@ -1,7 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/graphics.h>
-#include <engine/textrender.h>
+
+
 #include <engine/shared/config.h>
 #include <generated/protocol.h>
 #include <generated/client_data.h>
@@ -34,56 +34,7 @@ void CInfoMessages::OnMessage(int MsgType, void *pRawMsg)
 			return;
 
 		CNetMsg_Sv_KillMsg *pMsg = (CNetMsg_Sv_KillMsg *)pRawMsg;
-
-		// unpack messages
-		CInfoMsg Kill;
-		Kill.m_Player1ID = pMsg->m_Victim;
-		if(Config()->m_ClShowsocial)
-		{
-			Kill.m_Player1NameCursor.m_FontSize = 36.0f;
-		}
-
-		Kill.m_Player1RenderInfo = m_pClient->m_aClients[Kill.m_Player1ID].m_RenderInfo;
-
-		Kill.m_Player2ID = pMsg->m_Killer;
-		if(Kill.m_Player2ID >= 0)
-		{
-			if(Config()->m_ClShowsocial)
-			{
-				Kill.m_Player2NameCursor.m_FontSize = 36.0f;
-			}
-
-			Kill.m_Player2RenderInfo = m_pClient->m_aClients[Kill.m_Player2ID].m_RenderInfo;
-		}
-		else
-		{
-			bool IsTeamplay = (m_pClient->m_GameInfo.m_GameFlags&GAMEFLAG_TEAMS) != 0;
-			int KillerTeam = - 1 - Kill.m_Player2ID;
-			int Skin = m_pClient->m_pSkins->Find("dummy", false);
-			if(Skin != -1)
-			{
-				const CSkins::CSkin *pDummy = m_pClient->m_pSkins->Get(Skin);
-				for(int p = 0; p < NUM_SKINPARTS; p++)
-				{
-					Kill.m_Player2RenderInfo.m_aTextures[p] = pDummy->m_apParts[p]->m_OrgTexture;
-					if(IsTeamplay)
-					{
-						int ColorVal = m_pClient->m_pSkins->GetTeamColor(0, 0x000000, KillerTeam, p);
-						Kill.m_Player2RenderInfo.m_aColors[p] = m_pClient->m_pSkins->GetColorV4(ColorVal, p==SKINPART_MARKING);
-					}
-					else
-						Kill.m_Player2RenderInfo.m_aColors[p] = m_pClient->m_pSkins->GetColorV4(0x000000, p==SKINPART_MARKING);
-					Kill.m_Player2RenderInfo.m_aColors[p].a *= .5f;
-				}
-				Kill.m_Player2RenderInfo.m_Size = 64.0f;
-			}
-		}
-
-		Kill.m_Weapon = pMsg->m_Weapon;
-		Kill.m_ModeSpecial = pMsg->m_ModeSpecial;
-		Kill.m_FlagCarrierBlue = m_pClient->m_Snap.m_pGameDataFlag ? m_pClient->m_Snap.m_pGameDataFlag->m_FlagCarrierBlue : -1;
-
-		AddInfoMsg(INFOMSG_KILL, Kill);
+		dbg_msg("kill", "killer=%d", pMsg->m_Killer);
 	}
 	else if(MsgType == NETMSGTYPE_SV_RACEFINISH && Race)
 	{
@@ -128,27 +79,7 @@ void CInfoMessages::OnMessage(int MsgType, void *pRawMsg)
 		}
 		else
 		{
-			CInfoMsg Finish;
-			Finish.m_Player1ID = pMsg->m_ClientID;
-			Finish.m_Player1RenderInfo = m_pClient->m_aClients[Finish.m_Player1ID].m_RenderInfo;
-
-			Finish.m_TimeCursor.m_FontSize = 36.0f;
-
-			if(Config()->m_ClShowsocial)
-			{
-				Finish.m_Player1NameCursor.m_FontSize = 36.0f;
-			}
-
-			FormatTimeDiff(aTime, sizeof(aTime), pMsg->m_Diff, m_pClient->RacePrecision());
-			str_format(aBuf, sizeof(aBuf), "(%s)", aTime);
-			Finish.m_DiffCursor.m_FontSize = 36.0f;
-
-			Finish.m_Time = pMsg->m_Time;
-			Finish.m_Diff = pMsg->m_Diff;
-			Finish.m_RecordPersonal = pMsg->m_RecordPersonal;
-			Finish.m_RecordServer = pMsg->m_RecordServer;
-
-			AddInfoMsg(INFOMSG_FINISH, Finish);
+			dbg_msg("info", "INFOMSG_FINISH");
 		}
 	}
 }

@@ -2,8 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
 #include <engine/engine.h>
-#include <engine/graphics.h>
-#include <engine/textrender.h>
+
+
 #include <engine/keys.h>
 #include <engine/serverbrowser.h>
 #include <engine/shared/config.h>

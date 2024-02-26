@@ -6,7 +6,6 @@
 #include <base/tl/array.h>
 #include <engine/shared/ringbuffer.h>
 #include <game/client/component.h>
-#include <game/client/lineinput.h>
 #include <game/commands.h>
 
 class CChat : public CComponent
@@ -19,7 +18,6 @@ class CChat : public CComponent
 	};
 
 	char m_aInputBuf[MAX_LINE_LENGTH];
-	CLineInput m_Input;
 
 	struct CLine
 	{
