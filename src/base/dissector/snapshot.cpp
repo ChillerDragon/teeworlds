@@ -21,7 +21,6 @@
 #include <engine/console.h>
 #include <engine/editor.h>
 #include <engine/engine.h>
-#include <engine/graphics.h>
 #include <engine/input.h>
 #include <engine/keys.h>
 #include <engine/map.h>

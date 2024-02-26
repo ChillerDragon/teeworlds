@@ -10,122 +10,11 @@
 
 int CGlyphMap::CAtlas::TrySection(int Index, int Width, int Height)
 {
-	ivec3 Section = m_Sections[Index];
-	int CurX = Section.x;
-	int CurY = Section.y;
-
-	int FitWidth = Width;
-
-	if(CurX + Width > m_Width - 1)
-		return -1;
-
-	for(int i = Index; i < m_Sections.size(); ++i)
-	{
-		if(FitWidth <= 0)
-			break;
-
-		Section = m_Sections[i];
-		if(Section.y > CurY)
-			CurY = Section.y;
-		if(CurY + Height > m_Height - 1)
-			return -1;
-		FitWidth -= Section.l;
-	}
-
-	return CurY;
+	return 0;
 }
 
 void CGlyphMap::CAtlas::Init(int Index, int X, int Y, int Width, int Height)
 {
-	m_Offset.x = X;
-	m_Offset.y = Y;
-	m_Width = Width;
-	m_Height = Height;
-
-	m_ID = Index;
-	m_Sections.clear();
-
-	ivec3 Section;
-	Section.x = 1;
-	Section.y = 1;
-	Section.l = m_Width - 2;
-	m_Sections.add(Section);
-
-	m_IsEmpty = true;
-}
-
-ivec2 CGlyphMap::CAtlas::Add(int Width, int Height)
-{
-	m_IsEmpty = false;
-	int BestHeight = m_Height;
-	int BestWidth = m_Width;
-	int BestSectionIndex = -1;
-
-	ivec2 Position;
-
-	for(int i = 0; i < m_Sections.size(); ++i)
-	{
-		int y = TrySection(i, Width, Height);
-		if(y >= 0)
-		{
-			ivec3 Section = m_Sections[i];
-			int NewHeight = y + Height;
-			if((NewHeight < BestHeight) || ((NewHeight == BestHeight) && (Section.l > 0 && Section.l < BestWidth)))
-			{
-				BestHeight = NewHeight;
-				BestWidth = Section.l;
-				BestSectionIndex = i;
-				Position.x = Section.x;
-				Position.y = y;
-			}
-		}
-	}
-
-	if(BestSectionIndex < 0)
-	{
-		Position.x = -1;
-		Position.y = -1;
-		return Position;
-	}
-
-	ivec3 NewSection;
-	NewSection.x = Position.x;
-	NewSection.y = Position.y + Height;
-	NewSection.l = Width;
-	m_Sections.insert(NewSection, m_Sections.all().slice(BestSectionIndex, BestSectionIndex + 1));
-
-	for(int i = BestSectionIndex + 1; i < m_Sections.size(); ++i)
-	{
-		ivec3 *Section = &m_Sections[i];
-		ivec3 *Previous = &m_Sections[i-1];
-
-		if(Section->x >= Previous->x + Previous->l)
-			break;
-
-		int Shrink = Previous->x + Previous->l - Section->x;
-		Section->x += Shrink;
-		Section->l -= Shrink;
-		if(Section->l > 0)
-			break;
-
-		m_Sections.remove_index(i);
-		i -= 1;
-	}
-
-	for(int i = 0; i < m_Sections.size()-1; ++i)
-	{
-		ivec3 *Section = &m_Sections[i];
-		ivec3 *Next = &m_Sections[i+1];
-		if(Section->y == Next->y)
-		{
-			Section->l += Next->l;
-			m_Sections.remove_index(i+1);
-			i -= 1;
-		}
-	}
-
-	m_Access++;
-	return Position + m_Offset;
 }
 
 int CGlyphMap::AdjustOutlineThicknessToFontSize(int OutlineThickness, int FontSize)
@@ -170,57 +59,7 @@ void CGlyphMap::InitTexture(int Width, int Height)
 
 int CGlyphMap::FitGlyph(int Width, int Height, ivec2 *pPosition)
 {
-	*pPosition = m_aAtlasPages[m_ActiveAtlasIndex].Add(Width, Height);
-	if(pPosition->x >= 0 && pPosition->y >= 0)
-		return m_ActiveAtlasIndex;
-
-	// try next page
-	int NextPage = m_ActiveAtlasIndex + 1;
-	if(NextPage < NUM_PAGES_PER_DIM*NUM_PAGES_PER_DIM && m_aAtlasPages[NextPage].m_IsEmpty)
-	{
-		*pPosition = m_aAtlasPages[NextPage].Add(Width, Height);
-		if(pPosition->x >= 0 && pPosition->y >= 0)
-		{
-			m_ActiveAtlasIndex = NextPage;
-			return m_ActiveAtlasIndex;
-		}
-	}
-
-	// out of space, drop a page
-	int LeastAccess = INT_MAX;
-	int Atlas = 0;
-	for(int i = 0; i < NUM_PAGES_PER_DIM*NUM_PAGES_PER_DIM; ++i)
-	{
-		// Do not drop the active page
-		if(m_ActiveAtlasIndex == i)
-			continue;
-
-		int PageAccess = m_aAtlasPages[i].m_LastFrameAccess;
-		if(PageAccess < LeastAccess)
-		{
-			LeastAccess = PageAccess;
-			Atlas = i;
-		}
-	}
-
-	int X = m_aAtlasPages[Atlas].m_Offset.x;
-	int Y = m_aAtlasPages[Atlas].m_Offset.y;
-	int W = m_aAtlasPages[Atlas].m_Width;
-	int H = m_aAtlasPages[Atlas].m_Height;
-
-	unsigned char *pMem = (unsigned char *)mem_alloc(W*H);
-	mem_zero(pMem, W*H);
-
-	UploadGlyph(0, X, Y, W, H, pMem);
-
-	mem_free(pMem);
-
-	m_aAtlasPages[Atlas].Init(m_NumTotalPages++, X, Y, W, H);
-	*pPosition = m_aAtlasPages[Atlas].Add(Width, Height);
-	m_ActiveAtlasIndex = Atlas;
-
-	dbg_msg("textrender", "atlas is full, dropping atlas %d, total pages: %u", Atlas, m_NumTotalPages);
-	return Atlas;
+	return 0;
 }
 
 void CGlyphMap::UploadGlyph(int TextureIndex, int PosX, int PosY, int Width, int Height, const unsigned char *pData)
@@ -231,32 +70,6 @@ void CGlyphMap::UploadGlyph(int TextureIndex, int PosX, int PosY, int Width, int
 
 bool CGlyphMap::SetFaceByName(FT_Face *pFace, const char *pFamilyName)
 {
-	FT_Face Face = NULL;
-	char aFamilyStyleName[FONT_NAME_SIZE];
-
-	if(pFamilyName != NULL)
-	{
-		for(int i = 0; i < m_NumFtFaces; ++i)
-		{
-			str_format(aFamilyStyleName, FONT_NAME_SIZE, "%s %s", m_aFtFaces[i]->family_name, m_aFtFaces[i]->style_name);
-			if(str_comp(pFamilyName, aFamilyStyleName) == 0)
-			{
-				Face = m_aFtFaces[i];
-				break;
-			}
-
-			if(!Face && str_comp(pFamilyName, m_aFtFaces[i]->family_name) == 0)
-			{
-				Face = m_aFtFaces[i];
-			}
-		}
-	}
-
-	if(Face)
-	{
-		*pFace = Face;
-		return true;
-	}
 	return false;
 }
 

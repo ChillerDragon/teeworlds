@@ -135,25 +135,6 @@ public:
 
 	void Reset(int64 StringVersion = -1)
 	{
-		if(StringVersion < 0 || m_StringVersion != StringVersion)
-		{
-			m_Width = 0;
-			m_Height = 0;
-			m_NextLineAdvanceY = 0;
-			m_Advance = vec2(0, 0);
-			m_LineCount = 1;
-			m_CharCount = 0;
-			m_PageCountWhenDrawn = -1;
-			m_Truncated = false;
-			m_StartOfLine = true;
-			m_Glyphs.set_size(0);
-			m_StringVersion = StringVersion;
-			m_SkipTextRender = false;
-		}
-		else
-		{
-			m_SkipTextRender = true;
-		}
 	}
 
 	void MoveTo(float x, float y) { m_CursorPos = vec2(x, y); }
