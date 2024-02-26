@@ -72,10 +72,6 @@ void CMapLayers::BackgroundMapUpdate()
 {
 }
 
-static void PlaceEggDoodads(int LayerWidth, int LayerHeight, CTile* aOutTiles, CTile* aGameLayerTiles, int ItemWidth, int ItemHeight, const int* aImageTileID, int ImageTileIDCount, int Freq)
-{
-}
-
 void CMapLayers::PlaceEasterEggs(const CLayers *pLayers)
 {
 }
