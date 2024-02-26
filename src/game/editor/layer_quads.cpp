@@ -196,38 +196,6 @@ void CLayerQuads::GetSize(float *w, float *h) const
 	}
 }
 
-int CLayerQuads::RenderProperties(CUIRect *pToolBox)
-{
-	// layer props
-	enum
-	{
-		PROP_IMAGE=0,
-		NUM_PROPS,
-	};
-
-	CProperty aProps[] = {
-		{"Image", m_Image, PROPTYPE_IMAGE, -1, 0},
-		{0},
-	};
-
-	static int s_aIds[NUM_PROPS] = {0};
-	int NewVal = 0;
-	int Prop = m_pEditor->DoProperties(pToolBox, aProps, s_aIds, &NewVal);
-	if(Prop != -1)
-		m_pEditor->m_Map.m_Modified = true;
-
-	if(Prop == PROP_IMAGE)
-	{
-		if(NewVal >= 0)
-			m_Image = NewVal%m_pEditor->m_Map.m_lImages.size();
-		else
-			m_Image = -1;
-	}
-
-	return 0;
-}
-
-
 void CLayerQuads::ModifyImageIndex(INDEX_MODIFY_FUNC Func)
 {
 	Func(&m_Image);

@@ -180,7 +180,6 @@ public:
 	virtual void BrushRotate(float Amount) {}
 
 	virtual void Render() {}
-	virtual int RenderProperties(CUIRect *pToolbox) { return 0; }
 
 	virtual void ModifyImageIndex(INDEX_MODIFY_FUNC pfnFunc) {}
 	virtual void ModifyEnvelopeIndex(INDEX_MODIFY_FUNC pfnFunc) {}
@@ -436,7 +435,6 @@ public:
 	virtual void BrushRotate(float Amount);
 
 	virtual void ShowInfo();
-	virtual int RenderProperties(CUIRect *pToolbox);
 
 	virtual void ModifyImageIndex(INDEX_MODIFY_FUNC pfnFunc);
 	virtual void ModifyEnvelopeIndex(INDEX_MODIFY_FUNC pfnFunc);
@@ -478,8 +476,6 @@ public:
 	virtual void BrushFlipY();
 	virtual void BrushRotate(float Amount);
 
-	virtual int RenderProperties(CUIRect *pToolbox);
-
 	virtual void ModifyImageIndex(INDEX_MODIFY_FUNC pfnFunc);
 	virtual void ModifyEnvelopeIndex(INDEX_MODIFY_FUNC pfnFunc);
 
@@ -495,7 +491,6 @@ public:
 	CLayerGame(int w, int h);
 	~CLayerGame();
 
-	virtual int RenderProperties(CUIRect *pToolbox);
 };
 
 class CEditor : public IEditor
