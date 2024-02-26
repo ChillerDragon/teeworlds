@@ -16,11 +16,6 @@ struct CUserData
 	bool m_Render;
 } g_UserData;
 
-static int LoadSoundsThread(void *pUser)
-{
-	return 0;
-}
-
 int CSounds::GetInitAmount() const
 {
 	return 0;

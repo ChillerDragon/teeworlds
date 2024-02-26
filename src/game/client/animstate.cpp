@@ -7,19 +7,6 @@
 
 #include "animstate.h"
 
-static void AnimSeqEval(CAnimSequence *pSeq, float Time, CAnimKeyframe *pFrame)
-{
-}
-
-static void AnimAddKeyframe(CAnimKeyframe *pSeq, CAnimKeyframe *pAdded, float Amount)
-{
-}
-
-static void AnimAdd(CAnimState *pState, CAnimState *pAdded, float Amount)
-{
-}
-
-
 void CAnimState::Set(CAnimation *pAnim, float Time)
 {
 }

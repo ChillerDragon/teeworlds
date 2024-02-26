@@ -266,78 +266,10 @@ int CLayerTiles::BrushGrab(CLayerGroup *pBrush, CUIRect Rect)
 
 void CLayerTiles::FillSelection(bool Empty, CLayer *pBrush, CUIRect Rect)
 {
-	if(m_Readonly)
-		return;
-
-	Snap(&Rect);
-
-	int sx = ConvertX(Rect.x);
-	int sy = ConvertY(Rect.y);
-	int w = ConvertX(Rect.w);
-	int h = ConvertY(Rect.h);
-
-	CLayerTiles *pLt = static_cast<CLayerTiles*>(pBrush);
-
-	for(int y = 0; y < h; y++)
-	{
-		for(int x = 0; x < w; x++)
-		{
-			int fx = x+sx;
-			int fy = y+sy;
-
-			if(fx < 0 || fx >= m_Width || fy < 0 || fy >= m_Height)
-				continue;
-
-			if(Empty)
-				m_pTiles[fy*m_Width+fx].m_Index = 1;
-			else
-				m_pTiles[fy*m_Width+fx] = pLt->m_pTiles[(y*pLt->m_Width + x%pLt->m_Width) % (pLt->m_Width*pLt->m_Height)];
-		}
-	}
-
-	if(m_LiveAutoMap)
-	{
-		RECTi r = {sx - 1, sy - 1, w + 2, h + 2};
-		m_pEditor->m_Map.m_lImages[m_Image]->m_pAutoMapper->Proceed(this, m_SelectedRuleSet, r);
-	}
-
-	m_pEditor->m_Map.m_Modified = true;
 }
 
 void CLayerTiles::BrushDraw(CLayer *pBrush, float wx, float wy)
 {
-	if(m_Readonly)
-		return;
-
-	CLayerTiles *l = (CLayerTiles *)pBrush;
-	int sx = ConvertX(wx);
-	int sy = ConvertY(wy);
-
-	//dont draw if the mouse is held without moving
-	if(sx == s_lastBrushX && sy == s_lastBrushY)
-		return;
-
-	for(int y = 0; y < l->m_Height; y++)
-		for(int x = 0; x < l->m_Width; x++)
-		{
-			int fx = x+sx;
-			int fy = y+sy;
-			if(fx<0 || fx >= m_Width || fy < 0 || fy >= m_Height)
-				continue;
-
-			m_pTiles[fy*m_Width+fx] = l->m_pTiles[y*l->m_Width+x];
-		}
-
-	if(m_LiveAutoMap)
-	{
-		RECTi r = {sx - 1, sy - 1, l->m_Width + 2, l->m_Height + 2};
-		m_pEditor->m_Map.m_lImages[m_Image]->m_pAutoMapper->Proceed(this, m_SelectedRuleSet, r);
-	}
-
-	m_pEditor->m_Map.m_Modified = true;
-
-	s_lastBrushX = sx;
-	s_lastBrushY = sy;
 }
 
 void CLayerTiles::BrushFlipX()

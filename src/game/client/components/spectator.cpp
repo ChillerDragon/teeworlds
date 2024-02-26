@@ -28,10 +28,6 @@ bool CSpectator::SpecModePossible(int SpecMode, int SpectatorID)
 	return false;
 }
 
-static void IterateSpecMode(int Direction, int *pSpecMode, int *pSpectatorID)
-{
-}
-
 void CSpectator::HandleSpectateNextPrev(int Direction)
 {
 }

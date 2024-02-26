@@ -16,10 +16,6 @@
 #include "entities/projectile.h"
 #include "gamemodes/ctf.h"
 #include "gamemodes/dm.h"
-#include "gamemodes/lms.h"
-#include "gamemodes/lts.h"
-#include "gamemodes/mod.h"
-#include "gamemodes/tdm.h"
 #include "gamecontext.h"
 #include "player.h"
 
@@ -448,30 +444,11 @@ void CGameContext::AbortVoteOnDisconnect(int ClientID)
 
 void CGameContext::AbortVoteOnTeamChange(int ClientID)
 {
-	if(m_VoteCloseTime && ClientID == m_VoteClientID && str_startswith(m_aVoteCommand, "set_team "))
-		m_VoteCloseTime = -1;
 }
 
 
 void CGameContext::CheckPureTuning()
 {
-	// might not be created yet during start up
-	if(!m_pController)
-		return;
-
-	if(	str_comp(m_pController->GetGameType(), "DM")==0 ||
-		str_comp(m_pController->GetGameType(), "TDM")==0 ||
-		str_comp(m_pController->GetGameType(), "CTF")==0 ||
-		str_comp(m_pController->GetGameType(), "LMS")==0 ||
-		str_comp(m_pController->GetGameType(), "LTS")==0)
-	{
-		CTuningParams p;
-		if(mem_comp(&p, &m_Tuning, sizeof(p)) != 0)
-		{
-			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "resetting tuning due to pure server");
-			m_Tuning = p;
-		}
-	}
 }
 
 void CGameContext::SendTuningParams(int ClientID)
@@ -487,18 +464,6 @@ void CGameContext::SendTuningParams(int ClientID)
 
 void CGameContext::SwapTeams()
 {
-	if(!m_pController->IsTeamplay())
-		return;
-
-	SendGameMsg(GAMEMSG_TEAM_SWAP, -1);
-
-	for(int i = 0; i < MAX_CLIENTS; ++i)
-	{
-		if(m_apPlayers[i] && m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS)
-			m_pController->DoTeamChange(m_apPlayers[i], m_apPlayers[i]->GetTeam()^1, false);
-	}
-
-	m_pController->SwapTeamscore();
 }
 
 void CGameContext::OnTick()
@@ -1607,16 +1572,8 @@ void CGameContext::OnInit()
 	m_Collision.Init(&m_Layers);
 
 	// select gametype
-	if(str_comp_nocase(Config()->m_SvGametype, "mod") == 0)
-		m_pController = new CGameControllerMOD(this);
-	else if(str_comp_nocase(Config()->m_SvGametype, "ctf") == 0)
+	if(str_comp_nocase(Config()->m_SvGametype, "ctf") == 0)
 		m_pController = new CGameControllerCTF(this);
-	else if(str_comp_nocase(Config()->m_SvGametype, "lms") == 0)
-		m_pController = new CGameControllerLMS(this);
-	else if(str_comp_nocase(Config()->m_SvGametype, "lts") == 0)
-		m_pController = new CGameControllerLTS(this);
-	else if(str_comp_nocase(Config()->m_SvGametype, "tdm") == 0)
-		m_pController = new CGameControllerTDM(this);
 	else
 		m_pController = new CGameControllerDM(this);
 
