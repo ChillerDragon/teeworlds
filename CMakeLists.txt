@@ -1299,7 +1299,6 @@ set_src(ENGINE_INTERFACE GLOB src/engine
   console.h
   contacts.h
   demo.h
-  editor.h
   engine.h
   graphics.h
   input.h
@@ -1509,14 +1508,7 @@ if(CLIENT)
     ui_scrollregion.h
   )
   set_src(GAME_EDITOR GLOB src/game/editor
-    auto_map.cpp
-    auto_map.h
-    editor.cpp
-    editor.h
     io.cpp
-    layer_game.cpp
-    layer_quads.cpp
-    layer_tiles.cpp
     popups.cpp
   )
   set(GAME_GENERATED_CLIENT

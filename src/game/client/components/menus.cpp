@@ -7,7 +7,6 @@
 #include <base/vmath.h>
 
 #include <engine/config.h>
-#include <engine/editor.h>
 #include <engine/engine.h>
 #include <engine/contacts.h>
 #include <engine/keys.h>

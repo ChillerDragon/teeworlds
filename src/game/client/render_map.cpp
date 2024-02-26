@@ -215,14 +215,6 @@ void CRenderTools::RenderEvalEnvelope(const CEnvPoint *pPoints, int NumPoints, i
 	return;
 }
 
-static void Rotate(const CPoint *pCenter, CPoint *pPoint, float Rotation)
-{
-	int x = pPoint->x - pCenter->x;
-	int y = pPoint->y - pCenter->y;
-	pPoint->x = (int)(x * cosf(Rotation) - y * sinf(Rotation) + pCenter->x);
-	pPoint->y = (int)(x * sinf(Rotation) + y * cosf(Rotation) + pCenter->y);
-}
-
 void CRenderTools::RenderQuads(const CQuad *pQuads, int NumQuads, int RenderFlags, ENVELOPE_EVAL pfnEval, void *pUser)
 {
 	Graphics()->QuadsBegin();
@@ -312,10 +304,6 @@ void CRenderTools::RenderQuads(const CQuad *pQuads, int NumQuads, int RenderFlag
 			aRotated[3] = q->m_aPoints[3];
 			pPoints = aRotated;
 
-			Rotate(&q->m_aPoints[4], &aRotated[0], Rot);
-			Rotate(&q->m_aPoints[4], &aRotated[1], Rot);
-			Rotate(&q->m_aPoints[4], &aRotated[2], Rot);
-			Rotate(&q->m_aPoints[4], &aRotated[3], Rot);
 		}
 
 		IGraphics::CFreeformItem Freeform(

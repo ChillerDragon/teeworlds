@@ -5,7 +5,6 @@
 #include <engine/config.h>
 #include <engine/demo.h>
 #include <engine/contacts.h>
-#include <engine/graphics.h>
 #include <engine/keys.h>
 #include <engine/serverbrowser.h>
 #include <engine/textrender.h>
@@ -16,8 +15,6 @@
 
 #include <game/client/animstate.h>
 #include <game/client/gameclient.h>
-#include <game/client/render.h>
-#include <game/client/ui.h>
 
 #include "menus.h"
 #include "motd.h"

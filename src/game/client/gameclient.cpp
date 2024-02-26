@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/editor.h>
 #include <engine/engine.h>
 #include <engine/contacts.h>
 #include <engine/graphics.h>
@@ -222,7 +221,6 @@ void CGameClient::OnConsoleInit()
 	m_pDemoPlayer = Kernel()->RequestInterface<IDemoPlayer>();
 	m_pDemoRecorder = Kernel()->RequestInterface<IDemoRecorder>();
 	m_pServerBrowser = Kernel()->RequestInterface<IServerBrowser>();
-	m_pEditor = Kernel()->RequestInterface<IEditor>();
 	m_pFriends = Kernel()->RequestInterface<IFriends>();
 	m_pBlacklist = Kernel()->RequestInterface<IBlacklist>();
 
@@ -380,10 +378,6 @@ void CGameClient::OnInit()
 	// init all components
 	for(int i = m_All.m_Num-1; i >= 0; --i)
 		m_All.m_paComponents[i]->OnInit(); // this will call RenderLoading again
-
-	// init the editor
-	m_pEditor->Init();
-	m_pMenus->RenderLoading(2);
 
 	OnReset();
 
@@ -586,7 +580,7 @@ void CGameClient::StartRendering()
 
 void CGameClient::OnRender()
 {
-	CUIElementBase::Init(UI()); // update static pointer because game and editor use separate UI
+	CUIElementBase::Init(UI());
 
 	// update the local character and spectate position
 	UpdatePositions();
@@ -1027,7 +1021,7 @@ void CGameClient::OnEnterGame() {}
 
 void CGameClient::OnGameOver()
 {
-	if(Client()->State() != IClient::STATE_DEMOPLAYBACK && Config()->m_ClEditor == 0)
+	if(Client()->State() != IClient::STATE_DEMOPLAYBACK)
 		Client()->AutoScreenshot_Start();
 }
 
@@ -1677,15 +1671,6 @@ vec2 CGameClient::GetCharPos(int ClientID, bool Predicted) const
 			Client()->IntraGameTick()
 		);
 	}
-}
-
-void CGameClient::OnActivateEditor()
-{
-	OnRelease();
-
-	CLineInput *pActiveInput = CLineInput::GetActiveInput();
-	if(pActiveInput)
-		pActiveInput->Deactivate();
 }
 
 void CGameClient::CClientData::UpdateBotRenderInfo(CGameClient *pGameClient, int ClientID)

@@ -19,7 +19,6 @@
 #include <engine/client.h>
 #include <engine/config.h>
 #include <engine/console.h>
-#include <engine/editor.h>
 #include <engine/engine.h>
 #include <engine/input.h>
 #include <engine/keys.h>

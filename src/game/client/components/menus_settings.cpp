@@ -5,7 +5,6 @@
 #include <base/math.h>
 
 #include <engine/engine.h>
-#include <engine/graphics.h>
 #include <engine/serverbrowser.h>
 #include <engine/storage.h>
 #include <engine/textrender.h>
@@ -16,13 +15,8 @@
 #include <generated/client_data.h>
 
 #include <game/client/components/maplayers.h>
-#include <game/client/ui.h>
-#include <game/client/render.h>
 #include <game/client/gameclient.h>
-#include <game/client/animstate.h>
 
-#include "binds.h"
-#include "countryflags.h"
 #include "menus.h"
 
 CMenusKeyBinder::CMenusKeyBinder()
