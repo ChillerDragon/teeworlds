@@ -14,16 +14,6 @@ const int CBinds::s_aaDefaultBindKeys[][2] = {
 	{KEY_F3, 0}, {KEY_F4, 0},
 	{'r', 0},
 };
-const char CBinds::s_aaDefaultBindValues[][32] = {
-	"toggle_local_console", "toggle_remote_console", "+scoreboard", "+stats", "+show_chat", "screenshot", "snd_toggle",
-	"+left", "+right",
-	"+jump", "+fire", "+hook", "+emote", "+spectate", "spectate_next", "spectate_previous",
-	"+weapon1", "+weapon2", "+weapon3", "+weapon4", "+weapon5",
-	"+prevweapon", "+nextweapon",
-	"chat all", "chat team", "chat whisper",
-	"vote yes", "vote no",
-	"ready_change",
-};
 
 CBinds::CBinds()
 {
@@ -121,12 +111,6 @@ void CBinds::GetKey(const char *pBindStr, char aKey[64], unsigned BufSize)
 
 void CBinds::SetDefaults()
 {
-	// set default key bindings
-	UnbindAll();
-	const int count = sizeof(s_aaDefaultBindKeys)/sizeof(int)/2;
-	dbg_assert(count == sizeof(s_aaDefaultBindValues)/32, "the count of bind keys differs from that of bind values!");
-	for(int i = 0; i < count; i++)
-		Bind(s_aaDefaultBindKeys[i][0], s_aaDefaultBindKeys[i][1], s_aaDefaultBindValues[i]);
 }
 
 void CBinds::OnConsoleInit()
