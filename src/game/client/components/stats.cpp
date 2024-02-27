@@ -108,7 +108,3 @@ void CStats::OnPlayerEnter(int ClientID, int Team)
 void CStats::OnPlayerLeave(int ClientID)
 {
 }
-
-void CStats::AutoStatScreenshot()
-{
-}

@@ -664,15 +664,6 @@ void CGameContext::OnClientEnter(int ClientID)
 	// local info
 	NewClientInfoMsg.m_Local = 1;
 	Server()->SendPackMsg(&NewClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
-
-	if(Server()->DemoRecorder_IsRecording())
-	{
-		CNetMsg_De_ClientEnter Msg;
-		Msg.m_pName = NewClientInfoMsg.m_pName;
-		Msg.m_ClientID = ClientID;
-		Msg.m_Team = NewClientInfoMsg.m_Team;
-		Server()->SendPackMsg(&Msg, MSGFLAG_NOSEND, -1);
-	}
 }
 
 void CGameContext::OnClientConnected(int ClientID, bool Dummy, bool AsSpec)
@@ -717,14 +708,6 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 	// update clients on drop
 	if(Server()->ClientIngame(ClientID) || IsClientBot(ClientID))
 	{
-		if(Server()->DemoRecorder_IsRecording())
-		{
-			CNetMsg_De_ClientLeave Msg;
-			Msg.m_pName = Server()->ClientName(ClientID);
-			Msg.m_pReason = pReason;
-			Server()->SendPackMsg(&Msg, MSGFLAG_NOSEND, -1);
-		}
-
 		CNetMsg_Sv_ClientDrop Msg;
 		Msg.m_ClientID = ClientID;
 		Msg.m_pReason = pReason;
@@ -1634,17 +1617,6 @@ void CGameContext::OnShutdown()
 
 void CGameContext::OnSnap(int ClientID)
 {
-	// add tuning to demo
-	CTuningParams StandardTuning;
-	if(ClientID == -1 && Server()->DemoRecorder_IsRecording() && mem_comp(&StandardTuning, &m_Tuning, sizeof(CTuningParams)) != 0)
-	{
-		CNetObj_De_TuneParams *pTuneParams = static_cast<CNetObj_De_TuneParams *>(Server()->SnapNewItem(NETOBJTYPE_DE_TUNEPARAMS, 0, sizeof(CNetObj_De_TuneParams)));
-		if(!pTuneParams)
-			return;
-
-		mem_copy(pTuneParams->m_aTuneParams, &m_Tuning, sizeof(pTuneParams->m_aTuneParams));
-	}
-
 	m_World.Snap(ClientID);
 	m_pController->Snap(ClientID);
 	m_Events.Snap(ClientID);

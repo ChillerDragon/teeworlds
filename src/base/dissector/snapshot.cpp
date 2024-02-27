@@ -36,7 +36,6 @@
 #include <engine/shared/config.h>
 #include <engine/shared/compression.h>
 #include <engine/shared/datafile.h>
-#include <engine/shared/demo.h>
 #include <engine/shared/filecollection.h>
 #if __has_include(<engine/shared/mapchecker.h>)
 #include <engine/shared/mapchecker.h>
@@ -679,18 +678,6 @@ void print_snapshot(int Msg,
 
 			// add new
 			m_SnapshotStorage.Add(GameTick, time_get(), SnapSize, pTmpBuffer3, 1);
-
-			// add snapshot to demo
-			if(m_DemoRecorder.IsRecording())
-			{
-				// build up snapshot and add local messages
-				m_DemoRecSnapshotBuilder.Init(pTmpBuffer3);
-				GameClient()->OnDemoRecSnap();
-				SnapSize = m_DemoRecSnapshotBuilder.Finish(pTmpBuffer3);
-
-				// write snapshot
-				m_DemoRecorder.RecordSnapshot(GameTick, pTmpBuffer3, SnapSize);
-			}
 
 			// apply snapshot, cycle pointers
 			m_ReceivedSnapshots++;

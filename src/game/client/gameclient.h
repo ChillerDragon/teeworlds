@@ -37,8 +37,6 @@ class CGameClient : public IGameClient
 	class CConfig *m_pConfig;
 	class IConsole *m_pConsole;
 	class IStorage *m_pStorage;
-	class IDemoPlayer *m_pDemoPlayer;
-	class IDemoRecorder *m_pDemoRecorder;
 	class IServerBrowser *m_pServerBrowser;
 	class IFriends *m_pFriends;
 	class IBlacklist *m_pBlacklist;
@@ -76,8 +74,6 @@ public:
 	class IStorage *Storage() const { return m_pStorage; }
 	class CConfig *Config() const { return m_pConfig; }
 	class IConsole *Console() { return m_pConsole; }
-	class IDemoPlayer *DemoPlayer() const { return m_pDemoPlayer; }
-	class IDemoRecorder *DemoRecorder() const { return m_pDemoRecorder; }
 	class IServerBrowser *ServerBrowser() const { return m_pServerBrowser; }
 	class CLayers *Layers() { return &m_Layers; }
 	class CCollision *Collision() { return &m_Collision; }

@@ -2,9 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <limits.h>
 
-#include <engine/demo.h>
-
-
 #include <engine/shared/config.h>
 
 #include <generated/client_data.h>

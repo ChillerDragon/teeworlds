@@ -15,7 +15,6 @@
 #include <engine/shared/compression.h>
 #include <engine/shared/config.h>
 #include <engine/shared/datafile.h>
-#include <engine/shared/demo.h>
 #include <engine/shared/econ.h>
 #include <engine/shared/filecollection.h>
 #include <engine/shared/mapchecker.h>
@@ -252,7 +251,7 @@ void CServer::CClient::Reset()
 	m_MapChunk = 0;
 }
 
-CServer::CServer() : m_DemoRecorder(&m_SnapshotDelta)
+CServer::CServer()
 {
 	m_TickSpeed = SERVER_TICK_SPEED;
 
@@ -488,7 +487,9 @@ int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID)
 
 	// write message to demo recorder
 	if(!(Flags&MSGFLAG_NORECORD))
-		m_DemoRecorder.RecordMessage(pMsg->Data(), pMsg->Size());
+	{
+		// dbg_msg("send", "record");
+	}
 
 	if(!(Flags&MSGFLAG_NOSEND))
 	{
@@ -512,21 +513,6 @@ int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID)
 void CServer::DoSnapshot()
 {
 	GameServer()->OnPreSnap();
-
-	// create snapshot for demo recording
-	if(m_DemoRecorder.IsRecording())
-	{
-		char aData[CSnapshot::MAX_SIZE];
-		int SnapshotSize;
-
-		// build snap and possibly add some messages
-		m_SnapshotBuilder.Init();
-		GameServer()->OnSnap(-1);
-		SnapshotSize = m_SnapshotBuilder.Finish(aData);
-
-		// write snapshot
-		m_DemoRecorder.RecordSnapshot(Tick(), aData, SnapshotSize);
-	}
 
 	// create snapshots for all clients
 	for(int i = 0; i < MAX_CLIENTS; i++)
@@ -1278,10 +1264,6 @@ int CServer::LoadMap(const char *pMapName)
 	if(!m_pMap->Load(aBuf))
 		return 0;
 
-	// stop recording when we change map
-	if(m_DemoRecorder.IsRecording())
-		m_DemoRecorder.Stop();
-
 	// reinit snapshot ids
 	m_IDPool.TimeoutIDs();
 
@@ -1638,50 +1620,6 @@ void CServer::ConShutdown(IConsole::IResult *pResult, void *pUser)
 	}
 }
 
-void CServer::DemoRecorder_HandleAutoStart()
-{
-	if(Config()->m_SvAutoDemoRecord)
-	{
-		if(m_DemoRecorder.IsRecording())
-			m_DemoRecorder.Stop();
-		char aFilename[128];
-		char aDate[20];
-		str_timestamp(aDate, sizeof(aDate));
-		str_format(aFilename, sizeof(aFilename), "demos/%s_%s.demo", "auto/autorecord", aDate);
-		m_DemoRecorder.Start(aFilename, GameServer()->NetVersion(), m_aCurrentMap, m_CurrentMapSha256, m_CurrentMapCrc, "server");
-		if(Config()->m_SvAutoDemoMax)
-		{
-			// clean up auto recorded demos
-			CFileCollection AutoDemos;
-			AutoDemos.Init(Storage(), "demos/server", "autorecord", ".demo", Config()->m_SvAutoDemoMax);
-		}
-	}
-}
-
-bool CServer::DemoRecorder_IsRecording()
-{
-	return m_DemoRecorder.IsRecording();
-}
-
-void CServer::ConRecord(IConsole::IResult *pResult, void *pUser)
-{
-	CServer* pServer = (CServer *)pUser;
-	char aFilename[128];
-	if(pResult->NumArguments())
-		str_format(aFilename, sizeof(aFilename), "demos/%s.demo", pResult->GetString(0));
-	else
-	{
-		char aDate[20];
-		str_timestamp(aDate, sizeof(aDate));
-		str_format(aFilename, sizeof(aFilename), "demos/demo_%s.demo", aDate);
-	}
-	pServer->m_DemoRecorder.Start(aFilename, pServer->GameServer()->NetVersion(), pServer->m_aCurrentMap, pServer->m_CurrentMapSha256, pServer->m_CurrentMapCrc, "server");
-}
-
-void CServer::ConStopRecord(IConsole::IResult *pResult, void *pUser)
-{
-	((CServer *)pUser)->m_DemoRecorder.Stop();
-}
 
 void CServer::ConMapReload(IConsole::IResult *pResult, void *pUser)
 {
@@ -1808,38 +1746,6 @@ void CServer::ConchainMapUpdate(IConsole::IResult *pResult, void *pUserData, ICo
 	}
 }
 
-void CServer::RegisterCommands()
-{
-	// register console commands
-	Console()->Register("kick", "i[id] ?r[reason]", CFGFLAG_SERVER, ConKick, this, "Kick player with specified id for any reason");
-	Console()->Register("status", "", CFGFLAG_SERVER, ConStatus, this, "List players");
-	Console()->Register("shutdown", "?r[reason]", CFGFLAG_SERVER, ConShutdown, this, "Shut down");
-	Console()->Register("logout", "", CFGFLAG_SERVER|CFGFLAG_BASICACCESS, ConLogout, this, "Logout of rcon");
-
-	Console()->Register("record", "?s[file]", CFGFLAG_SERVER|CFGFLAG_STORE, ConRecord, this, "Record to a file");
-	Console()->Register("stoprecord", "", CFGFLAG_SERVER, ConStopRecord, this, "Stop recording");
-
-	Console()->Register("reload", "", CFGFLAG_SERVER, ConMapReload, this, "Reload the map");
-
-	Console()->Chain("sv_name", ConchainSpecialInfoupdate, this);
-	Console()->Chain("password", ConchainSpecialInfoupdate, this);
-
-	Console()->Chain("sv_player_slots", ConchainPlayerSlotsUpdate, this);
-	Console()->Chain("sv_max_clients", ConchainMaxclientsUpdate, this);
-	Console()->Chain("sv_max_clients", ConchainSpecialInfoupdate, this);
-	Console()->Chain("sv_max_clients_per_ip", ConchainMaxclientsperipUpdate, this);
-	Console()->Chain("mod_command", ConchainModCommandUpdate, this);
-	Console()->Chain("console_output_level", ConchainConsoleOutputLevelUpdate, this);
-	Console()->Chain("sv_rcon_password", ConchainRconPasswordSet, this);
-	Console()->Chain("sv_map", ConchainMapUpdate, this);
-
-	// register console commands in sub parts
-	m_ServerBan.InitServerBan(Console(), Storage(), this);
-	m_DemoRecorder.Init(Console(), Storage());
-	m_pGameServer->OnConsoleInit();
-}
-
-
 int CServer::SnapNewID()
 {
 	return m_IDPool.NewID();
@@ -1952,9 +1858,6 @@ int main(int argc, const char **argv) // ignore_convention
 	pServer->InitInterfaces(pKernel);
 	if(!UseDefaultConfig)
 	{
-		// register all console commands
-		pServer->RegisterCommands();
-
 		// execute autoexec file
 		pConsole->ExecuteFile("autoexec.cfg");
 

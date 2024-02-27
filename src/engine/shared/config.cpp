@@ -18,20 +18,6 @@ void EscapeParam(char *pDst, const char *pSrc, int size)
 	*pDst = 0;
 }
 
-static void Con_SaveConfig(IConsole::IResult *pResult, void *pUserData)
-{
-	char aFilename[128];
-	if(pResult->NumArguments())
-		str_format(aFilename, sizeof(aFilename), "configs/%s.cfg", pResult->GetString(0));
-	else
-	{
-		char aDate[20];
-		str_timestamp(aDate, sizeof(aDate));
-		str_format(aFilename, sizeof(aFilename), "configs/config_%s.cfg", aDate);
-	}
-	((CConfigManager *)pUserData)->Save(aFilename);
-}
-
 CConfigManager::CConfigManager()
 {
 	m_pStorage = 0;

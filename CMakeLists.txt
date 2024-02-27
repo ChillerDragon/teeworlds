@@ -1298,7 +1298,6 @@ set_src(ENGINE_INTERFACE GLOB src/engine
   config.h
   console.h
   contacts.h
-  demo.h
   engine.h
   kernel.h
   keys.h
@@ -1320,8 +1319,6 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   console.h
   datafile.cpp
   datafile.h
-  demo.cpp
-  demo.h
   econ.cpp
   econ.h
   engine.cpp

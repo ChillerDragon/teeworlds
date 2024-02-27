@@ -640,7 +640,6 @@ void IGameController::StartMatch()
 	else
 		SetGameState(IGS_WARMUP_GAME, TIMER_INFINITE);
 
-	Server()->DemoRecorder_HandleAutoStart();
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "start match type='%s' teamplay='%d'", m_pGameType, m_GameFlags&GAMEFLAG_TEAMS);
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);

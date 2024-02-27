@@ -75,13 +75,6 @@ public:
 	virtual void Connect(const char *pAddress) = 0;
 	virtual void Disconnect() = 0;
 	virtual void Quit() = 0;
-	virtual const char *DemoPlayer_Play(const char *pFilename, int StorageType) = 0;
-	virtual void DemoRecorder_Start(const char *pFilename, bool WithTimestamp) = 0;
-	virtual void DemoRecorder_HandleAutoStart() = 0;
-	virtual void DemoRecorder_Stop(bool ErrorIfNotRecording = false) = 0;
-	virtual void RecordGameMessage(bool State) = 0;
-	virtual void AutoStatScreenshot_Start() = 0;
-	virtual void AutoScreenshot_Start() = 0;
 	virtual void ServerBrowserUpdate() = 0;
 
 	// networking
@@ -143,8 +136,6 @@ public:
 	virtual const char *ErrorString() const = 0;
 	virtual const char *LatestVersion() const = 0;
 	virtual bool ConnectionProblems() const = 0;
-
-	virtual bool SoundInitFailed() const = 0;
 };
 
 class IGameClient : public IInterface

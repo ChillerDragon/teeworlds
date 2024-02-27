@@ -22,7 +22,6 @@
 #include <engine/shared/config.h>
 #include <engine/shared/compression.h>
 #include <engine/shared/datafile.h>
-#include <engine/shared/demo.h>
 #include <engine/shared/filecollection.h>
 #include <engine/shared/mapchecker.h>
 #include <engine/shared/network.h>
@@ -181,7 +180,7 @@ void CSmoothTime::Update(CGraph *pGraph, int64 Target, int TimeLeft, int AdjustD
 	m_BadnessScore -= 1+m_BadnessScore/100;
 }
 
-CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotDelta)
+CClient::CClient()
 {
 	m_pGameClient = 0;
 	m_pMap = 0;
@@ -202,8 +201,6 @@ CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotD
 
 	m_WindowMustRefocus = 0;
 	m_SnapCrcErrors = 0;
-	m_AutoScreenshotRecycle = false;
-	m_AutoStatScreenshotRecycle = false;
 
 	m_AckGameTick = -1;
 	m_CurrentRecvTick = 0;
@@ -269,8 +266,7 @@ int CClient::SendMsg(CMsgPacker *pMsg, int Flags)
 
 	if(Flags&MSGFLAG_RECORD)
 	{
-		if(m_DemoRecorder.IsRecording())
-			m_DemoRecorder.RecordMessage(Packet.m_pData, Packet.m_DataSize);
+		// dbg_msg("send", "flag record");
 	}
 
 	if(!(Flags&MSGFLAG_NOSEND))
@@ -454,8 +450,6 @@ void CClient::EnterGame()
 
 void CClient::OnClientOnline()
 {
-	DemoRecorder_HandleAutoStart();
-
 	// store password and server as favorite if configured, if the server was password protected
 	CServerInfo Info = {0};
 	GetServerInfo(&Info);
@@ -494,8 +488,6 @@ void CClient::Connect(const char *pAddress)
 	m_NetClient.Connect(&m_ServerAddress);
 	SetState(IClient::STATE_CONNECTING);
 
-	DemoRecorder_Stop();
-
 	m_InputtimeMarginGraph.Init(-150.0f, 150.0f);
 	m_GametimeMarginGraph.Init(-150.0f, 150.0f);
 }
@@ -505,10 +497,6 @@ void CClient::DisconnectWithReason(const char *pReason)
 	char aBuf[512];
 	str_format(aBuf, sizeof(aBuf), "disconnecting. reason='%s'", pReason?pReason:"unknown");
 	dbg_msg("client", "%s", aBuf);
-
-	// stop demo playback and recorder
-	m_DemoPlayer.Stop();
-	DemoRecorder_Stop();
 
 	// reset password stored in favorites if it's invalid
 	if(pReason && str_find_nocase(pReason, "password"))
@@ -676,9 +664,6 @@ const char *CClient::LoadMap(const char *pName, const char *pFilename, const SHA
 		m_pMap->Unload();
 		return aErrorMsg;
 	}
-
-	// stop demo recording if we loaded a new map
-	DemoRecorder_Stop();
 
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "loaded map '%s'", pFilename);
@@ -1409,18 +1394,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 					// add new
 					m_SnapshotStorage.Add(GameTick, time_get(), SnapSize, pTmpBuffer3, 1);
 
-					// add snapshot to demo
-					if(m_DemoRecorder.IsRecording())
-					{
-						// build up snapshot and add local messages
-						m_DemoRecSnapshotBuilder.Init(pTmpBuffer3);
-						GameClient()->OnDemoRecSnap();
-						SnapSize = m_DemoRecSnapshotBuilder.Finish(pTmpBuffer3);
-
-						// write snapshot
-						m_DemoRecorder.RecordSnapshot(GameTick, pTmpBuffer3, SnapSize);
-					}
-
 					// apply snapshot, cycle pointers
 					m_ReceivedSnapshots++;
 
@@ -1459,9 +1432,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 		{
 			// game message
 			GameClient()->OnMessage(Msg, &Unpacker);
-
-			if(m_RecordGameMessage && m_DemoRecorder.IsRecording())
-				m_DemoRecorder.RecordMessage(pPacket->m_pData, pPacket->m_DataSize);
 		}
 	}
 }
@@ -1509,61 +1479,12 @@ void CClient::PumpNetwork()
 	}
 }
 
-void CClient::OnDemoPlayerSnapshot(void *pData, int Size)
-{
-	// update ticks, they could have changed
-	const CDemoPlayer::CPlaybackInfo *pInfo = m_DemoPlayer.Info();
-	CSnapshotStorage::CHolder *pTemp;
-	m_CurGameTick = pInfo->m_Info.m_CurrentTick;
-	m_PrevGameTick = pInfo->m_PreviousTick;
-
-	// handle snapshots
-	pTemp = m_aSnapshots[SNAP_PREV];
-	m_aSnapshots[SNAP_PREV] = m_aSnapshots[SNAP_CURRENT];
-	m_aSnapshots[SNAP_CURRENT] = pTemp;
-
-	mem_copy(m_aSnapshots[SNAP_CURRENT]->m_pSnap, pData, Size);
-	mem_copy(m_aSnapshots[SNAP_CURRENT]->m_pAltSnap, pData, Size);
-
-	GameClient()->OnNewSnapshot();
-}
-
-void CClient::OnDemoPlayerMessage(void *pData, int Size)
-{
-	CUnpacker Unpacker;
-	Unpacker.Reset(pData, Size);
-
-	// unpack msgid and system flag
-	int Msg = Unpacker.GetInt();
-	int Sys = Msg&1;
-	Msg >>= 1;
-
-	if(Unpacker.Error())
-		return;
-
-	if(!Sys)
-		GameClient()->OnMessage(Msg, &Unpacker);
-}
-
 void CClient::Update()
 {
 	if(State() == IClient::STATE_DEMOPLAYBACK)
 	{
-		m_DemoPlayer.Update();
-		if(m_DemoPlayer.IsPlaying())
-		{
-			// update timers
-			const CDemoPlayer::CPlaybackInfo *pInfo = m_DemoPlayer.Info();
-			m_CurGameTick = pInfo->m_Info.m_CurrentTick;
-			m_PrevGameTick = pInfo->m_PreviousTick;
-			m_GameIntraTick = pInfo->m_IntraTick;
-			m_GameTickTime = pInfo->m_TickTime;
-		}
-		else
-		{
-			// disconnect on error
-			Disconnect();
-		}
+		// disconnect on error
+		Disconnect();
 	}
 	else if(State() == IClient::STATE_ONLINE && m_ReceivedSnapshots >= 3)
 	{
@@ -1715,8 +1636,6 @@ void CClient::VersionUpdate()
 
 void CClient::RegisterInterfaces()
 {
-	Kernel()->RegisterInterface(static_cast<IDemoRecorder*>(&m_DemoRecorder));
-	Kernel()->RegisterInterface(static_cast<IDemoPlayer*>(&m_DemoPlayer));
 	Kernel()->RegisterInterface(static_cast<IServerBrowser*>(&m_ServerBrowser));
 	Kernel()->RegisterInterface(static_cast<IFriends*>(&m_Friends));
 	Kernel()->RegisterInterface(static_cast<IBlacklist*>(&m_Blacklist));
@@ -1738,8 +1657,6 @@ void CClient::InitInterfaces()
 	m_ServerBrowser.Init(&m_ContactClient, m_pGameClient->NetVersion());
 	m_Friends.Init();
 	m_Blacklist.Init();
-	m_DemoRecorder.Init(Console(), m_pStorage);
-	m_DemoPlayer.Init(Console(), m_pStorage);
 }
 
 bool CClient::LimitFps()
@@ -1819,8 +1736,6 @@ void CClient::Run()
 			Connect(m_aCmdConnect);
 			m_aCmdConnect[0] = 0;
 		}
-
-		AutoScreenshot_Cleanup();
 
 		// check conditions
 		if(State() == IClient::STATE_QUITING)
@@ -1902,144 +1817,15 @@ void CClient::Con_Ping(IConsole::IResult *pResult, void *pUserData)
 	pSelf->m_PingStartTime = time_get();
 }
 
-void CClient::AutoScreenshot_Start()
-{
-}
-
-void CClient::AutoStatScreenshot_Start()
-{
-}
-
-void CClient::AutoScreenshot_Cleanup()
-{
-	if(m_AutoScreenshotRecycle)
-	{
-		if(Config()->m_ClAutoScreenshotMax)
-		{
-			// clean up auto taken screens
-			CFileCollection AutoScreens;
-			AutoScreens.Init(Storage(), "screenshots/auto", "autoscreen", ".png", Config()->m_ClAutoScreenshotMax);
-		}
-		m_AutoScreenshotRecycle = false;
-	}
-	if(m_AutoStatScreenshotRecycle)
-	{
-		if(Config()->m_ClAutoScreenshotMax)
-		{
-			// clean up auto taken stat screens
-			CFileCollection AutoScreens;
-			AutoScreens.Init(Storage(), "screenshots/auto", "stat", ".png", Config()->m_ClAutoScreenshotMax);
-		}
-		m_AutoStatScreenshotRecycle = false;
-	}
-}
-
-void CClient::Con_Screenshot(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
 void CClient::Con_Rcon(IConsole::IResult *pResult, void *pUserData)
 {
 	CClient *pSelf = (CClient *)pUserData;
 	pSelf->Rcon(pResult->GetString(0));
 }
 
-void CClient::Con_RconAuth(IConsole::IResult *pResult, void *pUserData)
-{
-	CClient *pSelf = (CClient *)pUserData;
-	pSelf->RconAuth("", pResult->GetString(0));
-}
-
-const char *CClient::DemoPlayer_Play(const char *pFilename, int StorageType)
-{
-	Disconnect();
-	m_NetClient.ResetErrorString();
-
-	// try to start playback
-	m_DemoPlayer.SetListener(this);
-
-	const char *pError = m_DemoPlayer.Load(pFilename, StorageType, GameClient()->NetVersion());
-	if(pError)
-		return pError;
-
-	// load map
-	const unsigned Crc = bytes_be_to_uint(m_DemoPlayer.Info()->m_Header.m_aMapCrc);
-	pError = LoadMapSearch(m_DemoPlayer.Info()->m_Header.m_aMapName, 0, Crc);
-	if(pError)
-	{
-		DisconnectWithReason(pError);
-		return pError;
-	}
-
-	GameClient()->OnConnected();
-
-	// setup buffers
-	mem_zero(m_aDemorecSnapshotData, sizeof(m_aDemorecSnapshotData));
-
-	m_aSnapshots[SNAP_CURRENT] = &m_aDemorecSnapshotHolders[SNAP_CURRENT];
-	m_aSnapshots[SNAP_PREV] = &m_aDemorecSnapshotHolders[SNAP_PREV];
-
-	m_aSnapshots[SNAP_CURRENT]->m_pSnap = (CSnapshot *)m_aDemorecSnapshotData[SNAP_CURRENT][0];
-	m_aSnapshots[SNAP_CURRENT]->m_pAltSnap = (CSnapshot *)m_aDemorecSnapshotData[SNAP_CURRENT][1];
-	m_aSnapshots[SNAP_CURRENT]->m_SnapSize = 0;
-	m_aSnapshots[SNAP_CURRENT]->m_Tick = -1;
-
-	m_aSnapshots[SNAP_PREV]->m_pSnap = (CSnapshot *)m_aDemorecSnapshotData[SNAP_PREV][0];
-	m_aSnapshots[SNAP_PREV]->m_pAltSnap = (CSnapshot *)m_aDemorecSnapshotData[SNAP_PREV][1];
-	m_aSnapshots[SNAP_PREV]->m_SnapSize = 0;
-	m_aSnapshots[SNAP_PREV]->m_Tick = -1;
-
-	// enter demo playback state
-	SetState(IClient::STATE_DEMOPLAYBACK);
-
-	m_DemoPlayer.Play();
-	GameClient()->OnEnterGame();
-
-	return 0;
-}
-
-void CClient::DemoRecorder_Start(const char *pFilename, bool WithTimestamp)
-{
-}
-
-void CClient::DemoRecorder_HandleAutoStart()
-{
-}
-
-void CClient::DemoRecorder_Stop(bool ErrorIfNotRecording)
-{
-}
-
-void CClient::DemoRecorder_AddDemoMarker()
-{
-}
-
-void CClient::Con_Record(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
-void CClient::Con_StopRecord(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
-void CClient::Con_AddDemoMarker(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
 void CClient::ServerBrowserUpdate()
 {
 	m_ServerBrowser.RequestResort();
-}
-
-void CClient::ConchainServerBrowserUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
-{
-	pfnCallback(pResult, pCallbackUserData);
-	if(pResult->NumArguments())
-		((CClient *)pUserData)->ServerBrowserUpdate();
-}
-
-void CClient::RegisterCommands()
-{
 }
 
 static CClient *CreateClient()
@@ -2149,9 +1935,6 @@ int main(int argc, const char **argv) // ignore_convention
 	pConsole->Init();
 	pEngineMasterServer->Init();
 	pEngineMasterServer->Load();
-
-	// register all console commands
-	pClient->RegisterCommands();
 
 	// init client's interfaces
 	pClient->InitInterfaces();

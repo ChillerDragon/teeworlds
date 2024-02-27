@@ -2,11 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/engine.h>
 #include <engine/contacts.h>
-#include <engine/demo.h>
 #include <engine/map.h>
 #include <engine/storage.h>
 #include <engine/serverbrowser.h>
-#include <engine/shared/demo.h>
 #include <engine/shared/config.h>
 
 #include <generated/protocol.h>
@@ -123,14 +121,9 @@ const char *CGameClient::GetItemName(int Type) const { return m_NetObjHandler.Ge
 bool CGameClient::IsXmas() const { return Config()->m_ClShowXmasHats == 2 || (Config()->m_ClShowXmasHats == 1 && m_IsXmasDay); }
 bool CGameClient::IsEaster() const { return Config()->m_ClShowEasterEggs == 2 || (Config()->m_ClShowEasterEggs == 1 && m_IsEasterDay); }
 
-bool CGameClient::IsDemoPlaybackPaused() const { return Client()->State() == IClient::STATE_DEMOPLAYBACK && DemoPlayer()->BaseInfo()->m_Paused; }
 float CGameClient::GetAnimationPlaybackSpeed() const
 {
-	if(IsWorldPaused() || IsDemoPlaybackPaused())
-		return 0.0f;
-	if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
-		return DemoPlayer()->BaseInfo()->m_Speed;
-	return 1.0f;
+	return 0.0f;
 }
 
 enum
@@ -210,8 +203,6 @@ void CGameClient::OnConsoleInit()
 	m_pConfig = Kernel()->RequestInterface<IConfigManager>()->Values();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
-	m_pDemoPlayer = Kernel()->RequestInterface<IDemoPlayer>();
-	m_pDemoRecorder = Kernel()->RequestInterface<IDemoRecorder>();
 	m_pServerBrowser = Kernel()->RequestInterface<IServerBrowser>();
 	m_pFriends = Kernel()->RequestInterface<IFriends>();
 	m_pBlacklist = Kernel()->RequestInterface<IBlacklist>();
@@ -418,15 +409,7 @@ void CGameClient::UpdatePositions()
 	// spectator position
 	if(m_Snap.m_SpecInfo.m_Active)
 	{
-		if(Client()->State() == IClient::STATE_DEMOPLAYBACK &&
-			DemoPlayer()->GetDemoType() == IDemoPlayer::DEMOTYPE_SERVER &&
-			m_Snap.m_SpecInfo.m_SpectatorID != -1)
-		{
-			m_Snap.m_SpecInfo.m_Position = GetCharPos(m_Snap.m_SpecInfo.m_SpectatorID);
-			m_LocalCharacterPos = m_Snap.m_SpecInfo.m_Position;
-			m_Snap.m_SpecInfo.m_UsePosition = true;
-		}
-		else if(
+		if(
 			m_Snap.m_pSpectatorInfo &&
 			(
 				Client()->State() == IClient::STATE_DEMOPLAYBACK ||
@@ -507,12 +490,9 @@ void CGameClient::OnRelease()
 
 void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 {
-	Client()->RecordGameMessage(true);
-
 	// special messages
 	if(MsgId == NETMSGTYPE_SV_TUNEPARAMS && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 	{
-		Client()->RecordGameMessage(false);
 		// unpack the new tuning
 		CTuningParams NewTuning;
 		int *pParams = (int *)&NewTuning;
@@ -692,7 +672,6 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 
 	if(MsgId == NETMSGTYPE_SV_CLIENTINFO && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 	{
-		Client()->RecordGameMessage(false);
 		CNetMsg_Sv_ClientInfo *pMsg = (CNetMsg_Sv_ClientInfo *)pRawMsg;
 
 		if(pMsg->m_Local)
@@ -718,15 +697,6 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 			if(m_LocalClientID != -1 && !pMsg->m_Silent)
 			{
 				DoEnterMessage(pMsg->m_pName, pMsg->m_ClientID, pMsg->m_Team);
-
-				if(m_pDemoRecorder->IsRecording())
-				{
-					CNetMsg_De_ClientEnter Msg;
-					Msg.m_pName = pMsg->m_pName;
-					Msg.m_ClientID = pMsg->m_ClientID;
-					Msg.m_Team = pMsg->m_Team;
-					Client()->SendPackMsg(&Msg, MSGFLAG_NOSEND|MSGFLAG_RECORD);
-				}
 			}
 		}
 
@@ -766,7 +736,6 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	}
 	else if(MsgId == NETMSGTYPE_SV_CLIENTDROP && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 	{
-		Client()->RecordGameMessage(false);
 		CNetMsg_Sv_ClientDrop *pMsg = (CNetMsg_Sv_ClientDrop *)pRawMsg;
 
 		if(m_LocalClientID == pMsg->m_ClientID || !m_aClients[pMsg->m_ClientID].m_Active)
@@ -797,7 +766,6 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	}
 	else if(MsgId == NETMSGTYPE_SV_SKINCHANGE && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 	{
-		Client()->RecordGameMessage(false);
 		CNetMsg_Sv_SkinChange *pMsg = (CNetMsg_Sv_SkinChange *)pRawMsg;
 
 		if(!m_aClients[pMsg->m_ClientID].m_Active)
@@ -817,7 +785,6 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	}
 	else if(MsgId == NETMSGTYPE_SV_GAMEINFO && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 	{
-		Client()->RecordGameMessage(false);
 		CNetMsg_Sv_GameInfo *pMsg = (CNetMsg_Sv_GameInfo *)pRawMsg;
 
 		m_GameInfo.m_GameFlags = pMsg->m_GameFlags;
@@ -828,7 +795,6 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	}
 	else if(MsgId == NETMSGTYPE_SV_SERVERSETTINGS && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 	{
-		Client()->RecordGameMessage(false);
 		CNetMsg_Sv_ServerSettings *pMsg = (CNetMsg_Sv_ServerSettings *)pRawMsg;
 
 		if(!m_ServerSettings.m_TeamLock && pMsg->m_TeamLock)
@@ -922,14 +888,10 @@ void CGameClient::OnEnterGame() {}
 
 void CGameClient::OnGameOver()
 {
-	if(Client()->State() != IClient::STATE_DEMOPLAYBACK)
-		Client()->AutoScreenshot_Start();
 }
 
 void CGameClient::OnStartGame()
 {
-	if(Client()->State() != IClient::STATE_DEMOPLAYBACK)
-		Client()->DemoRecorder_HandleAutoStart();
 }
 
 void CGameClient::OnRconLine(const char *pLine)
@@ -1288,24 +1250,15 @@ void CGameClient::OnNewSnapshot()
 	else
 	{
 		m_Snap.m_SpecInfo.m_Active = true;
-		if(Client()->State() == IClient::STATE_DEMOPLAYBACK && DemoPlayer()->GetDemoType() == IDemoPlayer::DEMOTYPE_SERVER &&
-			m_DemoSpecID != -1 && m_Snap.m_aCharacters[m_DemoSpecID].m_Active)
+		if (m_DemoSpecMode == SPEC_PLAYER)
 		{
-			m_Snap.m_SpecInfo.m_SpecMode = SPEC_PLAYER;
-			m_Snap.m_SpecInfo.m_SpectatorID = m_DemoSpecID;
+			m_Snap.m_SpecInfo.m_SpecMode = SPEC_FREEVIEW;
+			m_Snap.m_SpecInfo.m_SpectatorID = -1;
 		}
 		else
 		{
-			if (m_DemoSpecMode == SPEC_PLAYER)
-			{
-				m_Snap.m_SpecInfo.m_SpecMode = SPEC_FREEVIEW;
-				m_Snap.m_SpecInfo.m_SpectatorID = -1;
-			}
-			else
-			{
-				m_Snap.m_SpecInfo.m_SpecMode = m_DemoSpecMode;
-				m_Snap.m_SpecInfo.m_SpectatorID = m_DemoSpecID;
-			}
+			m_Snap.m_SpecInfo.m_SpecMode = m_DemoSpecMode;
+			m_Snap.m_SpecInfo.m_SpectatorID = m_DemoSpecID;
 		}
 	}
 
