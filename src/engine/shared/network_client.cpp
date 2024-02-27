@@ -72,17 +72,22 @@ int CNetClient::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 	{
 		// check for a chunk
 		if(m_RecvUnpacker.FetchChunk(pChunk))
+		{
+			dbg_msg("r", "no fetch");
 			return 1;
+		}
 
 		// TODO: empty the recvinfo
 		NETADDR Addr;
 		int Result = UnpackPacket(&Addr, m_RecvUnpacker.m_aBuffer, &m_RecvUnpacker.m_Data);
+		dbg_msg("r", "r=%d", Result);
 		// no more packets for now
 		if(Result > 0)
 			break;
 
 		if(!Result)
 		{
+			dbg_msg("recv", "connstate=%d", m_Connection.State());
 			if(m_Connection.State() != NET_CONNSTATE_OFFLINE && m_Connection.State() != NET_CONNSTATE_ERROR && net_addr_comp(m_Connection.PeerAddress(), &Addr, true) == 0)
 			{
 				if(m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr))
@@ -206,4 +211,3 @@ const char *CNetClient::ErrorString() const
 {
 	return m_Connection.ErrorString();
 }
-
