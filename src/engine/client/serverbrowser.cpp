@@ -564,7 +564,7 @@ void CServerBrowser::RequestImpl(const NETADDR &Addr, CServerEntry *pEntry)
 		net_addr_str(&Addr, aAddrStr, sizeof(aAddrStr), true);
 		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf),"requesting server info from %s", aAddrStr);
-		dbg_msg("client_srvbrowse", aBuf);
+		dbg_msg("client_srvbrowse", "%s", aBuf);
 	}
 
 	CPacker Packer;
