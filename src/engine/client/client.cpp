@@ -45,7 +45,6 @@
 	#include <windows.h>
 #endif
 
-#include "SDL.h"
 #ifdef main
 #undef main
 #endif
@@ -1664,17 +1663,6 @@ void CClient::Run()
 	m_LocalStartTime = time_get();
 	m_SnapshotParts = 0;
 
-	// init SDL
-	{
-		if(SDL_Init(0) < 0)
-		{
-			dbg_msg("client", "unable to init SDL base: %s", SDL_GetError());
-			return;
-		}
-
-		atexit(SDL_Quit); // ignore_convention
-	}
-
 	// open socket
 	{
 		NETADDR BindAddr;
@@ -1773,9 +1761,6 @@ void CClient::Run()
 	Disconnect();
 
 	m_ServerBrowser.SaveServerlist();
-
-	// shutdown SDL
-	SDL_Quit();
 }
 
 int64 CClient::TickStartTime(int Tick)

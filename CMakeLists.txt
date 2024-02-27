@@ -1396,8 +1396,6 @@ list(APPEND TARGETS_OWN engine-shared game-shared)
 if(CLIENT)
   # Sources
   set_src(ENGINE_CLIENT GLOB src/engine/client
-    backend_sdl.cpp
-    backend_sdl.h
     client.cpp
     client.h
     keynames.h
