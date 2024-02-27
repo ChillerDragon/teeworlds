@@ -1454,14 +1454,10 @@ if(CLIENT)
     components/nameplates.h
     components/notifications.cpp
     components/notifications.h
-    components/particles.cpp
-    components/particles.h
     components/players.cpp
     components/players.h
     components/scoreboard.cpp
     components/scoreboard.h
-    components/skins.cpp
-    components/skins.h
     components/spectator.cpp
     components/spectator.h
     components/stats.cpp

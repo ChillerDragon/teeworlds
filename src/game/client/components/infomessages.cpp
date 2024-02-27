@@ -11,7 +11,6 @@
 #include "infomessages.h"
 
 #include "chat.h"
-#include "skins.h"
 
 void CInfoMessages::OnReset()
 {

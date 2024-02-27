@@ -290,8 +290,6 @@ public:
 	class CGameConsole *m_pGameConsole;
 	class CBinds *m_pBinds;
 	class CBroadcast *m_pBroadcast;
-	class CParticles *m_pParticles;
-	class CSkins *m_pSkins;
 	class CCountryFlags *m_pCountryFlags;
 	class CChat *m_pChat;
 	class CDamageInd *m_pDamageind;

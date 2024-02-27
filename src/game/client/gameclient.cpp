@@ -33,11 +33,9 @@
 #include "components/menus.h"
 #include "components/motd.h"
 #include "components/notifications.h"
-#include "components/particles.h"
 #include "components/players.h"
 #include "components/nameplates.h"
 #include "components/scoreboard.h"
-#include "components/skins.h"
 #include "components/spectator.h"
 #include "components/stats.h"
 #include "components/voting.h"
@@ -86,8 +84,6 @@ static CMotd gs_Motd;
 static CBroadcast gs_Broadcast;
 static CGameConsole gs_GameConsole;
 static CBinds gs_Binds;
-static CParticles gs_Particles;
-static CSkins gs_Skins;
 static CCountryFlags gs_CountryFlags;
 static CHud gs_Hud;
 static CDebugHud gs_DebugHud;
@@ -203,8 +199,6 @@ void CGameClient::OnConsoleInit()
 	m_pBinds = &::gs_Binds;
 	m_pBroadcast = &::gs_Broadcast;
 	m_pGameConsole = &::gs_GameConsole;
-	m_pParticles = &::gs_Particles;
-	m_pSkins = &::gs_Skins;
 	m_pCountryFlags = &::gs_CountryFlags;
 	m_pChat = &::gs_Chat;
 	m_pCamera = &::gs_Camera;
@@ -220,10 +214,8 @@ void CGameClient::OnConsoleInit()
 	m_pStats = &::gs_Stats;
 
 	// make a list of all the systems, make sure to add them in the corrent render order
-	m_All.Add(m_pSkins);
 	m_All.Add(m_pCountryFlags);
 	m_All.Add(m_pEffects); // doesn't render anything, just updates effects
-	m_All.Add(m_pParticles); // doesn't render anything, just updates all the particles
 	m_All.Add(m_pBinds);
 	m_All.Add(&m_pBinds->m_SpecialBinds);
 	m_All.Add(m_pControls);
@@ -231,13 +223,10 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(m_pVoting);
 
 	m_All.Add(&gs_MapLayersBackGround); // first to render
-	m_All.Add(&m_pParticles->m_RenderTrail);
 	m_All.Add(m_pItems);
 	m_All.Add(&gs_Players);
 	m_All.Add(&gs_MapLayersForeGround);
-	m_All.Add(&m_pParticles->m_RenderExplosions);
 	m_All.Add(&gs_NamePlates);
-	m_All.Add(&m_pParticles->m_RenderGeneral);
 	m_All.Add(m_pDamageind);
 	m_All.Add(&gs_Hud);
 	m_All.Add(&gs_Spectator);
