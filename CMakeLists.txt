@@ -66,7 +66,6 @@ endif()
 option(CLIENT "Compile client" ON)
 option(HEADLESS_CLIENT "Build the client without graphics" OFF)
 option(DOWNLOAD_DEPENDENCIES "Download dependencies (only available on Windows)" ${AUTO_DEPENDENCIES_DEFAULT})
-option(DOWNLOAD_GTEST "Download and compile GTest if not found" ${AUTO_DEPENDENCIES_DEFAULT})
 option(PREFER_BUNDLED_LIBS "Prefer bundled libraries over system libraries" ${AUTO_DEPENDENCIES_DEFAULT})
 option(DEV "Don't generate stuff necessary for packaging" OFF)
 
@@ -278,7 +277,6 @@ endif()
 find_package(ZLIB)
 find_package(Crypto)
 find_package(Git)
-find_package(GTest)
 find_package(Pnglite)
 find_package(Threads)
 find_package(Wavpack)
@@ -337,19 +335,6 @@ if(NOT(Python3_FOUND))
   message(SEND_ERROR "You must install Python to compile Teeworlds")
 endif()
 
-if(NOT(GTEST_FOUND))
-  if(DOWNLOAD_GTEST)
-    if(GIT_FOUND)
-      message(STATUS "Automatically downloading GTest to be able to run tests")
-    else()
-      set(DOWNLOAD_GTEST OFF)
-      message(WARNING "To automatically download GTest, you have to install Git")
-    endif()
-  else()
-    message(STATUS "To run the tests, you have to install GTest")
-  endif()
-endif()
-
 if(TARGET_OS STREQUAL "windows")
   set(PLATFORM_CLIENT)
   set(PLATFORM_CLIENT_LIBS opengl32 winmm imm32)
@@ -376,71 +361,6 @@ else()
     set(PLATFORM_LIBS rt) # clock_gettime for glibc < 2.17
   else()
     set(PLATFORM_LIBS)
-  endif()
-endif()
-
-########################################################################
-# DOWNLOAD GTEST
-########################################################################
-
-if(NOT(GTEST_FOUND) AND DOWNLOAD_GTEST)
-  set(TEEWORLDS_GTEST_VERSION v1.13.0)
-  configure_file(cmake/Download_GTest_CMakeLists.txt.in googletest-download/CMakeLists.txt)
-  execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-    RESULT_VARIABLE result
-    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/googletest-download
-  )
-  if(result)
-    message(WARNING "CMake step for googletest failed: ${result}")
-    set(DOWNLOAD_GTEST OFF)
-  else()
-    execute_process(COMMAND ${CMAKE_COMMAND} --build .
-      RESULT_VARIABLE result
-      WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/googletest-download
-    )
-    if(result)
-      message(WARNING "Build step for googletest failed: ${result}")
-      set(DOWNLOAD_GTEST OFF)
-    else()
-      file(GLOB_RECURSE DDNET_GTEST_CMAKELISTS ${CMAKE_BINARY_DIR}/googletest-src/CMakeLists.txt)
-      foreach(file ${DDNET_GTEST_CMAKELISTS})
-        file(READ ${file} CONTENTS)
-        string(REPLACE "cmake_minimum_required(VERSION 2.6.4)" "cmake_minimum_required(VERSION 2.8.12...3.19.1)" CONTENTS "${CONTENTS}")
-        string(REPLACE "cmake_minimum_required(VERSION 2.6.4)" "cmake_minimum_required(VERSION 2.8.12...3.19.1)" CONTENTS "${CONTENTS}")
-        string(REPLACE "cmake_minimum_required(VERSION 2.8.8)" "cmake_minimum_required(VERSION 2.8.12...3.19.1)" CONTENTS "${CONTENTS}")
-        file(WRITE ${file} "${CONTENTS}")
-      endforeach()
-
-      # Prevent overriding the parent project's compiler/linker settings on Windows
-      set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-      # Add googletest directly to our build. This defines the gtest target.
-      add_subdirectory(
-        ${PROJECT_BINARY_DIR}/googletest-src
-        ${PROJECT_BINARY_DIR}/googletest-build
-        EXCLUDE_FROM_ALL
-      )
-
-      if(MSVC)
-        foreach(target gtest)
-          # `/w` disables all warnings. This is needed because `gtest` enables
-          # `/WX` (equivalent of `-Werror`) for some reason, breaking builds
-          # when MSVS adds new warnings.
-          target_compile_options(${target} PRIVATE /w)
-          if(POLICY CMP0091)
-            set_property(TARGET ${target} PROPERTY MSVC_RUNTIME_LIBRARY MultiThreaded$<${DBG}:Debug>)
-          else()
-            target_compile_options(${target} PRIVATE $<$<NOT:${DBG}>:/MT> $<${DBG}:/MTd>)
-          endif()
-        endforeach()
-      endif()
-
-      set(GTEST_LIBRARIES gtest)
-      set(GTEST_INCLUDE_DIRS)
-      if(CMAKE_VERSION VERSION_LESS 2.8.11)
-        set(GTEST_INCLUDE_DIRS "${gtest_SOURCE_DIR}/include")
-      endif()
-    endif()
   endif()
 endif()
 
@@ -1394,48 +1314,6 @@ endif()
 ########################################################################
 
 add_custom_target(everything DEPENDS ${TARGETS_OWN})
-
-########################################################################
-# TESTS
-########################################################################
-
-if(GTEST_FOUND OR DOWNLOAD_GTEST)
-  set_src(TESTS GLOB src/test
-    bytes_be.cpp
-    compression.cpp
-    datafile.cpp
-    fs.cpp
-    git_revision.cpp
-    hash.cpp
-    io.cpp
-    jsonwriter.cpp
-    sorted_array.cpp
-    storage.cpp
-    str.cpp
-    test.cpp
-    test.h
-    thread.cpp
-  )
-  set(TARGET_TESTRUNNER testrunner)
-  add_executable(${TARGET_TESTRUNNER} EXCLUDE_FROM_ALL
-    ${TESTS}
-    $<TARGET_OBJECTS:engine-shared>
-    $<TARGET_OBJECTS:game-shared>
-    ${DEPS}
-  )
-  target_link_libraries(${TARGET_TESTRUNNER} ${LIBS} ${GTEST_LIBRARIES})
-  target_include_directories(${TARGET_TESTRUNNER} PRIVATE ${GTEST_INCLUDE_DIRS})
-
-  list(APPEND TARGETS_OWN ${TARGET_TESTRUNNER})
-  list(APPEND TARGETS_LINK ${TARGET_TESTRUNNER})
-
-  add_custom_target(run_tests
-    COMMAND $<TARGET_FILE:${TARGET_TESTRUNNER}> ${TESTRUNNER_ARGS}
-    COMMENT Running tests
-    DEPENDS ${TARGET_TESTRUNER}
-    USES_TERMINAL
-  )
-endif()
 
 ########################################################################
 # INSTALLATION
