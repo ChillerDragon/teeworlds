@@ -143,7 +143,6 @@ public:
 		FILTER_EMPTY=32,
 		FILTER_FULL=64,
 		FILTER_SPECTATORS=128,
-		FILTER_FRIENDS=256,
 		FILTER_PW=512,
 		FILTER_FAVORITE=1024,
 		FILTER_COMPAT_VERSION=2048,
@@ -165,21 +164,12 @@ public:
 	virtual int NumClients() const = 0;
 	virtual const CServerInfo *Get(int Index) const = 0;
 
-	virtual int NumSortedServers(int Index) const = 0;
-	virtual int NumSortedPlayers(int Index) const = 0;
-	virtual const CServerInfo *SortedGet(int FilterIndex, int Index) const = 0;
-	virtual const void *GetID(int FilterIndex, int Index) const = 0;
 
 	virtual void AddFavorite(const CServerInfo *pInfo) = 0;
 	virtual void RemoveFavorite(const CServerInfo *pInfo) = 0;
 	virtual void UpdateFavoriteState(CServerInfo *pInfo) = 0;
 	virtual void SetFavoritePassword(const char *pAddress, const char *pPassword) = 0;
 	virtual const char *GetFavoritePassword(const char *pAddress) = 0;
-
-	virtual int AddFilter(const CServerFilterInfo *pFilterInfo) = 0;
-	virtual void SetFilter(int Index, const CServerFilterInfo *pFilterInfo) = 0;
-	virtual void GetFilter(int Index, CServerFilterInfo *pFilterInfo) = 0;
-	virtual void RemoveFilter(int Index) = 0;
 };
 
 #endif

@@ -1,7 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/engine.h>
-#include <engine/contacts.h>
 #include <engine/map.h>
 #include <engine/storage.h>
 #include <engine/serverbrowser.h>
@@ -204,8 +203,6 @@ void CGameClient::OnConsoleInit()
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	m_pServerBrowser = Kernel()->RequestInterface<IServerBrowser>();
-	m_pFriends = Kernel()->RequestInterface<IFriends>();
-	m_pBlacklist = Kernel()->RequestInterface<IBlacklist>();
 
 	// setup pointers
 	m_pBinds = &::gs_Binds;
@@ -264,31 +261,6 @@ void CGameClient::OnConsoleInit()
 	Console()->Register("team", "i[team]", CFGFLAG_CLIENT, ConTeam, this, "Switch team");
 	Console()->Register("kill", "", CFGFLAG_CLIENT, ConKill, this, "Respawn");
 	Console()->Register("ready_change", "", CFGFLAG_CLIENT, ConReadyChange, this, "Change ready state");
-
-	Console()->Chain("add_friend", ConchainFriendUpdate, this);
-	Console()->Chain("remove_friend", ConchainFriendUpdate, this);
-	Console()->Chain("add_ignore", ConchainBlacklistUpdate, this);
-	Console()->Chain("remove_ignore", ConchainBlacklistUpdate, this);
-	Console()->Chain("cl_show_xmas_hats", ConchainXmasHatUpdate, this);
-	Console()->Chain("player_color_body", ConchainSkinChange, this);
-	Console()->Chain("player_color_marking", ConchainSkinChange, this);
-	Console()->Chain("player_color_decoration", ConchainSkinChange, this);
-	Console()->Chain("player_color_hands", ConchainSkinChange, this);
-	Console()->Chain("player_color_feet", ConchainSkinChange, this);
-	Console()->Chain("player_color_eyes", ConchainSkinChange, this);
-	Console()->Chain("player_use_custom_color_body", ConchainSkinChange, this);
-	Console()->Chain("player_use_custom_color_marking", ConchainSkinChange, this);
-	Console()->Chain("player_use_custom_color_decoration", ConchainSkinChange, this);
-	Console()->Chain("player_use_custom_color_hands", ConchainSkinChange, this);
-	Console()->Chain("player_use_custom_color_feet", ConchainSkinChange, this);
-	Console()->Chain("player_use_custom_color_eyes", ConchainSkinChange, this);
-	Console()->Chain("player_skin", ConchainSkinChange, this);
-	Console()->Chain("player_skin_body", ConchainSkinChange, this);
-	Console()->Chain("player_skin_marking", ConchainSkinChange, this);
-	Console()->Chain("player_skin_decoration", ConchainSkinChange, this);
-	Console()->Chain("player_skin_hands", ConchainSkinChange, this);
-	Console()->Chain("player_skin_feet", ConchainSkinChange, this);
-	Console()->Chain("player_skin_eyes", ConchainSkinChange, this);
 
 	for(int i = 0; i < m_All.m_Num; i++)
 		m_All.m_paComponents[i]->m_pClient = this;
@@ -713,9 +685,9 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		}
 
 		// update friend state
-		m_aClients[pMsg->m_ClientID].m_Friend = Friends()->IsFriend(m_aClients[pMsg->m_ClientID].m_aName, m_aClients[pMsg->m_ClientID].m_aClan, true);
+		m_aClients[pMsg->m_ClientID].m_Friend = false;
 		// update chat ignore state
-		m_aClients[pMsg->m_ClientID].m_ChatIgnore = Blacklist()->IsIgnored(m_aClients[pMsg->m_ClientID].m_aName, m_aClients[pMsg->m_ClientID].m_aClan, true);
+		m_aClients[pMsg->m_ClientID].m_ChatIgnore = false;
 		if(m_aClients[pMsg->m_ClientID].m_ChatIgnore)
 		{
 			char aBuf[128];
@@ -1667,50 +1639,6 @@ void CGameClient::ConReadyChange(IConsole::IResult *pResult, void *pUserData)
 	CGameClient *pClient = static_cast<CGameClient *>(pUserData);
 	if(pClient->Client()->State() == IClient::STATE_ONLINE)
 		pClient->SendReadyChange();
-}
-
-void CGameClient::ConchainSkinChange(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
-{
-	pfnCallback(pResult, pCallbackUserData);
-	CGameClient *pClient = static_cast<CGameClient *>(pUserData);
-	if(pClient->Client()->State() == IClient::STATE_ONLINE && pResult->NumArguments())
-		pClient->SendSkinChange();
-}
-
-void CGameClient::ConchainFriendUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
-{
-	pfnCallback(pResult, pCallbackUserData);
-	CGameClient *pClient = static_cast<CGameClient *>(pUserData);
-	for(int i = 0; i < MAX_CLIENTS; ++i)
-	{
-		if(pClient->m_aClients[i].m_Active)
-			pClient->m_aClients[i].m_Friend = pClient->Friends()->IsFriend(pClient->m_aClients[i].m_aName, pClient->m_aClients[i].m_aClan, true);
-	}
-}
-
-void CGameClient::ConchainBlacklistUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
-{
-	pfnCallback(pResult, pCallbackUserData);
-	CGameClient *pClient = static_cast<CGameClient *>(pUserData);
-	for(int i = 0; i < MAX_CLIENTS; ++i)
-	{
-		if(pClient->m_aClients[i].m_Active)
-			pClient->m_aClients[i].m_ChatIgnore = pClient->Blacklist()->IsIgnored(pClient->m_aClients[i].m_aName, pClient->m_aClients[i].m_aClan, true);
-	}
-}
-
-void CGameClient::ConchainXmasHatUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
-{
-	pfnCallback(pResult, pCallbackUserData);
-	CGameClient *pClient = static_cast<CGameClient *>(pUserData);
-	if(pClient->Client()->State() != IClient::STATE_ONLINE)
-		return;
-
-	for(int i = 0; i < MAX_CLIENTS; ++i)
-	{
-		if(pClient->m_aClients[i].m_Active)
-			pClient->m_aClients[i].UpdateRenderInfo(pClient, i, true);
-	}
 }
 
 IGameClient *CreateGameClient()

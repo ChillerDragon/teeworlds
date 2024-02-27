@@ -11,7 +11,6 @@
 #include <engine/config.h>
 #include <engine/console.h>
 #include <engine/engine.h>
-#include <engine/contacts.h>
 #include <engine/masterserver.h>
 
 #include <mastersrv/mastersrv.h>

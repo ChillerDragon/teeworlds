@@ -5,7 +5,6 @@
 
 #include <engine/serverbrowser.h>
 #include "serverbrowser_entry.h"
-#include "serverbrowser_filter.h"
 
 class CServerBrowserFavorites
 {
@@ -46,7 +45,7 @@ public:
 
 	CServerBrowserFavorites();
 	void Init(class CNetClient *pNetClient, class IConsole *pConsole, class IEngine *pEngine, class IConfigManager *pConfigManager);
-	
+
 	bool AddFavoriteEx(const char *pHostname, const NETADDR *pAddr, bool DoCheck, const char *pPassword = 0);
 	CFavoriteServer *FindFavoriteByAddr(const NETADDR &Addr, int *Index);
 	CFavoriteServer *FindFavoriteByHostname(const char *pHostname, int *Index);

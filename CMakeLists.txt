@@ -1297,7 +1297,6 @@ set_src(ENGINE_INTERFACE GLOB src/engine
   client.h
   config.h
   console.h
-  contacts.h
   engine.h
   kernel.h
   keys.h
@@ -1401,16 +1400,12 @@ if(CLIENT)
     backend_sdl.h
     client.cpp
     client.h
-    contacts.cpp
-    contacts.h
     keynames.h
     serverbrowser.cpp
     serverbrowser.h
     serverbrowser_entry.h
     serverbrowser_fav.cpp
     serverbrowser_fav.h
-    serverbrowser_filter.cpp
-    serverbrowser_filter.h
   )
   set_src(GAME_CLIENT GLOB_RECURSE src/game/client
     animstate.cpp

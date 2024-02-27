@@ -38,8 +38,6 @@ class CGameClient : public IGameClient
 	class IConsole *m_pConsole;
 	class IStorage *m_pStorage;
 	class IServerBrowser *m_pServerBrowser;
-	class IFriends *m_pFriends;
-	class IBlacklist *m_pBlacklist;
 
 	CLayers m_Layers;
 	class CCollision m_Collision;
@@ -58,10 +56,6 @@ class CGameClient : public IGameClient
 	static void ConTeam(IConsole::IResult *pResult, void *pUserData);
 	static void ConKill(IConsole::IResult *pResult, void *pUserData);
 	static void ConReadyChange(IConsole::IResult *pResult, void *pUserData);
-	static void ConchainSkinChange(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainFriendUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainBlacklistUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainXmasHatUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 
 	void EvolveCharacter(CNetObj_Character *pCharacter, int Tick);
 
@@ -77,8 +71,6 @@ public:
 	class IServerBrowser *ServerBrowser() const { return m_pServerBrowser; }
 	class CLayers *Layers() { return &m_Layers; }
 	class CCollision *Collision() { return &m_Collision; }
-	class IFriends *Friends() { return m_pFriends; }
-	class IBlacklist *Blacklist() { return m_pBlacklist; }
 
 	const char *NetobjFailedOn() { return m_NetObjHandler.FailedObjOn(); }
 	int NetobjNumFailures() { return m_NetObjHandler.NumObjFailures(); }

@@ -6,7 +6,6 @@
 #include <engine/serverbrowser.h>
 #include "serverbrowser_entry.h"
 #include "serverbrowser_fav.h"
-#include "serverbrowser_filter.h"
 
 class CServerBrowser : public IServerBrowser
 {
@@ -17,7 +16,7 @@ public:
 		SET_FAV_ADD,
 		SET_TOKEN,
 	};
-		
+
 	CServerBrowser();
 	void Init(class CNetClient *pClient, const char *pNetVersion);
 	void Set(const NETADDR &Addr, int SetType, int Token, const CServerInfo *pInfo);
@@ -38,24 +37,14 @@ public:
 	int NumClients() const { return m_aServerlist[m_ActServerlistType].m_NumClients; }
 	const CServerInfo *Get(int Index) const { return &m_aServerlist[m_ActServerlistType].m_ppServerlist[Index]->m_Info; }
 
-	int NumSortedServers(int FilterIndex) const { return m_ServerBrowserFilter.GetNumSortedServers(FilterIndex); }
-	int NumSortedPlayers(int FilterIndex) const { return m_ServerBrowserFilter.GetNumSortedPlayers(FilterIndex); }
-	const CServerInfo *SortedGet(int FilterIndex, int Index) const { return &m_aServerlist[m_ActServerlistType].m_ppServerlist[m_ServerBrowserFilter.GetIndex(FilterIndex, Index)]->m_Info; }
-	const void *GetID(int FilterIndex, int Index) const { return m_ServerBrowserFilter.GetID(FilterIndex, Index); }
-
 	void AddFavorite(const CServerInfo *pInfo);
 	void RemoveFavorite(const CServerInfo *pInfo);
 	void UpdateFavoriteState(CServerInfo *pInfo);
 	void SetFavoritePassword(const char *pAddress, const char *pPassword);
 	const char *GetFavoritePassword(const char *pAddress);
 
-	int AddFilter(const CServerFilterInfo *pFilterInfo) { return m_ServerBrowserFilter.AddFilter(pFilterInfo); }
-	void SetFilter(int Index, const CServerFilterInfo *pFilterInfo) { m_ServerBrowserFilter.SetFilter(Index, pFilterInfo); }
-	void GetFilter(int Index, CServerFilterInfo *pFilterInfo) { m_ServerBrowserFilter.GetFilter(Index, pFilterInfo); }
-	void RemoveFilter(int Index) { m_ServerBrowserFilter.RemoveFilter(Index); }
-
 	static void CBFTrackPacket(int TrackID, void *pUser);
-	
+
 	void LoadServerlist();
 	void SaveServerlist();
 
@@ -68,7 +57,6 @@ private:
 	class IMapChecker *m_pMapChecker;
 
 	class CServerBrowserFavorites m_ServerBrowserFavorites;
-	class CServerBrowserFilter m_ServerBrowserFilter;
 
 	class CConfig *Config() const { return m_pConfig; }
 	class IConsole *Console() const { return m_pConsole; }
@@ -85,7 +73,7 @@ private:
 		int m_NumPlayers;
 		int m_NumServers;
 		int m_NumServerCapacity;
-	
+
 		CServerEntry *m_aServerlistIp[256]; // ip hash list
 		CServerEntry **m_ppServerlist;
 

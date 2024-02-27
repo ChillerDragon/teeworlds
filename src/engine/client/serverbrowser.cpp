@@ -15,7 +15,6 @@
 #include <engine/config.h>
 #include <engine/console.h>
 #include <engine/engine.h>
-#include <engine/contacts.h>
 #include <engine/masterserver.h>
 #include <engine/storage.h>
 
@@ -95,7 +94,6 @@ void CServerBrowser::Init(class CNetClient *pNetClient, const char *pNetVersion)
 	m_pNetClient = pNetClient;
 
 	m_ServerBrowserFavorites.Init(pNetClient, m_pConsole, Kernel()->RequestInterface<IEngine>(), pConfigManager);
-	m_ServerBrowserFilter.Init(Config(), Kernel()->RequestInterface<IFriends>(), pNetVersion);
 }
 
 void CServerBrowser::Set(const NETADDR &Addr, int SetType, int Token, const CServerInfo *pInfo)
@@ -265,7 +263,6 @@ void CServerBrowser::Update()
 		}
 	}
 
-	m_ServerBrowserFilter.Sort(m_aServerlist[m_ActServerlistType].m_ppServerlist, m_aServerlist[m_ActServerlistType].m_NumServers, m_NeedResort ? CServerBrowserFilter::RESORT_FLAG_FORCE : 0);
 	m_NeedResort = false;
 }
 
@@ -276,7 +273,6 @@ void CServerBrowser::SetType(int Type)
 		return;
 
 	m_ActServerlistType = Type;
-	m_ServerBrowserFilter.Sort(m_aServerlist[m_ActServerlistType].m_ppServerlist, m_aServerlist[m_ActServerlistType].m_NumServers, CServerBrowserFilter::RESORT_FLAG_FORCE);
 }
 
 void CServerBrowser::Refresh(int RefreshFlags)
@@ -290,8 +286,6 @@ void CServerBrowser::Refresh(int RefreshFlags)
 	{
 		// clear out everything
 		m_aServerlist[IServerBrowser::TYPE_LAN].Clear();
-		if(m_ActServerlistType == IServerBrowser::TYPE_LAN)
-			m_ServerBrowserFilter.Clear();
 
 		// next token
 		m_CurrentLanToken = GetNewToken();
@@ -329,8 +323,6 @@ void CServerBrowser::Refresh(int RefreshFlags)
 			m_pNetClient->PurgeStoredPacket(pEntry->m_TrackID);
 		}
 		m_aServerlist[IServerBrowser::TYPE_INTERNET].Clear();
-		if(m_ActServerlistType == IServerBrowser::TYPE_INTERNET)
-			m_ServerBrowserFilter.Clear();
 		m_pFirstReqServer = 0;
 		m_pLastReqServer = 0;
 		m_NumRequests = 0;
@@ -371,9 +363,6 @@ void CServerBrowser::AddFavorite(const CServerInfo *pInfo)
 			{
 				pEntry->m_Info.m_Favorite = true;
 
-				// refresh servers in all filters where favorites are filtered
-				if(i == m_ActServerlistType)
-					m_ServerBrowserFilter.Sort(m_aServerlist[m_ActServerlistType].m_ppServerlist, m_aServerlist[m_ActServerlistType].m_NumServers, CServerBrowserFilter::RESORT_FLAG_FAV);
 			}
 		}
 	}
@@ -390,9 +379,6 @@ void CServerBrowser::RemoveFavorite(const CServerInfo *pInfo)
 			{
 				pEntry->m_Info.m_Favorite = false;
 
-				// refresh servers in all filters where favorites are filtered
-				if(i == m_ActServerlistType)
-					m_ServerBrowserFilter.Sort(m_aServerlist[m_ActServerlistType].m_ppServerlist, m_aServerlist[m_ActServerlistType].m_NumServers, CServerBrowserFilter::RESORT_FLAG_FAV);
 			}
 		}
 	}
@@ -418,9 +404,6 @@ void CServerBrowser::SetFavoritePassword(const char *pAddress, const char *pPass
 			{
 				pEntry->m_Info.m_Favorite = true;
 
-				// refresh servers in all filters where favorites are filtered
-				if(i == m_ActServerlistType)
-					m_ServerBrowserFilter.Sort(m_aServerlist[m_ActServerlistType].m_ppServerlist, m_aServerlist[m_ActServerlistType].m_NumServers, CServerBrowserFilter::RESORT_FLAG_FAV);
 			}
 		}
 	}
