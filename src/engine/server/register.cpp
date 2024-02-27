@@ -270,7 +270,7 @@ int CRegister::RegisterProcessPacket(CNetChunk *pPacket, TOKEN Token)
 		dbg_msg("register", "ERROR: the master server reports that clients can not connect to this server.");
 		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf), "ERROR: configure your firewall/nat to let through udp on port %d.", m_pConfig->m_SvPort);
-		dbg_msg("register", aBuf);
+		dbg_msg("register", "%s", aBuf);
 		RegisterNewState(REGISTERSTATE_ERROR);
 		return 1;
 	}
