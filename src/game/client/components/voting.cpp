@@ -203,21 +203,15 @@ void CVoting::OnMessage(int MsgType, void *pRawMsg)
 					break;
 				case VOTE_START_KICK:
 					{
-						char aName[4];
-						if(!Config()->m_ClShowsocial)
-							str_copy(aName, pMsg->m_pDescription, sizeof(aName));
-						str_format(aBuf, sizeof(aBuf), Localize("'%s' called for vote to kick '%s' (%s)"), aLabel, Config()->m_ClShowsocial ? pMsg->m_pDescription : aName, pMsg->m_pReason);
-						str_format(m_aDescription, sizeof(m_aDescription), "Kick '%s'", Config()->m_ClShowsocial ? pMsg->m_pDescription : aName);
+						str_format(aBuf, sizeof(aBuf), Localize("'%s' called for vote to kick '%s' (%s)"), aLabel, pMsg->m_pDescription, pMsg->m_pReason);
+						str_format(m_aDescription, sizeof(m_aDescription), "Kick '%s'", pMsg->m_pDescription);
 						m_pClient->m_pChat->AddLine(aBuf);
 						break;
 					}
 				case VOTE_START_SPEC:
 					{
-						char aName[4];
-						if(!Config()->m_ClShowsocial)
-							str_copy(aName, pMsg->m_pDescription, sizeof(aName));
-						str_format(aBuf, sizeof(aBuf), Localize("'%s' called for vote to move '%s' to spectators (%s)"), aLabel, Config()->m_ClShowsocial ? pMsg->m_pDescription : aName, pMsg->m_pReason);
-						str_format(m_aDescription, sizeof(m_aDescription), "Move '%s' to spectators", Config()->m_ClShowsocial ? pMsg->m_pDescription : aName);
+						str_format(aBuf, sizeof(aBuf), Localize("'%s' called for vote to move '%s' to spectators (%s)"), aLabel, pMsg->m_pDescription, pMsg->m_pReason);
+						str_format(m_aDescription, sizeof(m_aDescription), "Move '%s' to spectators", pMsg->m_pDescription);
 						m_pClient->m_pChat->AddLine(aBuf);
 					}
 				}

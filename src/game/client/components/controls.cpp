@@ -102,8 +102,7 @@ void CControls::OnMessage(int Msg, void *pRawMsg)
 	if(Msg == NETMSGTYPE_SV_WEAPONPICKUP)
 	{
 		CNetMsg_Sv_WeaponPickup *pMsg = (CNetMsg_Sv_WeaponPickup *)pRawMsg;
-		if(Config()->m_ClAutoswitchWeapons)
-			m_InputData.m_WantedWeapon = pMsg->m_Weapon+1;
+		m_InputData.m_WantedWeapon = pMsg->m_Weapon+1; // auto switch
 	}
 }
 
@@ -182,45 +181,4 @@ int CControls::SnapInput(int *pData)
 
 void CControls::OnRender()
 {
-	ClampMousePos();
-
-	// update target pos
-	if(m_pClient->m_Snap.m_pGameData && !m_pClient->m_Snap.m_SpecInfo.m_Active)
-		m_TargetPos = m_pClient->m_LocalCharacterPos + m_MousePos;
-	else if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
-		m_TargetPos = m_pClient->m_Snap.m_SpecInfo.m_Position + m_MousePos;
-	else
-		m_TargetPos = m_MousePos;
-}
-
-bool CControls::OnCursorMove(float x, float y, int CursorType)
-{
-	return true;
-}
-
-void CControls::ClampMousePos()
-{
-	if(m_pClient->m_Snap.m_SpecInfo.m_Active && !m_pClient->m_Snap.m_SpecInfo.m_UsePosition)
-	{
-		m_MousePos.x = clamp(m_MousePos.x, 200.0f, Collision()->GetWidth()*32-200.0f);
-		m_MousePos.y = clamp(m_MousePos.y, 200.0f, Collision()->GetHeight()*32-200.0f);
-	}
-	else
-	{
-		const float MouseMax = GetMaxMouseDistance();
-		if(dot(m_MousePos, m_MousePos) > MouseMax * MouseMax)
-			m_MousePos = normalize(m_MousePos) * MouseMax;
-	}
-}
-
-float CControls::GetMaxMouseDistance() const
-{
-	if(Config()->m_ClDynamicCamera)
-	{
-		float CameraMaxDistance = 200.0f;
-		float FollowFactor = Config()->m_ClMouseFollowfactor/100.0f;
-		return minimum(CameraMaxDistance/FollowFactor + Config()->m_ClMouseDeadzone, (float)Config()->m_ClMouseMaxDistanceDynamic);
-	}
-	else
-		return (float)Config()->m_ClMouseMaxDistanceStatic;
 }

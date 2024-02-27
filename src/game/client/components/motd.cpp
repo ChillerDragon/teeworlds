@@ -44,8 +44,9 @@ void CMotd::OnMessage(int MsgType, void *pRawMsg)
 			}
 		}
 
-		if(m_aServerMotd[0] && Config()->m_ClMotdTime)
-			m_ServerMotdTime = time_get()+time_freq()*Config()->m_ClMotdTime;
+		int ClMotdTime = 10;
+		if(m_aServerMotd[0] && ClMotdTime)
+			m_ServerMotdTime = time_get()+time_freq()*ClMotdTime;
 		else
 			m_ServerMotdTime = 0;
 	}

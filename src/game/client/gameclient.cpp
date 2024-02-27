@@ -117,8 +117,6 @@ const char *CGameClient::NetVersionHashUsed() const { return GAME_NETVERSION_HAS
 const char *CGameClient::NetVersionHashReal() const{ return GAME_NETVERSION_HASH; }
 int CGameClient::ClientVersion() const { return CLIENT_VERSION; }
 const char *CGameClient::GetItemName(int Type) const { return m_NetObjHandler.GetObjName(Type); }
-bool CGameClient::IsXmas() const { return Config()->m_ClShowXmasHats == 2 || (Config()->m_ClShowXmasHats == 1 && m_IsXmasDay); }
-bool CGameClient::IsEaster() const { return Config()->m_ClShowEasterEggs == 2 || (Config()->m_ClShowEasterEggs == 1 && m_IsEasterDay); }
 
 float CGameClient::GetAnimationPlaybackSpeed() const
 {
@@ -150,12 +148,9 @@ static int GetStrTeam(int Team, bool Teamplay)
 
 void CGameClient::GetPlayerLabel(char* aBuf, int BufferSize, int ClientID, const char* ClientName)
 {
-	if(!Config()->m_ClShowsocial)
-		str_format(aBuf, BufferSize, "%2d:", ClientID);
-	else if(Config()->m_ClShowUserId)
-		str_format(aBuf, BufferSize, "%2d: %s", ClientID, ClientName);
-	else
-		str_format(aBuf, BufferSize, "%s", ClientName);
+	// str_format(aBuf, BufferSize, "%2d:", ClientID);
+	// str_format(aBuf, BufferSize, "%2d: %s", ClientID, ClientName);
+	str_format(aBuf, BufferSize, "%s", ClientName);
 }
 
 enum
@@ -1454,8 +1449,9 @@ bool CGameClient::ShouldUsePredicted() const
 	// - Viewing a demo
 	// - When the game is paused or waiting
 	// - When we are spectating
+	bool Predict = false;
 	return
-		Config()->m_ClPredict &&
+		Predict &&
 		Client()->State() != IClient::STATE_DEMOPLAYBACK &&
 		!IsWorldPaused() &&
 		!m_Snap.m_SpecInfo.m_Active &&
@@ -1464,7 +1460,8 @@ bool CGameClient::ShouldUsePredicted() const
 
 bool CGameClient::ShouldUsePredictedChar(int ClientID) const
 {
-	return ClientID == m_LocalClientID || Config()->m_ClPredictPlayers;
+	bool PredictPlayers = true;
+	return ClientID == m_LocalClientID || PredictPlayers;
 }
 
 void CGameClient::UsePredictedChar(
