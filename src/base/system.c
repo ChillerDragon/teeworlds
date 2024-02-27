@@ -2556,7 +2556,7 @@ int mem_comp(const void *a, const void *b, int size)
 int mem_has_null(const void *block, unsigned size)
 {
 	const unsigned char *bytes = block;
-	unsigned i;        
+	unsigned i;
 	for(i = 0; i < size; i++)
 	{
 		if(bytes[i] == 0)
@@ -3007,6 +3007,11 @@ void uint_to_bytes_be(unsigned char *bytes, unsigned value)
 	bytes[1] = (value >> 16u) & 0xffu;
 	bytes[2] = (value >> 8u) & 0xffu;
 	bytes[3] = value & 0xffu;
+}
+
+const char *Localize(const char *pStr, const char *pContext)
+{
+	return pStr;
 }
 
 

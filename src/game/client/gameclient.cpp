@@ -10,7 +10,6 @@
 #include <generated/client_data.h>
 
 #include <game/version.h>
-#include "localization.h"
 #include "render.h"
 
 #include "gameclient.h"
@@ -266,9 +265,6 @@ void CGameClient::OnInit()
 	int TotalWorkAmount = 0;
 	for(int i = m_All.m_Num-1; i >= 0; --i)
 		TotalWorkAmount += m_All.m_paComponents[i]->GetInitAmount();
-
-	// set the language
-	g_Localization.Load(Config()->m_ClLanguagefile, Storage(), Console());
 
 	// init all components
 	for(int i = m_All.m_Num-1; i >= 0; --i)

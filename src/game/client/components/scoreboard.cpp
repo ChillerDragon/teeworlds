@@ -9,7 +9,6 @@
 
 #include <game/client/animstate.h>
 #include <game/client/gameclient.h>
-#include <game/client/localization.h>
 #include <game/client/components/countryflags.h>
 #include <game/client/components/motd.h>
 #include <game/client/components/stats.h>

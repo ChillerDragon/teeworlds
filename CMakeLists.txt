@@ -1462,8 +1462,6 @@ if(CLIENT)
     components/voting.h
     gameclient.cpp
     gameclient.h
-    localization.cpp
-    localization.h
     render.cpp
     render.h
   )

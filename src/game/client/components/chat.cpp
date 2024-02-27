@@ -12,7 +12,6 @@
 #include <generated/client_data.h>
 
 #include <game/client/gameclient.h>
-#include <game/client/localization.h>
 
 #include <game/client/components/scoreboard.h>
 
