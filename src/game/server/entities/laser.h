@@ -3,12 +3,13 @@
 #ifndef GAME_SERVER_ENTITIES_LASER_H
 #define GAME_SERVER_ENTITIES_LASER_H
 
-#include <game/server/entity.h>
+#include <base/vmath.h>
 
-class CLaser : public CEntity
+class CLaser
 {
 public:
-	CLaser(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, float StartEnergy, int Owner);
+	vec2 m_Pos;
+	CLaser(vec2 Pos, vec2 Direction, float StartEnergy, int Owner);
 
 	virtual void Reset();
 	virtual void Tick();

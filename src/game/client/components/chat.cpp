@@ -5,7 +5,6 @@
 
 
 #include <engine/keys.h>
-#include <engine/serverbrowser.h>
 #include <engine/shared/config.h>
 
 #include <generated/protocol.h>
@@ -17,7 +16,6 @@
 
 #include "menus.h"
 #include "chat.h"
-#include "binds.h"
 
 CChat::CChat()
 {
@@ -39,37 +37,9 @@ void CChat::OnStateChange(int NewState, int OldState)
 {
 }
 
-void CChat::ConSay(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
-void CChat::ConSayTeam(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
-void CChat::ConSaySelf(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
-void CChat::ConWhisper(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
-void CChat::ConChat(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
-void CChat::ConShowChat(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
-void CChat::ConChatCommand(IConsole::IResult *pResult, void *pUserData)
-{
-}
 
 void CChat::OnInit()
 {
-	m_CommandManager.Init(Console());
 }
 
 void CChat::OnConsoleInit()
@@ -92,10 +62,6 @@ void CChat::ClearInput()
 {
 }
 
-void CChat::ServerCommandCallback(IConsole::IResult *pResult, void *pContext)
-{
-}
-
 void CChat::OnMessage(int MsgType, void *pRawMsg)
 {
 	if(MsgType == NETMSGTYPE_SV_CHAT)
@@ -108,20 +74,13 @@ void CChat::OnMessage(int MsgType, void *pRawMsg)
 	else if(MsgType == NETMSGTYPE_SV_COMMANDINFO)
 	{
 		CNetMsg_Sv_CommandInfo *pMsg = (CNetMsg_Sv_CommandInfo *)pRawMsg;
-		if(!m_CommandManager.AddCommand(pMsg->m_Name, pMsg->m_HelpText, pMsg->m_ArgsFormat, ServerCommandCallback, this))
-			dbg_msg("chat_commands", "adding server chat command: name='%s' args='%s' help='%s'", pMsg->m_Name, pMsg->m_ArgsFormat, pMsg->m_HelpText);
-		else
-			dbg_msg("chat_commands", "failed to add command '%s'", pMsg->m_Name);
-
+		dbg_msg("chat_commands", "adding server chat command: name='%s' args='%s' help='%s'", pMsg->m_Name, pMsg->m_ArgsFormat, pMsg->m_HelpText);
 	}
 	else if(MsgType == NETMSGTYPE_SV_COMMANDINFOREMOVE)
 	{
 		CNetMsg_Sv_CommandInfoRemove *pMsg = (CNetMsg_Sv_CommandInfoRemove *)pRawMsg;
 
-		if(!m_CommandManager.RemoveCommand(pMsg->m_Name))
-		{
-			dbg_msg("chat_commands", "removed chat command: name='%s'", pMsg->m_Name);
-		}
+		dbg_msg("chat_commands", "removed chat command: name='%s'", pMsg->m_Name);
 	}
 }
 
@@ -181,32 +140,6 @@ bool CChat::CompleteCommand()
 {
 	return true;
 }
-
-// callback functions for commands
-void CChat::Com_All(IConsole::IResult *pResult, void *pContext)
-{
-}
-
-void CChat::Com_Team(IConsole::IResult *pResult, void *pContext)
-{
-}
-
-void CChat::Com_Reply(IConsole::IResult *pResult, void *pContext)
-{
-}
-
-void CChat::Com_Whisper(IConsole::IResult *pResult, void *pContext)
-{
-}
-
-void CChat::Com_Mute(IConsole::IResult *pResult, void *pContext)
-{
-}
-
-void CChat::Com_Befriend(IConsole::IResult *pResult, void *pContext)
-{
-}
-
 
 int CChat::FilterChatCommands(const char *pLine)
 {

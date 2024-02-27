@@ -8,6 +8,40 @@
 #include "player.h"
 
 
+inline void StrToInts(int *pInts, int Num, const char *pStr)
+{
+       int Index = 0;
+       while(Num)
+       {
+               char aBuf[4] = {0,0,0,0};
+               for(int c = 0; c < 4 && pStr[Index]; c++, Index++)
+                       aBuf[c] = pStr[Index];
+               *pInts = ((aBuf[0]+128)<<24)|((aBuf[1]+128)<<16)|((aBuf[2]+128)<<8)|(aBuf[3]+128);
+               pInts++;
+               Num--;
+       }
+
+       // null terminate
+       pInts[-1] &= 0xffffff00;
+}
+
+inline void IntsToStr(const int *pInts, int Num, char *pStr)
+{
+       while(Num)
+       {
+               pStr[0] = (((*pInts)>>24)&0xff)-128;
+               pStr[1] = (((*pInts)>>16)&0xff)-128;
+               pStr[2] = (((*pInts)>>8)&0xff)-128;
+               pStr[3] = ((*pInts)&0xff)-128;
+               pStr += 4;
+               pInts++;
+               Num--;
+       }
+
+       // null terminate
+       pStr[-1] = 0;
+}
+
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS)
 
 IServer *CPlayer::Server() const { return m_pGameServer->Server(); }
@@ -234,12 +268,6 @@ void CPlayer::OnPredictedInput(CNetObj_PlayerInput *NewInput)
 
 void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 {
-	if(GameServer()->m_World.m_Paused)
-	{
-		m_PlayerFlags = NewInput->m_PlayerFlags;
-		return;
-	}
-
 	if(NewInput->m_PlayerFlags&PLAYERFLAG_CHATTING)
 	{
 		// skip the input if chat is active
@@ -261,42 +289,6 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 
 	if(!m_pCharacter && m_Team != TEAM_SPECTATORS && (NewInput->m_Fire&1))
 		Respawn();
-
-	if(!m_pCharacter && m_Team == TEAM_SPECTATORS && (NewInput->m_Fire&1))
-	{
-		if(!m_ActiveSpecSwitch)
-		{
-			m_ActiveSpecSwitch = true;
-			if(m_SpecMode == SPEC_FREEVIEW)
-			{
-				CCharacter *pChar = (CCharacter *)GameServer()->m_World.ClosestEntity(m_ViewPos, 6.0f*32, CGameWorld::ENTTYPE_CHARACTER, 0);
-				CFlag *pFlag = (CFlag *)GameServer()->m_World.ClosestEntity(m_ViewPos, 6.0f*32, CGameWorld::ENTTYPE_FLAG, 0);
-				if(pChar || pFlag)
-				{
-					if(!pChar || (pFlag && pChar && distance(m_ViewPos, pFlag->GetPos()) < distance(m_ViewPos, pChar->GetPos())))
-					{
-						m_SpecMode = pFlag->GetTeam() == TEAM_RED ? SPEC_FLAGRED : SPEC_FLAGBLUE;
-						m_pSpecFlag = pFlag;
-						m_SpectatorID = -1;
-					}
-					else
-					{
-						m_SpecMode = SPEC_PLAYER;
-						m_pSpecFlag = 0;
-						m_SpectatorID = pChar->GetPlayer()->GetCID();
-					}
-				}
-			}
-			else
-			{
-				m_SpecMode = SPEC_FREEVIEW;
-				m_pSpecFlag = 0;
-				m_SpectatorID = -1;
-			}
-		}
-	}
-	else if(m_ActiveSpecSwitch)
-		m_ActiveSpecSwitch = false;
 
 	// check for activity
 	if(NewInput->m_Direction || m_LatestActivity.m_TargetX != NewInput->m_TargetX ||
@@ -347,56 +339,6 @@ void CPlayer::Respawn()
 
 bool CPlayer::SetSpectatorID(int SpecMode, int SpectatorID)
 {
-	if((SpecMode == m_SpecMode && SpecMode != SPEC_PLAYER) ||
-		(m_SpecMode == SPEC_PLAYER && SpecMode == SPEC_PLAYER && (SpectatorID == -1 || m_SpectatorID == SpectatorID || m_ClientID == SpectatorID)))
-	{
-		return false;
-	}
-
-	if(m_Team == TEAM_SPECTATORS)
-	{
-		// check for freeview or if wanted player is playing
-		if(SpecMode != SPEC_PLAYER || (SpecMode == SPEC_PLAYER && GameServer()->m_apPlayers[SpectatorID] && GameServer()->m_apPlayers[SpectatorID]->GetTeam() != TEAM_SPECTATORS))
-		{
-			if(SpecMode == SPEC_FLAGRED || SpecMode == SPEC_FLAGBLUE)
-			{
-				CFlag *pFlag = (CFlag*)GameServer()->m_World.FindFirst(CGameWorld::ENTTYPE_FLAG);
-				while (pFlag)
-				{
-					if ((pFlag->GetTeam() == TEAM_RED && SpecMode == SPEC_FLAGRED) || (pFlag->GetTeam() == TEAM_BLUE && SpecMode == SPEC_FLAGBLUE))
-					{
-						m_pSpecFlag = pFlag;
-						if (pFlag->GetCarrier())
-							m_SpectatorID = pFlag->GetCarrier()->GetPlayer()->GetCID();
-						else
-							m_SpectatorID = -1;
-						break;
-					}
-					pFlag = (CFlag*)pFlag->TypeNext();
-				}
-				if (!m_pSpecFlag)
-					return false;
-				m_SpecMode = SpecMode;
-				return true;
-			}
-			m_pSpecFlag = 0;
-			m_SpecMode = SpecMode;
-			m_SpectatorID = SpectatorID;
-			return true;
-		}
-	}
-	else if(m_DeadSpecMode)
-	{
-		// check if wanted player can be followed
-		if(SpecMode == SPEC_PLAYER && GameServer()->m_apPlayers[SpectatorID] && DeadCanFollow(GameServer()->m_apPlayers[SpectatorID]))
-		{
-			m_SpecMode = SpecMode;
-			m_pSpecFlag = 0;
-			m_SpectatorID = SpectatorID;
-			return true;
-		}
-	}
-
 	return false;
 }
 
@@ -467,7 +409,7 @@ void CPlayer::TryRespawn()
 		return;
 
 	m_Spawning = false;
-	m_pCharacter = new(m_ClientID) CCharacter(&GameServer()->m_World);
+	m_pCharacter = new(m_ClientID) CCharacter();
 	m_pCharacter->Spawn(this, SpawnPos);
 	GameServer()->CreatePlayerSpawn(SpawnPos);
 }

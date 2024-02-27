@@ -9,21 +9,13 @@
 
 #include <game/client/animstate.h>
 #include <game/client/gameclient.h>
-#include <game/client/components/countryflags.h>
 #include <game/client/components/motd.h>
-#include <game/client/components/stats.h>
 
 #include "menus.h"
-#include "stats.h"
 #include "scoreboard.h"
-#include "stats.h"
 
 
 CScoreboard::CScoreboard()
-{
-}
-
-void CScoreboard::ConKeyScoreboard(IConsole::IResult *pResult, void *pUserData)
 {
 }
 

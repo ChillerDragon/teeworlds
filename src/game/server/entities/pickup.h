@@ -3,14 +3,13 @@
 #ifndef GAME_SERVER_ENTITIES_PICKUP_H
 #define GAME_SERVER_ENTITIES_PICKUP_H
 
-#include <game/server/entity.h>
-
 const int PickupPhysSize = 14;
 
-class CPickup : public CEntity
+class CPickup
 {
 public:
-	CPickup(CGameWorld *pGameWorld, int Type, vec2 Pos);
+	vec2 m_Pos;
+	CPickup(int Type, vec2 Pos);
 
 	virtual void Reset();
 	virtual void Tick();

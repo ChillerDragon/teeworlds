@@ -3,9 +3,7 @@
 #ifndef GAME_SERVER_ENTITIES_FLAG_H
 #define GAME_SERVER_ENTITIES_FLAG_H
 
-#include <game/server/entity.h>
-
-class CFlag : public CEntity
+class CFlag
 {
 private:
 	/* Identity */
@@ -20,11 +18,14 @@ private:
 	int m_DropTick;
 
 public:
+	vec2 m_Pos;
+	vec2 GetPos() { return m_Pos; }
+
 	/* Constants */
 	static int const ms_PhysSize = 14;
 
 	/* Constructor */
-	CFlag(CGameWorld *pGameWorld, int Team, vec2 StandPos);
+	CFlag(int Team, vec2 StandPos);
 
 	/* Getters */
 	int GetTeam() const				{ return m_Team; }
@@ -33,7 +34,6 @@ public:
 	int GetGrabTick() const			{ return m_GrabTick; }
 	int GetDropTick() const			{ return m_DropTick; }
 
-	/* CEntity functions */
 	virtual void Reset();
 	virtual void TickPaused();
 	virtual void Snap(int SnappingClient);

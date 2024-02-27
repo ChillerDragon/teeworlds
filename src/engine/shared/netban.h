@@ -68,7 +68,7 @@ protected:
 		int m_Hash;
 		int m_HashIndex;	// matching parts for ranges, 0 for addr
 
-		CNetHash() {}	
+		CNetHash() {}
 		CNetHash(const NETADDR *pAddr);
 		CNetHash(const CNetRange *pRange);
 
@@ -84,7 +84,7 @@ protected:
 		};
 		int m_Expires;
 		int m_LastInfoQuery;
-		char m_aReason[REASON_LENGTH];		
+		char m_aReason[REASON_LENGTH];
 	};
 
 	template<class T> struct CBan
@@ -111,7 +111,7 @@ protected:
 		int Remove(CBan<CDataType> *pBan);
 		void Update(CBan<CDataType> *pBan, const CBanInfo *pInfo);
 		void Reset();
-	
+
 		int Num() const { return m_CountUsed; }
 		bool IsFull() const { return m_CountUsed == MAX_BANS; }
 
@@ -146,12 +146,11 @@ protected:
 	typedef CBanPool<CNetRange, 16> CBanRangePool;
 	typedef CBan<NETADDR> CBanAddr;
 	typedef CBan<CNetRange> CBanRange;
-	
+
 	template<class T> void MakeBanInfo(CBan<T> *pBan, char *pBuf, unsigned BuffSize, int Type, int *pLastInfoQuery=0);
 	template<class T> int Ban(T *pBanPool, const typename T::CDataType *pData, int Seconds, const char *pReason);
 	template<class T> int Unban(T *pBanPool, const typename T::CDataType *pData);
 
-	class IConsole *m_pConsole;
 	class IStorage *m_pStorage;
 	CBanAddrPool m_BanAddrPool;
 	CBanRangePool m_BanRangePool;
@@ -166,11 +165,10 @@ public:
 		MSGTYPE_BANREM,
 	};
 
-	class IConsole *Console() const { return m_pConsole; }
 	class IStorage *Storage() const { return m_pStorage; }
 
 	virtual ~CNetBan() {}
-	void Init(class IConsole *pConsole, class IStorage *pStorage);
+	void Init(class IStorage *pStorage);
 	void Update();
 
 	virtual int BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason);
@@ -181,12 +179,6 @@ public:
 	void UnbanAll();
 	template<class T> bool IsBannable(const T *pData);
 	bool IsBanned(const NETADDR *pAddr, char *pBuf, unsigned BufferSize, int *pLastInfoQuery);
-
-	static void ConBan(class IConsole::IResult *pResult, void *pUser);
-	static void ConUnban(class IConsole::IResult *pResult, void *pUser);
-	static void ConUnbanAll(class IConsole::IResult *pResult, void *pUser);
-	static void ConBans(class IConsole::IResult *pResult, void *pUser);
-	static void ConBansSave(class IConsole::IResult *pResult, void *pUser);
 };
 
 #endif

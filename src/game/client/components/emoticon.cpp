@@ -12,14 +12,6 @@ CEmoticon::CEmoticon()
 {
 }
 
-void CEmoticon::ConKeyEmoticon(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
-void CEmoticon::ConEmote(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
 void CEmoticon::OnConsoleInit()
 {
 }

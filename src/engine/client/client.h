@@ -56,12 +56,9 @@ class CClient : public IClient
 	IEngine *m_pEngine;
 	IGameClient *m_pGameClient;
 	IEngineMap *m_pMap;
-	IMapChecker *m_pMapChecker;
 	IConfigManager *m_pConfigManager;
 	CConfig *m_pConfig;
-	IConsole *m_pConsole;
 	IStorage *m_pStorage;
-	IEngineMasterServer *m_pMasterServer;
 
 	enum
 	{
@@ -71,7 +68,6 @@ class CClient : public IClient
 
 	class CNetClient m_NetClient;
 	class CNetClient m_ContactClient;
-	class CServerBrowser m_ServerBrowser;
 
 	char m_aServerAddressStr[256];
 	char m_aServerPassword[128];
@@ -157,9 +153,6 @@ class CClient : public IClient
 
 	class CSnapshotDelta m_SnapshotDelta;
 
-	//
-	class CServerInfo m_CurrentServerInfo;
-
 	// version info
 	struct CVersionInfo
 	{
@@ -180,10 +173,8 @@ class CClient : public IClient
 public:
 	IEngine *Engine() { return m_pEngine; }
 	IGameClient *GameClient() { return m_pGameClient; }
-	IEngineMasterServer *MasterServer() { return m_pMasterServer; }
 	IConfigManager *ConfigManager() { return m_pConfigManager; }
 	CConfig *Config() { return m_pConfig; }
-	IConsole *Console() { return m_pConsole; }
 	IStorage *Storage() { return m_pStorage; }
 
 	CClient();
@@ -225,8 +216,6 @@ public:
 	const char *ServerAddress() const { return m_aServerAddressStr; }
 
 
-	virtual void GetServerInfo(CServerInfo *pServerInfo);
-
 	// ---
 
 	const void *SnapGetItem(int SnapID, int Index, CSnapItem *pItem) const;
@@ -246,7 +235,6 @@ public:
 	const char *LoadMap(const char *pName, const char *pFilename, const SHA256_DIGEST *pWantedSha256, unsigned WantedCrc);
 	const char *LoadMapSearch(const char *pMapName, const SHA256_DIGEST *pWantedSha256, int WantedCrc);
 
-	int UnpackServerInfo(CUnpacker *pUnpacker, CServerInfo *pInfo, int *pToken);
 	void ProcessConnlessPacket(CNetChunk *pPacket);
 	void ProcessServerPacket(CNetChunk *pPacket);
 
@@ -268,15 +256,6 @@ public:
 
 	void ConnectOnStart(const char *pAddress);
 	void DoVersionSpecificActions();
-
-	static void Con_Connect(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Disconnect(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Quit(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Minimize(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Ping(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Rcon(IConsole::IResult *pResult, void *pUserData);
-
-	void ServerBrowserUpdate();
 
 	// chillers verbose network printer
 	void PrintSnapshot(int Msg, CUnpacker &Unpacker);

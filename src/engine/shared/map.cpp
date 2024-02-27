@@ -52,7 +52,7 @@ public:
 				if(pLayer->m_Type == LAYERTYPE_TILES)
 				{
 					CMapItemLayerTilemap *pTilemap = reinterpret_cast<CMapItemLayerTilemap *>(pLayer);
-					
+
 					if(pTilemap->m_Version > 3)
 					{
 						const int TilemapCount = pTilemap->m_Width * pTilemap->m_Height;
@@ -85,9 +85,9 @@ public:
 					}
 				}
 			}
-			
+
 		}
-		
+
 		return true;
 	}
 

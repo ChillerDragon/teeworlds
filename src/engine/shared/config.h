@@ -14,7 +14,7 @@ public:
 	#define MACRO_CONFIG_UTF8STR(Name,ScriptName,Size,Len,Def,Save,Desc) char m_##Name[Size]; // Flawfinder: ignore
 
 	#include "config_variables.h"
-	
+
 	#undef MACRO_CONFIG_INT
 	#undef MACRO_CONFIG_STR
 	#undef MACRO_CONFIG_UTF8STR
@@ -45,7 +45,6 @@ class CConfigManager : public IConfigManager
 	};
 
 	class IStorage *m_pStorage;
-	class IConsole *m_pConsole;
 	IOHANDLE m_ConfigFile;
 	int m_FlagMask;
 	CCallback m_aCallbacks[MAX_CALLBACKS];

@@ -3,28 +3,12 @@
 #include "spectator.h"
 
 
-void CSpectator::ConKeySpectator(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
-void CSpectator::ConSpectate(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
 bool CSpectator::SpecModePossible(int SpecMode, int SpectatorID)
 {
 	return false;
 }
 
 void CSpectator::HandleSpectateNextPrev(int Direction)
-{
-}
-
-void CSpectator::ConSpectateNext(IConsole::IResult *pResult, void *pUserData)
-{
-}
-
-void CSpectator::ConSpectatePrevious(IConsole::IResult *pResult, void *pUserData)
 {
 }
 

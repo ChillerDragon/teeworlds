@@ -7,7 +7,7 @@
 #include "network.h"
 
 
-bool CNetClient::Open(NETADDR BindAddr, CConfig *pConfig, IConsole *pConsole, IEngine *pEngine, int Flags)
+bool CNetClient::Open(NETADDR BindAddr, CConfig *pConfig, IEngine *pEngine, int Flags)
 {
 	// open socket
 	NETSOCKET Socket;
@@ -19,7 +19,7 @@ bool CNetClient::Open(NETADDR BindAddr, CConfig *pConfig, IConsole *pConsole, IE
 	mem_zero(this, sizeof(*this));
 
 	// init
-	Init(Socket, pConfig, pConsole, pEngine);
+	Init(Socket, pConfig, pEngine);
 	m_Connection.Init(this, false);
 
 	m_TokenManager.Init(this);
@@ -206,4 +206,3 @@ const char *CNetClient::ErrorString() const
 {
 	return m_Connection.ErrorString();
 }
-

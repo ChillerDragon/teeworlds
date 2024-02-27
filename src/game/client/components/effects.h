@@ -15,7 +15,6 @@ public:
 	CEffects();
 
 	void AirJump(vec2 Pos);
-	void DamageIndicator(vec2 Pos, int Amount, float Angle, int ClientID);
 	void PowerupShine(vec2 Pos, vec2 Size);
 	void SmokeTrail(vec2 Pos, vec2 Vel);
 	void SkidTrail(vec2 Pos, vec2 Vel);

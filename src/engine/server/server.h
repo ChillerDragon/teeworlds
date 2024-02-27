@@ -50,12 +50,10 @@ class CServerBan : public CNetBan
 public:
 	class CServer *Server() const { return m_pServer; }
 
-	void InitServerBan(class IConsole *pConsole, class IStorage *pStorage, class CServer* pServer);
+	void InitServerBan(class IStorage *pStorage, class CServer* pServer);
 
 	virtual int BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason);
 	virtual int BanRange(const CNetRange *pRange, int Seconds, const char *pReason);
-
-	static void ConBanExt(class IConsole::IResult *pResult, void *pUser);
 };
 
 
@@ -63,12 +61,10 @@ class CServer : public IServer
 {
 	class IGameServer *m_pGameServer;
 	class CConfig *m_pConfig;
-	class IConsole *m_pConsole;
 	class IStorage *m_pStorage;
 public:
 	class IGameServer *GameServer() { return m_pGameServer; }
 	class CConfig *Config() { return m_pConfig; }
-	class IConsole *Console() { return m_pConsole; }
 	class IStorage *Storage() { return m_pStorage; }
 
 	enum
@@ -134,7 +130,6 @@ public:
 		int m_MapChunk;
 		bool m_NoRconNote;
 		bool m_Quitting;
-		const IConsole::CCommandInfo *m_pRconCmdToSend;
 		const CMapListEntry *m_pMapListEntryToSend;
 
 		void Reset();
@@ -146,11 +141,9 @@ public:
 	CSnapshotBuilder m_SnapshotBuilder;
 	CSnapIDPool m_IDPool;
 	CNetServer m_NetServer;
-	CEcon m_Econ;
 	CServerBan m_ServerBan;
 
 	IEngineMap *m_pMap;
-	IMapChecker *m_pMapChecker;
 
 	int64 m_GameStartTime;
 	bool m_RunServer;
@@ -177,7 +170,7 @@ public:
 	{
 		CMapListEntry *m_pPrev;
 		CMapListEntry *m_pNext;
-		char m_aName[IConsole::TEMPMAP_NAME_LENGTH];
+		char m_aName[256];
 	};
 
 	CHeap *m_pMapListHeap;
@@ -228,9 +221,8 @@ public:
 	void SendRconLine(int ClientID, const char *pLine);
 	static void SendRconLineAuthed(const char *pLine, void *pUser, bool Highlighted);
 
-	void SendRconCmdAdd(const IConsole::CCommandInfo *pCommandInfo, int ClientID);
-	void SendRconCmdRem(const IConsole::CCommandInfo *pCommandInfo, int ClientID);
-	void UpdateClientRconCommands();
+	// void SendRconCmdAdd(const IConsole::CCommandInfo *pCommandInfo, int ClientID);
+	// void SendRconCmdRem(const IConsole::CCommandInfo *pCommandInfo, int ClientID);
 	void SendMapListEntryAdd(const CMapListEntry *pMapListEntry, int ClientID);
 	void SendMapListEntryRem(const CMapListEntry *pMapListEntry, int ClientID);
 	void UpdateClientMapListEntries();
@@ -246,27 +238,13 @@ public:
 	const char *GetMapName();
 	int LoadMap(const char *pMapName);
 
-	void InitRegister(CNetServer *pNetServer, IEngineMasterServer *pMasterServer, CConfig *pConfig, IConsole *pConsole);
+	void InitRegister(CNetServer *pNetServer, CConfig *pConfig);
 	void InitInterfaces(IKernel *pKernel);
 	int Run();
 	void Free();
 
 	static int MapListEntryCallback(const char *pFilename, int IsDir, int DirType, void *pUser);
 	void InitMapList();
-
-	static void ConKick(IConsole::IResult *pResult, void *pUser);
-	static void ConStatus(IConsole::IResult *pResult, void *pUser);
-	static void ConShutdown(IConsole::IResult *pResult, void *pUser);
-	static void ConMapReload(IConsole::IResult *pResult, void *pUser);
-	static void ConLogout(IConsole::IResult *pResult, void *pUser);
-	static void ConchainSpecialInfoupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainPlayerSlotsUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainMaxclientsUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainMaxclientsperipUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainModCommandUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainConsoleOutputLevelUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainRconPasswordSet(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainMapUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 
 	virtual int SnapNewID();
 	virtual void SnapFreeID(int ID);

@@ -6,7 +6,6 @@
 #include <engine/engine.h>
 
 #include "config.h"
-#include "console.h"
 #include "network.h"
 #include "huffman.h"
 
@@ -115,7 +114,7 @@ CNetBase::~CNetBase()
 		Shutdown();
 }
 
-void CNetBase::Init(NETSOCKET Socket, CConfig *pConfig, IConsole *pConsole, IEngine *pEngine)
+void CNetBase::Init(NETSOCKET Socket, CConfig *pConfig, IEngine *pEngine)
 {
 	m_Socket = Socket;
 	m_pConfig = pConfig;

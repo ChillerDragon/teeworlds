@@ -3,7 +3,6 @@
 #include <base/hash_ctxt.h>
 #include <base/system.h>
 #include <engine/storage.h>
-#include "linereader.h"
 #include <zlib.h>
 
 // compiled-in data-dir path
@@ -86,38 +85,6 @@ public:
 
 	void LoadPaths()
 	{
-		// check current directory
-		IOHANDLE File = io_open("storage.cfg", IOFLAG_READ | IOFLAG_SKIP_BOM);
-		if(!File)
-		{
-			// check usable path in argv[0]
-			char aBuffer[IO_MAX_PATH_LENGTH];
-			str_copy(aBuffer, m_aAppDir, sizeof(aBuffer));
-			str_append(aBuffer, "/storage.cfg", sizeof(aBuffer));
-			File = io_open(aBuffer, IOFLAG_READ | IOFLAG_SKIP_BOM);
-			if(!File)
-			{
-				dbg_msg("storage", "couldn't open storage.cfg");
-				return;
-			}
-		}
-
-		CLineReader LineReader;
-		LineReader.Init(File);
-		const char *pLine;
-		while((pLine = LineReader.Get()))
-		{
-			const char *pLineWithoutPrefix = str_startswith(pLine, "add_path ");
-			if(pLineWithoutPrefix)
-			{
-				AddPath(pLineWithoutPrefix);
-			}
-		}
-
-		io_close(File);
-
-		if(!m_NumPaths)
-			dbg_msg("storage", "no paths found in storage.cfg");
 	}
 
 	void AddDefaultPaths()

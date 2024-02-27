@@ -5,15 +5,17 @@
 
 #include <generated/protocol.h>
 
-#include <game/gamecore.h>
-#include <game/server/entity.h>
+#include <game/server/alloc.h>
 
+#include <base/vmath.h>
 
-class CCharacter : public CEntity
+class CCharacter
 {
 	MACRO_ALLOC_POOL_ID()
 
 public:
+	vec2 m_Pos;
+	vec2 GetPos() { return m_Pos; }
 	//character's size
 	static const int ms_PhysSize = 28;
 
@@ -22,7 +24,9 @@ public:
 		MIN_KILLMESSAGE_CLIENTVERSION=0x0704,   // todo 0.8: remove me
 	};
 
-	CCharacter(CGameWorld *pWorld);
+	CCharacter();
+	virtual ~CCharacter(){}
+
 
 	virtual void Reset();
 	virtual void Destroy();
@@ -70,7 +74,6 @@ private:
 	bool m_Alive;
 
 	// weapon info
-	CEntity *m_apHitObjects[MAX_PLAYERS];
 	int m_NumObjectsHit;
 
 	struct WeaponStat
@@ -118,14 +121,7 @@ private:
 		int m_OldVelAmount;
 	} m_Ninja;
 
-	// the player core for the physics
-	CCharacterCore m_Core;
-
-	// info for dead reckoning
 	int m_ReckoningTick; // tick that we are performing dead reckoning From
-	CCharacterCore m_SendCore; // core that we should send
-	CCharacterCore m_ReckoningCore; // the dead reckoning core
-
 };
 
 #endif

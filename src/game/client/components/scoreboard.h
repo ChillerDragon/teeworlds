@@ -12,8 +12,6 @@ class CScoreboard : public CComponent
 	void RenderRecordingNotification(float x, float w);
 	void RenderNetworkQuality(float x, float w);
 
-	static void ConKeyScoreboard(IConsole::IResult *pResult, void *pUserData);
-
 	const char *GetClanName(int Team);
 
 	bool m_Active;

@@ -18,7 +18,6 @@
 
 #include <engine/client.h>
 #include <engine/config.h>
-#include <engine/console.h>
 #include <engine/engine.h>
 #include <engine/keys.h>
 #include <engine/map.h>
@@ -29,7 +28,6 @@
 #include <engine/masterserver.h>
 #endif
 
-#include <engine/serverbrowser.h>
 #include <engine/storage.h>
 
 
@@ -37,9 +35,6 @@
 #include <engine/shared/compression.h>
 #include <engine/shared/datafile.h>
 #include <engine/shared/filecollection.h>
-#if __has_include(<engine/shared/mapchecker.h>)
-#include <engine/shared/mapchecker.h>
-#endif
 #include <engine/shared/network.h>
 #include <engine/shared/packer.h>
 #include <engine/shared/protocol.h>
@@ -58,8 +53,6 @@
 #if __has_include(<engine/contacts.h>)
 #include <engine/contacts.h>
 #endif
-#include <engine/serverbrowser.h>
-#include <engine/client/serverbrowser.h>
 #if __has_include(<engine/client/contacts.h>)
 #include <engine/client/contacts.h>
 #endif
@@ -688,8 +681,6 @@ void print_snapshot(int Msg,
 			if(m_ReceivedSnapshots == 2)
 			{
 				// start at 200ms and work from there
-				m_PredictedTime.Init(GameTick * time_freq() / SERVER_TICK_SPEED);
-				m_PredictedTime.SetAdjustSpeed(1, 1000.0f);
 				m_GameTime.Init((GameTick - 1) * time_freq() / SERVER_TICK_SPEED);
 				m_aSnapshots[CClient::SNAP_PREV] = m_SnapshotStorage.m_pFirst;
 				m_aSnapshots[CClient::SNAP_CURRENT] = m_SnapshotStorage.m_pLast;

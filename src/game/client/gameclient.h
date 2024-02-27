@@ -5,10 +5,9 @@
 
 #include <base/vmath.h>
 #include <engine/client.h>
-#include <engine/console.h>
-#include <game/layers.h>
-#include <game/gamecore.h>
 #include "render.h"
+
+#include <generated/protocol.h>
 
 class CGameClient : public IGameClient
 {
@@ -34,12 +33,7 @@ class CGameClient : public IGameClient
 	class IEngine *m_pEngine;
 	class IClient *m_pClient;
 	class CConfig *m_pConfig;
-	class IConsole *m_pConsole;
 	class IStorage *m_pStorage;
-	class IServerBrowser *m_pServerBrowser;
-
-	CLayers m_Layers;
-	class CCollision m_Collision;
 
 	void ProcessEvents();
 	void ProcessTriggeredEvents(int Events, vec2 Pos);
@@ -52,12 +46,6 @@ class CGameClient : public IGameClient
 	int m_LastFlagCarrierRed;
 	int m_LastFlagCarrierBlue;
 
-	static void ConTeam(IConsole::IResult *pResult, void *pUserData);
-	static void ConKill(IConsole::IResult *pResult, void *pUserData);
-	static void ConReadyChange(IConsole::IResult *pResult, void *pUserData);
-
-	void EvolveCharacter(CNetObj_Character *pCharacter, int Tick);
-
 	void LoadFonts();
 
 public:
@@ -66,19 +54,12 @@ public:
 	class IClient *Client() const { return m_pClient; }
 	class IStorage *Storage() const { return m_pStorage; }
 	class CConfig *Config() const { return m_pConfig; }
-	class IConsole *Console() { return m_pConsole; }
-	class IServerBrowser *ServerBrowser() const { return m_pServerBrowser; }
-	class CLayers *Layers() { return &m_Layers; }
-	class CCollision *Collision() { return &m_Collision; }
 
 	const char *NetobjFailedOn() { return m_NetObjHandler.FailedObjOn(); }
 	int NetobjNumFailures() { return m_NetObjHandler.NumObjFailures(); }
 	const char *NetmsgFailedOn() { return m_NetObjHandler.FailedMsgOn(); }
 
 	bool m_SuppressEvents;
-
-	// TODO: move this
-	CTuningParams m_Tuning;
 
 	enum
 	{
@@ -92,24 +73,6 @@ public:
 	int m_DemoSpecID;
 
 	vec2 m_LocalCharacterPos;
-
-	// Whether we should use/render predicted entities. Depends on client
-	// and game state.
-	bool ShouldUsePredicted() const;
-
-	// Whether we should use/render predictions for a specific `ClientID`.
-	// Should check `ShouldUsePredicted` before checking this.
-	bool ShouldUsePredictedChar(int ClientID) const;
-
-	// Replaces `pPrevChar`, `pPlayerChar`, and `IntraTick` with their predicted
-	// counterparts for `ClientID`. Should check `ShouldUsePredictedChar`
-	// before using this.
-	void UsePredictedChar(
-		CNetObj_Character *pPrevChar,
-		CNetObj_Character *pPlayerChar,
-		float *IntraTick,
-		int ClientID
-	) const;
 
 	vec2 GetCharPos(int ClientID, bool Predicted = false) const;
 
@@ -184,8 +147,6 @@ public:
 		int m_Team;
 		int m_Emoticon;
 		int m_EmoticonStart;
-		CCharacterCore m_Predicted;
-		CCharacterCore m_PrevPredicted;
 
 
 		CNetObj_Character m_Evolved;
@@ -247,7 +208,6 @@ public:
 	virtual void OnMessage(int MsgId, CUnpacker *pUnpacker);
 	virtual void OnNewSnapshot();
 	virtual void OnDemoRecSnap();
-	virtual void OnPredict();
 	virtual int OnSnapInput(int *pData);
 	virtual void OnShutdown();
 	virtual void OnEnterGame();
@@ -287,21 +247,14 @@ public:
 	void SendSkinChange();
 
 	// pointers to all systems
-	class CGameConsole *m_pGameConsole;
-	class CBinds *m_pBinds;
 	class CBroadcast *m_pBroadcast;
-	class CCountryFlags *m_pCountryFlags;
 	class CChat *m_pChat;
-	class CDamageInd *m_pDamageind;
 	class CControls *m_pControls;
 	class CEffects *m_pEffects;
 	class CMotd *m_pMotd;
 	class CVoting *m_pVoting;
 	class CScoreboard *m_pScoreboard;
-	class CStats *m_pStats;
 	class CItems *m_pItems;
-	class CMapLayers *m_pMapLayersBackGround;
-	class CMapLayers *m_pMapLayersForeGround;
 };
 
 

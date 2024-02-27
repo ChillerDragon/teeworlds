@@ -3,13 +3,11 @@
 #include <base/math.h>
 #include <base/system.h>
 
-#include <engine/console.h>
-
 #include "netban.h"
 #include "network.h"
 
 
-bool CNetServer::Open(NETADDR BindAddr, CConfig *pConfig, IConsole *pConsole, IEngine *pEngine, CNetBan *pNetBan,
+bool CNetServer::Open(NETADDR BindAddr, CConfig *pConfig, IEngine *pEngine, CNetBan *pNetBan,
 	int MaxClients, int MaxClientsPerIP, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient, void *pUser)
 {
 	// zero out the whole structure
@@ -22,7 +20,7 @@ bool CNetServer::Open(NETADDR BindAddr, CConfig *pConfig, IConsole *pConsole, IE
 
 	// init
 	m_pNetBan = pNetBan;
-	Init(Socket, pConfig, pConsole, pEngine);
+	Init(Socket, pConfig, pEngine);
 
 	m_TokenManager.Init(this);
 	m_TokenCache.Init(this, &m_TokenManager);
@@ -175,7 +173,7 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 
 					// only allow a specific number of players with the same ip
 					int FoundAddr = 1;
-					
+
 					bool Continue = false;
 					for(int i = 0; i < NET_MAX_CLIENTS; i++)
 					{

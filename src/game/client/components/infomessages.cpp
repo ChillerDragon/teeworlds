@@ -47,7 +47,7 @@ void CInfoMessages::OnMessage(int MsgType, void *pRawMsg)
 		m_pClient->GetPlayerLabel(aLabel, sizeof(aLabel), pMsg->m_ClientID, m_pClient->m_aClients[pMsg->m_ClientID].m_aName);
 
 		str_format(aBuf, sizeof(aBuf), "%2d: %s: finished in %s", pMsg->m_ClientID, m_pClient->m_aClients[pMsg->m_ClientID].m_aName, aTime);
-		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "race", aBuf);
+		dbg_msg("race", "%s", aBuf);
 
 		if(pMsg->m_RecordPersonal || pMsg->m_RecordServer)
 		{

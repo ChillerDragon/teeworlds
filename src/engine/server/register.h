@@ -17,36 +17,24 @@ class CRegister
 		REGISTERSTATE_ERROR
 	};
 
-	struct CMasterserverInfo
-	{
-		NETADDR m_Addr;
-		int m_Count;
-		int m_Valid;
-		int64 m_LastSend;
-	};
-
 	class CNetServer *m_pNetServer;
-	class IEngineMasterServer *m_pMasterServer;
 	class CConfig *m_pConfig;
-	class IConsole *m_pConsole;
 
 	int m_RegisterState;
 	int64 m_RegisterStateStart;
 	int m_RegisterFirst;
 	int m_RegisterCount;
 
-	CMasterserverInfo m_aMasterserverInfo[IMasterServer::MAX_MASTERSERVERS];
 	int m_RegisterRegisteredServer;
 
 	void RegisterNewState(int State);
-	void RegisterSendFwcheckresponse(NETADDR *pAddr, TOKEN Token);
 	void RegisterSendHeartbeat(NETADDR Addr);
 	void RegisterSendCountRequest(NETADDR Addr);
 	void RegisterGotCount(struct CNetChunk *pChunk);
 
 public:
 	CRegister();
-	void Init(class CNetServer *pNetServer, class IEngineMasterServer *pMasterServer, class CConfig *pConfig, class IConsole *pConsole);
+	void Init(class CNetServer *pNetServer, class CConfig *pConfig);
 	void RegisterUpdate(int Nettype);
 	int RegisterProcessPacket(struct CNetChunk *pPacket, TOKEN Token);
 };

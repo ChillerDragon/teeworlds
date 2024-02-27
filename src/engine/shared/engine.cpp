@@ -4,7 +4,6 @@
 
 #include <base/system.h>
 
-#include <engine/console.h>
 #include <engine/engine.h>
 #include <engine/storage.h>
 #include <engine/shared/config.h>
@@ -21,32 +20,11 @@ class CEngine : public IEngine
 {
 public:
 	CConfig *m_pConfig;
-	IConsole *m_pConsole;
 	IStorage *m_pStorage;
 	bool m_Logging;
 	IOHANDLE m_DataLogSent;
 	IOHANDLE m_DataLogRecv;
 	const char *m_pAppname;
-
-	static void Con_DbgLognetwork(IConsole::IResult *pResult, void *pUserData)
-	{
-		CEngine *pEngine = static_cast<CEngine *>(pUserData);
-
-		if(pEngine->m_Logging)
-		{
-			pEngine->StopLogging();
-		}
-		else
-		{
-			char aBuf[32];
-			str_timestamp(aBuf, sizeof(aBuf));
-			char aFilenameSent[128], aFilenameRecv[128];
-			str_format(aFilenameSent, sizeof(aFilenameSent), "dumps/%s_network_sent_%s.txt", pEngine->m_pAppname, aBuf);
-			str_format(aFilenameRecv, sizeof(aFilenameRecv), "dumps/%s_network_recv_%s.txt", pEngine->m_pAppname, aBuf);
-			pEngine->StartLogging(pEngine->m_pStorage->OpenFile(aFilenameSent, IOFLAG_WRITE, IStorage::TYPE_SAVE),
-									pEngine->m_pStorage->OpenFile(aFilenameRecv, IOFLAG_WRITE, IStorage::TYPE_SAVE));
-		}
-	}
 
 	CEngine(const char *pAppname)
 	{
@@ -80,7 +58,6 @@ public:
 	void Init()
 	{
 		m_pConfig = Kernel()->RequestInterface<IConfigManager>()->Values();
-		m_pConsole = Kernel()->RequestInterface<IConsole>();
 		m_pStorage = Kernel()->RequestInterface<IStorage>();
 	}
 

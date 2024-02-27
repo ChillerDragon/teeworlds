@@ -75,7 +75,6 @@ public:
 	virtual void Connect(const char *pAddress) = 0;
 	virtual void Disconnect() = 0;
 	virtual void Quit() = 0;
-	virtual void ServerBrowserUpdate() = 0;
 
 	// networking
 	virtual void EnterGame() = 0;
@@ -98,9 +97,6 @@ public:
 	virtual bool RconAuthed() const = 0;
 	virtual bool UseTempRconCommands() const = 0;
 	virtual void Rcon(const char *pLine) = 0;
-
-	// server info
-	virtual void GetServerInfo(class CServerInfo *pServerInfo) = 0;
 
 	// snapshot interface
 
@@ -156,7 +152,6 @@ public:
 	virtual void OnStateChange(int NewState, int OldState) = 0;
 	virtual void OnConnected() = 0;
 	virtual void OnMessage(int MsgID, CUnpacker *pUnpacker) = 0;
-	virtual void OnPredict() = 0;
 
 	virtual int OnSnapInput(int *pData) = 0;
 

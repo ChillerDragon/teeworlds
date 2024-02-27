@@ -3,31 +3,27 @@
 #ifndef GAME_SERVER_GAMECONTEXT_H
 #define GAME_SERVER_GAMECONTEXT_H
 
-#include <engine/console.h>
 #include <engine/server.h>
 
-#include <game/commands.h>
-#include <game/layers.h>
 #include <game/voting.h>
 
+#include <generated/protocol.h>
+
+#include <base/vmath.h>
+
 #include "eventhandler.h"
-#include "gameworld.h"
 
 /*
 	Tick
 		Game Context (CGameContext::tick)
-			Game World (GAMEWORLD::tick)
-				Reset world if requested (GAMEWORLD::reset)
 				All entities in the world (ENTITY::tick)
 				All entities in the world (ENTITY::tick_defered)
-				Remove entities marked for deletion (GAMEWORLD::remove_entities)
 			Game Controller (GAMECONTROLLER::tick)
 			All players (CPlayer::tick)
 
 
 	Snap
 		Game Context (CGameContext::snap)
-			Game World (GAMEWORLD::snap)
 				All entities in the world (ENTITY::snap)
 			Game Controller (GAMECONTROLLER::snap)
 			Events handler (EVENT_HANDLER::snap)
@@ -38,37 +34,8 @@ class CGameContext : public IGameServer
 {
 	IServer *m_pServer;
 	class CConfig *m_pConfig;
-	class IConsole *m_pConsole;
 	class IStorage *m_pStorage;
-	CLayers m_Layers;
-	CCollision m_Collision;
 	CNetObjHandler m_NetObjHandler;
-	CTuningParams m_Tuning;
-
-	static void ConTuneParam(IConsole::IResult *pResult, void *pUserData);
-	static void ConTuneReset(IConsole::IResult *pResult, void *pUserData);
-	static void ConTunes(IConsole::IResult *pResult, void *pUserData);
-	static void ConPause(IConsole::IResult *pResult, void *pUserData);
-	static void ConChangeMap(IConsole::IResult *pResult, void *pUserData);
-	static void ConRestart(IConsole::IResult *pResult, void *pUserData);
-	static void ConSay(IConsole::IResult *pResult, void *pUserData);
-	static void ConBroadcast(IConsole::IResult *pResult, void *pUserData);
-	static void ConSetTeam(IConsole::IResult *pResult, void *pUserData);
-	static void ConSetTeamAll(IConsole::IResult *pResult, void *pUserData);
-	static void ConSwapTeams(IConsole::IResult *pResult, void *pUserData);
-	static void ConShuffleTeams(IConsole::IResult *pResult, void *pUserData);
-	static void ConLockTeams(IConsole::IResult *pResult, void *pUserData);
-	static void ConForceTeamBalance(IConsole::IResult *pResult, void *pUserData);
-	static void ConAddVote(IConsole::IResult *pResult, void *pUserData);
-	static void ConRemoveVote(IConsole::IResult *pResult, void *pUserData);
-	static void ConClearVotes(IConsole::IResult *pResult, void *pUserData);
-	static void ConVote(IConsole::IResult *pResult, void *pUserData);
-	static void ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainSettingUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainGameinfoUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-
-	static void NewCommandHook(const CCommandManager::CCommand *pCommand, void *pContext);
-	static void RemoveCommandHook(const CCommandManager::CCommand *pCommand, void *pContext);
 
 	CGameContext(int Resetting);
 	void Construct(int Resetting);
@@ -77,10 +44,7 @@ class CGameContext : public IGameServer
 public:
 	IServer *Server() const { return m_pServer; }
 	class CConfig *Config() { return m_pConfig; }
-	class IConsole *Console() { return m_pConsole; }
 	class IStorage *Storage() { return m_pStorage; }
-	CCollision *Collision() { return &m_Collision; }
-	CTuningParams *Tuning() { return &m_Tuning; }
 
 	CGameContext();
 	~CGameContext();
@@ -91,10 +55,6 @@ public:
 	class CPlayer *m_apPlayers[MAX_CLIENTS];
 
 	class IGameController *m_pController;
-	CGameWorld m_World;
-	CCommandManager m_CommandManager;
-
-	CCommandManager *CommandManager() { return &m_CommandManager; }
 
 	// helper functions
 	class CCharacter *GetPlayerChar(int ClientID);
@@ -155,13 +115,9 @@ public:
 	void SendGameMsg(int GameMsgID, int ParaI1, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3, int ClientID);
 
-	void SendChatCommand(const CCommandManager::CCommand *pCommand, int ClientID);
+	// void SendChatCommand(const CCommandManager::CCommand *pCommand, int ClientID);
 	void SendChatCommands(int ClientID);
-	void SendRemoveChatCommand(const CCommandManager::CCommand *pCommand, int ClientID);
-
-	//
-	void CheckPureTuning();
-	void SendTuningParams(int ClientID);
+	// void SendRemoveChatCommand(const CCommandManager::CCommand *pCommand, int ClientID);
 
 	//
 	void SwapTeams();

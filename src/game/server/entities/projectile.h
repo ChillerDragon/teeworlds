@@ -3,7 +3,7 @@
 #ifndef GAME_SERVER_ENTITIES_PROJECTILE_H
 #define GAME_SERVER_ENTITIES_PROJECTILE_H
 
-#include <game/server/entity.h>
+#include <base/vmath.h>
 
 enum
 {
@@ -11,10 +11,11 @@ enum
 	PLAYER_TEAM_RED = -1
 };
 
-class CProjectile : public CEntity
+class CProjectile
 {
 public:
-	CProjectile(CGameWorld *pGameWorld, int Type, int Owner, vec2 Pos, vec2 Dir, int Span,
+	vec2 m_Pos;
+	CProjectile(int Type, int Owner, vec2 Pos, vec2 Dir, int Span,
 		int Damage, bool Explosive, float Force, int SoundImpact, int Weapon);
 
 	vec2 GetPos(float Time);

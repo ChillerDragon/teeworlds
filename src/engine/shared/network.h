@@ -67,7 +67,7 @@ enum
 enum
 {
 	NET_MAX_CHUNKHEADERSIZE = 3,
-	
+
 	// packets
 	NET_PACKETHEADERSIZE = 7,
 	NET_PACKETHEADERSIZE_CONNLESS = NET_PACKETHEADERSIZE + 2,
@@ -108,7 +108,7 @@ enum
 	//
 	NET_MAX_CLIENTS = 64,
 	NET_MAX_CONSOLE_CLIENTS = 4,
-	
+
 	NET_MAX_SEQUENCE = 1<<10,
 	NET_SEQUENCE_MASK = NET_MAX_SEQUENCE-1,
 
@@ -213,8 +213,8 @@ public:
 	CConfig *Config() { return m_pConfig; }
 	class IEngine *Engine() { return m_pEngine; }
 	int NetType() { return m_Socket.type; }
-	
-	void Init(NETSOCKET Socket, class CConfig *pConfig, class IConsole *pConsole, class IEngine *pEngine);
+
+	void Init(NETSOCKET Socket, class CConfig *pConfig, class IEngine *pEngine);
 	void Shutdown();
 	void UpdateLogHandles();
 	void Wait(int Time);
@@ -468,7 +468,7 @@ class CNetServer : public CNetBase
 
 public:
 	//
-	bool Open(NETADDR BindAddr, class CConfig *pConfig, class IConsole *pConsole, class IEngine *pEngine, class CNetBan *pNetBan,
+	bool Open(NETADDR BindAddr, class CConfig *pConfig, class IEngine *pEngine, class CNetBan *pNetBan,
 		int MaxClients, int MaxClientsPerIP, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient, void *pUser);
 	void Close(const char *pReason);
 
@@ -542,7 +542,7 @@ class CNetClient : public CNetBase
 
 public:
 	// openness
-	bool Open(NETADDR BindAddr, class CConfig *pConfig, class IConsole *pConsole, class IEngine *pEngine, int Flags);
+	bool Open(NETADDR BindAddr, class CConfig *pConfig, class IEngine *pEngine, int Flags);
 	void Close();
 
 	// connection state

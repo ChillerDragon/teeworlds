@@ -6,8 +6,6 @@
 #include <base/vmath.h>
 #include <base/tl/array.h>
 
-#include <game/commands.h>
-
 #include <generated/protocol.h>
 
 /*
@@ -229,8 +227,6 @@ public:
 	int GetRealPlayerNum() const { return m_aTeamSize[TEAM_RED]+m_aTeamSize[TEAM_BLUE]; }
 	int GetStartTeam();
 
-	//static void Com_Example(IConsole::IResult *pResult, void *pContext);
-	virtual void RegisterChatCommands(CCommandManager *pManager);
 };
 
 #endif

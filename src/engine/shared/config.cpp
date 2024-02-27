@@ -1,7 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/config.h>
-#include <engine/console.h>
 #include <engine/storage.h>
 #include <engine/shared/config.h>
 #include <game/version.h>
@@ -21,7 +20,6 @@ void EscapeParam(char *pDst, const char *pSrc, int size)
 CConfigManager::CConfigManager()
 {
 	m_pStorage = 0;
-	m_pConsole = 0;
 	m_ConfigFile = 0;
 	m_FlagMask = 0;
 	m_NumCallbacks = 0;
@@ -30,7 +28,6 @@ CConfigManager::CConfigManager()
 void CConfigManager::Init(int FlagMask)
 {
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
-	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_FlagMask = FlagMask;
 	Reset();
 }

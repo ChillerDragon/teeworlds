@@ -17,10 +17,6 @@ protected:
 	class IClient *Client() const { return m_pClient->Client(); }
 	class IStorage *Storage() const { return m_pClient->Storage(); }
 	class CConfig *Config() const { return m_pClient->Config(); }
-	class IConsole *Console() const { return m_pClient->Console(); }
-	class IServerBrowser *ServerBrowser() const { return m_pClient->ServerBrowser(); }
-	class CLayers *Layers() const { return m_pClient->Layers(); }
-	class CCollision *Collision() const { return m_pClient->Collision(); }
 public:
 	virtual ~CComponent() {}
 

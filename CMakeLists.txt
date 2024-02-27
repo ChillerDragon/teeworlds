@@ -1090,8 +1090,6 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src/generated/git_revision.cpp
 )
 chash("src/generated/nethash.cpp"
   "src/engine/shared/protocol.h"
-  "src/game/tuning.h"
-  "src/game/gamecore.cpp"
   "${PROJECT_BINARY_DIR}/src/generated/protocol.h"
 )
 generate_source("src/generated/client_data.cpp" "client_content_source")
@@ -1139,16 +1137,12 @@ set_src(BASE GLOB_RECURSE src/base
 set_src(ENGINE_INTERFACE GLOB src/engine
   client.h
   config.h
-  console.h
   engine.h
   kernel.h
   keys.h
   map.h
-  mapchecker.h
-  masterserver.h
   message.h
   server.h
-  serverbrowser.h
   storage.h
 )
 set_src(ENGINE_SHARED GLOB src/engine/shared
@@ -1157,12 +1151,8 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   config.cpp
   config.h
   config_variables.h
-  console.cpp
-  console.h
   datafile.cpp
   datafile.h
-  econ.cpp
-  econ.h
   engine.cpp
   filecollection.cpp
   filecollection.h
@@ -1170,15 +1160,8 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   huffman.h
   jobs.cpp
   jobs.h
-  jsonwriter.cpp
-  jsonwriter.h
   kernel.cpp
-  linereader.cpp
-  linereader.h
   map.cpp
-  mapchecker.cpp
-  mapchecker.h
-  masterserver.cpp
   memheap.cpp
   memheap.h
   netban.cpp
@@ -1202,15 +1185,7 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
 )
 set(ENGINE_GENERATED_SHARED src/generated/nethash.cpp src/generated/protocol.cpp src/generated/protocol.h)
 set_src(GAME_SHARED GLOB src/game
-  collision.cpp
-  collision.h
-  commands.h
-  gamecore.cpp
-  gamecore.h
-  layers.cpp
-  layers.h
   mapitems.h
-  tuning.h
   variables.h
   version.h
   voting.h
@@ -1241,42 +1216,25 @@ if(CLIENT)
   set_src(ENGINE_CLIENT GLOB src/engine/client
     client.cpp
     client.h
-    serverbrowser.cpp
-    serverbrowser.h
-    serverbrowser_entry.h
-    serverbrowser_fav.cpp
-    serverbrowser_fav.h
   )
   set_src(GAME_CLIENT GLOB_RECURSE src/game/client
     animstate.cpp
     animstate.h
     component.h
-    components/binds.cpp
-    components/binds.h
     components/broadcast.cpp
     components/broadcast.h
     components/chat.cpp
     components/chat.h
-    components/console.cpp
-    components/console.h
     components/controls.cpp
     components/controls.h
-    components/countryflags.cpp
-    components/countryflags.h
-    components/damageind.cpp
-    components/damageind.h
     components/effects.cpp
     components/effects.h
     components/emoticon.cpp
     components/emoticon.h
-    components/hud.cpp
-    components/hud.h
     components/infomessages.cpp
     components/infomessages.h
     components/items.cpp
     components/items.h
-    components/maplayers.cpp
-    components/maplayers.h
     components/menus.cpp
     components/menus.h
     components/menus_browser.cpp
@@ -1288,16 +1246,12 @@ if(CLIENT)
     components/motd.h
     components/nameplates.cpp
     components/nameplates.h
-    components/notifications.cpp
-    components/notifications.h
     components/players.cpp
     components/players.h
     components/scoreboard.cpp
     components/scoreboard.h
     components/spectator.cpp
     components/spectator.h
-    components/stats.cpp
-    components/stats.h
     components/voting.cpp
     components/voting.h
     gameclient.cpp
@@ -1397,20 +1351,14 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   entities/pickup.h
   entities/projectile.cpp
   entities/projectile.h
-  entity.cpp
-  entity.h
   eventhandler.cpp
   eventhandler.h
   gamecontext.cpp
   gamecontext.h
   gamecontroller.cpp
   gamecontroller.h
-  gamemodes/ctf.cpp
-  gamemodes/ctf.h
   gamemodes/dm.cpp
   gamemodes/dm.h
-  gameworld.cpp
-  gameworld.h
   player.cpp
   player.h
 )
@@ -1454,49 +1402,6 @@ endif()
 # VARIOUS TARGETS
 ########################################################################
 
-set_src(MASTERSRV_SRC GLOB src/mastersrv mastersrv.cpp mastersrv.h)
-set_src(VERSIONSRV_SRC GLOB src/versionsrv mapversions.h versionsrv.cpp versionsrv.h)
-list(APPEND VERSIONSRV_SRC ${PROJECT_BINARY_DIR}/src/generated/nethash.cpp)
-
-set(TARGET_MASTERSRV mastersrv)
-set(TARGET_VERSIONSRV versionsrv)
-
-add_executable(${TARGET_MASTERSRV} EXCLUDE_FROM_ALL ${MASTERSRV_SRC} $<TARGET_OBJECTS:engine-shared> ${DEPS})
-add_executable(${TARGET_VERSIONSRV} EXCLUDE_FROM_ALL ${VERSIONSRV_SRC} $<TARGET_OBJECTS:engine-shared> ${DEPS})
-
-target_link_libraries(${TARGET_MASTERSRV} ${LIBS})
-target_link_libraries(${TARGET_VERSIONSRV} ${LIBS})
-
-list(APPEND TARGETS_OWN ${TARGET_MASTERSRV} ${TARGET_VERSIONSRV})
-list(APPEND TARGETS_LINK ${TARGET_MASTERSRV} ${TARGET_VERSIONSRV})
-
-set(TARGETS_TOOLS)
-set_src(TOOLS GLOB src/tools
-  crapnet.cpp
-  fake_server.cpp
-  map_resave.cpp
-  map_version.cpp
-  packetgen.cpp
-)
-foreach(ABS_T ${TOOLS})
-  file(RELATIVE_PATH T "${PROJECT_SOURCE_DIR}/src/tools/" ${ABS_T})
-  if(T MATCHES "\\.cpp$")
-    string(REGEX REPLACE "\\.cpp$" "" TOOL "${T}")
-    add_executable(${TOOL} EXCLUDE_FROM_ALL
-      ${DEPS}
-      src/tools/${TOOL}.cpp
-      ${EXTRA_TOOL_SRC}
-      $<TARGET_OBJECTS:engine-shared>
-    )
-    target_link_libraries(${TOOL} ${LIBS})
-    list(APPEND TARGETS_TOOLS ${TOOL})
-  endif()
-endforeach()
-
-list(APPEND TARGETS_OWN ${TARGETS_TOOLS})
-list(APPEND TARGETS_LINK ${TARGETS_TOOLS})
-
-add_custom_target(tools DEPENDS ${TARGETS_TOOLS})
 add_custom_target(everything DEPENDS ${TARGETS_OWN})
 
 ########################################################################

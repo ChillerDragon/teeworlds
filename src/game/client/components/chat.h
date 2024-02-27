@@ -6,7 +6,6 @@
 #include <base/tl/array.h>
 #include <engine/shared/ringbuffer.h>
 #include <game/client/component.h>
-#include <game/commands.h>
 
 class CChat : public CComponent
 {
@@ -90,28 +89,11 @@ class CChat : public CComponent
 	int PreviousActiveCommand(int *pIndex);
 	int GetActiveCountRange(int i, int j);
 
-	CCommandManager m_CommandManager;
 	bool IsTypingCommand() const;
 	void HandleCommands(float x, float y, float w);
 	bool ExecuteCommand();
 	bool CompleteCommand();
 	const char *GetModeName(int Mode) const;
-
-	static void Com_All(IConsole::IResult *pResult, void *pContext);
-	static void Com_Team(IConsole::IResult *pResult, void *pContext);
-	static void Com_Reply(IConsole::IResult *pResult, void *pContext);
-	static void Com_Whisper(IConsole::IResult *pResult, void *pContext);
-	static void Com_Mute(IConsole::IResult *pResult, void *pContext);
-	static void Com_Befriend(IConsole::IResult *pResult, void *pContext);
-
-	static void ConSay(IConsole::IResult *pResult, void *pUserData);
-	static void ConSayTeam(IConsole::IResult *pResult, void *pUserData);
-	static void ConSaySelf(IConsole::IResult *pResult, void *pUserData);
-	static void ConWhisper(IConsole::IResult *pResult, void *pUserData);
-	static void ConChat(IConsole::IResult *pResult, void *pUserData);
-	static void ConShowChat(IConsole::IResult *pResult, void *pUserData);
-	static void ConChatCommand(IConsole::IResult *pResult, void *pUserData);
-	static void ServerCommandCallback(IConsole::IResult *pResult, void *pContext);
 
 public:
 	// client IDs for special messages

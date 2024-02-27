@@ -11,15 +11,6 @@
 #include "voting.h"
 
 
-void CVoting::ConVote(IConsole::IResult *pResult, void *pUserData)
-{
-	CVoting *pSelf = (CVoting *)pUserData;
-	if(str_comp_nocase(pResult->GetString(0), "yes") == 0)
-		pSelf->Vote(VOTE_CHOICE_YES);
-	else if(str_comp_nocase(pResult->GetString(0), "no") == 0)
-		pSelf->Vote(VOTE_CHOICE_NO);
-}
-
 void CVoting::Callvote(const char *pType, const char *pValue, const char *pReason, bool ForceVote)
 {
 	CNetMsg_Cl_CallVote Msg = {0};
@@ -175,7 +166,6 @@ void CVoting::OnStateChange(int NewState, int OldState)
 
 void CVoting::OnConsoleInit()
 {
-	Console()->Register("vote", "r['yes'|'no']", CFGFLAG_CLIENT, ConVote, this, "Vote yes/no");
 }
 
 void CVoting::OnMessage(int MsgType, void *pRawMsg)

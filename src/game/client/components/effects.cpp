@@ -18,10 +18,6 @@ void CEffects::AirJump(vec2 Pos)
 {
 }
 
-void CEffects::DamageIndicator(vec2 Pos, int Amount, float Angle, int ClientID)
-{
-}
-
 void CEffects::PowerupShine(vec2 Pos, vec2 size)
 {
 }
