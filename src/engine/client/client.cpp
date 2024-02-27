@@ -1438,7 +1438,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 
 void CClient::PumpNetwork()
 {
-	dbg_msg("client", "pump networkd");
 	m_NetClient.Update();
 
 	if(State() != IClient::STATE_DEMOPLAYBACK)
@@ -1482,7 +1481,6 @@ void CClient::PumpNetwork()
 
 void CClient::Update()
 {
-	dbg_msg("c", "updazte");
 	if(State() == IClient::STATE_DEMOPLAYBACK)
 	{
 		// disconnect on error

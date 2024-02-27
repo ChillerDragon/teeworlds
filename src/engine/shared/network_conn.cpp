@@ -232,7 +232,6 @@ void CNetConnection::Disconnect(const char *pReason)
 
 int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 {
-	dbg_msg("conn", "feed");
 	// check if actual ack value is valid(own sequence..latest peer ack)
 	if(m_Sequence >= m_PeerAck)
 	{
@@ -274,7 +273,6 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
 	{
 		int CtrlMsg = pPacket->m_aChunkData[0];
-		dbg_msg("network_in", "got ctrl msg: %d", CtrlMsg);
 		if(CtrlMsg == NET_CTRLMSG_CLOSE)
 		{
 			if(net_addr_comp(&m_PeerAddr, pAddr, true) == 0)
