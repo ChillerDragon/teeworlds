@@ -25,8 +25,6 @@ public:
 		int m_Score;
 		int m_PlayerType;
 
-		int m_FriendState;
-
 		enum
 		{
 			PLAYERFLAG_SPEC=1,
@@ -49,7 +47,6 @@ public:
 	NETADDR m_NetAddr;
 
 	int m_QuickSearchHit;
-	int m_FriendState;
 
 	int m_MaxClients;
 	int m_NumClients;

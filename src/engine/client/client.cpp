@@ -1637,7 +1637,6 @@ void CClient::VersionUpdate()
 void CClient::RegisterInterfaces()
 {
 	Kernel()->RegisterInterface(static_cast<IServerBrowser*>(&m_ServerBrowser));
-	Kernel()->RegisterInterface(static_cast<IFriends*>(&m_Friends));
 	Kernel()->RegisterInterface(static_cast<IBlacklist*>(&m_Blacklist));
 }
 
@@ -1655,7 +1654,6 @@ void CClient::InitInterfaces()
 
 	//
 	m_ServerBrowser.Init(&m_ContactClient, m_pGameClient->NetVersion());
-	m_Friends.Init();
 	m_Blacklist.Init();
 }
 

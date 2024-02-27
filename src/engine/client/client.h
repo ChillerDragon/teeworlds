@@ -72,7 +72,6 @@ class CClient : public IClient
 	class CNetClient m_NetClient;
 	class CNetClient m_ContactClient;
 	class CServerBrowser m_ServerBrowser;
-	class CFriends m_Friends;
 	class CBlacklist m_Blacklist;
 
 	char m_aServerAddressStr[256];

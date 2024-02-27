@@ -194,24 +194,6 @@ void CServerBrowserFilter::CServerFilter::Filter()
 					Filtered = true;
 			}
 		}
-
-		if(!Filtered)
-		{
-			// check for friend
-			m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_FriendState = CContactInfo::CONTACT_NO;
-			for(int p = 0; p < m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_NumClients; p++)
-			{
-				m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_aClients[p].m_FriendState = m_pServerBrowserFilter->m_pFriends->GetFriendState(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_aClients[p].m_aName,
-					m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_aClients[p].m_aClan);
-				m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_FriendState = maximum(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_FriendState, m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_aClients[p].m_FriendState);
-			}
-
-			if(!(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_FRIENDS) || m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_FriendState != CContactInfo::CONTACT_NO)
-			{
-				m_pSortedServerlist[m_NumSortedServers++] = i;
-				m_NumSortedPlayers += RelevantClientCount;
-			}
-		}
 	}
 }
 
