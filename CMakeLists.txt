@@ -368,14 +368,10 @@ endif()
 # DEPENDENCY COMPILATION
 ########################################################################
 
-set_src(DEP_JSON_SRC GLOB src/engine/external/json-parser json.c json.h)
-add_library(json EXCLUDE_FROM_ALL OBJECT ${DEP_JSON_SRC})
-
 set_src(DEP_MD5_SRC GLOB src/engine/external/md5 md5.c md5.h)
 add_library(md5 EXCLUDE_FROM_ALL OBJECT ${DEP_MD5_SRC})
 
-list(APPEND TARGETS_DEP json md5)
-set(DEP_JSON $<TARGET_OBJECTS:json>)
+list(APPEND TARGETS_DEP md5)
 set(DEP_MD5)
 if(NOT CRYPTO_FOUND)
   set(DEP_MD5 $<TARGET_OBJECTS:md5>)
@@ -517,316 +513,12 @@ set(EXPECTED_DATA
   audio/wp_switch-01.wv
   audio/wp_switch-02.wv
   audio/wp_switch-03.wv
-  countryflags/AD.png
-  countryflags/AE.png
-  countryflags/AF.png
-  countryflags/AG.png
-  countryflags/AI.png
-  countryflags/AL.png
-  countryflags/AM.png
-  countryflags/AO.png
-  countryflags/AR.png
-  countryflags/AS.png
-  countryflags/AT.png
-  countryflags/AU.png
-  countryflags/AW.png
-  countryflags/AX.png
-  countryflags/AZ.png
-  countryflags/BA.png
-  countryflags/BB.png
-  countryflags/BD.png
-  countryflags/BE.png
-  countryflags/BF.png
-  countryflags/BG.png
-  countryflags/BH.png
-  countryflags/BI.png
-  countryflags/BJ.png
-  countryflags/BL.png
-  countryflags/BM.png
-  countryflags/BN.png
-  countryflags/BO.png
-  countryflags/BR.png
-  countryflags/BS.png
-  countryflags/BT.png
-  countryflags/BW.png
-  countryflags/BY.png
-  countryflags/BZ.png
-  countryflags/CA.png
-  countryflags/CC.png
-  countryflags/CD.png
-  countryflags/CF.png
-  countryflags/CG.png
-  countryflags/CH.png
-  countryflags/CI.png
-  countryflags/CK.png
-  countryflags/CL.png
-  countryflags/CM.png
-  countryflags/CN.png
-  countryflags/CO.png
-  countryflags/CR.png
-  countryflags/CU.png
-  countryflags/CV.png
-  countryflags/CW.png
-  countryflags/CX.png
-  countryflags/CY.png
-  countryflags/CZ.png
-  countryflags/DE.png
-  countryflags/DJ.png
-  countryflags/DK.png
-  countryflags/DM.png
-  countryflags/DO.png
-  countryflags/DZ.png
-  countryflags/EC.png
-  countryflags/EE.png
-  countryflags/EG.png
-  countryflags/EH.png
-  countryflags/ER.png
-  countryflags/ES.png
-  countryflags/ET.png
-  countryflags/FI.png
-  countryflags/FJ.png
-  countryflags/FK.png
-  countryflags/FM.png
-  countryflags/FO.png
-  countryflags/FR.png
-  countryflags/GA.png
-  countryflags/GB.png
-  countryflags/GD.png
-  countryflags/GE.png
-  countryflags/GF.png
-  countryflags/GG.png
-  countryflags/GH.png
-  countryflags/GI.png
-  countryflags/GL.png
-  countryflags/GM.png
-  countryflags/GN.png
-  countryflags/GP.png
-  countryflags/GQ.png
-  countryflags/GR.png
-  countryflags/GS.png
-  countryflags/GT.png
-  countryflags/GU.png
-  countryflags/GW.png
-  countryflags/GY.png
-  countryflags/HK.png
-  countryflags/HN.png
-  countryflags/HR.png
-  countryflags/HT.png
-  countryflags/HU.png
-  countryflags/ID.png
-  countryflags/IE.png
-  countryflags/IL.png
-  countryflags/IM.png
-  countryflags/IN.png
-  countryflags/IO.png
-  countryflags/IQ.png
-  countryflags/IR.png
-  countryflags/IS.png
-  countryflags/IT.png
-  countryflags/JE.png
-  countryflags/JM.png
-  countryflags/JO.png
-  countryflags/JP.png
-  countryflags/KE.png
-  countryflags/KG.png
-  countryflags/KH.png
-  countryflags/KI.png
-  countryflags/KM.png
-  countryflags/KN.png
-  countryflags/KP.png
-  countryflags/KR.png
-  countryflags/KW.png
-  countryflags/KY.png
-  countryflags/KZ.png
-  countryflags/LA.png
-  countryflags/LB.png
-  countryflags/LC.png
-  countryflags/LI.png
-  countryflags/LK.png
-  countryflags/LR.png
-  countryflags/LS.png
-  countryflags/LT.png
-  countryflags/LU.png
-  countryflags/LV.png
-  countryflags/LY.png
-  countryflags/MA.png
-  countryflags/MC.png
-  countryflags/MD.png
-  countryflags/ME.png
-  countryflags/MF.png
-  countryflags/MG.png
-  countryflags/MH.png
-  countryflags/MK.png
-  countryflags/ML.png
-  countryflags/MM.png
-  countryflags/MN.png
-  countryflags/MO.png
-  countryflags/MP.png
-  countryflags/MQ.png
-  countryflags/MR.png
-  countryflags/MS.png
-  countryflags/MT.png
-  countryflags/MU.png
-  countryflags/MV.png
-  countryflags/MW.png
-  countryflags/MX.png
-  countryflags/MY.png
-  countryflags/MZ.png
-  countryflags/NA.png
-  countryflags/NC.png
-  countryflags/NE.png
-  countryflags/NF.png
-  countryflags/NG.png
-  countryflags/NI.png
-  countryflags/NL.png
-  countryflags/NO.png
-  countryflags/NP.png
-  countryflags/NR.png
-  countryflags/NU.png
-  countryflags/NZ.png
-  countryflags/OM.png
-  countryflags/PA.png
-  countryflags/PE.png
-  countryflags/PF.png
-  countryflags/PG.png
-  countryflags/PH.png
-  countryflags/PK.png
-  countryflags/PL.png
-  countryflags/PM.png
-  countryflags/PN.png
-  countryflags/PR.png
-  countryflags/PS.png
-  countryflags/PT.png
-  countryflags/PW.png
-  countryflags/PY.png
-  countryflags/QA.png
-  countryflags/RE.png
-  countryflags/RO.png
-  countryflags/RS.png
-  countryflags/RU.png
-  countryflags/RW.png
-  countryflags/SA.png
-  countryflags/SB.png
-  countryflags/SC.png
-  countryflags/SD.png
-  countryflags/SE.png
-  countryflags/SG.png
-  countryflags/SH.png
-  countryflags/SI.png
-  countryflags/SK.png
-  countryflags/SL.png
-  countryflags/SM.png
-  countryflags/SN.png
-  countryflags/SO.png
-  countryflags/SR.png
-  countryflags/SS.png
-  countryflags/ST.png
-  countryflags/SV.png
-  countryflags/SX.png
-  countryflags/SY.png
-  countryflags/SZ.png
-  countryflags/TC.png
-  countryflags/TD.png
-  countryflags/TF.png
-  countryflags/TG.png
-  countryflags/TH.png
-  countryflags/TJ.png
-  countryflags/TK.png
-  countryflags/TL.png
-  countryflags/TM.png
-  countryflags/TN.png
-  countryflags/TO.png
-  countryflags/TR.png
-  countryflags/TT.png
-  countryflags/TV.png
-  countryflags/TW.png
-  countryflags/TZ.png
-  countryflags/UA.png
-  countryflags/UG.png
-  countryflags/US.png
-  countryflags/UY.png
-  countryflags/UZ.png
-  countryflags/VA.png
-  countryflags/VC.png
-  countryflags/VE.png
-  countryflags/VG.png
-  countryflags/VI.png
-  countryflags/VN.png
-  countryflags/VU.png
-  countryflags/WF.png
-  countryflags/WS.png
-  countryflags/XBZ.png
-  countryflags/XCA.png
-  countryflags/XEN.png
-  countryflags/XES.png
-  countryflags/XGA.png
-  countryflags/XNI.png
-  countryflags/XSC.png
-  countryflags/XWA.png
-  countryflags/YE.png
-  countryflags/ZA.png
-  countryflags/ZM.png
-  countryflags/ZW.png
-  countryflags/default.png
-  countryflags/index.json
   deadtee.png
-  editor/automap/desert_main.json
-  editor/automap/grass_doodads.json
-  editor/automap/grass_main.json
-  editor/automap/jungle_deathtiles.json
-  editor/automap/jungle_main.json
-  editor/automap/winter_main.json
-  editor/background.png
-  editor/checker.png
-  editor/cursor.png
-  editor/entities.png
   emoticons.png
   fonts/DejaVuSans.ttf
   fonts/SourceHanSans.ttc
   fonts/index.json
   game.png
-  languages/belarusian.json
-  languages/bosnian.json
-  languages/brazilian_portuguese.json
-  languages/breton.json
-  languages/bulgarian.json
-  languages/catalan.json
-  languages/chuvash.json
-  languages/czech.json
-  languages/danish.json
-  languages/dutch.json
-  languages/esperanto.json
-  languages/estonian.json
-  languages/finnish.json
-  languages/french.json
-  languages/gaelic_scottish.json
-  languages/galician.json
-  languages/german.json
-  languages/greek.json
-  languages/hungarian.json
-  languages/index.json
-  languages/irish.json
-  languages/italian.json
-  languages/japanese.json
-  languages/korean.json
-  languages/kyrgyz.json
-  languages/license.txt
-  languages/lithuanian.json
-  languages/norwegian.json
-  languages/polish.json
-  languages/portuguese.json
-  languages/readme.txt
-  languages/romanian.json
-  languages/russian.json
-  languages/serbian.json
-  languages/simplified_chinese.json
-  languages/slovak.json
-  languages/slovenian.json
-  languages/spanish.json
-  languages/swedish.json
-  languages/traditional_chinese.json
-  languages/turkish.json
-  languages/ukrainian.json
   mapres/bg_cloud1.png
   mapres/bg_cloud2.png
   mapres/bg_cloud3.png
@@ -926,15 +618,6 @@ set(EXPECTED_DATA
   ui/themes/winter_day.map
   ui/themes/winter_night.map
 )
-
-if(NOT EXISTS ${PROJECT_SOURCE_DIR}/datasrc/languages/index.json)
-  message(WARNING "Missing datasrc/languages submodule. Please download a source release or update your git submodules with `git submodule update --init`")
-  foreach(item ${EXPECTED_DATA})
-    if(item MATCHES "^languages/")
-      list(REMOVE_ITEM EXPECTED_DATA ${item})
-    endif()
-  endforeach()
-endif()
 
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/datasrc/maps/dm1.map)
   message(WARNING "Missing datasrc/maps submodule. Please download a source release or update your git submodules with `git submodule update --init`")
@@ -1107,7 +790,7 @@ set(GAME_GENERATED_SHARED
   src/generated/protocol.h
 )
 
-set(DEPS ${DEP_JSON} ${DEP_MD5} ${ZLIB_DEP})
+set(DEPS ${DEP_MD5} ${ZLIB_DEP})
 
 # Libraries
 set(LIBS ${CMAKE_THREAD_LIBS_INIT} ${ZLIB_LIBRARIES} ${CRYPTO_LIBRARIES} ${PLATFORM_LIBS})
