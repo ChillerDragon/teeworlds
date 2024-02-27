@@ -13,7 +13,6 @@
 
 #include "menus.h"
 #include "controls.h"
-#include "camera.h"
 #include "hud.h"
 #include "voting.h"
 #include "binds.h"

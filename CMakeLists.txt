@@ -1415,8 +1415,6 @@ if(CLIENT)
     components/binds.h
     components/broadcast.cpp
     components/broadcast.h
-    components/camera.cpp
-    components/camera.h
     components/chat.cpp
     components/chat.h
     components/console.cpp
@@ -1427,8 +1425,6 @@ if(CLIENT)
     components/countryflags.h
     components/damageind.cpp
     components/damageind.h
-    components/debughud.cpp
-    components/debughud.h
     components/effects.cpp
     components/effects.h
     components/emoticon.cpp

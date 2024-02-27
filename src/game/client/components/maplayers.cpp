@@ -13,7 +13,6 @@
 #include <game/client/component.h>
 #include <game/client/render.h>
 
-#include "camera.h"
 #include "menus.h"
 #include "maplayers.h"
 

@@ -293,7 +293,6 @@ public:
 	class CCountryFlags *m_pCountryFlags;
 	class CChat *m_pChat;
 	class CDamageInd *m_pDamageind;
-	class CCamera *m_pCamera;
 	class CControls *m_pControls;
 	class CEffects *m_pEffects;
 	class CMotd *m_pMotd;

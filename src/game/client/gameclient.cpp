@@ -17,13 +17,11 @@
 
 #include "components/binds.h"
 #include "components/broadcast.h"
-#include "components/camera.h"
 #include "components/chat.h"
 #include "components/console.h"
 #include "components/controls.h"
 #include "components/countryflags.h"
 #include "components/damageind.h"
-#include "components/debughud.h"
 #include "components/effects.h"
 #include "components/emoticon.h"
 #include "components/hud.h"
@@ -78,7 +76,6 @@ void FormatTimeDiff(char *pBuf, int Size, int Time, int Precision, bool ForceSig
 
 // instantiate all systems
 static CInfoMessages gs_InfoMessages;
-static CCamera gs_Camera;
 static CChat gs_Chat;
 static CMotd gs_Motd;
 static CBroadcast gs_Broadcast;
@@ -86,7 +83,6 @@ static CGameConsole gs_GameConsole;
 static CBinds gs_Binds;
 static CCountryFlags gs_CountryFlags;
 static CHud gs_Hud;
-static CDebugHud gs_DebugHud;
 static CNotifications gs_Notifications;
 static CControls gs_Controls;
 static CEffects gs_Effects;
@@ -201,7 +197,6 @@ void CGameClient::OnConsoleInit()
 	m_pGameConsole = &::gs_GameConsole;
 	m_pCountryFlags = &::gs_CountryFlags;
 	m_pChat = &::gs_Chat;
-	m_pCamera = &::gs_Camera;
 	m_pControls = &::gs_Controls;
 	m_pEffects = &::gs_Effects;
 	m_pMotd = &::gs_Motd;
@@ -219,7 +214,6 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(m_pBinds);
 	m_All.Add(&m_pBinds->m_SpecialBinds);
 	m_All.Add(m_pControls);
-	m_All.Add(m_pCamera);
 	m_All.Add(m_pVoting);
 
 	m_All.Add(&gs_MapLayersBackGround); // first to render
@@ -234,7 +228,6 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(&gs_InfoMessages);
 	m_All.Add(m_pChat);
 	m_All.Add(&gs_Broadcast);
-	m_All.Add(&gs_DebugHud);
 	m_All.Add(&gs_Notifications);
 	m_All.Add(&gs_Scoreboard);
 	m_All.Add(m_pStats);
