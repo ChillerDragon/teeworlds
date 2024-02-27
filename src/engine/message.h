@@ -6,8 +6,6 @@
 #include <engine/shared/packer.h>
 #include <engine/shared/protocol.h>
 
-#include <base/dissector/dissector.h>
-
 class CMsgPacker : public CPacker
 {
 public:

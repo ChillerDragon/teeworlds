@@ -9,8 +9,6 @@
 #include "network.h"
 #include "huffman.h"
 
-#include <base/dissector/dissector.h>
-
 void CNetRecvUnpacker::Clear()
 {
 	m_Valid = false;
@@ -224,11 +222,6 @@ void CNetBase::SendPacket(const NETADDR *pAddr, CNetPacketConstruct *pPacket)
 			io_flush(m_DataLogSent);
 		}
 	}
-
-	if(m_pConfig->m_Debug > 2)
-	{
-		print_packet(pPacket, aBuffer, FinalSize, pAddr, NETWORK_OUT, Config());
-	}
 }
 
 // TODO: rename this function
@@ -279,11 +272,6 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 
 		if(Version != NET_PACKETVERSION)
 		{
-			if(m_pConfig->m_Debug > 2)
-			{
-				if(show_addr(pAddr))
-					dbg_msg("network_in", "got invalid version %d expected %d", Version, NET_PACKETVERSION);
-			}
 			return -1;
 		}
 
@@ -339,11 +327,6 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 					| (pPacket->m_aChunkData[3]<<8) | pPacket->m_aChunkData[4];
 			}
 		}
-	}
-
-	if(m_pConfig->m_Debug > 1)
-	{
-		print_packet(pPacket, pBuffer, Size, pAddr, NETWORK_IN, Config());
 	}
 
 	// log the data

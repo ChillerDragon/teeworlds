@@ -41,8 +41,6 @@
 #undef main
 #endif
 
-#include <base/dissector/snapshot.h>
-
 void CGraph::Init(float Min, float Max)
 {
 	m_MinRange = m_Min = Min;
@@ -777,7 +775,6 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 		if(Config()->m_DbgMaster)
 		{
 			dbg_msg("network_in", "WE GOT A SERVER LIST SERVERBROWSE_LIST");
-			print_hex("network_in", "    ", pPacket->m_pData, pPacket->m_DataSize, 12);
 		}
 		// check for valid master server address
 		bool Valid = false;
@@ -815,12 +812,7 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 			Addr.port = (pAddrs[i].m_aPort[0]<<8) | pAddrs[i].m_aPort[1];
 		}
 	}
-
-	if(Config()->m_Debug > 2)
-	{
-		if(show_addr(&pPacket->m_Address))
-			dbg_msg("network_in", "connless packet: %s", pConnlessPacket);
-	}
+	dbg_msg("conless", "msg %s", pConnlessPacket);
 }
 
 void CClient::ProcessServerPacket(CNetChunk *pPacket)
@@ -835,13 +827,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 
 	if(Unpacker.Error())
 		return;
-
-	if(m_pConfig->m_Debug == 1) // TODO: remove? this is kinda redundant with print_packet
-	{
-		char aMsg[512];
-		netmsg_to_s(Msg, aMsg, sizeof(aMsg));
-		dbg_msg("network_in", "server packet sys=%d msg=%d (%s)", Sys, Msg, aMsg);
-	}
 
 	if(Sys)
 	{
@@ -1044,22 +1029,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 		}
 		else if(Msg == NETMSG_SNAP || Msg == NETMSG_SNAPSINGLE || Msg == NETMSG_SNAPEMPTY)
 		{
-			CUnpacker PrintPacker = Unpacker; // create copy that will be modified during print
-			print_snapshot(Msg,
-				PrintPacker,
-				Config(),
-				m_ReceivedSnapshots,
-				m_SnapshotParts,
-				m_SnapshotDelta,
-				m_CurrentRecvTick,
-				m_SnapshotStorage,
-				m_SnapCrcErrors,
-				// const class CSmoothTime &GameTime,
-				m_aSnapshotIncomingData,
-				m_aSnapshots,
-				this,
-				true);
-
 			int NumParts = 1;
 			int Part = 0;
 			int GameTick = Unpacker.GetInt();

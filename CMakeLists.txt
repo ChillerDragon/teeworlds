@@ -1108,14 +1108,6 @@ generate_source("src/generated/server_data.h" "server_content_header")
 set_src(BASE GLOB_RECURSE src/base
   color.h
   detect.h
-  dissector/byte_printer.cpp
-  dissector/byte_printer.h
-  dissector/compat.cpp
-  dissector/compat.h
-  dissector/dissector.cpp
-  dissector/dissector.h
-  dissector/snapshot.cpp
-  dissector/snapshot.h
   hash.c
   hash.h
   hash_bundled.c
