@@ -18,7 +18,6 @@ const char * const CSkins::ms_apSkinPartNames[NUM_SKINPARTS] = {"body", "marking
 const char * const CSkins::ms_apColorComponents[NUM_COLOR_COMPONENTS] = {"hue", "sat", "lgt", "alp"};
 
 char *CSkins::ms_apSkinVariables[NUM_SKINPARTS] = {0};
-int *CSkins::ms_apUCCVariables[NUM_SKINPARTS] = {0};
 int *CSkins::ms_apColorVariables[NUM_SKINPARTS] = {0};
 
 const float MIN_EYE_BODY_COLOR_DIST = 80.f; // between body and eyes (LAB color space)
@@ -89,30 +88,6 @@ int CSkins::FindSkinPart(int Part, const char *pName, bool AllowSpecialPart)
 			return i;
 	}
 	return -1;
-}
-
-void CSkins::RandomizeSkin()
-{
-	for(int p = 0; p < NUM_SKINPARTS; p++)
-	{
-		int Hue = random_int() % 255;
-		int Sat = random_int() % 255;
-		int Lgt = random_int() % 255;
-		int Alp = 0;
-		if (p == 1) // SKINPART_MARKING
-			Alp = random_int() % 255;
-		int ColorVariable = (Alp << 24) | (Hue << 16) | (Sat << 8) | Lgt;
-		*CSkins::ms_apUCCVariables[p] = true;
-		*CSkins::ms_apColorVariables[p] = ColorVariable;
-	}
-
-	for(int p = 0; p < NUM_SKINPARTS; p++)
-	{
-		const CSkins::CSkinPart *s = GetSkinPart(p, random_int() % NumSkinPart(p));
-		while(s->m_Flags&CSkins::SKINFLAG_SPECIAL)
-			s = GetSkinPart(p, random_int() % NumSkinPart(p));
-		mem_copy(CSkins::ms_apSkinVariables[p], s->m_aName, MAX_SKIN_ARRAY_SIZE);
-	}
 }
 
 vec3 CSkins::GetColorV3(int v) const
@@ -258,7 +233,7 @@ bool CSkins::SaveSkinfile(const char *pSaveSkinName)
 			Writer.WriteAttribute("filename");
 			Writer.WriteStrValue(ms_apSkinVariables[PartIndex]);
 
-			const bool CustomColors = *ms_apUCCVariables[PartIndex];
+			const bool CustomColors = false;
 			Writer.WriteAttribute("custom_colors");
 			Writer.WriteBoolValue(CustomColors);
 

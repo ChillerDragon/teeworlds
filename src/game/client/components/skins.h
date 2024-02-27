@@ -48,7 +48,6 @@ public:
 	static const char * const ms_apColorComponents[NUM_COLOR_COMPONENTS];
 
 	static char *ms_apSkinVariables[NUM_SKINPARTS];
-	static int *ms_apUCCVariables[NUM_SKINPARTS]; // use custom color
 	static int *ms_apColorVariables[NUM_SKINPARTS];
 
 	int GetInitAmount() const;
@@ -63,7 +62,6 @@ public:
 	int Find(const char *pName, bool AllowSpecialSkin);
 	const CSkinPart *GetSkinPart(int Part, int Index);
 	int FindSkinPart(int Part, const char *pName, bool AllowSpecialPart);
-	void RandomizeSkin();
 
 	vec3 GetColorV3(int v) const;
 	vec4 GetColorV4(int v, bool UseAlpha) const;

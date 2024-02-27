@@ -1605,9 +1605,9 @@ void CGameClient::SendStartInfo()
 	Msg.m_Country = Config()->m_PlayerCountry;
 	for(int p = 0; p < NUM_SKINPARTS; p++)
 	{
-		Msg.m_apSkinPartNames[p] = CSkins::ms_apSkinVariables[p];
-		Msg.m_aUseCustomColors[p] = *CSkins::ms_apUCCVariables[p];
-		Msg.m_aSkinPartColors[p] = *CSkins::ms_apColorVariables[p];
+		Msg.m_apSkinPartNames[p] = "greensward";
+		Msg.m_aUseCustomColors[p] = 0;
+		Msg.m_aSkinPartColors[p] = 0;
 	}
 	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH);
 }
@@ -1629,9 +1629,9 @@ void CGameClient::SendSkinChange()
 	CNetMsg_Cl_SkinChange Msg;
 	for(int p = 0; p < NUM_SKINPARTS; p++)
 	{
-		Msg.m_apSkinPartNames[p] = CSkins::ms_apSkinVariables[p];
-		Msg.m_aUseCustomColors[p] = *CSkins::ms_apUCCVariables[p];
-		Msg.m_aSkinPartColors[p] = *CSkins::ms_apColorVariables[p];
+		Msg.m_apSkinPartNames[p] = "greensward";
+		Msg.m_aUseCustomColors[p] = 0;
+		Msg.m_aSkinPartColors[p] = 0;
 	}
 	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD|MSGFLAG_FLUSH);
 	m_LastSkinChangeTime = Client()->LocalTime();
