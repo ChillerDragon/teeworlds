@@ -487,7 +487,7 @@ bool CDataFileReader::CheckSha256(IOHANDLE Handle, const void *pSha256)
 	SHA256_CTX Sha256Ctx;
 	sha256_init(&Sha256Ctx);
 	unsigned char aBuffer[64*1024];
-	
+
 	while(1)
 	{
 		unsigned Bytes = io_read(Handle, aBuffer, sizeof(aBuffer));

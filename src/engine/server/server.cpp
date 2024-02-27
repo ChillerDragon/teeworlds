@@ -1180,20 +1180,12 @@ void CServer::PumpNetwork()
 
 const char *CServer::GetMapName()
 {
-	// get the name of the map without his path
-	char *pMapShortName = &Config()->m_SvMap[0];
-	for(int i = 0; i < str_length(Config()->m_SvMap)-1; i++)
-	{
-		if(Config()->m_SvMap[i] == '/' || Config()->m_SvMap[i] == '\\')
-			pMapShortName = &Config()->m_SvMap[i+1];
-	}
-	return pMapShortName;
+	return "dm1";
 }
 
 void CServer::ChangeMap(const char *pMap)
 {
-	str_copy(Config()->m_SvMap, pMap, sizeof(Config()->m_SvMap));
-	m_MapReload = str_comp(Config()->m_SvMap, m_aCurrentMap) != 0;
+	m_MapReload = true;
 }
 
 int CServer::LoadMap(const char *pMapName)
@@ -1254,13 +1246,13 @@ int CServer::Run()
 	InitMapList();
 
 	// load map
-	if(!LoadMap(Config()->m_SvMap))
+	if(!LoadMap(GetMapName()))
 	{
-		dbg_msg("server", "failed to load map. mapname='%s'", Config()->m_SvMap);
+		dbg_msg("server", "failed to load map. mapname='%s'", GetMapName());
 		Free();
 		return -1;
 	}
-	m_MapChunksPerRequest = Config()->m_SvMapDownloadSpeed;
+	m_MapChunksPerRequest = 1;
 
 	// start server
 	NETADDR BindAddr;
@@ -1318,7 +1310,7 @@ int CServer::Run()
 				m_MapReload = false;
 
 				// load map
-				if(LoadMap(Config()->m_SvMap))
+				if(LoadMap(GetMapName()))
 				{
 					// new map loaded
 					bool aSpecs[MAX_CLIENTS];
@@ -1344,9 +1336,8 @@ int CServer::Run()
 				}
 				else
 				{
-					str_format(aBuf, sizeof(aBuf), "failed to load map. mapname='%s'", Config()->m_SvMap);
+					str_format(aBuf, sizeof(aBuf), "failed to load map. mapname='%s'", GetMapName());
 					dbg_msg("server", "%s", aBuf);
-					str_copy(Config()->m_SvMap, m_aCurrentMap, sizeof(Config()->m_SvMap));
 				}
 			}
 
@@ -1490,12 +1481,7 @@ void CServer::InitMapList()
 	m_pMapListHeap = new CHeap();
 
 	CSubdirCallbackUserdata Userdata;
-	if(str_comp(Config()->m_SvMaplist, "standard") == 0)
-		Userdata.m_StandardOnly = true;
-	else if(str_comp(Config()->m_SvMaplist, "all") == 0)
-		Userdata.m_StandardOnly = false;
-	else /* "none" or any other value */
-		return;
+	Userdata.m_StandardOnly = false;
 
 	Userdata.m_pServer = this;
 	str_copy(Userdata.m_aName, "", sizeof(Userdata.m_aName));
