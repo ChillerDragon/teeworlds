@@ -9,7 +9,6 @@
 #include <game/layers.h>
 #include <game/gamecore.h>
 #include "render.h"
-#include "ui.h"
 
 class CGameClient : public IGameClient
 {

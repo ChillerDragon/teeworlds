@@ -1474,12 +1474,6 @@ if(CLIENT)
     localization.h
     render.cpp
     render.h
-    ui.cpp
-    ui.h
-    ui_listbox.cpp
-    ui_listbox.h
-    ui_rect.cpp
-    ui_rect.h
   )
   set_src(GAME_EDITOR GLOB src/game/editor
     io.cpp

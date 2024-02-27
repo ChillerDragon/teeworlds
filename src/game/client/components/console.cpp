@@ -14,8 +14,6 @@
 #include <engine/keys.h>
 #include <engine/console.h>
 
-#include <game/client/ui.h>
-
 #include <game/version.h>
 
 #include <game/client/components/controls.h>
