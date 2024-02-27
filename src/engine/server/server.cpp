@@ -1093,9 +1093,9 @@ void CServer::GenerateServerInfo(CPacker *pPacker, int Token)
 		Flags |= SERVERINFO_FLAG_TIMESCORE;
 	pPacker->AddInt(Flags);
 
-	pPacker->AddInt(Config()->m_SvSkillLevel);	// server skill level
+	pPacker->AddInt(0);	// server skill level
 	pPacker->AddInt(PlayerCount); // num players
-	pPacker->AddInt(Config()->m_SvPlayerSlots); // max players
+	pPacker->AddInt(10); // max players
 	pPacker->AddInt(ClientCount); // num clients
 	pPacker->AddInt(maximum(ClientCount, Config()->m_SvMaxClients)); // max clients
 

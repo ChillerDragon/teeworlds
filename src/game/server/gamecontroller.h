@@ -20,7 +20,6 @@ class IGameController
 	class IServer *m_pServer;
 
 	// activity
-	void DoActivityCheck();
 	bool GetPlayersReadyState(int WithoutID = -1);
 	void SetPlayersReadyState(bool ReadyState);
 	void CheckReadyStates(int WithoutID = -1);
@@ -35,8 +34,6 @@ class IGameController
 	int m_UnbalancedTick;
 
 	virtual bool CanBeMovedOnBalance(int ClientID) const;
-	void CheckTeamBalance();
-	void DoTeamBalance();
 
 	// game
 	enum EGameState
@@ -66,8 +63,6 @@ class IGameController
 
 	// map
 	char m_aMapWish[128];
-
-	void CycleMap();
 
 	// spawn
 	struct CSpawnEval
@@ -222,7 +217,6 @@ public:
 	bool CanChangeTeam(CPlayer *pPplayer, int JoinTeam) const;
 
 	void DoTeamChange(class CPlayer *pPlayer, int Team, bool DoChatMsg=true);
-	void ForceTeamBalance() { if(!(m_GameFlags&GAMEFLAG_SURVIVAL)) DoTeamBalance(); }
 
 	int GetRealPlayerNum() const { return m_aTeamSize[TEAM_RED]+m_aTeamSize[TEAM_BLUE]; }
 	int GetStartTeam();

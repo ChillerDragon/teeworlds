@@ -1178,7 +1178,6 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
 set(ENGINE_GENERATED_SHARED src/generated/nethash.cpp src/generated/protocol.cpp src/generated/protocol.h)
 set_src(GAME_SHARED GLOB src/game
   mapitems.h
-  variables.h
   version.h
   voting.h
 )

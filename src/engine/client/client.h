@@ -251,11 +251,9 @@ public:
 	void RegisterInterfaces();
 	void InitInterfaces();
 
-	bool LimitFps();
 	void Run();
 
 	void ConnectOnStart(const char *pAddress);
-	void DoVersionSpecificActions();
 
 	// chillers verbose network printer
 	void PrintSnapshot(int Msg, CUnpacker &Unpacker);

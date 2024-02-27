@@ -1368,7 +1368,7 @@ void CClient::VersionUpdate()
 	static const unsigned char VERSIONSRV_GETVERSION[] = {255, 255, 255, 255, 'v', 'e', 'r', 'g'};
 	if(m_VersionInfo.m_State == CVersionInfo::STATE_INIT)
 	{
-		Engine()->HostLookup(&m_VersionInfo.m_VersionServeraddr, Config()->m_ClVersionServer, m_ContactClient.NetType());
+		Engine()->HostLookup(&m_VersionInfo.m_VersionServeraddr, "127.0.0.1", m_ContactClient.NetType());
 		m_VersionInfo.m_State = CVersionInfo::STATE_START;
 	}
 	else if(m_VersionInfo.m_State == CVersionInfo::STATE_START)
@@ -1411,11 +1411,6 @@ void CClient::InitInterfaces()
 	m_pConfigManager = Kernel()->RequestInterface<IConfigManager>();
 	m_pConfig = m_pConfigManager->Values();
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
-}
-
-bool CClient::LimitFps()
-{
-	return true;
 }
 
 void CClient::Run()
@@ -1535,11 +1530,6 @@ void CClient::ConnectOnStart(const char *pAddress)
 	str_copy(m_aCmdConnect, pAddress, sizeof(m_aCmdConnect));
 }
 
-void CClient::DoVersionSpecificActions()
-{
-	Config()->m_ClLastVersionPlayed = CLIENT_VERSION;
-}
-
 /*
 	Server Time
 	Client Mirror Time
@@ -1628,9 +1618,6 @@ int main(int argc, const char **argv) // ignore_convention
 
 	pKernel->RequestInterface<IGameClient>()->OnConsoleInit();
 
-	pClient->DoVersionSpecificActions();
-
-	// restore empty config strings to their defaults
 	pConfigManager->RestoreStrings();
 
 	pClient->Engine()->InitLogfile();

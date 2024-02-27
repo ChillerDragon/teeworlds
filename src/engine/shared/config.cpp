@@ -34,61 +34,14 @@ void CConfigManager::Init(int FlagMask)
 
 void CConfigManager::Reset()
 {
-	#define MACRO_CONFIG_INT(Name,ScriptName,def,min,max,flags,desc) m_Values.m_##Name = def;
-	#define MACRO_CONFIG_STR(Name,ScriptName,len,def,flags,desc) str_copy(m_Values.m_##Name, def, len);
-	#define MACRO_CONFIG_UTF8STR(Name,ScriptName,size,len,def,flags,desc) str_utf8_copy_num(m_Values.m_##Name, def, size, len);
-
-	#include "config_variables.h"
-
-	#undef MACRO_CONFIG_INT
-	#undef MACRO_CONFIG_STR
-	#undef MACRO_CONFIG_UTF8STR
 }
 
 void CConfigManager::RestoreStrings()
 {
-	#define MACRO_CONFIG_INT(Name,ScriptName,def,min,max,flags,desc)	// nop
-	#define MACRO_CONFIG_STR(Name,ScriptName,len,def,flags,desc) if(!m_Values.m_##Name[0] && def[0]) str_copy(m_Values.m_##Name, def, len);
-	#define MACRO_CONFIG_UTF8STR(Name,ScriptName,size,len,def,flags,desc) if(!m_Values.m_##Name[0] && def[0]) str_utf8_copy_num(m_Values.m_##Name, def, size, len);
-
-	#include "config_variables.h"
-
-	#undef MACRO_CONFIG_INT
-	#undef MACRO_CONFIG_STR
-	#undef MACRO_CONFIG_UTF8STR
 }
 
 void CConfigManager::Save(const char *pFilename)
 {
-	if(!m_pStorage)
-		return;
-
-	if(!pFilename)
-		pFilename = SETTINGS_FILENAME ".cfg";
-	m_ConfigFile = m_pStorage->OpenFile(pFilename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
-
-	if(!m_ConfigFile)
-		return;
-
-	WriteLine("# Teeworlds " GAME_VERSION);
-
-	char aLineBuf[1024*2];
-	char aEscapeBuf[1024*2];
-
-	#define MACRO_CONFIG_INT(Name,ScriptName,def,min,max,flags,desc) if(((flags)&(CFGFLAG_SAVE))&&((flags)&(m_FlagMask))&&(m_Values.m_##Name!=int(def))){ str_format(aLineBuf, sizeof(aLineBuf), "%s %i", #ScriptName, m_Values.m_##Name); WriteLine(aLineBuf); }
-	#define MACRO_CONFIG_STR(Name,ScriptName,len,def,flags,desc) if(((flags)&(CFGFLAG_SAVE))&&((flags)&(m_FlagMask)&&(str_comp(m_Values.m_##Name,def)))){ EscapeParam(aEscapeBuf, m_Values.m_##Name, sizeof(aEscapeBuf)); str_format(aLineBuf, sizeof(aLineBuf), "%s \"%s\"", #ScriptName, aEscapeBuf); WriteLine(aLineBuf); }
-	#define MACRO_CONFIG_UTF8STR(Name,ScriptName,size,len,def,flags,desc) if(((flags)&(CFGFLAG_SAVE))&&((flags)&(m_FlagMask)&&(str_comp(m_Values.m_##Name,def)))){ EscapeParam(aEscapeBuf, m_Values.m_##Name, sizeof(aEscapeBuf)); str_format(aLineBuf, sizeof(aLineBuf), "%s \"%s\"", #ScriptName, aEscapeBuf); WriteLine(aLineBuf); }
-
-	#include "config_variables.h"
-
-	#undef MACRO_CONFIG_INT
-	#undef MACRO_CONFIG_STR
-	#undef MACRO_CONFIG_UTF8STR
-
-	for(int i = 0; i < m_NumCallbacks; i++)
-		m_aCallbacks[i].m_pfnFunc(this, m_aCallbacks[i].m_pUserData);
-
-	io_close(m_ConfigFile);
 }
 
 void CConfigManager::RegisterCallback(SAVECALLBACKFUNC pfnFunc, void *pUserData)
