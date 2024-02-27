@@ -1398,7 +1398,6 @@ if(CLIENT)
   set_src(ENGINE_CLIENT GLOB src/engine/client
     client.cpp
     client.h
-    keynames.h
     serverbrowser.cpp
     serverbrowser.h
     serverbrowser_entry.h
