@@ -16,7 +16,6 @@
 #include "components/broadcast.h"
 #include "components/chat.h"
 #include "components/controls.h"
-#include "components/effects.h"
 #include "components/emoticon.h"
 #include "components/items.h"
 #include "components/infomessages.h"
@@ -104,7 +103,6 @@ static CChat gs_Chat;
 static CMotd gs_Motd;
 static CBroadcast gs_Broadcast;
 static CControls gs_Controls;
-static CEffects gs_Effects;
 static CScoreboard gs_Scoreboard;
 static CEmoticon gs_Emoticon;
 static CVoting gs_Voting;
@@ -208,14 +206,12 @@ void CGameClient::OnConsoleInit()
 	m_pBroadcast = &::gs_Broadcast;
 	m_pChat = &::gs_Chat;
 	m_pControls = &::gs_Controls;
-	m_pEffects = &::gs_Effects;
 	m_pMotd = &::gs_Motd;
 	m_pVoting = &::gs_Voting;
 	m_pScoreboard = &::gs_Scoreboard;
 	m_pItems = &::gs_Items;
 
 	// make a list of all the systems, make sure to add them in the corrent render order
-	m_All.Add(m_pEffects); // doesn't render anything, just updates effects
 	m_All.Add(m_pControls);
 	m_All.Add(m_pVoting);
 
@@ -817,23 +813,23 @@ void CGameClient::ProcessEvents()
 		}
 		else if(Item.m_Type == NETEVENTTYPE_EXPLOSION)
 		{
-			CNetEvent_Explosion *ev = (CNetEvent_Explosion *)pData;
-			m_pEffects->Explosion(vec2(ev->m_X, ev->m_Y));
+			// CNetEvent_Explosion *ev = (CNetEvent_Explosion *)pData;
+			// m_pEffects->Explosion(vec2(ev->m_X, ev->m_Y));
 		}
 		else if(Item.m_Type == NETEVENTTYPE_HAMMERHIT)
 		{
-			CNetEvent_HammerHit *ev = (CNetEvent_HammerHit *)pData;
-			m_pEffects->HammerHit(vec2(ev->m_X, ev->m_Y));
+			// CNetEvent_HammerHit *ev = (CNetEvent_HammerHit *)pData;
+			// m_pEffects->HammerHit(vec2(ev->m_X, ev->m_Y));
 		}
 		else if(Item.m_Type == NETEVENTTYPE_SPAWN)
 		{
-			CNetEvent_Spawn *ev = (CNetEvent_Spawn *)pData;
-			m_pEffects->PlayerSpawn(vec2(ev->m_X, ev->m_Y));
+			// CNetEvent_Spawn *ev = (CNetEvent_Spawn *)pData;
+			// m_pEffects->PlayerSpawn(vec2(ev->m_X, ev->m_Y));
 		}
 		else if(Item.m_Type == NETEVENTTYPE_DEATH)
 		{
-			CNetEvent_Death *ev = (CNetEvent_Death *)pData;
-			m_pEffects->PlayerDeath(vec2(ev->m_X, ev->m_Y), ev->m_ClientID);
+			// CNetEvent_Death *ev = (CNetEvent_Death *)pData;
+			// m_pEffects->PlayerDeath(vec2(ev->m_X, ev->m_Y), ev->m_ClientID);
 		}
 		else if(Item.m_Type == NETEVENTTYPE_SOUNDWORLD)
 		{
@@ -850,8 +846,8 @@ void CGameClient::ProcessTriggeredEvents(int Events, vec2 Pos)
 
 	if(Events&COREEVENTFLAG_GROUND_JUMP)
 		dbg_msg("sound", "(CSounds::CHN_WORLD, SOUND_PLAYER_JUMP, 1.0f, Pos);");
-	if(Events&COREEVENTFLAG_AIR_JUMP)
-		m_pEffects->AirJump(Pos);
+	// if(Events&COREEVENTFLAG_AIR_JUMP)
+	// 	m_pEffects->AirJump(Pos);
 	if(Events&COREEVENTFLAG_HOOK_ATTACH_PLAYER)
 		dbg_msg("sound", "(CSounds::CHN_WORLD, SOUND_HOOK_ATTACH_PLAYER, 1.0f, Pos);");
 	if(Events&COREEVENTFLAG_HOOK_ATTACH_GROUND)

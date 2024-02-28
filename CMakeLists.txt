@@ -730,8 +730,6 @@ if(CLIENT)
     components/chat.h
     components/controls.cpp
     components/controls.h
-    components/effects.cpp
-    components/effects.h
     components/emoticon.cpp
     components/emoticon.h
     components/infomessages.cpp

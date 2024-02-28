@@ -250,7 +250,6 @@ public:
 	class CBroadcast *m_pBroadcast;
 	class CChat *m_pChat;
 	class CControls *m_pControls;
-	class CEffects *m_pEffects;
 	class CMotd *m_pMotd;
 	class CVoting *m_pVoting;
 	class CScoreboard *m_pScoreboard;
