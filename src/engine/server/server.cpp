@@ -1078,7 +1078,7 @@ void CServer::GenerateServerInfo(CPacker *pPacker, int Token)
 	}
 
 	pPacker->AddString(GameServer()->Version(), 32);
-	pPacker->AddString(Config()->m_SvName, 64);
+	pPacker->AddString(GetServerName(), 64);
 	pPacker->AddString(Config()->m_SvHostname, 128);
 	pPacker->AddString(GetMapName(), 32);
 
@@ -1183,6 +1183,11 @@ const char *CServer::GetMapName()
 	return "dm1";
 }
 
+const char *CServer::GetServerName()
+{
+	return "unnamed server";
+}
+
 void CServer::ChangeMap(const char *pMap)
 {
 	m_MapReload = true;
@@ -1282,7 +1287,7 @@ int CServer::Run()
 	}
 
 	char aBuf[256];
-	str_format(aBuf, sizeof(aBuf), "server name is '%s'", Config()->m_SvName);
+	str_format(aBuf, sizeof(aBuf), "server name is '%s'", GetServerName());
 	dbg_msg("server", "%s", aBuf);
 
 	GameServer()->OnInit();

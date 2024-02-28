@@ -236,6 +236,7 @@ public:
 
 	virtual void ChangeMap(const char *pMap);
 	const char *GetMapName();
+	const char *GetServerName();
 	int LoadMap(const char *pMapName);
 
 	void InitRegister(CNetServer *pNetServer, CConfig *pConfig);
