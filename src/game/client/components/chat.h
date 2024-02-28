@@ -7,7 +7,6 @@
 class CChat : public CComponent
 {
 	// Mode defined by the CHAT_* constants in protocol.h
-	int m_Mode;
 	int m_WhisperTarget;
 	const char *GetModeName(int Mode) const;
 

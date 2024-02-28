@@ -232,11 +232,6 @@ void CGameClient::OnInit()
 	for(int i = 0; i < OLD_NUM_NETOBJTYPES; i++)
 		Client()->SnapSetStaticsize(i, m_NetObjHandler.GetObjSize(i));
 
-	// determine total work for loading all components
-	int TotalWorkAmount = 0;
-	for(int i = m_All.m_Num-1; i >= 0; --i)
-		TotalWorkAmount += m_All.m_paComponents[i]->GetInitAmount();
-
 	// init all components
 	for(int i = m_All.m_Num-1; i >= 0; --i)
 		m_All.m_paComponents[i]->OnInit();
