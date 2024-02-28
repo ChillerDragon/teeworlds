@@ -6,49 +6,7 @@
 
 class CInfoMessages : public CComponent
 {
-	// info messages
-	struct CInfoMsg
-	{
-		int m_Type;
-		int m_Tick;
-
-		// victim / finishing player
-		int m_Player1ID;
-
-		// killer
-		int m_Player2ID;
-
-		// kill msg
-		int m_Weapon;
-		int m_ModeSpecial; // for CTF, if the guy is carrying a flag for example
-		int m_FlagCarrierBlue;
-
-		// finish msg
-		int m_Time;
-		int m_Diff;
-		int m_RecordPersonal;
-		int m_RecordServer;
-	};
-
-	enum
-	{
-		MAX_INFOMSGS = 5,
-
-		INFOMSG_KILL = 0,
-		INFOMSG_FINISH
-	};
-
-	CInfoMsg m_aInfoMsgs[MAX_INFOMSGS];
-	int m_InfoMsgCurrent;
-
-	void AddInfoMsg(int Type, CInfoMsg NewMsg);
-
-	void RenderKillMsg(CInfoMsg *pInfoMsg, float x, float y) const;
-	void RenderFinishMsg(CInfoMsg *pInfoMsg, float x, float y) const;
-
 public:
-	virtual void OnReset();
-	virtual void OnRender();
 	virtual void OnMessage(int MsgType, void *pRawMsg);
 };
 

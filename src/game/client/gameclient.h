@@ -157,7 +157,6 @@ public:
 		bool m_Friend;
 
 		void UpdateRenderInfo(CGameClient *pGameClient, int ClientID, bool UpdateSkinInfo);
-		void UpdateBotRenderInfo(CGameClient *pGameClient, int ClientID);
 		void Reset(CGameClient *pGameClient, int CLientID);
 	};
 

@@ -903,25 +903,6 @@ void CGameClient::OnNewSnapshot()
 
 	ProcessEvents();
 
-	if(Config()->m_DbgStress)
-	{
-		if((Client()->GameTick()%100) == 0)
-		{
-			char aMessage[64];
-			int MsgLen = random_int()%(sizeof(aMessage)-1);
-			for(int i = 0; i < MsgLen; i++)
-				aMessage[i] = 'a'+(random_int()%('z'-'a'));
-			aMessage[MsgLen] = 0;
-
-			CNetMsg_Cl_Say Msg;
-			Msg.m_Mode = random_int()&1;
-			Msg.m_Target = -1;
-			Msg.m_pMessage = aMessage;
-			Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
-		}
-	}
-
-
 	// go trough all the items in the snapshot and gather the info we want
 	{
 		int Num = Client()->SnapNumItems(IClient::SNAP_CURRENT);
@@ -1000,7 +981,6 @@ void CGameClient::OnNewSnapshot()
 							m_Snap.m_SpecInfo.m_SpectatorID = -1;
 						}
 					}
-					m_aClients[ClientID].UpdateBotRenderInfo(this, ClientID);
 				}
 			}
 			else if(Item.m_Type == NETOBJTYPE_PLAYERINFORACE)
@@ -1221,10 +1201,6 @@ vec2 CGameClient::GetCharPos(int ClientID, bool Predicted) const
 		vec2(m_Snap.m_aCharacters[ClientID].m_Cur.m_X, m_Snap.m_aCharacters[ClientID].m_Cur.m_Y),
 		Client()->IntraGameTick()
 	);
-}
-
-void CGameClient::CClientData::UpdateBotRenderInfo(CGameClient *pGameClient, int ClientID)
-{
 }
 
 void CGameClient::CClientData::UpdateRenderInfo(CGameClient *pGameClient, int ClientID, bool UpdateSkinInfo)

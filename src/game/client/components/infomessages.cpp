@@ -2,23 +2,12 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
 
-#include <engine/shared/config.h>
 #include <generated/protocol.h>
 #include <generated/client_data.h>
 
-#include <game/client/gameclient.h>
-#include <game/client/animstate.h>
 #include "infomessages.h"
 
 #include "chat.h"
-
-void CInfoMessages::OnReset()
-{
-}
-
-void CInfoMessages::AddInfoMsg(int Type, CInfoMsg NewMsg)
-{
-}
 
 void CInfoMessages::OnMessage(int MsgType, void *pRawMsg)
 {
@@ -81,16 +70,4 @@ void CInfoMessages::OnMessage(int MsgType, void *pRawMsg)
 			dbg_msg("info", "INFOMSG_FINISH");
 		}
 	}
-}
-
-void CInfoMessages::OnRender()
-{
-}
-
-void CInfoMessages::RenderKillMsg(CInfoMsg *pInfoMsg, float x, float y) const
-{
-}
-
-void CInfoMessages::RenderFinishMsg(CInfoMsg *pInfoMsg, float x, float y) const
-{
 }
