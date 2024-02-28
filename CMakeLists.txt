@@ -622,23 +622,10 @@ if(CLIENT)
     ${PLATFORM_CLIENT_LIBS}
   )
 
-  if(TARGET_OS STREQUAL "windows")
-    set(CLIENT_ICON "other/icons/${CLIENT_EXECUTABLE}.rc")
-    if(NOT MINGW)
-      set(CLIENT_MANIFEST "other/manifest/teeworlds.manifest")
-    else()
-      set(CLIENT_MANIFEST "other/manifest/teeworlds.rc")
-    endif()
-  else()
-    set(CLIENT_ICON)
-  endif()
-
   # Target
   set(TARGET_CLIENT ${CLIENT_EXECUTABLE})
   add_executable(${TARGET_CLIENT}
     ${CLIENT_SRC}
-    ${CLIENT_ICON}
-    ${CLIENT_MANIFEST}
     ${DEPS_CLIENT}
     $<TARGET_OBJECTS:engine-shared>
     $<TARGET_OBJECTS:game-shared>
@@ -693,11 +680,6 @@ set(GAME_GENERATED_SERVER
   src/generated/server_data.h
 )
 set(SERVER_SRC ${ENGINE_SERVER} ${GAME_SERVER} ${GAME_GENERATED_SERVER})
-if(TARGET_OS STREQUAL "windows")
-  set(SERVER_ICON "other/icons/${SERVER_EXECUTABLE}.rc")
-else()
-  set(SERVER_ICON)
-endif()
 
 # Libraries
 set(LIBS_SERVER ${LIBS})
@@ -707,7 +689,6 @@ set(TARGET_SERVER ${SERVER_EXECUTABLE})
 add_executable(${TARGET_SERVER}
   ${DEPS}
   ${SERVER_SRC}
-  ${SERVER_ICON}
   $<TARGET_OBJECTS:engine-shared>
   $<TARGET_OBJECTS:game-shared>
 )
@@ -857,9 +838,6 @@ set(CPACK_FILES
   storage.cfg
   ${COPY_FILES}
 )
-if(TARGET_OS STREQUAL "windows")
-  list(APPEND CPACK_FILES other/config_directory.bat)
-endif()
 
 if(NOT DEV)
   install(DIRECTORY ${PROJECT_BINARY_DIR}/data DESTINATION share/${PROJECT_NAME} COMPONENT data)

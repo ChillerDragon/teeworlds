@@ -449,7 +449,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 					case STR_TEAM_BLUE: pMsg = Localize("All players were moved to the blue team"); break;
 					case STR_TEAM_SPECTATORS: pMsg = Localize("All players were moved to the spectators"); break;
 					}
-					m_pBroadcast->DoClientBroadcast(pMsg);
+					dbg_msg("client-broadcast", "%s", pMsg);
 				}
 				break;
 			case GAMEMSG_TEAM_BALANCE_VICTIM:
@@ -460,7 +460,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 					case STR_TEAM_RED: pMsg = Localize("You were moved to the red team due to team balancing"); break;
 					case STR_TEAM_BLUE: pMsg = Localize("You were moved to the blue team due to team balancing"); break;
 					}
-					m_pBroadcast->DoClientBroadcast(pMsg);
+					dbg_msg("client-broadcast", "%s", pMsg);
 				}
 				break;
 			case GAMEMSG_CTF_GRAB:
@@ -530,7 +530,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 			m_pChat->AddLine(pText);
 			break;
 		case DO_BROADCAST:
-			m_pBroadcast->DoClientBroadcast(pText);
+			dbg_msg("client-broadcast", "%s", pText);
 			break;
 		}
 	}
