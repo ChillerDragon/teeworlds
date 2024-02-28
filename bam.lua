@@ -401,10 +401,6 @@ function GenerateSettings(conf, arch, builddir, compiler, headless)
 		settings.cc.defines:Add("CONF_RELEASE")
 	end
 
-	if headless == "on" then
-		settings.cc.defines:Add("CONF_HEADLESS_CLIENT")
-	end
-
 	-- Generate object files in {builddir}/objs/
 	settings.cc.Output = function (settings_, input)
 		-- strip
@@ -487,12 +483,6 @@ end
 
 if ScriptArgs['builddir'] then
 	builddir = ScriptArgs['builddir']
-end
-
-if ScriptArgs['headless'] then
-	headless = ScriptArgs['headless']
-else
-	headless = nil
 end
 
 targets = {client="teeworlds", server="teeworlds_srv",
