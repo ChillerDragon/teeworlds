@@ -205,8 +205,6 @@ function GenerateWindowsSettings(settings, conf, target_arch, compiler)
 	settings.cc.defines:Add("UNICODE") -- Windows headers
 	settings.cc.defines:Add("_UNICODE") -- C-runtime
 
-	local manifests = SharedManifests(compiler)
-
 	-- Required libs
 	settings.link.libs:Add("gdi32")
 	settings.link.libs:Add("user32")
