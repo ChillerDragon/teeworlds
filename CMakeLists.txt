@@ -507,38 +507,6 @@ set(EXPECTED_DATA
   fonts/SourceHanSans.ttc
   fonts/index.json
   game.png
-  mapres/bg_cloud1.png
-  mapres/bg_cloud2.png
-  mapres/bg_cloud3.png
-  mapres/desert_doodads.png
-  mapres/desert_main.png
-  mapres/desert_mountains.png
-  mapres/desert_mountains2.png
-  mapres/desert_sun.png
-  mapres/easter.png
-  mapres/generic_deathtiles.png
-  mapres/generic_lamps.png
-  mapres/generic_shadows.png
-  mapres/generic_unhookable.png
-  mapres/grass_doodads.png
-  mapres/grass_main.png
-  mapres/jungle_background.png
-  mapres/jungle_deathtiles.png
-  mapres/jungle_doodads.png
-  mapres/jungle_main.png
-  mapres/jungle_midground.png
-  mapres/jungle_unhookables.png
-  mapres/light.png
-  mapres/moon.png
-  mapres/mountains.png
-  mapres/snow.png
-  mapres/stars.png
-  mapres/sun.png
-  mapres/winter_doodads.png
-  mapres/winter_main.png
-  mapres/winter_mountains.png
-  mapres/winter_mountains2.png
-  mapres/winter_mountains3.png
   maps/ctf1.map
   maps/ctf2.map
   maps/ctf3.map
@@ -559,52 +527,6 @@ set(EXPECTED_DATA
   maps/readme.txt
   particles.png
   race_flag.png
-  ui/blob.png
-  ui/console.png
-  ui/console_bar.png
-  ui/debug_font.png
-  ui/demo_buttons.png
-  ui/file_icons.png
-  ui/gametypes/ctf.png
-  ui/gametypes/dm.png
-  ui/gametypes/lms.png
-  ui/gametypes/lts.png
-  ui/gametypes/mod.png
-  ui/gametypes/race.png
-  ui/gametypes/tdm.png
-  ui/gui_buttons.png
-  ui/gui_cursor.png
-  ui/gui_icons.png
-  ui/gui_logo.png
-  ui/icons/arrows.png
-  ui/icons/browse.png
-  ui/icons/browser.png
-  ui/icons/chat_whisper.png
-  ui/icons/friend.png
-  ui/icons/level.png
-  ui/icons/menu.png
-  ui/icons/network.png
-  ui/icons/sidebar.png
-  ui/icons/timer_clock.png
-  ui/icons/tools.png
-  ui/menuimages/demos.png
-  ui/menuimages/editor.png
-  ui/menuimages/local_server.png
-  ui/menuimages/play_game.png
-  ui/menuimages/settings.png
-  ui/no_skinpart.png
-  ui/sound_icons.png
-  ui/themes/auto.png
-  ui/themes/heavens.png
-  ui/themes/heavens_day.map
-  ui/themes/heavens_night.map
-  ui/themes/jungle.png
-  ui/themes/jungle_day.map
-  ui/themes/jungle_night.map
-  ui/themes/none.png
-  ui/themes/winter.png
-  ui/themes/winter_day.map
-  ui/themes/winter_night.map
 )
 
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/datasrc/maps/dm1.map)
