@@ -9,7 +9,6 @@
 #include <generated/client_data.h>
 
 #include <game/version.h>
-#include "render.h"
 
 #include "gameclient.h"
 
@@ -19,11 +18,9 @@
 #include "components/emoticon.h"
 #include "components/items.h"
 #include "components/infomessages.h"
-#include "components/menus.h"
 #include "components/motd.h"
 #include "components/players.h"
 #include "components/nameplates.h"
-#include "components/scoreboard.h"
 #include "components/spectator.h"
 #include "components/voting.h"
 
@@ -103,7 +100,6 @@ static CChat gs_Chat;
 static CMotd gs_Motd;
 static CBroadcast gs_Broadcast;
 static CControls gs_Controls;
-static CScoreboard gs_Scoreboard;
 static CEmoticon gs_Emoticon;
 static CVoting gs_Voting;
 static CSpectator gs_Spectator;
@@ -208,7 +204,6 @@ void CGameClient::OnConsoleInit()
 	m_pControls = &::gs_Controls;
 	m_pMotd = &::gs_Motd;
 	m_pVoting = &::gs_Voting;
-	m_pScoreboard = &::gs_Scoreboard;
 	m_pItems = &::gs_Items;
 
 	// make a list of all the systems, make sure to add them in the corrent render order
@@ -223,7 +218,6 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(&gs_InfoMessages);
 	m_All.Add(m_pChat);
 	m_All.Add(&gs_Broadcast);
-	m_All.Add(&gs_Scoreboard);
 	m_All.Add(m_pMotd);
 
 	for(int i = 0; i < m_All.m_Num; i++)

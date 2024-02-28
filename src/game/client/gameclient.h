@@ -5,7 +5,6 @@
 
 #include <base/vmath.h>
 #include <engine/client.h>
-#include "render.h"
 
 #include <generated/protocol.h>
 
@@ -251,7 +250,6 @@ public:
 	class CControls *m_pControls;
 	class CMotd *m_pMotd;
 	class CVoting *m_pVoting;
-	class CScoreboard *m_pScoreboard;
 	class CItems *m_pItems;
 };
 

@@ -7,7 +7,6 @@
 #include <generated/client_data.h>
 #include <game/client/gameclient.h>
 
-#include "menus.h"
 #include "motd.h"
 
 void CMotd::Clear()

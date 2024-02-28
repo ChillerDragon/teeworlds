@@ -7,8 +7,6 @@
 #include <game/client/gameclient.h>
 #include <game/client/component.h>
 #include <game/client/components/chat.h>
-#include <game/client/components/menus.h>
-#include <game/client/components/scoreboard.h>
 
 #include "controls.h"
 
@@ -74,8 +72,7 @@ int CControls::SnapInput(int *pData)
 	else
 		m_InputData.m_PlayerFlags = 0;
 
-	if(m_pClient->m_pScoreboard->IsActive())
-		m_InputData.m_PlayerFlags |= PLAYERFLAG_SCOREBOARD;
+	// m_InputData.m_PlayerFlags |= PLAYERFLAG_SCOREBOARD;
 
 	if(m_LastData.m_PlayerFlags != m_InputData.m_PlayerFlags)
 		Send = true;

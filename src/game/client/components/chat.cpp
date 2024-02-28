@@ -12,9 +12,6 @@
 
 #include <game/client/gameclient.h>
 
-#include <game/client/components/scoreboard.h>
-
-#include "menus.h"
 #include "chat.h"
 
 CChat::CChat()

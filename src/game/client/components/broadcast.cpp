@@ -9,7 +9,6 @@
 
 #include "broadcast.h"
 #include "chat.h"
-#include "scoreboard.h"
 #include "motd.h"
 
 static const float BROADCAST_FONTSIZE_BIG = 11.0f;

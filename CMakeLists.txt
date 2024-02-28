@@ -736,29 +736,18 @@ if(CLIENT)
     components/infomessages.h
     components/items.cpp
     components/items.h
-    components/menus.cpp
-    components/menus.h
-    components/menus_browser.cpp
-    components/menus_callback.cpp
-    components/menus_ingame.cpp
-    components/menus_settings.cpp
-    components/menus_start.cpp
     components/motd.cpp
     components/motd.h
     components/nameplates.cpp
     components/nameplates.h
     components/players.cpp
     components/players.h
-    components/scoreboard.cpp
-    components/scoreboard.h
     components/spectator.cpp
     components/spectator.h
     components/voting.cpp
     components/voting.h
     gameclient.cpp
     gameclient.h
-    render.cpp
-    render.h
   )
   set_src(GAME_EDITOR GLOB src/game/editor
     io.cpp
