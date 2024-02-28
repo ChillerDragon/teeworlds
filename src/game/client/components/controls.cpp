@@ -67,10 +67,7 @@ int CControls::SnapInput(int *pData)
 	bool Send = false;
 
 	// update player state
-	if(m_pClient->m_pChat->IsActive())
-		m_InputData.m_PlayerFlags = PLAYERFLAG_CHATTING;
-	else
-		m_InputData.m_PlayerFlags = 0;
+	// m_InputData.m_PlayerFlags = PLAYERFLAG_CHATTING;
 
 	// m_InputData.m_PlayerFlags |= PLAYERFLAG_SCOREBOARD;
 
