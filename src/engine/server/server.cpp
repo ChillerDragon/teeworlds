@@ -1252,7 +1252,7 @@ void CServer::InitInterfaces(IKernel *pKernel)
 	m_pStorage = pKernel->RequestInterface<IStorage>();
 }
 
-int CServer::Run()
+int CServer::Run(bool shutdown)
 {
 	//
 	m_PrintCBIndex = 1;
@@ -1406,6 +1406,8 @@ int CServer::Run()
 				dbg_msg("server", "interrupted");
 				break;
 			}
+			if(shutdown)
+				m_RunServer = false;
 		}
 	}
 	// disconnect all clients on shutdown
@@ -1541,16 +1543,21 @@ void HandleSigIntTerm(int Param)
 int main(int argc, const char **argv) // ignore_convention
 {
 	cmdline_fix(&argc, &argv);
-#if defined(CONF_FAMILY_WINDOWS)
+	bool shutdown = false;
 	for(int i = 1; i < argc; i++) // ignore_convention
 	{
+#if defined(CONF_FAMILY_WINDOWS)
 		if(str_comp("-s", argv[i]) == 0 || str_comp("--silent", argv[i]) == 0) // ignore_convention
 		{
 			ShowWindow(GetConsoleWindow(), SW_HIDE);
 			break;
 		}
-	}
 #endif
+		if(str_comp("shutdown", argv[i]) == 0) // ignore_convention
+		{
+			shutdown = true;
+		}
+	}
 
 	if(secure_random_init() != 0)
 	{
@@ -1603,7 +1610,7 @@ int main(int argc, const char **argv) // ignore_convention
 
 	// run the server
 	dbg_msg("server", "starting...");
-	int Ret = pServer->Run();
+	int Ret = pServer->Run(shutdown);
 
 	// free
 	delete pServer;

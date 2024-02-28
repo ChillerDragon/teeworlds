@@ -242,7 +242,7 @@ public:
 
 	void InitRegister(CNetServer *pNetServer, CConfig *pConfig);
 	void InitInterfaces(IKernel *pKernel);
-	int Run();
+	int Run(bool shutdown);
 	void Free();
 
 	static int MapListEntryCallback(const char *pFilename, int IsDir, int DirType, void *pUser);
