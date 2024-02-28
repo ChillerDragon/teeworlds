@@ -226,8 +226,6 @@ CClient::CClient()
 	mem_zero(m_aSnapshots, sizeof(m_aSnapshots));
 	m_SnapshotStorage.Init();
 	m_ReceivedSnapshots = 0;
-
-	m_VersionInfo.m_State = CVersionInfo::STATE_INIT;
 }
 
 // ----- send functions -----
@@ -674,58 +672,58 @@ struct CMastersrvAddr
 void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 {
 	static const unsigned char SERVERBROWSE_LIST[] = {255, 255, 255, 255, 'l', 'i', 's', '2'};
-	static const unsigned char VERSIONSRV_VERSION[] = {255, 255, 255, 255, 'v', 'e', 'r', 's'};
-	static const unsigned char VERSIONSRV_GETMAPLIST[] = {255, 255, 255, 255, 'v', 'm', 'l', 'g'};
-	static const unsigned char VERSIONSRV_MAPLIST[] = {255, 255, 255, 255, 'v', 'm', 'l', 's'};
+	// static const unsigned char VERSIONSRV_VERSION[] = {255, 255, 255, 255, 'v', 'e', 'r', 's'};
+	// static const unsigned char VERSIONSRV_GETMAPLIST[] = {255, 255, 255, 255, 'v', 'm', 'l', 'g'};
+	// static const unsigned char VERSIONSRV_MAPLIST[] = {255, 255, 255, 255, 'v', 'm', 'l', 's'};
 
 	const char *pConnlessPacket = "CONNLESS_UNKOWN";
 	// version server
-	if(m_VersionInfo.m_State == CVersionInfo::STATE_READY && net_addr_comp(&pPacket->m_Address, &m_VersionInfo.m_VersionServeraddr.m_Addr, true) == 0)
-	{
-		pConnlessPacket = "CONNLESS_VERSION";
-		// version info
-		if(pPacket->m_DataSize == (int)(sizeof(VERSIONSRV_VERSION) + sizeof(GAME_RELEASE_VERSION)) &&
-			mem_comp(pPacket->m_pData, VERSIONSRV_VERSION, sizeof(VERSIONSRV_VERSION)) == 0)
+	// if(m_VersionInfo.m_State == CVersionInfo::STATE_READY && net_addr_comp(&pPacket->m_Address, &m_VersionInfo.m_VersionServeraddr.m_Addr, true) == 0)
+	// {
+	// 	pConnlessPacket = "CONNLESS_VERSION";
+	// 	// version info
+	// 	if(pPacket->m_DataSize == (int)(sizeof(VERSIONSRV_VERSION) + sizeof(GAME_RELEASE_VERSION)) &&
+	// 		mem_comp(pPacket->m_pData, VERSIONSRV_VERSION, sizeof(VERSIONSRV_VERSION)) == 0)
 
-		{
-			char *pVersionData = (char*)pPacket->m_pData + sizeof(VERSIONSRV_VERSION);
-			int VersionMatch = !mem_comp(pVersionData, GAME_RELEASE_VERSION, sizeof(GAME_RELEASE_VERSION));
+	// 	{
+	// 		char *pVersionData = (char*)pPacket->m_pData + sizeof(VERSIONSRV_VERSION);
+	// 		int VersionMatch = !mem_comp(pVersionData, GAME_RELEASE_VERSION, sizeof(GAME_RELEASE_VERSION));
 
-			char aVersion[sizeof(GAME_RELEASE_VERSION)];
-			str_copy(aVersion, pVersionData, sizeof(aVersion));
+	// 		char aVersion[sizeof(GAME_RELEASE_VERSION)];
+	// 		str_copy(aVersion, pVersionData, sizeof(aVersion));
 
-			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "version does %s (%s)",
-				VersionMatch ? "match" : "NOT match",
-				aVersion);
-			dbg_msg("client/version", "%s", aBuf);
+	// 		char aBuf[256];
+	// 		str_format(aBuf, sizeof(aBuf), "version does %s (%s)",
+	// 			VersionMatch ? "match" : "NOT match",
+	// 			aVersion);
+	// 		dbg_msg("client/version", "%s", aBuf);
 
-			// assume version is out of date when version-data doesn't match
-			if(!VersionMatch)
-			{
-				str_copy(m_aVersionStr, aVersion, sizeof(m_aVersionStr));
-			}
+	// 		// assume version is out of date when version-data doesn't match
+	// 		if(!VersionMatch)
+	// 		{
+	// 			str_copy(m_aVersionStr, aVersion, sizeof(m_aVersionStr));
+	// 		}
 
-			// request the map version list now
-			CNetChunk Packet;
-			mem_zero(&Packet, sizeof(Packet));
-			Packet.m_ClientID = -1;
-			Packet.m_Address = m_VersionInfo.m_VersionServeraddr.m_Addr;
-			Packet.m_pData = VERSIONSRV_GETMAPLIST;
-			Packet.m_DataSize = sizeof(VERSIONSRV_GETMAPLIST);
-			Packet.m_Flags = NETSENDFLAG_CONNLESS;
-			m_ContactClient.Send(&Packet);
-		}
+	// 		// request the map version list now
+	// 		CNetChunk Packet;
+	// 		mem_zero(&Packet, sizeof(Packet));
+	// 		Packet.m_ClientID = -1;
+	// 		Packet.m_Address = m_VersionInfo.m_VersionServeraddr.m_Addr;
+	// 		Packet.m_pData = VERSIONSRV_GETMAPLIST;
+	// 		Packet.m_DataSize = sizeof(VERSIONSRV_GETMAPLIST);
+	// 		Packet.m_Flags = NETSENDFLAG_CONNLESS;
+	// 		m_ContactClient.Send(&Packet);
+	// 	}
 
-		// map version list
-		if(pPacket->m_DataSize >= (int)sizeof(VERSIONSRV_MAPLIST) &&
-			mem_comp(pPacket->m_pData, VERSIONSRV_MAPLIST, sizeof(VERSIONSRV_MAPLIST)) == 0)
-		{
-			// int Size = pPacket->m_DataSize-sizeof(VERSIONSRV_MAPLIST);
-			// int Num = Size/sizeof(CMapVersion);
-			pConnlessPacket = "VERSIONSRV_MAPLIST";
-		}
-	}
+	// 	// map version list
+	// 	if(pPacket->m_DataSize >= (int)sizeof(VERSIONSRV_MAPLIST) &&
+	// 		mem_comp(pPacket->m_pData, VERSIONSRV_MAPLIST, sizeof(VERSIONSRV_MAPLIST)) == 0)
+	// 	{
+	// 		// int Size = pPacket->m_DataSize-sizeof(VERSIONSRV_MAPLIST);
+	// 		// int Num = Size/sizeof(CMapVersion);
+	// 		pConnlessPacket = "VERSIONSRV_MAPLIST";
+	// 	}
+	// }
 
 	// server list from master server
 	if(pPacket->m_DataSize >= (int)sizeof(SERVERBROWSE_LIST) &&
@@ -1325,37 +1323,37 @@ void CClient::Update()
 
 void CClient::VersionUpdate()
 {
-	static const unsigned char VERSIONSRV_GETVERSION[] = {255, 255, 255, 255, 'v', 'e', 'r', 'g'};
-	if(m_VersionInfo.m_State == CVersionInfo::STATE_INIT)
-	{
-		Engine()->HostLookup(&m_VersionInfo.m_VersionServeraddr, "127.0.0.1", m_ContactClient.NetType());
-		m_VersionInfo.m_State = CVersionInfo::STATE_START;
-	}
-	else if(m_VersionInfo.m_State == CVersionInfo::STATE_START)
-	{
-		if(m_VersionInfo.m_VersionServeraddr.m_Job.Status() == CJob::STATE_DONE)
-		{
-			if(m_VersionInfo.m_VersionServeraddr.m_Job.Result() == 0)
-			{
-				CNetChunk Packet;
+	// static const unsigned char VERSIONSRV_GETVERSION[] = {255, 255, 255, 255, 'v', 'e', 'r', 'g'};
+	// if(m_VersionInfo.m_State == CVersionInfo::STATE_INIT)
+	// {
+	// 	net_host_lookup(&m_VersionInfo.m_VersionServeraddr, "127.0.0.1", m_ContactClient.NetType()); // TODO: this doesnt work like that
+	// 	m_VersionInfo.m_State = CVersionInfo::STATE_START;
+	// }
+	// else if(m_VersionInfo.m_State == CVersionInfo::STATE_START)
+	// {
+	// 	if(m_VersionInfo.m_VersionServeraddr.m_Job.Status() == CJob::STATE_DONE)
+	// 	{
+	// 		if(m_VersionInfo.m_VersionServeraddr.m_Job.Result() == 0)
+	// 		{
+	// 			CNetChunk Packet;
 
-				mem_zero(&Packet, sizeof(Packet));
+	// 			mem_zero(&Packet, sizeof(Packet));
 
-				m_VersionInfo.m_VersionServeraddr.m_Addr.port = 8285;
+	// 			m_VersionInfo.m_VersionServeraddr.m_Addr.port = 8285;
 
-				Packet.m_ClientID = -1;
-				Packet.m_Address = m_VersionInfo.m_VersionServeraddr.m_Addr;
-				Packet.m_pData = VERSIONSRV_GETVERSION;
-				Packet.m_DataSize = sizeof(VERSIONSRV_GETVERSION);
-				Packet.m_Flags = NETSENDFLAG_CONNLESS;
+	// 			Packet.m_ClientID = -1;
+	// 			Packet.m_Address = m_VersionInfo.m_VersionServeraddr.m_Addr;
+	// 			Packet.m_pData = VERSIONSRV_GETVERSION;
+	// 			Packet.m_DataSize = sizeof(VERSIONSRV_GETVERSION);
+	// 			Packet.m_Flags = NETSENDFLAG_CONNLESS;
 
-				m_ContactClient.Send(&Packet);
-				m_VersionInfo.m_State = CVersionInfo::STATE_READY;
-			}
-			else
-				m_VersionInfo.m_State = CVersionInfo::STATE_ERROR;
-		}
-	}
+	// 			m_ContactClient.Send(&Packet);
+	// 			m_VersionInfo.m_State = CVersionInfo::STATE_READY;
+	// 		}
+	// 		else
+	// 			m_VersionInfo.m_State = CVersionInfo::STATE_ERROR;
+	// 	}
+	// }
 }
 
 void CClient::RegisterInterfaces()
@@ -1580,9 +1578,6 @@ int main(int argc, const char **argv) // ignore_convention
 	// run the client
 	dbg_msg("client", "starting...");
 	pClient->Run();
-
-	// wait for background jobs to finish
-	pEngine->ShutdownJobs();
 
 	// free components
 	pClient->~CClient();

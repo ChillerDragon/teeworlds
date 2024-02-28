@@ -526,8 +526,6 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   filecollection.h
   huffman.cpp
   huffman.h
-  jobs.cpp
-  jobs.h
   kernel.cpp
   memheap.cpp
   memheap.h

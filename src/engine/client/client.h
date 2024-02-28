@@ -152,21 +152,6 @@ class CClient : public IClient
 
 	class CSnapshotDelta m_SnapshotDelta;
 
-	// version info
-	struct CVersionInfo
-	{
-		enum
-		{
-			STATE_INIT=0,
-			STATE_START,
-			STATE_READY,
-			STATE_ERROR,
-		};
-
-		int m_State;
-		class CHostLookup m_VersionServeraddr;
-	} m_VersionInfo;
-
 	int64 TickStartTime(int Tick);
 
 public:

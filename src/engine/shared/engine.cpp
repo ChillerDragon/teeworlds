@@ -10,12 +10,6 @@
 #include <engine/shared/network.h>
 
 
-static int HostLookupThread(void *pUser)
-{
-	CHostLookup *pLookup = (CHostLookup *)pUser;
-	return net_host_lookup(pLookup->m_aHostname, &pLookup->m_Addr, pLookup->m_Nettype);
-}
-
 class CEngine : public IEngine
 {
 public:
@@ -42,8 +36,6 @@ public:
 		dbg_msg("engine", "unknown endian");
 	#endif
 
-		m_JobPool.Init(1);
-
 		m_DataLogSent = 0;
 		m_DataLogRecv = 0;
 		m_Logging = false;
@@ -59,11 +51,6 @@ public:
 	{
 		m_pConfig = Kernel()->RequestInterface<IConfigManager>()->Values();
 		m_pStorage = Kernel()->RequestInterface<IStorage>();
-	}
-
-	void ShutdownJobs()
-	{
-		m_JobPool.Shutdown();
 	}
 
 	void InitLogfile()
@@ -128,20 +115,6 @@ public:
 			m_DataLogRecv = 0;
 		}
 		m_Logging = false;
-	}
-
-	void HostLookup(CHostLookup *pLookup, const char *pHostname, int Nettype)
-	{
-		str_copy(pLookup->m_aHostname, pHostname, sizeof(pLookup->m_aHostname));
-		pLookup->m_Nettype = Nettype;
-		AddJob(&pLookup->m_Job, HostLookupThread, pLookup);
-	}
-
-	void AddJob(CJob *pJob, JOBFUNC pfnFunc, void *pData)
-	{
-		if(m_pConfig->m_Debug && !m_pConfig->m_Clean)
-			dbg_msg("engine", "job added");
-		m_JobPool.Add(pJob, pfnFunc, pData);
 	}
 };
 
