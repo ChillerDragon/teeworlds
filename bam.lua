@@ -144,29 +144,14 @@ function GenerateMacOSXSettings(settings, conf, arch, compiler)
 
 	GenerateCommonSettings(settings, conf, arch, compiler)
 
-	-- Build server launcher before adding game stuff
-	local serverlaunch = Link(settings, "serverlaunch", Compile(settings, "src/osxlaunch/server.m"))
-
 	-- Master server, version server and tools
 	BuildEngineCommon(settings)
-	BuildMasterserver(settings)
-	BuildVersionserver(settings)
-	BuildTools(settings)
 
 	-- Add requirements for Server & Client
 	BuildGameCommon(settings)
 
-	-- Server
-	settings.link.frameworks:Add("Cocoa")
-	local server_exe = BuildServer(settings)
-	AddDependency(server_exe, serverlaunch)
+	BuildServer(settings)
 
-	-- Client
-	settings.link.frameworks:Add("OpenGL")
-	settings.link.frameworks:Add("AGL")
-	-- FIXME: the SDL config is applied in BuildClient too but is needed here before so the launcher will compile
-	config.sdl:Apply(settings)
-	settings.link.extrafiles:Merge(Compile(settings, "src/osxlaunch/client.m"))
 	BuildClient(settings)
 
 	-- Content
@@ -195,9 +180,6 @@ function GenerateLinuxSettings(settings, conf, arch, compiler)
 
 	-- Master server, version server and tools
 	BuildEngineCommon(settings)
-	BuildTools(settings)
-	BuildMasterserver(settings)
-	BuildVersionserver(settings)
 
 	-- Add requirements for Server & Client
 	BuildGameCommon(settings)
@@ -259,9 +241,6 @@ function GenerateWindowsSettings(settings, conf, target_arch, compiler)
 
 	-- Master server, version server and tools
 	BuildEngineCommon(settings)
-	BuildMasterserver(settings)
-	BuildVersionserver(settings)
-	BuildTools(settings)
 
 	-- Add requirements for Server & Client
 	BuildGameCommon(settings)
@@ -369,23 +348,6 @@ function BuildServer(settings, family, platform)
 	local game_server = Compile(settings, CollectRecursive("src/game/server/*.cpp"), SharedServerFiles())
 
 	return Link(settings, "teeworlds_srv", libs["zlib"], libs["md5"], server, game_server)
-end
-
-function BuildTools(settings)
-	local tools = {}
-	for i,v in ipairs(Collect("src/tools/*.cpp", "src/tools/*.c")) do
-		local toolname = PathFilename(PathBase(v))
-		tools[i] = Link(settings, toolname, Compile(settings, v), libs["zlib"], libs["md5"], libs["wavpack"], libs["png"])
-	end
-	PseudoTarget(settings.link.Output(settings, "pseudo_tools") .. settings.link.extension, tools)
-end
-
-function BuildMasterserver(settings)
-	return Link(settings, "mastersrv", Compile(settings, Collect("src/mastersrv/*.cpp")), libs["zlib"], libs["md5"])
-end
-
-function BuildVersionserver(settings)
-	return Link(settings, "versionsrv", Compile(settings, Collect("src/versionsrv/*.cpp")), libs["zlib"], libs["md5"])
 end
 
 function BuildContent(settings, arch, conf)
@@ -534,8 +496,7 @@ else
 end
 
 targets = {client="teeworlds", server="teeworlds_srv",
-           versionserver="versionsrv", masterserver="mastersrv",
-           tools="pseudo_tools", content="content"}
+           content="content"}
 
 subtargets = {}
 for t, cur_target in pairs(targets) do
