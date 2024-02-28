@@ -16,7 +16,6 @@
 #include "components/chat.h"
 #include "components/controls.h"
 #include "components/emoticon.h"
-#include "components/items.h"
 #include "components/infomessages.h"
 #include "components/motd.h"
 #include "components/players.h"
@@ -106,7 +105,6 @@ static CSpectator gs_Spectator;
 
 static CPlayers gs_Players;
 static CNamePlates gs_NamePlates;
-static CItems gs_Items;
 
 CGameClient::CStack::CStack() { m_Num = 0; }
 void CGameClient::CStack::Add(class CComponent *pComponent) { m_paComponents[m_Num++] = pComponent; }
@@ -204,13 +202,11 @@ void CGameClient::OnConsoleInit()
 	m_pControls = &::gs_Controls;
 	m_pMotd = &::gs_Motd;
 	m_pVoting = &::gs_Voting;
-	m_pItems = &::gs_Items;
 
 	// make a list of all the systems, make sure to add them in the corrent render order
 	m_All.Add(m_pControls);
 	m_All.Add(m_pVoting);
 
-	m_All.Add(m_pItems);
 	m_All.Add(&gs_Players);
 	m_All.Add(&gs_NamePlates);
 	m_All.Add(&gs_Spectator);

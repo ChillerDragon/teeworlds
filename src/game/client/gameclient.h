@@ -250,7 +250,6 @@ public:
 	class CControls *m_pControls;
 	class CMotd *m_pMotd;
 	class CVoting *m_pVoting;
-	class CItems *m_pItems;
 };
 
 

@@ -603,8 +603,6 @@ if(CLIENT)
     components/emoticon.h
     components/infomessages.cpp
     components/infomessages.h
-    components/items.cpp
-    components/items.h
     components/motd.cpp
     components/motd.h
     components/nameplates.cpp
