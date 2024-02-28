@@ -1,8 +1,6 @@
 CheckVersion("0.5")
 
 Import("configure.lua")
-Import("other/sdl/sdl.lua")
-Import("other/freetype/freetype.lua")
 
 --- Setup Config -------
 config = NewConfig()
@@ -11,12 +9,9 @@ config:Add(OptTestCompileC("stackprotector", "int main(){return 0;}", "-fstack-p
 config:Add(OptTestCompileC("minmacosxsdk", "int main(){return 0;}", "-mmacosx-version-min=10.7 -isysroot /Developer/SDKs/MacOSX10.7.sdk"))
 config:Add(OptTestCompileC("buildwithoutsseflag", "#include <immintrin.h>\nint main(){_mm_pause();return 0;}", ""))
 config:Add(OptLibrary("zlib", "zlib.h", false))
-config:Add(SDL.OptFind("sdl", true))
-config:Add(FreeType.OptFind("freetype", true))
 config:Finalize("config.lua")
 
 generated_src_dir = "build/src"
-generated_icon_dir = "build/icons"
 builddir = "build/%(arch)s/%(conf)s"
 content_src_dir = "datasrc/"
 
@@ -55,20 +50,6 @@ function CHash(output, ...)
 	return output
 end
 
-function ResCompile(scriptfile, compiler)
-	scriptfile = Path(scriptfile)
-	local output = nil
-	if compiler == "cl" then
-		output = PathJoin(generated_icon_dir, PathBase(PathFilename(scriptfile)) .. ".res")
-		AddJob(output, "rc " .. scriptfile, "rc /fo " .. output .. " " .. scriptfile)
-	elseif compiler == "gcc" or compiler == "clang" then
-		output = PathJoin(generated_icon_dir, PathBase(PathFilename(scriptfile)) .. ".coff")
-		AddJob(output, "windres " .. scriptfile, "windres -i " .. scriptfile .. " -o " .. output)
-	end
-	AddDependency(output, scriptfile)
-	return output
-end
-
 function ContentCompile(action, output)
 	output = PathJoin(generated_src_dir, Path(output))
 	AddJob(
@@ -100,12 +81,10 @@ function GenerateCommonSettings(settings, conf, arch, compiler)
 	end
 
 	local md5 = Compile(settings, Collect("src/engine/external/md5/*.c"))
-	local wavpack = Compile(settings, Collect("src/engine/external/wavpack/*.c"))
-	local png = Compile(settings, Collect("src/engine/external/pnglite/*.c"))
 	local json = Compile(settings, Collect("src/engine/external/json-parser/*.c"))
 
 	-- globally available libs
-	libs = {zlib=zlib, wavpack=wavpack, png=png, md5=md5, json=json}
+	libs = {zlib=zlib, md5=md5, json=json}
 end
 
 function GenerateMacOSXSettings(settings, conf, arch, compiler)
@@ -226,7 +205,6 @@ function GenerateWindowsSettings(settings, conf, target_arch, compiler)
 	settings.cc.defines:Add("UNICODE") -- Windows headers
 	settings.cc.defines:Add("_UNICODE") -- C-runtime
 
-	local icons = SharedIcons(compiler)
 	local manifests = SharedManifests(compiler)
 
 	-- Required libs
@@ -247,12 +225,9 @@ function GenerateWindowsSettings(settings, conf, target_arch, compiler)
 
 	-- Server
 	local server_settings = settings:Copy()
-	server_settings.link.extrafiles:Add(icons.server)
 	BuildServer(server_settings)
 
 	-- Client
-	settings.link.extrafiles:Add(icons.client)
-	settings.link.extrafiles:Add(manifests.client)
 	settings.link.libs:Add("opengl32")
 	settings.link.libs:Add("winmm")
 	settings.link.libs:Add("imm32")
@@ -303,24 +278,6 @@ function SharedClientFiles()
 	return shared_client_files
 end
 
-shared_icons = {}
-function SharedIcons(compiler)
-	if not shared_icons[compiler] then
-		local server_icon = ResCompile("other/icons/teeworlds_srv_" .. compiler .. ".rc", compiler)
-		local client_icon = ResCompile("other/icons/teeworlds_" .. compiler .. ".rc", compiler)
-		shared_icons[compiler] = {server=server_icon, client=client_icon}
-	end
-	return shared_icons[compiler]
-end
-
-function SharedManifests(compiler)
-	if not shared_manifests then
-		local client_manifest = ResCompile("other/manifest/teeworlds.rc", compiler)
-		shared_manifests = {client=client_manifest}
-	end
-	return shared_manifests
-end
-
 function BuildEngineCommon(settings)
 	settings.link.extrafiles:Merge(Compile(settings, Collect("src/engine/shared/*.cpp", "src/base/*.c")))
 end
@@ -331,15 +288,12 @@ end
 
 
 function BuildClient(settings, family, platform)
-	config.sdl:Apply(settings)
-	config.freetype:Apply(settings)
-
 	local client = Compile(settings, Collect("src/engine/client/*.cpp"))
 
 	local game_client = Compile(settings, CollectRecursive("src/game/client/*.cpp"), SharedClientFiles())
 	local game_editor = Compile(settings, Collect("src/game/editor/*.cpp"))
 
-	Link(settings, "teeworlds", libs["zlib"], libs["md5"], libs["wavpack"], libs["png"], libs["json"], client, game_client, game_editor)
+	Link(settings, "teeworlds", libs["zlib"], libs["md5"], libs["json"], client, game_client, game_editor)
 end
 
 function BuildServer(settings, family, platform)
@@ -352,24 +306,13 @@ end
 
 function BuildContent(settings, arch, conf)
 	local content = {}
-	table.insert(content, CopyToDir(settings.link.Output(settings, "data"), CollectRecursive(content_src_dir .. "*.png", content_src_dir .. "*.wv", content_src_dir .. "*.ttc", content_src_dir .. "*.ttf", content_src_dir .. "*.txt", content_src_dir .. "*.map", content_src_dir .. "*.rules", content_src_dir .. "*.json")))
+	table.insert(content, CopyToDir(settings.link.Output(settings, "data"), CollectRecursive(content_src_dir .. "*.txt", content_src_dir .. "*.map", content_src_dir .. "*.rules", content_src_dir .. "*.json")))
 	if family == "windows" then
 		if arch == "x86_64" then
 			_arch = "64"
 		else
 			_arch = "32"
 		end
-		-- dependencies
-		dl = Python("scripts/download.py")
-		AddJob({
-				"other/freetype/include/ft2build.h", "other/freetype/windows/lib" .. _arch .. "/freetype.dll",
-				"other/sdl/include/SDL.h", "other/sdl/windows/lib" .. _arch .. "/SDL2.dll"
-			}, "Downloading freetype and SDL2", dl .. " freetype sdl"
-		)
-		table.insert(content, CopyFile(settings.link.Output(settings, "") .. "/SDL2.dll", "other/sdl/windows/lib" .. _arch .. "/SDL2.dll"))
-		table.insert(content, CopyFile(settings.link.Output(settings, "") .. "/freetype.dll", "other/freetype/windows/lib" .. _arch .. "/freetype.dll"))
-		AddDependency(settings.link.Output(settings, "") .. "/SDL2.dll", "other/sdl/include/SDL.h")
-		AddDependency(settings.link.Output(settings, "") .. "/freetype.dll", "other/freetype/include/ft2build.h")
 	end
 	PseudoTarget(settings.link.Output(settings, "content") .. settings.link.extension, content)
 end
@@ -415,8 +358,6 @@ function GenerateSettings(conf, arch, builddir, compiler, headless)
 	end
 
 	settings.cc.includes:Add("src")
-	settings.cc.includes:Add("src/engine/external/pnglite")
-	settings.cc.includes:Add("src/engine/external/wavpack")
 	settings.cc.includes:Add(generated_src_dir)
 
 	if family == "windows" then

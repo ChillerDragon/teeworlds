@@ -1079,7 +1079,7 @@ void CServer::GenerateServerInfo(CPacker *pPacker, int Token)
 
 	pPacker->AddString(GameServer()->Version(), 32);
 	pPacker->AddString(GetServerName(), 64);
-	pPacker->AddString(Config()->m_SvHostname, 128);
+	pPacker->AddString("127.0.0.1", 128); // hostname
 	pPacker->AddString(GetMapName(), 32);
 
 	// gametype
@@ -1188,6 +1188,11 @@ const char *CServer::GetServerName()
 	return "unnamed server";
 }
 
+int CServer::GetPort()
+{
+	return 8303;
+}
+
 void CServer::ChangeMap(const char *pMap)
 {
 	m_MapReload = true;
@@ -1269,19 +1274,19 @@ int CServer::Run()
 	{
 		// sweet!
 		BindAddr.type = NETTYPE_ALL;
-		BindAddr.port = Config()->m_SvPort;
+		BindAddr.port = GetPort();
 	}
 	else
 	{
 		mem_zero(&BindAddr, sizeof(BindAddr));
 		BindAddr.type = NETTYPE_ALL;
-		BindAddr.port = Config()->m_SvPort;
+		BindAddr.port = GetPort();
 	}
 
 	if(!m_NetServer.Open(BindAddr, Config(), Kernel()->RequestInterface<IEngine>(), &m_ServerBan,
 		Config()->m_SvMaxClients, Config()->m_SvMaxClientsPerIP, NewClientCallback, DelClientCallback, this))
 	{
-		dbg_msg("server", "couldn't open socket. port %d might already be in use", Config()->m_SvPort);
+		dbg_msg("server", "couldn't open socket. port %d might already be in use", GetPort());
 		Free();
 		return -1;
 	}

@@ -276,9 +276,7 @@ endif()
 find_package(ZLIB)
 find_package(Crypto)
 find_package(Git)
-find_package(Pnglite)
 find_package(Threads)
-find_package(Wavpack)
 
 
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
@@ -316,9 +314,7 @@ if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   show_dependency_status("Hdiutil" HDIUTIL)
 endif()
 show_dependency_status("OpenSSL Crypto" CRYPTO)
-show_dependency_status("Pnglite" PNGLITE)
 show_dependency_status("Python3" Python3)
-show_dependency_status("Wavpack" WAVPACK)
 show_dependency_status("Zlib" ZLIB)
 
 if(NOT(Python3_FOUND))
@@ -605,10 +601,6 @@ if(CLIENT)
     components/infomessages.h
     components/motd.cpp
     components/motd.h
-    components/nameplates.cpp
-    components/nameplates.h
-    components/players.cpp
-    components/players.h
     components/spectator.cpp
     components/spectator.h
     components/voting.cpp
@@ -616,23 +608,17 @@ if(CLIENT)
     gameclient.cpp
     gameclient.h
   )
-  set_src(GAME_EDITOR GLOB src/game/editor
-    io.cpp
-    popups.cpp
-  )
   set(GAME_GENERATED_CLIENT
     src/generated/client_data.cpp
     src/generated/client_data.h
   )
-  set(CLIENT_SRC ${PLATFORM_CLIENT} ${ENGINE_CLIENT} ${GAME_CLIENT} ${GAME_EDITOR} ${GAME_GENERATED_CLIENT})
+  set(CLIENT_SRC ${PLATFORM_CLIENT} ${ENGINE_CLIENT} ${GAME_CLIENT} ${GAME_GENERATED_CLIENT})
 
-  set(DEPS_CLIENT ${DEPS} ${PNGLITE_DEP} ${WAVPACK_DEP})
+  set(DEPS_CLIENT ${DEPS})
 
   # Libraries
   set(LIBS_CLIENT
     ${LIBS}
-    ${PNGLITE_LIBRARIES}
-    ${WAVPACK_LIBRARIES}
     ${PLATFORM_CLIENT_LIBS}
   )
 
@@ -659,26 +645,9 @@ if(CLIENT)
   )
   target_link_libraries(${TARGET_CLIENT} ${LIBS_CLIENT})
 
-  target_include_directories(${TARGET_CLIENT} PRIVATE
-    ${PNGLITE_INCLUDE_DIRS}
-    ${WAVPACK_INCLUDE_DIRS}
-  )
-
-  set(PARAMS "${WAVPACK_INCLUDE_DIRS};${WAVPACK_INCLUDE_DIRS}")
-  if(NOT(WAVPACK_OPEN_FILE_INPUT_EX_PARAMS STREQUAL PARAMS))
-    unset(WAVPACK_OPEN_FILE_INPUT_EX CACHE)
-  endif()
-  set(WAVPACK_OPEN_FILE_INPUT_EX_PARAMS "${PARAMS}" CACHE INTERNAL "")
-
-  set(CMAKE_REQUIRED_INCLUDES ${ORIGINAL_CMAKE_REQUIRED_INCLUDES} ${WAVPACK_INCLUDE_DIRS})
-  set(CMAKE_REQUIRED_LIBRARIES ${ORIGINAL_CMAKE_REQUIRED_LIBRARIES} ${WAVPACK_LIBRARIES})
-  check_symbol_exists(WavpackOpenFileInputEx wavpack.h WAVPACK_OPEN_FILE_INPUT_EX)
   set(CMAKE_REQUIRED_INCLUDES ${ORIGINAL_CMAKE_REQUIRED_INCLUDES})
   set(CMAKE_REQUIRED_LIBRARIES ${ORIGINAL_CMAKE_REQUIRED_LIBRARIES})
-
-  if(WAVPACK_OPEN_FILE_INPUT_EX)
-    target_compile_definitions(${TARGET_CLIENT} PRIVATE CONF_WAVPACK_OPEN_FILE_INPUT_EX)
-  endif()
+  set(CMAKE_REQUIRED_LIBRARIES ${ORIGINAL_CMAKE_REQUIRED_LIBRARIES})
 
   list(APPEND TARGETS_OWN ${TARGET_CLIENT})
   list(APPEND TARGETS_LINK ${TARGET_CLIENT})

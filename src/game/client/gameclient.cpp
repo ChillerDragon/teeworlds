@@ -18,8 +18,6 @@
 #include "components/emoticon.h"
 #include "components/infomessages.h"
 #include "components/motd.h"
-#include "components/players.h"
-#include "components/nameplates.h"
 #include "components/spectator.h"
 #include "components/voting.h"
 
@@ -102,9 +100,6 @@ static CControls gs_Controls;
 static CEmoticon gs_Emoticon;
 static CVoting gs_Voting;
 static CSpectator gs_Spectator;
-
-static CPlayers gs_Players;
-static CNamePlates gs_NamePlates;
 
 CGameClient::CStack::CStack() { m_Num = 0; }
 void CGameClient::CStack::Add(class CComponent *pComponent) { m_paComponents[m_Num++] = pComponent; }
@@ -207,8 +202,6 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(m_pControls);
 	m_All.Add(m_pVoting);
 
-	m_All.Add(&gs_Players);
-	m_All.Add(&gs_NamePlates);
 	m_All.Add(&gs_Spectator);
 	m_All.Add(&gs_Emoticon);
 	m_All.Add(&gs_InfoMessages);
