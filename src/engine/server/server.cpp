@@ -1194,7 +1194,11 @@ int CServer::LoadMap(const char *pMapName)
 	str_format(aBuf, sizeof(aBuf), "maps/%s.map", pMapName);
 
 	if(!m_pMap->Load(aBuf))
-		return 0;
+	{
+		str_format(aBuf, sizeof(aBuf), "data/maps/%s.map", pMapName);
+		if(!m_pMap->Load(aBuf))
+			return 0;
+	}
 
 	// reinit snapshot ids
 	m_IDPool.TimeoutIDs();
