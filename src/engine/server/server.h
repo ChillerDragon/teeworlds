@@ -237,6 +237,8 @@ public:
 	virtual void ChangeMap(const char *pMap);
 	const char *GetMapName();
 	const char *GetServerName();
+	int GetMaxClients() { return 64; }
+	int GetMaxClientsPerIP() { return 2; }
 	int GetPort();
 	int LoadMap(const char *pMapName);
 

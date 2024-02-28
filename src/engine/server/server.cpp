@@ -1097,7 +1097,7 @@ void CServer::GenerateServerInfo(CPacker *pPacker, int Token)
 	pPacker->AddInt(PlayerCount); // num players
 	pPacker->AddInt(10); // max players
 	pPacker->AddInt(ClientCount); // num clients
-	pPacker->AddInt(maximum(ClientCount, Config()->m_SvMaxClients)); // max clients
+	pPacker->AddInt(maximum(ClientCount, GetMaxClients())); // max clients
 
 	if(Token != -1)
 	{
@@ -1284,7 +1284,7 @@ int CServer::Run(bool shutdown)
 	}
 
 	if(!m_NetServer.Open(BindAddr, Config(), Kernel()->RequestInterface<IEngine>(), &m_ServerBan,
-		Config()->m_SvMaxClients, Config()->m_SvMaxClientsPerIP, NewClientCallback, DelClientCallback, this))
+		GetMaxClients(), GetMaxClientsPerIP(), NewClientCallback, DelClientCallback, this))
 	{
 		dbg_msg("server", "couldn't open socket. port %d might already be in use", GetPort());
 		Free();
