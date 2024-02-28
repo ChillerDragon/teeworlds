@@ -347,7 +347,6 @@ void CNetBan::Init(IStorage *pStorage)
 {
 	m_pStorage = pStorage;
 	m_BanAddrPool.Reset();
-	m_BanRangePool.Reset();
 
 	net_host_lookup("localhost", &m_LocalhostIPV4, NETTYPE_IPV4);
 	net_host_lookup("localhost", &m_LocalhostIPV6, NETTYPE_IPV6);
@@ -365,12 +364,6 @@ void CNetBan::Update()
 		dbg_msg("net_ban", "%s", aBuf);
 		m_BanAddrPool.Remove(m_BanAddrPool.First());
 	}
-	while(m_BanRangePool.First() && m_BanRangePool.First()->m_Info.m_Expires != CBanInfo::EXPIRES_NEVER && m_BanRangePool.First()->m_Info.m_Expires < Now)
-	{
-		str_format(aBuf, sizeof(aBuf), "ban %s expired", NetToString(&m_BanRangePool.First()->m_Data, aNetStr, sizeof(aNetStr)));
-		dbg_msg("net_ban", "%s", aBuf);
-		m_BanRangePool.Remove(m_BanRangePool.First());
-	}
 }
 
 int CNetBan::BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason)
@@ -378,27 +371,9 @@ int CNetBan::BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason)
 	return Ban(&m_BanAddrPool, pAddr, Seconds, pReason);
 }
 
-int CNetBan::BanRange(const CNetRange *pRange, int Seconds, const char *pReason)
-{
-	if(pRange->IsValid())
-		return Ban(&m_BanRangePool, pRange, Seconds, pReason);
-
-	dbg_msg("net_ban", "ban failed (invalid range)");
-	return -1;
-}
-
 int CNetBan::UnbanByAddr(const NETADDR *pAddr)
 {
 	return Unban(&m_BanAddrPool, pAddr);
-}
-
-int CNetBan::UnbanByRange(const CNetRange *pRange)
-{
-	if(pRange->IsValid())
-		return Unban(&m_BanRangePool, pRange);
-
-	dbg_msg("net_ban", "ban failed (invalid range)");
-	return -1;
 }
 
 int CNetBan::UnbanByIndex(int Index)
@@ -411,20 +386,6 @@ int CNetBan::UnbanByIndex(int Index)
 		NetToString(&pBan->m_Data, aBuf, sizeof(aBuf));
 		Result = m_BanAddrPool.Remove(pBan);
 	}
-	else
-	{
-		CBanRange *pBan = m_BanRangePool.Get(Index-m_BanAddrPool.Num());
-		if(pBan)
-		{
-			NetToString(&pBan->m_Data, aBuf, sizeof(aBuf));
-			Result = m_BanRangePool.Remove(pBan);
-		}
-		else
-		{
-			dbg_msg("net_ban", "unban failed (invalid index)");
-			return -1;
-		}
-	}
 
 	char aMsg[256];
 	str_format(aMsg, sizeof(aMsg), "unbanned index %i (%s)", Index, aBuf);
@@ -435,7 +396,6 @@ int CNetBan::UnbanByIndex(int Index)
 void CNetBan::UnbanAll()
 {
 	m_BanAddrPool.Reset();
-	m_BanRangePool.Reset();
 }
 
 template<class T>
@@ -460,19 +420,6 @@ bool CNetBan::IsBanned(const NETADDR *pAddr, char *pBuf, unsigned BufferSize, in
 	{
 		MakeBanInfo(pBan, pBuf, BufferSize, MSGTYPE_PLAYER, pLastInfoQuery);
 		return true;
-	}
-
-	// check ban ranges
-	for(int i = Length-1; i >= 0; --i)
-	{
-		for(CBanRange *pBan = m_BanRangePool.First(&aHash[i]); pBan; pBan = pBan->m_pHashNext)
-		{
-			if(NetMatch(&pBan->m_Data, pAddr, i, Length))
-			{
-				MakeBanInfo(pBan, pBuf, BufferSize, MSGTYPE_PLAYER, pLastInfoQuery);
-				return true;
-			}
-		}
 	}
 
 	return false;

@@ -143,9 +143,7 @@ protected:
 	};
 
 	typedef CBanPool<NETADDR, 1> CBanAddrPool;
-	typedef CBanPool<CNetRange, 16> CBanRangePool;
 	typedef CBan<NETADDR> CBanAddr;
-	typedef CBan<CNetRange> CBanRange;
 
 	template<class T> void MakeBanInfo(CBan<T> *pBan, char *pBuf, unsigned BuffSize, int Type, int *pLastInfoQuery=0);
 	template<class T> int Ban(T *pBanPool, const typename T::CDataType *pData, int Seconds, const char *pReason);
@@ -153,7 +151,6 @@ protected:
 
 	class IStorage *m_pStorage;
 	CBanAddrPool m_BanAddrPool;
-	CBanRangePool m_BanRangePool;
 	NETADDR m_LocalhostIPV4, m_LocalhostIPV6;
 
 public:
@@ -172,7 +169,6 @@ public:
 	void Update();
 
 	virtual int BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason);
-	virtual int BanRange(const CNetRange *pRange, int Seconds, const char *pReason);
 	int UnbanByAddr(const NETADDR *pAddr);
 	int UnbanByRange(const CNetRange *pRange);
 	int UnbanByIndex(int Index);

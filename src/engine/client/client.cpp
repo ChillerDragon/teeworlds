@@ -12,7 +12,6 @@
 #include <engine/config.h>
 #include <engine/engine.h>
 #include <engine/keys.h>
-#include <engine/map.h>
 #include <engine/storage.h>
 
 
@@ -171,7 +170,6 @@ void CSmoothTime::Update(CGraph *pGraph, int64 Target, int TimeLeft, int AdjustD
 CClient::CClient()
 {
 	m_pGameClient = 0;
-	m_pMap = 0;
 	m_pConfigManager = 0;
 	m_pConfig = 0;
 
@@ -473,7 +471,6 @@ void CClient::DisconnectWithReason(const char *pReason)
 	m_UseTempRconCommands = 0;
 	m_NetClient.Disconnect(pReason);
 	SetState(IClient::STATE_OFFLINE);
-	m_pMap->Unload();
 
 	// disable all downloads
 	m_MapdownloadChunk = 0;
@@ -589,47 +586,10 @@ void CClient::Render()
 
 const char *CClient::LoadMap(const char *pName, const char *pFilename, const SHA256_DIGEST *pWantedSha256, unsigned WantedCrc)
 {
-	static char aErrorMsg[512];
-
-	SetState(IClient::STATE_LOADING);
-
-	if(!m_pMap->Load(pFilename))
-	{
-		str_format(aErrorMsg, sizeof(aErrorMsg), "map '%s' not found", pFilename);
-		return aErrorMsg;
-	}
-
-	if(pWantedSha256 && m_pMap->Sha256() != *pWantedSha256)
-	{
-		char aSha256[SHA256_MAXSTRSIZE];
-		char aWantedSha256[SHA256_MAXSTRSIZE];
-		sha256_str(m_pMap->Sha256(), aSha256, sizeof(aSha256));
-		sha256_str(*pWantedSha256, aWantedSha256, sizeof(aWantedSha256));
-		str_format(aErrorMsg, sizeof(aErrorMsg), "map differs from the server. found = %s wanted = %s", aSha256, aWantedSha256);
-		dbg_msg("client", "%s", aErrorMsg);
-		m_pMap->Unload();
-		return aErrorMsg;
-	}
-
-	// get the crc of the map
-	if(m_pMap->Crc() != WantedCrc)
-	{
-		str_format(aErrorMsg, sizeof(aErrorMsg), "map differs from the server. found = %08x wanted = %08x", m_pMap->Crc(), WantedCrc);
-		dbg_msg("client", "%s", aErrorMsg);
-		m_pMap->Unload();
-		return aErrorMsg;
-	}
-
 	char aBuf[256];
-	str_format(aBuf, sizeof(aBuf), "loaded map '%s'", pFilename);
+	str_format(aBuf, sizeof(aBuf), "fake loaded map '%s'", pFilename);
 	dbg_msg("client", "%s", aBuf);
 	m_ReceivedSnapshots = 0;
-
-	str_copy(m_aCurrentMap, pName, sizeof(m_aCurrentMap));
-	str_copy(m_aCurrentMapPath, pFilename, sizeof(m_aCurrentMapPath));
-	m_CurrentMapSha256 = m_pMap->Sha256();
-	m_CurrentMapCrc = m_pMap->Crc();
-
 	return 0x0;
 }
 
@@ -1407,7 +1367,6 @@ void CClient::InitInterfaces()
 	// fetch interfaces
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
 	m_pGameClient = Kernel()->RequestInterface<IGameClient>();
-	m_pMap = Kernel()->RequestInterface<IEngineMap>();
 	m_pConfigManager = Kernel()->RequestInterface<IConfigManager>();
 	m_pConfig = m_pConfigManager->Values();
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
@@ -1571,7 +1530,6 @@ int main(int argc, const char **argv) // ignore_convention
 	IEngine *pEngine = CreateEngine("Teeworlds");
 	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_CLIENT, argc, argv); // ignore_convention
 	IConfigManager *pConfigManager = CreateConfigManager();
-	IEngineMap *pEngineMap = CreateEngineMap();
 
 	if(RandInitFailed)
 	{
@@ -1585,9 +1543,6 @@ int main(int argc, const char **argv) // ignore_convention
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pEngine);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConfigManager);
 
-
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IEngineMap*>(pEngineMap)); // register as both
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMap*>(pEngineMap));
 
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(CreateGameClient());
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pStorage);
@@ -1636,7 +1591,6 @@ int main(int argc, const char **argv) // ignore_convention
 	delete pEngine;
 	delete pStorage;
 	delete pConfigManager;
-	delete pEngineMap;
 
 	secure_random_uninit();
 	cmdline_free(argc, argv);

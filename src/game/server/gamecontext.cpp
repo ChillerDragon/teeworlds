@@ -5,7 +5,6 @@
 #include <engine/shared/config.h>
 #include <engine/shared/memheap.h>
 #include <engine/storage.h>
-#include <engine/map.h>
 
 #include <generated/server_data.h>
 #include <game/version.h>
@@ -15,8 +14,6 @@
 #include "gamemodes/dm.h"
 #include "gamecontext.h"
 #include "player.h"
-
-#include <game/mapitems.h>
 
 enum
 {

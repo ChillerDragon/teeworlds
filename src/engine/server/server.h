@@ -53,7 +53,6 @@ public:
 	void InitServerBan(class IStorage *pStorage, class CServer* pServer);
 
 	virtual int BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason);
-	virtual int BanRange(const CNetRange *pRange, int Seconds, const char *pReason);
 };
 
 
@@ -142,8 +141,6 @@ public:
 	CSnapIDPool m_IDPool;
 	CNetServer m_NetServer;
 	CServerBan m_ServerBan;
-
-	IEngineMap *m_pMap;
 
 	int64 m_GameStartTime;
 	bool m_RunServer;

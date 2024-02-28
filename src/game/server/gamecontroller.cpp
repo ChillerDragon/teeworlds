@@ -2,8 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 
-#include <game/mapitems.h>
-
 #include "entities/character.h"
 #include "entities/pickup.h"
 #include "gamecontext.h"

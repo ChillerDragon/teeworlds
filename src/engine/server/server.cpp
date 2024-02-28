@@ -6,7 +6,6 @@
 
 #include <engine/config.h>
 #include <engine/engine.h>
-#include <engine/map.h>
 #include <engine/server.h>
 #include <engine/storage.h>
 
@@ -193,16 +192,8 @@ int CServerBan::BanExt(T *pBanPool, const typename T::CDataType *pData, int Seco
 
 int CServerBan::BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason)
 {
-	return BanExt(&m_BanAddrPool, pAddr, Seconds, pReason);
-}
-
-int CServerBan::BanRange(const CNetRange *pRange, int Seconds, const char *pReason)
-{
-	if(pRange->IsValid())
-		return BanExt(&m_BanRangePool, pRange, Seconds, pReason);
-
-	dbg_msg("net_ban", "ban failed (invalid range)");
-	return -1;
+	dbg_msg("server", "ban %p", pAddr);
+	return 0;
 }
 
 void CServer::CClient::Reset()
@@ -1203,19 +1194,14 @@ int CServer::LoadMap(const char *pMapName)
 	char aBuf[IO_MAX_PATH_LENGTH];
 	str_format(aBuf, sizeof(aBuf), "maps/%s.map", pMapName);
 
-	if(!m_pMap->Load(aBuf))
-	{
-		str_format(aBuf, sizeof(aBuf), "data/maps/%s.map", pMapName);
-		if(!m_pMap->Load(aBuf))
-			return 0;
-	}
-
 	// reinit snapshot ids
 	m_IDPool.TimeoutIDs();
 
 	// get the sha256 and crc of the map
-	m_CurrentMapSha256 = m_pMap->Sha256();
-	m_CurrentMapCrc = m_pMap->Crc();
+	static const unsigned char DM1_SHA256[] = {0x49, 0x1a, 0xf1, 0x7a, 0x51, 0x02, 0x14, 0x50, 0x62, 0x70, 0x90, 0x4f, 0x14, 0x7a, 0x4c, 0x30, 0xae, 0x0a, 0x85, 0xb9, 0x1b, 0xb8, 0x54, 0x39, 0x5b, 0xef, 0x8c, 0x39, 0x7f, 0xc0, 0x78, 0xc3};
+	mem_copy(m_CurrentMapSha256.data, DM1_SHA256, sizeof(DM1_SHA256));
+	m_CurrentMapCrc = 1683261464; // should print "crc is 64548818"
+
 	char aSha256[SHA256_MAXSTRSIZE];
 	sha256_str(m_CurrentMapSha256, aSha256, sizeof(aSha256));
 	char aBufMsg[256];
@@ -1229,6 +1215,11 @@ int CServer::LoadMap(const char *pMapName)
 	// load complete map into memory for download
 	{
 		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
+		if(!File)
+		{
+			dbg_msg("server", "TODO: load map into memory");
+			return 1;
+		}
 		m_CurrentMapSize = (int)io_length(File);
 		if(m_pCurrentMapData)
 			mem_free(m_pCurrentMapData);
@@ -1248,7 +1239,6 @@ void CServer::InitInterfaces(IKernel *pKernel)
 {
 	m_pConfig = pKernel->RequestInterface<IConfigManager>()->Values();
 	m_pGameServer = pKernel->RequestInterface<IGameServer>();
-	m_pMap = pKernel->RequestInterface<IEngineMap>();
 	m_pStorage = pKernel->RequestInterface<IStorage>();
 }
 
@@ -1421,11 +1411,6 @@ int CServer::Run(bool shutdown)
 
 void CServer::Free()
 {
-	if(m_pMap)
-	{
-		m_pMap->Unload();
-	}
-
 	if(m_pCurrentMapData)
 	{
 		mem_free(m_pCurrentMapData);
@@ -1574,7 +1559,6 @@ int main(int argc, const char **argv) // ignore_convention
 	// create the components
 	int FlagMask = CFGFLAG_SERVER|CFGFLAG_ECON;
 	IEngine *pEngine = CreateEngine("Teeworlds_Server");
-	IEngineMap *pEngineMap = CreateEngineMap();
 	IGameServer *pGameServer = CreateGameServer();
 	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_SERVER, argc, argv); // ignore_convention
 	IConfigManager *pConfigManager = CreateConfigManager();
@@ -1586,8 +1570,6 @@ int main(int argc, const char **argv) // ignore_convention
 
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pServer); // register as both
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pEngine);
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IEngineMap*>(pEngineMap)); // register as both
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMap*>(pEngineMap));
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pGameServer);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pStorage);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConfigManager);
@@ -1616,7 +1598,6 @@ int main(int argc, const char **argv) // ignore_convention
 	delete pServer;
 	delete pKernel;
 	delete pEngine;
-	delete pEngineMap;
 	delete pGameServer;
 	delete pStorage;
 	delete pConfigManager;

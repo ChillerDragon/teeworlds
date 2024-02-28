@@ -55,7 +55,6 @@ class CClient : public IClient
 	// needed interfaces
 	IEngine *m_pEngine;
 	IGameClient *m_pGameClient;
-	IEngineMap *m_pMap;
 	IConfigManager *m_pConfigManager;
 	CConfig *m_pConfig;
 	IStorage *m_pStorage;

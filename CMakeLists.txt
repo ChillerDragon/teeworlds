@@ -509,7 +509,6 @@ set_src(ENGINE_INTERFACE GLOB src/engine
   engine.h
   kernel.h
   keys.h
-  map.h
   message.h
   server.h
   storage.h
@@ -530,7 +529,6 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   jobs.cpp
   jobs.h
   kernel.cpp
-  map.cpp
   memheap.cpp
   memheap.h
   netban.cpp
@@ -554,7 +552,6 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
 )
 set(ENGINE_GENERATED_SHARED src/generated/nethash.cpp src/generated/protocol.cpp src/generated/protocol.h)
 set_src(GAME_SHARED GLOB src/game
-  mapitems.h
   version.h
   voting.h
 )
