@@ -2,35 +2,12 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_CLIENT_COMPONENTS_SPECTATOR_H
 #define GAME_CLIENT_COMPONENTS_SPECTATOR_H
-#include <base/vmath.h>
 
 #include <game/client/component.h>
 
 class CSpectator : public CComponent
 {
-	enum
-	{
-		NO_SELECTION=-1,
-	};
-
-	bool m_Active;
-	bool m_WasActive;
-
-	int m_SelectedSpectatorID;
-	int m_SelectedSpecMode;
-	vec2 m_SelectorMouse;
-
-	bool SpecModePossible(int SpecMode, int SpectatorID);
-	void HandleSpectateNextPrev(int Direction);
-
 public:
-	CSpectator();
-
-	virtual void OnConsoleInit();
-	virtual void OnRender();
-	virtual void OnRelease();
-	virtual void OnReset();
-
 	void Spectate(int SpecMode, int SpectatorID);
 };
 
