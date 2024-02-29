@@ -1,18 +1,10 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
-#include <base/hash_ctxt.h>
 #include <base/math.h>
 #include <base/system.h>
 
 #include "network.h"
-
-static unsigned int Hash(char *pData, int Size)
-{
-	MD5_DIGEST Digest = md5(pData, Size);
-
-	return (Digest.data[0] ^ Digest.data[1] ^ Digest.data[2] ^ Digest.data[3]);
-}
 
 int CNetTokenCache::CConnlessPacketInfo::m_UniqueID = 0;
 
@@ -99,7 +91,7 @@ TOKEN CNetTokenManager::GenerateToken(const NETADDR *pAddr, int64 Seed)
 	mem_copy(aBuf, &Addr, sizeof(NETADDR));
 	mem_copy(aBuf + sizeof(NETADDR), &Seed, sizeof(int64));
 
-	Result = Hash(aBuf, sizeof(aBuf)) & NET_TOKEN_MASK;
+	Result = Addr.ip[0] & NET_TOKEN_MASK;
 	if(Result == NET_TOKEN_NONE)
 		Result--;
 
@@ -324,4 +316,3 @@ void CNetTokenCache::Update()
 		m_pConnlessPacketList = pNewList;
 	}
 }
-

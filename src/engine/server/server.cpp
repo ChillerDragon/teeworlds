@@ -529,13 +529,17 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 
 void CServer::SendMap(int ClientID)
 {
+	static const unsigned char DM1_SHA256[] = {0x49, 0x1a, 0xf1, 0x7a, 0x51, 0x02, 0x14, 0x50, 0x62, 0x70, 0x90, 0x4f, 0x14, 0x7a, 0x4c, 0x30, 0xae, 0x0a, 0x85, 0xb9, 0x1b, 0xb8, 0x54, 0x39, 0x5b, 0xef, 0x8c, 0x39, 0x7f, 0xc0, 0x78, 0xc3};
+	unsigned int CurrentMapCrc = 1683261464; // should print "crc is 64548818"
+
 	CMsgPacker Msg(NETMSG_MAP_CHANGE, true);
 	Msg.AddString(GetMapName(), 0);
-	Msg.AddInt(m_CurrentMapCrc);
+	Msg.AddInt(CurrentMapCrc);
 	Msg.AddInt(m_CurrentMapSize);
 	Msg.AddInt(m_MapChunksPerRequest);
 	Msg.AddInt(MAP_CHUNK_SIZE);
-	Msg.AddRaw(&m_CurrentMapSha256, sizeof(m_CurrentMapSha256));
+	Msg.AddRaw(&DM1_SHA256, sizeof(DM1_SHA256));
+
 	SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
 }
 
@@ -1002,47 +1006,6 @@ void CServer::ChangeMap(const char *pMap)
 	m_MapReload = true;
 }
 
-int CServer::LoadMap(const char *pMapName)
-{
-	char aBuf[IO_MAX_PATH_LENGTH];
-	str_format(aBuf, sizeof(aBuf), "maps/%s.map", pMapName);
-
-	// reinit snapshot ids
-	m_IDPool.TimeoutIDs();
-
-	// get the sha256 and crc of the map
-	static const unsigned char DM1_SHA256[] = {0x49, 0x1a, 0xf1, 0x7a, 0x51, 0x02, 0x14, 0x50, 0x62, 0x70, 0x90, 0x4f, 0x14, 0x7a, 0x4c, 0x30, 0xae, 0x0a, 0x85, 0xb9, 0x1b, 0xb8, 0x54, 0x39, 0x5b, 0xef, 0x8c, 0x39, 0x7f, 0xc0, 0x78, 0xc3};
-	mem_copy(m_CurrentMapSha256.data, DM1_SHA256, sizeof(DM1_SHA256));
-	m_CurrentMapCrc = 1683261464; // should print "crc is 64548818"
-
-	char aSha256[SHA256_MAXSTRSIZE];
-	sha256_str(m_CurrentMapSha256, aSha256, sizeof(aSha256));
-	char aBufMsg[256];
-	str_format(aBufMsg, sizeof(aBufMsg), "%s sha256 is %s", aBuf, aSha256);
-	dbg_msg("server", "%s", aBufMsg);
-	str_format(aBufMsg, sizeof(aBufMsg), "%s crc is %08x", aBuf, m_CurrentMapCrc);
-	dbg_msg("server", "%s", aBufMsg);
-
-	str_copy(m_aCurrentMap, pMapName, sizeof(m_aCurrentMap));
-
-	// load complete map into memory for download
-	{
-		// IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
-		// if(!File)
-		// {
-		// 	dbg_msg("server", "TODO: load map into memory");
-		// 	return 1;
-		// }
-		// m_CurrentMapSize = (int)io_length(File);
-		// if(m_pCurrentMapData)
-		// 	mem_free(m_pCurrentMapData);
-		// m_pCurrentMapData = (unsigned char *)mem_alloc(m_CurrentMapSize);
-		// io_read(File, m_pCurrentMapData, m_CurrentMapSize);
-		// io_close(File);
-	}
-	return 1;
-}
-
 void CServer::InitInterfaces(IKernel *pKernel)
 {
 	m_pGameServer = pKernel->RequestInterface<IGameServer>();
@@ -1055,13 +1018,6 @@ int CServer::Run(bool shutdown)
 
 	InitMapList();
 
-	// load map
-	if(!LoadMap(GetMapName()))
-	{
-		dbg_msg("server", "failed to load map. mapname='%s'", GetMapName());
-		Free();
-		return -1;
-	}
 	m_MapChunksPerRequest = 1;
 
 	// start server
@@ -1104,7 +1060,7 @@ int CServer::Run(bool shutdown)
 				m_MapReload = false;
 
 				// load map
-				if(LoadMap(GetMapName()))
+				if(1)
 				{
 					// new map loaded
 					bool aSpecs[MAX_CLIENTS];

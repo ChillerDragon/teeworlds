@@ -3,8 +3,6 @@
 #ifndef ENGINE_CLIENT_CLIENT_H
 #define ENGINE_CLIENT_CLIENT_H
 
-#include <base/hash.h>
-
 class CGraph
 {
 	enum
@@ -96,7 +94,6 @@ class CClient : public IClient
 	//
 	char m_aCurrentMap[256];
 	char m_aCurrentMapPath[IO_MAX_PATH_LENGTH];
-	SHA256_DIGEST m_CurrentMapSha256;
 	unsigned m_CurrentMapCrc;
 
 	//
@@ -110,8 +107,6 @@ class CClient : public IClient
 	int m_MapdownloadChunk;
 	int m_MapdownloadChunkNum;
 	int m_MapDownloadChunkSize;
-	SHA256_DIGEST m_MapdownloadSha256;
-	bool m_MapdownloadSha256Present;
 	int m_MapdownloadCrc;
 	int m_MapdownloadAmount;
 	int m_MapdownloadTotalsize;
@@ -207,8 +202,6 @@ public:
 
 	virtual const char *ErrorString() const;
 
-	const char *LoadMap(const char *pName, const char *pFilename, const SHA256_DIGEST *pWantedSha256, unsigned WantedCrc);
-	const char *LoadMapSearch(const char *pMapName, const SHA256_DIGEST *pWantedSha256, int WantedCrc);
 
 	void ProcessConnlessPacket(CNetChunk *pPacket);
 	void ProcessServerPacket(CNetChunk *pPacket);

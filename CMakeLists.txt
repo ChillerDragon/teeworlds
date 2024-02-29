@@ -346,19 +346,6 @@ else()
 endif()
 
 ########################################################################
-# DEPENDENCY COMPILATION
-########################################################################
-
-set_src(DEP_MD5_SRC GLOB src/engine/external/md5 md5.c md5.h)
-add_library(md5 EXCLUDE_FROM_ALL OBJECT ${DEP_MD5_SRC})
-
-list(APPEND TARGETS_DEP md5)
-set(DEP_MD5)
-if(NOT CRYPTO_FOUND)
-  set(DEP_MD5 $<TARGET_OBJECTS:md5>)
-endif()
-
-########################################################################
 # DATA
 ########################################################################
 
@@ -389,15 +376,6 @@ endforeach()
 ########################################################################
 # CODE GENERATION
 ########################################################################
-
-function(chash output_file)
-  add_custom_command(OUTPUT ${output_file}
-    COMMAND ${Python3_EXECUTABLE} scripts/cmd5.py ${ARGN}
-      > "${PROJECT_BINARY_DIR}/${output_file}"
-    DEPENDS scripts/cmd5.py ${ARGN}
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-  )
-endfunction()
 
 function(generate_source output_file script_parameter)
   add_custom_command(OUTPUT ${output_file}
@@ -436,10 +414,6 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src/generated/git_revision.cpp
     ${GIT_REVISION_EXTRA_DEPS}
     scripts/git_revision.py
 )
-chash("src/generated/nethash.cpp"
-  "src/engine/shared/protocol.h"
-  "${PROJECT_BINARY_DIR}/src/generated/protocol.h"
-)
 generate_source("src/generated/client_data.cpp" "client_content_source")
 generate_source("src/generated/client_data.h" "client_content_header")
 generate_source("src/generated/protocol.cpp" "network_source")
@@ -455,12 +429,6 @@ generate_source("src/generated/server_data.h" "server_content_header")
 # Sources
 set_src(BASE GLOB_RECURSE src/base
   detect.h
-  hash.c
-  hash.h
-  hash_bundled.c
-  hash_ctxt.h
-  hash_libtomcrypt.c
-  hash_openssl.c
   math.h
   system.c
   system.h
@@ -505,18 +473,15 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   snapshot.cpp
   snapshot.h
 )
-set(ENGINE_GENERATED_SHARED src/generated/nethash.cpp src/generated/protocol.cpp src/generated/protocol.h)
+set(ENGINE_GENERATED_SHARED src/generated/protocol.cpp src/generated/protocol.h)
 set_src(GAME_SHARED GLOB src/game
   version.h
   voting.h
 )
 set(GAME_GENERATED_SHARED
   src/generated/git_revision.cpp
-  src/generated/nethash.cpp
   src/generated/protocol.h
 )
-
-set(DEPS ${DEP_MD5})
 
 # Libraries
 set(LIBS ${CMAKE_THREAD_LIBS_INIT} ${CRYPTO_LIBRARIES} ${PLATFORM_LIBS})

@@ -6,8 +6,6 @@
 #include <engine/server.h>
 #include <engine/shared/memheap.h>
 
-#include <base/hash.h>
-
 class CSnapIDPool
 {
 	enum
@@ -138,7 +136,6 @@ public:
 		MAP_CHUNK_SIZE=NET_MAX_PAYLOAD-NET_MAX_CHUNKHEADERSIZE-4, // msg type
 	};
 	char m_aCurrentMap[64];
-	SHA256_DIGEST m_CurrentMapSha256;
 	unsigned m_CurrentMapCrc;
 	unsigned char *m_pCurrentMapData;
 	int m_CurrentMapSize;
@@ -211,7 +208,6 @@ public:
 	int GetMaxClients() { return 64; }
 	int GetMaxClientsPerIP() { return 2; }
 	int GetPort();
-	int LoadMap(const char *pMapName);
 
 	void InitInterfaces(IKernel *pKernel);
 	int Run(bool shutdown);
