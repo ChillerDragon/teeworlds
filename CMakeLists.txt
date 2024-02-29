@@ -481,7 +481,6 @@ generate_source("src/generated/server_data.h" "server_content_header")
 
 # Sources
 set_src(BASE GLOB_RECURSE src/base
-  color.h
   detect.h
   hash.c
   hash.h
