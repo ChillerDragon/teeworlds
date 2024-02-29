@@ -1069,8 +1069,7 @@ void CGameClient::OnNewSnapshot()
 		}
 		else if(Client()->SnapFindItem(IClient::SNAP_PREV, NETOBJTYPE_CHARACTER, m_LocalClientID))
 		{
-			// player died
-			m_pControls->OnPlayerDeath();
+			dbg_msg("client", "our tee died :c");
 		}
 	}
 	else

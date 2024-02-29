@@ -169,9 +169,6 @@ public:
 	void RconAuth(const char *pName, const char *pPassword);
 	virtual void Rcon(const char *pCmd);
 
-	virtual bool ConnectionProblems() const;
-	virtual int GetInputtimeMarginStabilityScore();
-
 	void SendInput();
 
 	// TODO: OPT: do this alot smarter!

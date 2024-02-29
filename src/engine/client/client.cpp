@@ -287,16 +287,6 @@ void CClient::Rcon(const char *pCmd)
 	SendMsg(&Msg, MSGFLAG_VITAL);
 }
 
-bool CClient::ConnectionProblems() const
-{
-	return m_NetClient.GotProblems() != 0;
-}
-
-int CClient::GetInputtimeMarginStabilityScore()
-{
-	return 0;
-}
-
 void CClient::SendInput()
 {
 	int64 Now = time_get();

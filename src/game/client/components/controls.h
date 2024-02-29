@@ -20,10 +20,7 @@ public:
 
 	virtual void OnReset();
 	virtual void OnRelease();
-	virtual void OnRender();
 	virtual void OnMessage(int MsgType, void *pRawMsg);
-	virtual void OnConsoleInit();
-	virtual void OnPlayerDeath();
 
 	int SnapInput(int *pData);
 };

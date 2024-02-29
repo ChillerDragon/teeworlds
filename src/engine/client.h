@@ -79,9 +79,6 @@ public:
 	// networking
 	virtual void EnterGame() = 0;
 
-	// network stats
-	virtual int GetInputtimeMarginStabilityScore() = 0;
-
 	//
 	virtual const char *GetCurrentMapName() const = 0;
 	virtual const char *GetCurrentMapPath() const = 0;
@@ -131,7 +128,6 @@ public:
 	virtual const char *ServerAddress() const = 0;
 	virtual const char *ErrorString() const = 0;
 	virtual const char *LatestVersion() const = 0;
-	virtual bool ConnectionProblems() const = 0;
 };
 
 class IGameClient : public IInterface

@@ -33,11 +33,6 @@ void CControls::OnRelease()
 	OnReset();
 }
 
-void CControls::OnPlayerDeath()
-{
-	if(!m_pClient->m_Snap.m_pGameDataRace || !(m_pClient->m_Snap.m_pGameDataRace->m_RaceFlags&RACEFLAG_KEEP_WANTED_WEAPON))
-		m_LastData.m_WantedWeapon = m_InputData.m_WantedWeapon = 0;
-}
 
 struct CInputSet
 {
@@ -45,10 +40,6 @@ struct CInputSet
 	int *m_pVariable;
 	int m_Value;
 };
-
-void CControls::OnConsoleInit()
-{
-}
 
 void CControls::OnMessage(int Msg, void *pRawMsg)
 {
@@ -111,8 +102,4 @@ int CControls::SnapInput(int *pData)
 	s_LastSendTime = time_get();
 	mem_copy(pData, &m_InputData, sizeof(m_InputData));
 	return sizeof(m_InputData);
-}
-
-void CControls::OnRender()
-{
 }
