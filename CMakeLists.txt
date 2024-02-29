@@ -581,8 +581,6 @@ if(CLIENT)
     client.h
   )
   set_src(GAME_CLIENT GLOB_RECURSE src/game/client
-    animstate.cpp
-    animstate.h
     component.h
     components/broadcast.cpp
     components/broadcast.h
