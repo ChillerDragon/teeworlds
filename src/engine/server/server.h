@@ -157,9 +157,6 @@ public:
 	CMapListEntry *m_pFirstMapEntry;
 	int m_NumMapEntries;
 
-	int m_RconPasswordSet;
-	int m_GeneratedRconPassword;
-
 	CServer();
 
 	virtual void SetClientName(int ClientID, const char *pName);
@@ -172,8 +169,6 @@ public:
 	int64 TickStartTime(int Tick);
 
 	int Init();
-
-	void InitRconPasswordIfUnset();
 
 	void SetRconCID(int ClientID);
 	bool IsAuthed(int ClientID) const;

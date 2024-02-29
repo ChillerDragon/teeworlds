@@ -8,7 +8,6 @@ config:Add(OptCCompiler("compiler"))
 config:Add(OptTestCompileC("stackprotector", "int main(){return 0;}", "-fstack-protector -fstack-protector-all"))
 config:Add(OptTestCompileC("minmacosxsdk", "int main(){return 0;}", "-mmacosx-version-min=10.7 -isysroot /Developer/SDKs/MacOSX10.7.sdk"))
 config:Add(OptTestCompileC("buildwithoutsseflag", "#include <immintrin.h>\nint main(){_mm_pause();return 0;}", ""))
-config:Add(OptLibrary("zlib", "zlib.h", false))
 config:Finalize("config.lua")
 
 generated_src_dir = "build/src"
@@ -68,23 +67,11 @@ function GenerateCommonSettings(settings, conf, arch, compiler)
 		settings.cc.flags:Add("-Wall", "-fno-exceptions")
 	end
 
-	-- Compile zlib if needed
-	local zlib = nil
-	if config.zlib.value == 1 then
-		settings.link.libs:Add("z")
-		if config.zlib.include_path then
-			settings.cc.includes:Add(config.zlib.include_path)
-		end
-	else
-		settings.cc.includes:Add("src/engine/external/zlib")
-		zlib = Compile(settings, Collect("src/engine/external/zlib/*.c"))
-	end
-
 	local md5 = Compile(settings, Collect("src/engine/external/md5/*.c"))
 	local json = Compile(settings, Collect("src/engine/external/json-parser/*.c"))
 
 	-- globally available libs
-	libs = {zlib=zlib, md5=md5, json=json}
+	libs = {md5=md5, json=json}
 end
 
 function GenerateMacOSXSettings(settings, conf, arch, compiler)
@@ -291,7 +278,7 @@ function BuildClient(settings, family, platform)
 	local game_client = Compile(settings, CollectRecursive("src/game/client/*.cpp"), SharedClientFiles())
 	local game_editor = Compile(settings, Collect("src/game/editor/*.cpp"))
 
-	Link(settings, "teeworlds", libs["zlib"], libs["md5"], libs["json"], client, game_client, game_editor)
+	Link(settings, "teeworlds", libs["md5"], libs["json"], client, game_client, game_editor)
 end
 
 function BuildServer(settings, family, platform)
@@ -299,7 +286,7 @@ function BuildServer(settings, family, platform)
 
 	local game_server = Compile(settings, CollectRecursive("src/game/server/*.cpp"), SharedServerFiles())
 
-	return Link(settings, "teeworlds_srv", libs["zlib"], libs["md5"], server, game_server)
+	return Link(settings, "teeworlds_srv", libs["md5"], server, game_server)
 end
 
 function BuildContent(settings, arch, conf)

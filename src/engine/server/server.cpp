@@ -152,9 +152,6 @@ CServer::CServer()
 	m_RconClientID = IServer::RCON_CID_SERV;
 	m_RconAuthLevel = AUTHED_ADMIN;
 
-	m_RconPasswordSet = 0;
-	m_GeneratedRconPassword = 0;
-
 	Init();
 }
 
@@ -310,35 +307,6 @@ int CServer::ClientCountry(int ClientID) const
 bool CServer::ClientIngame(int ClientID) const
 {
 	return ClientID >= 0 && ClientID < MAX_CLIENTS && m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME;
-}
-
-void CServer::InitRconPasswordIfUnset()
-{
-	if(m_RconPasswordSet)
-	{
-		return;
-	}
-
-	static const char VALUES[] = "ABCDEFGHKLMNPRSTUVWXYZabcdefghjkmnopqt23456789";
-	static const size_t NUM_VALUES = sizeof(VALUES) - 1; // Disregard the '\0'.
-	static const size_t PASSWORD_LENGTH = 6;
-	dbg_assert(NUM_VALUES * NUM_VALUES >= 2048, "need at least 2048 possibilities for 2-character sequences");
-	// With 6 characters, we get a password entropy of log(2048) * 6/2 = 33bit.
-
-	dbg_assert(PASSWORD_LENGTH % 2 == 0, "need an even password length");
-	unsigned short aRandom[PASSWORD_LENGTH / 2];
-	char aRandomPassword[PASSWORD_LENGTH+1];
-	aRandomPassword[PASSWORD_LENGTH] = 0;
-
-	secure_random_fill(aRandom, sizeof(aRandom));
-	for(size_t i = 0; i < PASSWORD_LENGTH / 2; i++)
-	{
-		unsigned short RandomNumber = aRandom[i] % 2048;
-		aRandomPassword[2 * i + 0] = VALUES[RandomNumber / NUM_VALUES];
-		aRandomPassword[2 * i + 1] = VALUES[RandomNumber % NUM_VALUES];
-	}
-
-	m_GeneratedRconPassword = 1;
 }
 
 int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID)
@@ -722,6 +690,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				}
 
 				const char *pPassword = Unpacker.GetString(CUnpacker::SANITIZE_CC);
+				dbg_msg("server", "client sent password=%s", pPassword);
 				// wrong password
 				// m_NetServer.Drop(ClientID, "Wrong password");
 				// return;
@@ -870,6 +839,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		else if(Msg == NETMSG_RCON_AUTH)
 		{
 			const char *pPw = Unpacker.GetString(CUnpacker::SANITIZE_CC);
+			dbg_msg("server", "client send rcon password=%s", pPw);
 
 			if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && Unpacker.Error() == 0)
 			{
@@ -1131,13 +1101,6 @@ int CServer::Run(bool shutdown)
 	str_format(aBuf, sizeof(aBuf), "game version %s", GameServer()->Version());
 	dbg_msg("server", "%s", aBuf);
 
-	if(m_GeneratedRconPassword)
-	{
-		dbg_msg("server", "+-------------------------+");
-		dbg_msg("server", "| rcon password: '%s' |", "xxx");
-		dbg_msg("server", "+-------------------------+");
-	}
-
 	// start game
 	{
 		m_GameStartTime = time_get();
@@ -1367,8 +1330,6 @@ int main(int argc, const char **argv) // ignore_convention
 	pEngine->Init();
 
 	pServer->InitInterfaces(pKernel);
-
-	pServer->InitRconPasswordIfUnset();
 
 	// run the server
 	dbg_msg("server", "starting...");
