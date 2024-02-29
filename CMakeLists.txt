@@ -369,36 +369,9 @@ set(EXPECTED_DATA
   fonts/SourceHanSans.ttc
   fonts/index.json
   game.png
-  maps/ctf1.map
-  maps/ctf2.map
-  maps/ctf3.map
-  maps/ctf4.map
-  maps/ctf5.map
-  maps/ctf6.map
-  maps/ctf7.map
-  maps/ctf8.map
-  maps/dm1.map
-  maps/dm2.map
-  maps/dm3.map
-  maps/dm6.map
-  maps/dm7.map
-  maps/dm8.map
-  maps/dm9.map
-  maps/license.txt
-  maps/lms1.map
-  maps/readme.txt
   particles.png
   race_flag.png
 )
-
-if(NOT EXISTS ${PROJECT_SOURCE_DIR}/datasrc/maps/dm1.map)
-  message(WARNING "Missing datasrc/maps submodule. Please download a source release or update your git submodules with `git submodule update --init`")
-  foreach(item ${EXPECTED_DATA})
-    if(item MATCHES "^maps/")
-      list(REMOVE_ITEM EXPECTED_DATA ${item})
-    endif()
-  endforeach()
-endif()
 
 set_glob(DATA GLOB_RECURSE "json;map;png;rules;ttc;ttf;txt;wv" datasrc ${EXPECTED_DATA})
 
