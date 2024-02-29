@@ -121,17 +121,6 @@ public:
 
 	// event
 	/*
-		Function: on_CCharacter_death
-			Called when a CCharacter in the world dies.
-
-		Arguments:
-			victim - The CCharacter that died.
-			killer - The player that killed it.
-			weapon - What weapon that killed it. Can be -1 for undefined
-				weapon when switching team or player suicides.
-	*/
-	virtual int OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon);
-	/*
 		Function: on_CCharacter_spawn
 			Called when a CCharacter spawns into the game world.
 
@@ -139,22 +128,6 @@ public:
 			chr - The CCharacter that was spawned.
 	*/
 	virtual void OnCharacterSpawn(class CCharacter *pChr);
-
-	virtual void OnFlagReturn(class CFlag *pFlag);
-
-	/*
-		Function: on_entity
-			Called when the map is loaded to process an entity
-			in the map.
-
-		Arguments:
-			index - Entity index.
-			pos - Where the entity is located in the world.
-
-		Returns:
-			bool?
-	*/
-	virtual bool OnEntity(int Index, vec2 Pos);
 
 	virtual void OnPlayerConnect(class CPlayer *pPlayer);
 	virtual void OnPlayerDisconnect(class CPlayer *pPlayer);
@@ -171,7 +144,6 @@ public:
 		TIMER_END = 10,
 	};
 
-	void DoPause(int Seconds) { SetGameState(IGS_GAME_PAUSED, Seconds); }
 	void DoWarmup(int Seconds)
 	{
 		SetGameState(IGS_WARMUP_USER, Seconds);
