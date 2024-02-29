@@ -85,13 +85,13 @@ jobs:
         cd release
         ./teeworlds_srv shutdown || true
 
-    - name: Package
-      run: |
-        cd release
-        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }}
-        mkdir artifacts
-        mv teeworlds_srv artifacts
-        mv teeworlds artifacts
+    # - name: Package
+    #   run: |
+    #     cd release
+    #     ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }}
+    #     mkdir artifacts
+    #     mv teeworlds_srv artifacts
+    #     mv teeworlds artifacts
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v1
