@@ -7,18 +7,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, ubuntu-18.04]
+        os: [ubuntu-latest, windows-latest]
         include:
         - os: ubuntu-latest
           cmake-args: -G "Unix Makefiles"
           build-args: --parallel
-          package-file: teeworlds-*-linux_x86_64.tar.xz
-          env:
-            CFLAGS: -Wdeclaration-after-statement -Werror
-            CXXFLAGS: -Werror
-        - os: ubuntu-18.04
-          cmake-path: /usr/bin/
-          cmake-args: -G "Unix Makefiles"
           package-file: teeworlds-*-linux_x86_64.tar.xz
           env:
             CFLAGS: -Wdeclaration-after-statement -Werror
