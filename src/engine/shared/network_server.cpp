@@ -3,11 +3,10 @@
 #include <base/math.h>
 #include <base/system.h>
 
-#include "netban.h"
 #include "network.h"
 
 
-bool CNetServer::Open(NETADDR BindAddr, CConfig *pConfig, IEngine *pEngine, CNetBan *pNetBan,
+bool CNetServer::Open(NETADDR BindAddr, CConfig *pConfig, IEngine *pEngine,
 	int MaxClients, int MaxClientsPerIP, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient, void *pUser)
 {
 	// zero out the whole structure
@@ -19,7 +18,6 @@ bool CNetServer::Open(NETADDR BindAddr, CConfig *pConfig, IEngine *pEngine, CNet
 		return false;
 
 	// init
-	m_pNetBan = pNetBan;
 	Init(Socket, pConfig, pEngine);
 
 	m_TokenManager.Init(this);
@@ -61,7 +59,6 @@ void CNetServer::Drop(int ClientID, const char *pReason)
 
 int CNetServer::Update()
 {
-	int64 Now = time_get();
 	for(int i = 0; i < NET_MAX_CLIENTS; i++)
 	{
 		if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
@@ -70,13 +67,7 @@ int CNetServer::Update()
 		m_aSlots[i].m_Connection.Update();
 		if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_ERROR)
 		{
-			if(Now - m_aSlots[i].m_Connection.ConnectTime() < time_freq() && NetBan())
-			{
-				if(NetBan()->BanAddr(ClientAddr(i), 60, "Stressing network") == -1)
-					Drop(i, m_aSlots[i].m_Connection.ErrorString());
-			}
-			else
-				Drop(i, m_aSlots[i].m_Connection.ErrorString());
+			Drop(i, m_aSlots[i].m_Connection.ErrorString());
 		}
 	}
 
@@ -106,20 +97,6 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 
 		if(!Result)
 		{
-			// check for bans
-			char aBuf[128];
-			int LastInfoQuery;
-			if(NetBan() && NetBan()->IsBanned(&Addr, aBuf, sizeof(aBuf), &LastInfoQuery))
-			{
-				// banned, reply with a message (5 second cooldown)
-				int Time = time_timestamp();
-				if(LastInfoQuery + 5 < Time)
-				{
-					SendControlMsg(&Addr, m_RecvUnpacker.m_Data.m_ResponseToken, 0, NET_CTRLMSG_CLOSE, aBuf, str_length(aBuf) + 1);
-				}
-				continue;
-			}
-
 			bool Found = false;
 			// try to find matching slot
 			for(int i = 0; i < NET_MAX_CLIENTS; i++)

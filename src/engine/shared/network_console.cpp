@@ -2,18 +2,16 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/system.h>
 
-#include "netban.h"
 #include "network.h"
 
 
-bool CNetConsole::Open(NETADDR BindAddr, CNetBan *pNetBan, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient, void *pUser)
+bool CNetConsole::Open(NETADDR BindAddr, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient, void *pUser)
 {
 	// zero out the whole structure
 	mem_zero(this, sizeof(*this));
 	m_Socket.type = NETTYPE_INVALID;
 	m_Socket.ipv4sock = -1;
 	m_Socket.ipv6sock = -1;
-	m_pNetBan = pNetBan;
 
 	// open socket
 	m_Socket = net_tcp_create(BindAddr);
@@ -98,21 +96,7 @@ int CNetConsole::Update()
 
 	if(net_tcp_accept(m_Socket, &Socket, &Addr) > 0)
 	{
-		// check if we just should drop the packet
-		char aBuf[128];
-		int LastInfoQuery;
-		if(NetBan() && NetBan()->IsBanned(&Addr, aBuf, sizeof(aBuf), &LastInfoQuery))
-		{
-			// banned, reply with a message (5 second cooldown) and drop
-			int Time = time_timestamp();
-			if(LastInfoQuery + 5 < Time)
-			{
-				net_tcp_send(Socket, aBuf, str_length(aBuf));
-			}
-			net_tcp_close(Socket);
-		}
-		else
-			AcceptClient(Socket, &Addr);
+		AcceptClient(Socket, &Addr);
 	}
 
 	for(int i = 0; i < NET_MAX_CONSOLE_CLIENTS; i++)

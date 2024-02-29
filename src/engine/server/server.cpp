@@ -7,13 +7,9 @@
 #include <engine/config.h>
 #include <engine/engine.h>
 #include <engine/server.h>
-#include <engine/storage.h>
 
 #include <engine/shared/compression.h>
 #include <engine/shared/config.h>
-#include <engine/shared/datafile.h>
-#include <engine/shared/filecollection.h>
-#include <engine/shared/netban.h>
 #include <engine/shared/network.h>
 #include <engine/shared/packer.h>
 #include <engine/shared/protocol.h>
@@ -117,83 +113,6 @@ void CSnapIDPool::FreeID(int ID)
 		m_FirstTimed = ID;
 		m_LastTimed = ID;
 	}
-}
-
-
-void CServerBan::InitServerBan(IStorage *pStorage, CServer* pServer)
-{
-	CNetBan::Init(pStorage);
-
-	m_pServer = pServer;
-}
-
-template<class T>
-int CServerBan::BanExt(T *pBanPool, const typename T::CDataType *pData, int Seconds, const char *pReason)
-{
-	// validate address
-	if(Server()->m_RconClientID >= 0 && Server()->m_RconClientID < MAX_CLIENTS &&
-		Server()->m_aClients[Server()->m_RconClientID].m_State != CServer::CClient::STATE_EMPTY)
-	{
-		if(NetMatch(pData, Server()->m_NetServer.ClientAddr(Server()->m_RconClientID)))
-		{
-			dbg_msg("net_ban", "ban error (you can't ban yourself)");
-			return -1;
-		}
-
-		for(int i = 0; i < MAX_CLIENTS; ++i)
-		{
-			if(i == Server()->m_RconClientID || Server()->m_aClients[i].m_State == CServer::CClient::STATE_EMPTY)
-				continue;
-
-			if(Server()->m_aClients[i].m_Authed >= Server()->m_RconAuthLevel && NetMatch(pData, Server()->m_NetServer.ClientAddr(i)))
-			{
-				dbg_msg("net_ban", "ban error (command denied)");
-				return -1;
-			}
-		}
-	}
-	else if(Server()->m_RconClientID == IServer::RCON_CID_VOTE)
-	{
-		for(int i = 0; i < MAX_CLIENTS; ++i)
-		{
-			if(Server()->m_aClients[i].m_State == CServer::CClient::STATE_EMPTY)
-				continue;
-
-			if(Server()->m_aClients[i].m_Authed != CServer::AUTHED_NO && NetMatch(pData, Server()->m_NetServer.ClientAddr(i)))
-			{
-				dbg_msg("net_ban", "ban error (command denied)");
-				return -1;
-			}
-		}
-	}
-
-	int Result = Ban(pBanPool, pData, Seconds, pReason);
-	if(Result != 0)
-		return Result;
-
-	// drop banned clients
-	typename T::CDataType Data = *pData;
-	for(int i = 0; i < MAX_CLIENTS; ++i)
-	{
-		if(Server()->m_aClients[i].m_State == CServer::CClient::STATE_EMPTY)
-			continue;
-
-		if(NetMatch(&Data, Server()->m_NetServer.ClientAddr(i)))
-		{
-			CNetHash NetHash(&Data);
-			char aBuf[256];
-			MakeBanInfo(pBanPool->Find(&Data, &NetHash), aBuf, sizeof(aBuf), MSGTYPE_PLAYER);
-			Server()->m_NetServer.Drop(i, aBuf);
-		}
-	}
-
-	return Result;
-}
-
-int CServerBan::BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason)
-{
-	dbg_msg("server", "ban %p", pAddr);
-	return 0;
 }
 
 void CServer::CClient::Reset()
@@ -330,7 +249,7 @@ bool CServer::IsAuthed(int ClientID) const
 
 bool CServer::IsBanned(int ClientID)
 {
-	return m_ServerBan.IsBanned(m_NetServer.ClientAddr(ClientID), 0, 0, 0);
+	return false;
 }
 
 int CServer::GetClientInfo(int ClientID, CClientInfo *pInfo) const
@@ -1000,20 +919,6 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=%s authed (moderator)", ClientID, aAddrStr);
 					dbg_msg("server", "%s", aBuf);
 				}
-				else if(Config()->m_SvRconMaxTries && m_ServerBan.IsBannable(m_NetServer.ClientAddr(ClientID)))
-				{
-					m_aClients[ClientID].m_AuthTries++;
-					char aBuf[128];
-					str_format(aBuf, sizeof(aBuf), "Wrong password %d/%d.", m_aClients[ClientID].m_AuthTries, Config()->m_SvRconMaxTries);
-					SendRconLine(ClientID, aBuf);
-					if(m_aClients[ClientID].m_AuthTries >= Config()->m_SvRconMaxTries)
-					{
-						if(!Config()->m_SvRconBantime)
-							m_NetServer.Drop(ClientID, "Too many remote console authentication tries");
-						else
-							m_ServerBan.BanAddr(m_NetServer.ClientAddr(ClientID), Config()->m_SvRconBantime*60, "Too many remote console authentication tries");
-					}
-				}
 				else
 				{
 					SendRconLine(ClientID, "Wrong password.");
@@ -1165,8 +1070,6 @@ void CServer::PumpNetwork()
 		else
 			ProcessClientPacket(&Packet);
 	}
-
-	m_ServerBan.Update();
 }
 
 const char *CServer::GetMapName()
@@ -1214,18 +1117,18 @@ int CServer::LoadMap(const char *pMapName)
 
 	// load complete map into memory for download
 	{
-		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
-		if(!File)
-		{
-			dbg_msg("server", "TODO: load map into memory");
-			return 1;
-		}
-		m_CurrentMapSize = (int)io_length(File);
-		if(m_pCurrentMapData)
-			mem_free(m_pCurrentMapData);
-		m_pCurrentMapData = (unsigned char *)mem_alloc(m_CurrentMapSize);
-		io_read(File, m_pCurrentMapData, m_CurrentMapSize);
-		io_close(File);
+		// IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
+		// if(!File)
+		// {
+		// 	dbg_msg("server", "TODO: load map into memory");
+		// 	return 1;
+		// }
+		// m_CurrentMapSize = (int)io_length(File);
+		// if(m_pCurrentMapData)
+		// 	mem_free(m_pCurrentMapData);
+		// m_pCurrentMapData = (unsigned char *)mem_alloc(m_CurrentMapSize);
+		// io_read(File, m_pCurrentMapData, m_CurrentMapSize);
+		// io_close(File);
 	}
 	return 1;
 }
@@ -1239,7 +1142,6 @@ void CServer::InitInterfaces(IKernel *pKernel)
 {
 	m_pConfig = pKernel->RequestInterface<IConfigManager>()->Values();
 	m_pGameServer = pKernel->RequestInterface<IGameServer>();
-	m_pStorage = pKernel->RequestInterface<IStorage>();
 }
 
 int CServer::Run(bool shutdown)
@@ -1273,7 +1175,7 @@ int CServer::Run(bool shutdown)
 		BindAddr.port = GetPort();
 	}
 
-	if(!m_NetServer.Open(BindAddr, Config(), Kernel()->RequestInterface<IEngine>(), &m_ServerBan,
+	if(!m_NetServer.Open(BindAddr, Config(), Kernel()->RequestInterface<IEngine>(),
 		GetMaxClients(), GetMaxClientsPerIP(), NewClientCallback, DelClientCallback, this))
 	{
 		dbg_msg("server", "couldn't open socket. port %d might already be in use", GetPort());
@@ -1433,47 +1335,6 @@ struct CSubdirCallbackUserdata
 
 int CServer::MapListEntryCallback(const char *pFilename, int IsDir, int DirType, void *pUser)
 {
-	CSubdirCallbackUserdata *pUserdata = (CSubdirCallbackUserdata *)pUser;
-	CServer *pThis = pUserdata->m_pServer;
-
-	if(pFilename[0] == '.') // hidden files
-		return 0;
-
-	char aFilename[IO_MAX_PATH_LENGTH];
-	if(pUserdata->m_aName[0])
-		str_format(aFilename, sizeof(aFilename), "%s/%s", pUserdata->m_aName, pFilename);
-	else
-		str_format(aFilename, sizeof(aFilename), "%s", pFilename);
-
-	if(IsDir)
-	{
-		CSubdirCallbackUserdata Userdata;
-		Userdata.m_StandardOnly = pUserdata->m_StandardOnly;
-		Userdata.m_pServer = pThis;
-		str_copy(Userdata.m_aName, aFilename, sizeof(Userdata.m_aName));
-		char aFindPath[IO_MAX_PATH_LENGTH];
-		str_format(aFindPath, sizeof(aFindPath), "maps/%s/", aFilename);
-		pThis->m_pStorage->ListDirectory(IStorage::TYPE_ALL, aFindPath, MapListEntryCallback, &Userdata);
-		return 0;
-	}
-
-	const char *pSuffix = str_endswith(aFilename, ".map");
-	if(!pSuffix) // not ending with .map
-		return 0;
-	aFilename[pSuffix - aFilename] = 0; // remove suffix
-
-	CMapListEntry *pEntry = (CMapListEntry *)pThis->m_pMapListHeap->Allocate(sizeof(CMapListEntry));
-	pThis->m_NumMapEntries++;
-	pEntry->m_pNext = 0;
-	pEntry->m_pPrev = pThis->m_pLastMapEntry;
-	if(pEntry->m_pPrev)
-		pEntry->m_pPrev->m_pNext = pEntry;
-	pThis->m_pLastMapEntry = pEntry;
-	if(!pThis->m_pFirstMapEntry)
-		pThis->m_pFirstMapEntry = pEntry;
-
-	str_copy(pEntry->m_aName, aFilename, sizeof(pEntry->m_aName));
-
 	return 0;
 }
 
@@ -1486,7 +1347,6 @@ void CServer::InitMapList()
 
 	Userdata.m_pServer = this;
 	str_copy(Userdata.m_aName, "", sizeof(Userdata.m_aName));
-	m_pStorage->ListDirectory(IStorage::TYPE_ALL, "maps/", MapListEntryCallback, &Userdata);
 	dbg_msg("server", "%d maps added to maplist", m_NumMapEntries);
 }
 
@@ -1560,7 +1420,6 @@ int main(int argc, const char **argv) // ignore_convention
 	int FlagMask = CFGFLAG_SERVER|CFGFLAG_ECON;
 	IEngine *pEngine = CreateEngine("Teeworlds_Server");
 	IGameServer *pGameServer = CreateGameServer();
-	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_SERVER, argc, argv); // ignore_convention
 	IConfigManager *pConfigManager = CreateConfigManager();
 
 	pServer->InitRegister(&pServer->m_NetServer, pConfigManager->Values());
@@ -1571,7 +1430,6 @@ int main(int argc, const char **argv) // ignore_convention
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pServer); // register as both
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pEngine);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pGameServer);
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pStorage);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConfigManager);
 
 		if(RegisterFail)
@@ -1586,8 +1444,6 @@ int main(int argc, const char **argv) // ignore_convention
 	// restore empty config strings to their defaults
 	pConfigManager->RestoreStrings();
 
-	pEngine->InitLogfile();
-
 	pServer->InitRconPasswordIfUnset();
 
 	// run the server
@@ -1599,7 +1455,6 @@ int main(int argc, const char **argv) // ignore_convention
 	delete pKernel;
 	delete pEngine;
 	delete pGameServer;
-	delete pStorage;
 	delete pConfigManager;
 
 	secure_random_uninit();

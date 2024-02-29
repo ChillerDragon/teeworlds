@@ -15,7 +15,6 @@ protected:
 	// perhaps propagte pointers for these as well
 	class IKernel *Kernel() const { return m_pClient->Kernel(); }
 	class IClient *Client() const { return m_pClient->Client(); }
-	class IStorage *Storage() const { return m_pClient->Storage(); }
 	class CConfig *Config() const { return m_pClient->Config(); }
 public:
 	virtual ~CComponent() {}

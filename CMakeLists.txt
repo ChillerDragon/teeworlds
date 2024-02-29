@@ -511,7 +511,6 @@ set_src(ENGINE_INTERFACE GLOB src/engine
   keys.h
   message.h
   server.h
-  storage.h
 )
 set_src(ENGINE_SHARED GLOB src/engine/shared
   compression.cpp
@@ -519,18 +518,12 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   config.cpp
   config.h
   config_variables.h
-  datafile.cpp
-  datafile.h
   engine.cpp
-  filecollection.cpp
-  filecollection.h
   huffman.cpp
   huffman.h
   kernel.cpp
   memheap.cpp
   memheap.h
-  netban.cpp
-  netban.h
   network.cpp
   network.h
   network_client.cpp
@@ -546,7 +539,6 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   ringbuffer.h
   snapshot.cpp
   snapshot.h
-  storage.cpp
 )
 set(ENGINE_GENERATED_SHARED src/generated/nethash.cpp src/generated/protocol.cpp src/generated/protocol.h)
 set_src(GAME_SHARED GLOB src/game

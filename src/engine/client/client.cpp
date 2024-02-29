@@ -12,13 +12,10 @@
 #include <engine/config.h>
 #include <engine/engine.h>
 #include <engine/keys.h>
-#include <engine/storage.h>
 
 
 #include <engine/shared/config.h>
 #include <engine/shared/compression.h>
-#include <engine/shared/datafile.h>
-#include <engine/shared/filecollection.h>
 #include <engine/shared/network.h>
 #include <engine/shared/packer.h>
 #include <engine/shared/protocol.h>
@@ -472,11 +469,6 @@ void CClient::DisconnectWithReason(const char *pReason)
 
 	// disable all downloads
 	m_MapdownloadChunk = 0;
-	if(m_MapdownloadFileTemp)
-	{
-		io_close(m_MapdownloadFileTemp);
-		Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorage::TYPE_SAVE);
-	}
 	m_MapdownloadFileTemp = 0;
 	m_MapdownloadSha256 = SHA256_ZEROED;
 	m_MapdownloadSha256Present = false;
@@ -619,48 +611,7 @@ static void FormatMapDownloadFilename(const char *pName, const SHA256_DIGEST *pS
 
 const char *CClient::LoadMapSearch(const char *pMapName, const SHA256_DIGEST *pWantedSha256, int WantedCrc)
 {
-	const char *pError = 0;
-	char aBuf[512];
-	char aWanted[SHA256_MAXSTRSIZE + 16];
-	aWanted[0] = 0;
-	if(pWantedSha256)
-	{
-		char aWantedSha256[SHA256_MAXSTRSIZE];
-		sha256_str(*pWantedSha256, aWantedSha256, sizeof(aWantedSha256));
-		str_format(aWanted, sizeof(aWanted), "sha256=%s ", aWantedSha256);
-	}
-	str_format(aBuf, sizeof(aBuf), "loading map, map=%s wanted %scrc=%08x", pMapName, aWanted, WantedCrc);
-	dbg_msg("client", "%s", aBuf);
-	SetState(IClient::STATE_LOADING);
-
-	// try the normal maps folder
-	str_format(aBuf, sizeof(aBuf), "maps/%s.map", pMapName);
-	pError = LoadMap(pMapName, aBuf, pWantedSha256, WantedCrc);
-	if(!pError)
-		return pError;
-
-	// try the downloaded maps
-	FormatMapDownloadFilename(pMapName, pWantedSha256, WantedCrc, false, aBuf, sizeof(aBuf));
-	pError = LoadMap(pMapName, aBuf, pWantedSha256, WantedCrc);
-	if(!pError)
-		return pError;
-
-	// backward compatibility with old names
-	if(pWantedSha256)
-	{
-		FormatMapDownloadFilename(pMapName, 0, WantedCrc, false, aBuf, sizeof(aBuf));
-		pError = LoadMap(pMapName, aBuf, pWantedSha256, WantedCrc);
-		if(!pError)
-			return pError;
-	}
-
-	// search for the map within subfolders
-	char aFilename[128];
-	str_format(aFilename, sizeof(aFilename), "%s.map", pMapName);
-	if(Storage()->FindFile(aFilename, "maps", IStorage::TYPE_ALL, aBuf, sizeof(aBuf)))
-		pError = LoadMap(pMapName, aBuf, pWantedSha256, WantedCrc);
-
-	return pError;
+	return 0;
 }
 
 struct CMastersrvAddr
@@ -824,12 +775,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 				}
 				else
 				{
-					if(m_MapdownloadFileTemp)
-					{
-						io_close(m_MapdownloadFileTemp);
-						Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorage::TYPE_SAVE);
-					}
-
 					// start map download
 					FormatMapDownloadFilename(pMap, pMapSha256, MapCrc, false, m_aMapdownloadFilename, sizeof(m_aMapdownloadFilename));
 					FormatMapDownloadFilename(pMap, pMapSha256, MapCrc, true, m_aMapdownloadFilenameTemp, sizeof(m_aMapdownloadFilenameTemp));
@@ -839,7 +784,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 					dbg_msg("client/network", "%s", aBuf);
 
 					str_copy(m_aMapdownloadName, pMap, sizeof(m_aMapdownloadName));
-					m_MapdownloadFileTemp = Storage()->OpenFile(m_aMapdownloadFilenameTemp, IOFLAG_WRITE, IStorage::TYPE_SAVE);
 					m_MapdownloadChunk = 0;
 					m_MapdownloadChunkNum = MapChunkNum;
 					m_MapDownloadChunkSize = MapChunkSize;
@@ -882,9 +826,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 				m_MapdownloadFileTemp = 0;
 				m_MapdownloadAmount = 0;
 				m_MapdownloadTotalsize = -1;
-
-				Storage()->RemoveFile(m_aMapdownloadFilename, IStorage::TYPE_SAVE);
-				Storage()->RenameFile(m_aMapdownloadFilenameTemp, m_aMapdownloadFilename, IStorage::TYPE_SAVE);
 
 				// load map
 				const char *pError = LoadMap(m_aMapdownloadName, m_aMapdownloadFilename, m_MapdownloadSha256Present ? &m_MapdownloadSha256 : 0, m_MapdownloadCrc);
@@ -1367,7 +1308,6 @@ void CClient::InitInterfaces()
 	m_pGameClient = Kernel()->RequestInterface<IGameClient>();
 	m_pConfigManager = Kernel()->RequestInterface<IConfigManager>();
 	m_pConfig = m_pConfigManager->Values();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
 }
 
 void CClient::Run()
@@ -1526,7 +1466,6 @@ int main(int argc, const char **argv) // ignore_convention
 	// create the components
 	int FlagMask = CFGFLAG_CLIENT;
 	IEngine *pEngine = CreateEngine("Teeworlds");
-	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_CLIENT, argc, argv); // ignore_convention
 	IConfigManager *pConfigManager = CreateConfigManager();
 
 	if(RandInitFailed)
@@ -1543,7 +1482,6 @@ int main(int argc, const char **argv) // ignore_convention
 
 
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(CreateGameClient());
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pStorage);
 
 		if(RegisterFail)
 			return -1;
@@ -1573,8 +1511,6 @@ int main(int argc, const char **argv) // ignore_convention
 
 	pConfigManager->RestoreStrings();
 
-	pClient->Engine()->InitLogfile();
-
 	// run the client
 	dbg_msg("client", "starting...");
 	pClient->Run();
@@ -1584,7 +1520,6 @@ int main(int argc, const char **argv) // ignore_convention
 	mem_free(pClient);
 	delete pKernel;
 	delete pEngine;
-	delete pStorage;
 	delete pConfigManager;
 
 	secure_random_uninit();

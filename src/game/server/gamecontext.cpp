@@ -4,7 +4,6 @@
 
 #include <engine/shared/config.h>
 #include <engine/shared/memheap.h>
-#include <engine/storage.h>
 
 #include <generated/server_data.h>
 #include <game/version.h>
@@ -1012,7 +1011,6 @@ void CGameContext::OnInit()
 	// init everything
 	m_pServer = Kernel()->RequestInterface<IServer>();
 	m_pConfig = Kernel()->RequestInterface<IConfigManager>()->Values();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	m_Events.SetGameServer(this);
 
 	// HACK: only set static size for items, which were available in the first 0.7 release

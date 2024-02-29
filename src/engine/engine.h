@@ -11,7 +11,6 @@ class IEngine : public IInterface
 
 public:
 	virtual void Init() = 0;
-	virtual void InitLogfile() = 0;
 	virtual void QueryNetLogHandles(IOHANDLE *pHDLSend, IOHANDLE *pHDLRecv) = 0;
 };
 

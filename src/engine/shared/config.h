@@ -44,7 +44,6 @@ class CConfigManager : public IConfigManager
 		void *m_pUserData;
 	};
 
-	class IStorage *m_pStorage;
 	IOHANDLE m_ConfigFile;
 	int m_FlagMask;
 	CCallback m_aCallbacks[MAX_CALLBACKS];

@@ -57,9 +57,6 @@ enum
 	NETSTATE_CONNECTING,
 	NETSTATE_ONLINE,
 
-	NETBANTYPE_SOFT=1,
-	NETBANTYPE_DROP=2,
-
 	NETCREATE_FLAG_RANDOMPORT=1,
 };
 
@@ -451,7 +448,6 @@ class CNetServer : public CNetBase
 		CNetConnection m_Connection;
 	};
 
-	class CNetBan *m_pNetBan;
 	CSlot m_aSlots[NET_MAX_CLIENTS];
 	int m_NumClients;
 	int m_MaxClients;
@@ -468,7 +464,7 @@ class CNetServer : public CNetBase
 
 public:
 	//
-	bool Open(NETADDR BindAddr, class CConfig *pConfig, class IEngine *pEngine, class CNetBan *pNetBan,
+	bool Open(NETADDR BindAddr, class CConfig *pConfig, class IEngine *pEngine,
 		int MaxClients, int MaxClientsPerIP, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient, void *pUser);
 	void Close(const char *pReason);
 
@@ -483,7 +479,6 @@ public:
 
 	// status requests
 	const NETADDR *ClientAddr(int ClientID) const { return m_aSlots[ClientID].m_Connection.PeerAddress(); }
-	class CNetBan *NetBan() const { return m_pNetBan; }
 
 	//
 	void SetMaxClients(int MaxClients);
@@ -498,7 +493,6 @@ class CNetConsole
 	};
 
 	NETSOCKET m_Socket;
-	class CNetBan *m_pNetBan;
 	CSlot m_aSlots[NET_MAX_CONSOLE_CLIENTS];
 
 	NETFUNC_NEWCLIENT m_pfnNewClient;
@@ -509,7 +503,7 @@ class CNetConsole
 
 public:
 	//
-	bool Open(NETADDR BindAddr, class CNetBan *pNetBan, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient, void *pUser);
+	bool Open(NETADDR BindAddr, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient, void *pUser);
 	void Close();
 
 	//
@@ -524,7 +518,6 @@ public:
 
 	// status requests
 	const NETADDR *ClientAddr(int ClientID) const { return m_aSlots[ClientID].m_Connection.PeerAddress(); }
-	class CNetBan *NetBan() const { return m_pNetBan; }
 };
 
 

@@ -57,7 +57,6 @@ class CClient : public IClient
 	IGameClient *m_pGameClient;
 	IConfigManager *m_pConfigManager;
 	CConfig *m_pConfig;
-	IStorage *m_pStorage;
 
 	enum
 	{
@@ -159,7 +158,6 @@ public:
 	IGameClient *GameClient() { return m_pGameClient; }
 	IConfigManager *ConfigManager() { return m_pConfigManager; }
 	CConfig *Config() { return m_pConfig; }
-	IStorage *Storage() { return m_pStorage; }
 
 	CClient();
 

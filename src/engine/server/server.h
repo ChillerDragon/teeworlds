@@ -6,6 +6,8 @@
 #include <engine/server.h>
 #include <engine/shared/memheap.h>
 
+#include <base/hash.h>
+
 class CSnapIDPool
 {
 	enum
@@ -41,30 +43,13 @@ public:
 };
 
 
-class CServerBan : public CNetBan
-{
-	class CServer *m_pServer;
-
-	template<class T> int BanExt(T *pBanPool, const typename T::CDataType *pData, int Seconds, const char *pReason);
-
-public:
-	class CServer *Server() const { return m_pServer; }
-
-	void InitServerBan(class IStorage *pStorage, class CServer* pServer);
-
-	virtual int BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason);
-};
-
-
 class CServer : public IServer
 {
 	class IGameServer *m_pGameServer;
 	class CConfig *m_pConfig;
-	class IStorage *m_pStorage;
 public:
 	class IGameServer *GameServer() { return m_pGameServer; }
 	class CConfig *Config() { return m_pConfig; }
-	class IStorage *Storage() { return m_pStorage; }
 
 	enum
 	{
@@ -140,7 +125,6 @@ public:
 	CSnapshotBuilder m_SnapshotBuilder;
 	CSnapIDPool m_IDPool;
 	CNetServer m_NetServer;
-	CServerBan m_ServerBan;
 
 	int64 m_GameStartTime;
 	bool m_RunServer;

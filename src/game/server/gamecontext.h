@@ -34,7 +34,6 @@ class CGameContext : public IGameServer
 {
 	IServer *m_pServer;
 	class CConfig *m_pConfig;
-	class IStorage *m_pStorage;
 	CNetObjHandler m_NetObjHandler;
 
 	CGameContext(int Resetting);
@@ -44,7 +43,6 @@ class CGameContext : public IGameServer
 public:
 	IServer *Server() const { return m_pServer; }
 	class CConfig *Config() { return m_pConfig; }
-	class IStorage *Storage() { return m_pStorage; }
 
 	CGameContext();
 	~CGameContext();
