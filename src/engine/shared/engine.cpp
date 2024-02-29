@@ -5,14 +5,12 @@
 #include <base/system.h>
 
 #include <engine/engine.h>
-#include <engine/shared/config.h>
 #include <engine/shared/network.h>
 
 
 class CEngine : public IEngine
 {
 public:
-	CConfig *m_pConfig;
 	bool m_Logging;
 	IOHANDLE m_DataLogSent;
 	IOHANDLE m_DataLogRecv;
@@ -47,7 +45,6 @@ public:
 
 	void Init()
 	{
-		m_pConfig = Kernel()->RequestInterface<IConfigManager>()->Values();
 	}
 
 	void QueryNetLogHandles(IOHANDLE *pHDLSend, IOHANDLE *pHDLRecv)

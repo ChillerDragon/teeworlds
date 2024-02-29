@@ -31,7 +31,6 @@ class CGameClient : public IGameClient
 
 	class IEngine *m_pEngine;
 	class IClient *m_pClient;
-	class CConfig *m_pConfig;
 
 	void ProcessEvents();
 	void ProcessTriggeredEvents(int Events, vec2 Pos);
@@ -50,7 +49,6 @@ public:
 	IKernel *Kernel() { return IInterface::Kernel(); }
 	IEngine *Engine() const { return m_pEngine; }
 	class IClient *Client() const { return m_pClient; }
-	class CConfig *Config() const { return m_pConfig; }
 
 	const char *NetobjFailedOn() { return m_NetObjHandler.FailedObjOn(); }
 	int NetobjNumFailures() { return m_NetObjHandler.NumObjFailures(); }

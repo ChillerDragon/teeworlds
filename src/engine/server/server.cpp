@@ -4,18 +4,15 @@
 #include <base/math.h>
 #include <base/system.h>
 
-#include <engine/config.h>
 #include <engine/engine.h>
 #include <engine/server.h>
 
 #include <engine/shared/compression.h>
-#include <engine/shared/config.h>
 #include <engine/shared/network.h>
 #include <engine/shared/packer.h>
 #include <engine/shared/protocol.h>
 #include <engine/shared/snapshot.h>
 
-#include "register.h"
 #include "server.h"
 
 #if defined(CONF_FAMILY_WINDOWS)
@@ -341,7 +338,6 @@ void CServer::InitRconPasswordIfUnset()
 		aRandomPassword[2 * i + 1] = VALUES[RandomNumber % NUM_VALUES];
 	}
 
-	str_copy(Config()->m_SvRconPassword, aRandomPassword, sizeof(Config()->m_SvRconPassword));
 	m_GeneratedRconPassword = 1;
 }
 
@@ -670,7 +666,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 	if(Unpacker.Error())
 		return;
 
-	if(m_pConfig->m_Debug > 2)
+	if(1)
 	{
 		const char *pMsg = "unkown";
 		if(Msg == NETMSG_NULL) { pMsg = "NULL"; }
@@ -726,12 +722,9 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				}
 
 				const char *pPassword = Unpacker.GetString(CUnpacker::SANITIZE_CC);
-				if(Config()->m_Password[0] != 0 && str_comp(Config()->m_Password, pPassword) != 0)
-				{
-					// wrong password
-					m_NetServer.Drop(ClientID, "Wrong password");
-					return;
-				}
+				// wrong password
+				// m_NetServer.Drop(ClientID, "Wrong password");
+				// return;
 
 				m_aClients[ClientID].m_Version = Unpacker.GetInt();
 
@@ -764,12 +757,9 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					Msg.AddRaw(&m_pCurrentMapData[Offset], ChunkSize);
 					SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
 
-					if(Config()->m_Debug)
-					{
-						char aBuf[64];
-						str_format(aBuf, sizeof(aBuf), "sending chunk %d with size %d", Chunk, ChunkSize);
-						dbg_msg("server", "%s", aBuf);
-					}
+					char aBuf[64];
+					str_format(aBuf, sizeof(aBuf), "sending chunk %d with size %d", Chunk, ChunkSize);
+					dbg_msg("server", "%s", aBuf);
 				}
 			}
 		}
@@ -883,46 +873,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 
 			if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && Unpacker.Error() == 0)
 			{
-				if(Config()->m_SvRconPassword[0] == 0 && Config()->m_SvRconModPassword[0] == 0)
-				{
-					if(!m_aClients[ClientID].m_NoRconNote)
-					{
-						SendRconLine(ClientID, "No rcon password set on server. Set sv_rcon_password and/or sv_rcon_mod_password to enable the remote console.");
-						m_aClients[ClientID].m_NoRconNote = true;
-					}
-				}
-				else if(Config()->m_SvRconPassword[0] && str_comp(pPw, Config()->m_SvRconPassword) == 0)
-				{
-					CMsgPacker Msg(NETMSG_RCON_AUTH_ON, true);
-					SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
-
-					m_aClients[ClientID].m_Authed = AUTHED_ADMIN;
-					if(m_aClients[ClientID].m_Version >= MIN_MAPLIST_CLIENTVERSION)
-						m_aClients[ClientID].m_pMapListEntryToSend = m_pFirstMapEntry;
-					SendRconLine(ClientID, "Admin authentication successful. Full remote console access granted.");
-					char aAddrStr[NETADDR_MAXSTRSIZE];
-					net_addr_str(m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), true);
-					char aBuf[256];
-					str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=%s authed (admin)", ClientID, aAddrStr);
-					dbg_msg("server", "%s", aBuf);
-				}
-				else if(Config()->m_SvRconModPassword[0] && str_comp(pPw, Config()->m_SvRconModPassword) == 0)
-				{
-					CMsgPacker Msg(NETMSG_RCON_AUTH_ON, true);
-					SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
-
-					m_aClients[ClientID].m_Authed = AUTHED_MOD;
-					SendRconLine(ClientID, "Moderator authentication successful. Limited remote console access granted.");
-					char aAddrStr[NETADDR_MAXSTRSIZE];
-					net_addr_str(m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), true);
-					char aBuf[256];
-					str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=%s authed (moderator)", ClientID, aAddrStr);
-					dbg_msg("server", "%s", aBuf);
-				}
-				else
-				{
-					SendRconLine(ClientID, "Wrong password.");
-				}
+				SendRconLine(ClientID, "Wrong password.");
 			}
 		}
 		else if(Msg == NETMSG_PING)
@@ -932,14 +883,11 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		}
 		else
 		{
-			if(Config()->m_Debug)
-			{
-				char aBuf[256];
-				str_format(aBuf, sizeof(aBuf), "strange message ClientID=%d msg=%d data_size=%d", ClientID, Msg, pPacket->m_DataSize);
-				dbg_msg("server", "%s", aBuf);
-				str_hex(aBuf, sizeof(aBuf), pPacket->m_pData, minimum(pPacket->m_DataSize, 32));
-				dbg_msg("server", "%s", aBuf);
-			}
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), "strange message ClientID=%d msg=%d data_size=%d", ClientID, Msg, pPacket->m_DataSize);
+			dbg_msg("server", "%s", aBuf);
+			str_hex(aBuf, sizeof(aBuf), pPacket->m_pData, minimum(pPacket->m_DataSize, 32));
+			dbg_msg("server", "%s", aBuf);
 		}
 	}
 	else
@@ -983,8 +931,7 @@ void CServer::GenerateServerInfo(CPacker *pPacker, int Token)
 
 	// flags
 	int Flags = 0;
-	if(Config()->m_Password[0])  // password set
-		Flags |= SERVERINFO_FLAG_PASSWORD;
+	Flags |= SERVERINFO_FLAG_PASSWORD;
 	if(GameServer()->TimeScore())
 		Flags |= SERVERINFO_FLAG_TIMESCORE;
 	pPacker->AddInt(Flags);
@@ -1043,8 +990,6 @@ void CServer::PumpNetwork()
 	{
 		if(Packet.m_Flags&NETSENDFLAG_CONNLESS)
 		{
-			if(m_Register.RegisterProcessPacket(&Packet, ResponseToken))
-				continue;
 			if(Packet.m_DataSize >= int(sizeof(SERVERBROWSE_GETINFO)) &&
 				mem_comp(Packet.m_pData, SERVERBROWSE_GETINFO, sizeof(SERVERBROWSE_GETINFO)) == 0)
 			{
@@ -1133,14 +1078,12 @@ int CServer::LoadMap(const char *pMapName)
 	return 1;
 }
 
-void CServer::InitRegister(CNetServer *pNetServer, CConfig *pConfig)
+void CServer::InitRegister(CNetServer *pNetServer)
 {
-	m_Register.Init(pNetServer, pConfig);
 }
 
 void CServer::InitInterfaces(IKernel *pKernel)
 {
-	m_pConfig = pKernel->RequestInterface<IConfigManager>()->Values();
 	m_pGameServer = pKernel->RequestInterface<IGameServer>();
 }
 
@@ -1162,20 +1105,11 @@ int CServer::Run(bool shutdown)
 
 	// start server
 	NETADDR BindAddr;
-	if(Config()->m_Bindaddr[0] && net_host_lookup(Config()->m_Bindaddr, &BindAddr, NETTYPE_ALL) == 0)
-	{
-		// sweet!
-		BindAddr.type = NETTYPE_ALL;
-		BindAddr.port = GetPort();
-	}
-	else
-	{
-		mem_zero(&BindAddr, sizeof(BindAddr));
-		BindAddr.type = NETTYPE_ALL;
-		BindAddr.port = GetPort();
-	}
+	mem_zero(&BindAddr, sizeof(BindAddr));
+	BindAddr.type = NETTYPE_ALL;
+	BindAddr.port = GetPort();
 
-	if(!m_NetServer.Open(BindAddr, Config(), Kernel()->RequestInterface<IEngine>(),
+	if(!m_NetServer.Open(BindAddr, Kernel()->RequestInterface<IEngine>(),
 		GetMaxClients(), GetMaxClientsPerIP(), NewClientCallback, DelClientCallback, this))
 	{
 		dbg_msg("server", "couldn't open socket. port %d might already be in use", GetPort());
@@ -1200,7 +1134,7 @@ int CServer::Run(bool shutdown)
 	if(m_GeneratedRconPassword)
 	{
 		dbg_msg("server", "+-------------------------+");
-		dbg_msg("server", "| rcon password: '%s' |", Config()->m_SvRconPassword);
+		dbg_msg("server", "| rcon password: '%s' |", "xxx");
 		dbg_msg("server", "+-------------------------+");
 	}
 
@@ -1279,14 +1213,11 @@ int CServer::Run(bool shutdown)
 			// snap game
 			if(NewTicks)
 			{
-				if(Config()->m_SvHighBandwidth || ShouldSnap)
+				if(ShouldSnap)
 					DoSnapshot();
 
 				UpdateClientMapListEntries();
 			}
-
-			// master server stuff
-			m_Register.RegisterUpdate(m_NetServer.NetType());
 
 			PumpNetwork();
 
@@ -1417,12 +1348,10 @@ int main(int argc, const char **argv) // ignore_convention
 	IKernel *pKernel = IKernel::Create();
 
 	// create the components
-	int FlagMask = CFGFLAG_SERVER|CFGFLAG_ECON;
 	IEngine *pEngine = CreateEngine("Teeworlds_Server");
 	IGameServer *pGameServer = CreateGameServer();
-	IConfigManager *pConfigManager = CreateConfigManager();
 
-	pServer->InitRegister(&pServer->m_NetServer, pConfigManager->Values());
+	pServer->InitRegister(&pServer->m_NetServer);
 
 	{
 		bool RegisterFail = false;
@@ -1430,19 +1359,14 @@ int main(int argc, const char **argv) // ignore_convention
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pServer); // register as both
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pEngine);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pGameServer);
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConfigManager);
 
 		if(RegisterFail)
 			return -1;
 	}
 
 	pEngine->Init();
-	pConfigManager->Init(FlagMask);
 
 	pServer->InitInterfaces(pKernel);
-
-	// restore empty config strings to their defaults
-	pConfigManager->RestoreStrings();
 
 	pServer->InitRconPasswordIfUnset();
 
@@ -1455,7 +1379,6 @@ int main(int argc, const char **argv) // ignore_convention
 	delete pKernel;
 	delete pEngine;
 	delete pGameServer;
-	delete pConfigManager;
 
 	secure_random_uninit();
 	cmdline_free(argc, argv);

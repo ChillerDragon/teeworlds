@@ -2,12 +2,10 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/system.h>
 
-#include <engine/shared/config.h>
-
 #include "network.h"
 
 
-bool CNetClient::Open(NETADDR BindAddr, CConfig *pConfig, IEngine *pEngine, int Flags)
+bool CNetClient::Open(NETADDR BindAddr, IEngine *pEngine, int Flags)
 {
 	// open socket
 	NETSOCKET Socket;
@@ -19,7 +17,7 @@ bool CNetClient::Open(NETADDR BindAddr, CConfig *pConfig, IEngine *pEngine, int 
 	mem_zero(this, sizeof(*this));
 
 	// init
-	Init(Socket, pConfig, pEngine);
+	Init(Socket, pEngine);
 	m_Connection.Init(this, false);
 
 	m_TokenManager.Init(this);
@@ -112,8 +110,6 @@ int CNetClient::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 
 					if(pResponseToken)
 						*pResponseToken = m_RecvUnpacker.m_Data.m_ResponseToken;
-					// if(Config()->m_Debug > 2)
-					// 	dbg_msg("network_in", "abort recieving chunk");
 					return 1;
 				}
 			}

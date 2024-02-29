@@ -55,8 +55,6 @@ class CClient : public IClient
 	// needed interfaces
 	IEngine *m_pEngine;
 	IGameClient *m_pGameClient;
-	IConfigManager *m_pConfigManager;
-	CConfig *m_pConfig;
 
 	enum
 	{
@@ -156,8 +154,6 @@ class CClient : public IClient
 public:
 	IEngine *Engine() { return m_pEngine; }
 	IGameClient *GameClient() { return m_pGameClient; }
-	IConfigManager *ConfigManager() { return m_pConfigManager; }
-	CConfig *Config() { return m_pConfig; }
 
 	CClient();
 

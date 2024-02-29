@@ -505,19 +505,14 @@ set_src(BASE GLOB_RECURSE src/base
 )
 set_src(ENGINE_INTERFACE GLOB src/engine
   client.h
-  config.h
   engine.h
   kernel.h
-  keys.h
   message.h
   server.h
 )
 set_src(ENGINE_SHARED GLOB src/engine/shared
   compression.cpp
   compression.h
-  config.cpp
-  config.h
-  config_variables.h
   engine.cpp
   huffman.cpp
   huffman.h
@@ -632,8 +627,6 @@ endif()
 
 # Sources
 set_src(ENGINE_SERVER GLOB src/engine/server
-  register.cpp
-  register.h
   server.cpp
   server.h
 )

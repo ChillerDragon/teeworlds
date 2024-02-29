@@ -6,7 +6,7 @@
 #include "network.h"
 
 
-bool CNetServer::Open(NETADDR BindAddr, CConfig *pConfig, IEngine *pEngine,
+bool CNetServer::Open(NETADDR BindAddr, IEngine *pEngine,
 	int MaxClients, int MaxClientsPerIP, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient, void *pUser)
 {
 	// zero out the whole structure
@@ -18,7 +18,7 @@ bool CNetServer::Open(NETADDR BindAddr, CConfig *pConfig, IEngine *pEngine,
 		return false;
 
 	// init
-	Init(Socket, pConfig, pEngine);
+	Init(Socket, pEngine);
 
 	m_TokenManager.Init(this);
 	m_TokenCache.Init(this, &m_TokenManager);

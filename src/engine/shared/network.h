@@ -196,7 +196,6 @@ class CNetBase
 	};
 	static CNetInitializer m_NetInitializer;
 
-	class CConfig *m_pConfig;
 	class IEngine *m_pEngine;
 	NETSOCKET m_Socket;
 	IOHANDLE m_DataLogSent;
@@ -207,11 +206,10 @@ class CNetBase
 public:
 	CNetBase();
 	~CNetBase();
-	CConfig *Config() { return m_pConfig; }
 	class IEngine *Engine() { return m_pEngine; }
 	int NetType() { return m_Socket.type; }
 
-	void Init(NETSOCKET Socket, class CConfig *pConfig, class IEngine *pEngine);
+	void Init(NETSOCKET Socket, class IEngine *pEngine);
 	void Shutdown();
 	void UpdateLogHandles();
 	void Wait(int Time);
@@ -364,7 +362,6 @@ public:
 
 	TOKEN Token() const { return m_Token; }
 	TOKEN PeerToken() const { return m_PeerToken; }
-	class CConfig *Config() { return m_pNetBase->Config(); }
 
 	int Update();
 	int Flush();
@@ -464,7 +461,7 @@ class CNetServer : public CNetBase
 
 public:
 	//
-	bool Open(NETADDR BindAddr, class CConfig *pConfig, class IEngine *pEngine,
+	bool Open(NETADDR BindAddr, class IEngine *pEngine,
 		int MaxClients, int MaxClientsPerIP, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient, void *pUser);
 	void Close(const char *pReason);
 
@@ -535,7 +532,7 @@ class CNetClient : public CNetBase
 
 public:
 	// openness
-	bool Open(NETADDR BindAddr, class CConfig *pConfig, class IEngine *pEngine, int Flags);
+	bool Open(NETADDR BindAddr, class IEngine *pEngine, int Flags);
 	void Close();
 
 	// connection state

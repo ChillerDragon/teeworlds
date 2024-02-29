@@ -9,12 +9,8 @@
 #include <base/system.h>
 
 #include <engine/client.h>
-#include <engine/config.h>
 #include <engine/engine.h>
-#include <engine/keys.h>
 
-
-#include <engine/shared/config.h>
 #include <engine/shared/compression.h>
 #include <engine/shared/network.h>
 #include <engine/shared/packer.h>
@@ -23,8 +19,6 @@
 #include <engine/shared/snapshot.h>
 
 #include <game/version.h>
-
-#include <engine/shared/config.h>
 
 #include "client.h"
 
@@ -167,8 +161,6 @@ void CSmoothTime::Update(CGraph *pGraph, int64 Target, int TimeLeft, int AdjustD
 CClient::CClient()
 {
 	m_pGameClient = 0;
-	m_pConfigManager = 0;
-	m_pConfig = 0;
 
 	m_RenderFrameTime = 0.0001f;
 	m_RenderFrameTimeLow = 1.0f;
@@ -681,18 +673,7 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 		mem_comp(pPacket->m_pData, SERVERBROWSE_LIST, sizeof(SERVERBROWSE_LIST)) == 0)
 	{
 		pConnlessPacket = "SERVERBROWSE_LIST";
-		if(Config()->m_DbgMaster)
-		{
-			dbg_msg("network_in", "WE GOT A SERVER LIST SERVERBROWSE_LIST");
-		}
-		// check for valid master server address
-		bool Valid = false;
-		if(!Valid)
-		{
-			if(Config()->m_Debug > 2)
-				dbg_msg("network_in", "invalid master server list packet");
-			return;
-		}
+		dbg_msg("network_in", "WE GOT A SERVER LIST SERVERBROWSE_LIST");
 
 		int Size = pPacket->m_DataSize-sizeof(SERVERBROWSE_LIST);
 		int Num = Size/sizeof(CMastersrvAddr);
@@ -797,8 +778,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 					CMsgPacker Msg(NETMSG_REQUEST_MAP_DATA, true);
 					SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH);
 
-					if(Config()->m_Debug)
-						dbg_msg("client/network", "requested first chunk package");
+					dbg_msg("client/network", "requested first chunk package");
 				}
 			}
 		}
@@ -843,8 +823,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 				CMsgPacker Msg(NETMSG_REQUEST_MAP_DATA, true);
 				SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH);
 
-				if(Config()->m_Debug)
-					dbg_msg("client/network", "requested next chunk package");
+				dbg_msg("client/network", "requested next chunk package");
 			}
 		}
 		else if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && Msg == NETMSG_SERVERINFO)
@@ -865,7 +844,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 			const char *pHelp = Unpacker.GetString(CUnpacker::SANITIZE_CC);
 			const char *pParams = Unpacker.GetString(CUnpacker::SANITIZE_CC);
 			if(Unpacker.Error() == 0)
-				dbg_msg("rcon", "cmd add pName=%s, pParams=%s, CFGFLAG_SERVER=%d, pHelp=%s", pName, pParams, CFGFLAG_SERVER, pHelp);
+				dbg_msg("rcon", "cmd add pName=%s, pParams=%s, pHelp=%s", pName, pParams, pHelp);
 		}
 		else if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && Msg == NETMSG_RCON_CMD_REM)
 		{
@@ -998,12 +977,9 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 						{
 							// couldn't find the delta snapshots that the server used
 							// to compress this snapshot. force the server to resync
-							if(Config()->m_Debug)
-							{
-								char aBuf[256];
-								str_format(aBuf, sizeof(aBuf), "error, couldn't find the delta snapshot");
-								dbg_msg("client", "%s", aBuf);
-							}
+							char aBuf[256];
+							str_format(aBuf, sizeof(aBuf), "error, couldn't find the delta snapshot");
+							dbg_msg("client", "%s", aBuf);
 
 							// ack snapshot
 							// TODO: combine this with the input message
@@ -1039,13 +1015,10 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 
 					if(Msg != NETMSG_SNAPEMPTY && pTmpBuffer3->Crc() != Crc)
 					{
-						if(Config()->m_Debug)
-						{
-							char aBuf[256];
-							str_format(aBuf, sizeof(aBuf), "snapshot crc error #%d - tick=%d wantedcrc=%d gotcrc=%d compressed_size=%d delta_tick=%d",
-								m_SnapCrcErrors, GameTick, Crc, pTmpBuffer3->Crc(), CompleteSize, DeltaTick);
-							dbg_msg("client", "%s", aBuf);
-						}
+						char aBuf[256];
+						str_format(aBuf, sizeof(aBuf), "snapshot crc error #%d - tick=%d wantedcrc=%d gotcrc=%d compressed_size=%d delta_tick=%d",
+							m_SnapCrcErrors, GameTick, Crc, pTmpBuffer3->Crc(), CompleteSize, DeltaTick);
+						dbg_msg("client", "%s", aBuf);
 
 						m_SnapCrcErrors++;
 						if(m_SnapCrcErrors > 10)
@@ -1231,31 +1204,6 @@ void CClient::Update()
 		}
 	}
 
-	// STRESS TEST: join the server again
-	if(Config()->m_DbgStress)
-	{
-		static int64 ActionTaken = 0;
-		int64 Now = time_get();
-		if(State() == IClient::STATE_OFFLINE)
-		{
-			if(Now > ActionTaken+time_freq()*2)
-			{
-				dbg_msg("stress", "reconnecting!");
-				Connect(Config()->m_DbgStressServer);
-				ActionTaken = Now;
-			}
-		}
-		else
-		{
-			if(Now > ActionTaken+time_freq()*(10+Config()->m_DbgStress))
-			{
-				dbg_msg("stress", "disconnecting!");
-				Disconnect();
-				ActionTaken = Now;
-			}
-		}
-	}
-
 	// pump the network
 	PumpNetwork();
 
@@ -1306,8 +1254,6 @@ void CClient::InitInterfaces()
 	// fetch interfaces
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
 	m_pGameClient = Kernel()->RequestInterface<IGameClient>();
-	m_pConfigManager = Kernel()->RequestInterface<IConfigManager>();
-	m_pConfig = m_pConfigManager->Values();
 }
 
 void CClient::Run()
@@ -1318,23 +1264,15 @@ void CClient::Run()
 	// open socket
 	{
 		NETADDR BindAddr;
-		if(Config()->m_Bindaddr[0] && net_host_lookup(Config()->m_Bindaddr, &BindAddr, NETTYPE_ALL) == 0)
-		{
-			// got bindaddr
-			BindAddr.type = NETTYPE_ALL;
-		}
-		else
-		{
-			mem_zero(&BindAddr, sizeof(BindAddr));
-			BindAddr.type = NETTYPE_ALL;
-		}
-		if(!m_NetClient.Open(BindAddr, Config(), Engine(), BindAddr.port ? 0 : NETCREATE_FLAG_RANDOMPORT))
+		mem_zero(&BindAddr, sizeof(BindAddr));
+		BindAddr.type = NETTYPE_ALL;
+		if(!m_NetClient.Open(BindAddr, Engine(), BindAddr.port ? 0 : NETCREATE_FLAG_RANDOMPORT))
 		{
 			dbg_msg("client", "couldn't open socket(net)");
 			return;
 		}
 		BindAddr.port = 0;
-		if(!m_ContactClient.Open(BindAddr, Config(), Engine(), 0))
+		if(!m_ContactClient.Open(BindAddr, Engine(), 0))
 		{
 			dbg_msg("client", "couldn't open socket(contact)");
 			return;
@@ -1376,31 +1314,7 @@ void CClient::Run()
 			break;
 
 		// beNice
-		if(Config()->m_ClCpuThrottle)
-			thread_sleep(Config()->m_ClCpuThrottle);
-
-		if(Config()->m_DbgHitch)
-		{
-			thread_sleep(Config()->m_DbgHitch);
-			Config()->m_DbgHitch = 0;
-		}
-
-		/*
-		if(ReportTime < time_get())
-		{
-			if(0 && Config()->m_Debug)
-			{
-				dbg_msg("client/report", "fps=%.02f (%.02f %.02f) netstate=%d",
-					m_Frames/(float)(ReportInterval/time_freq()),
-					1.0f/m_RenderFrameTimeHigh,
-					1.0f/m_RenderFrameTimeLow,
-					m_NetClient.State());
-			}
-			m_RenderFrameTimeLow = 1;
-			m_RenderFrameTimeHigh = 0;
-			m_RenderFrames = 0;
-			ReportTime += ReportInterval;
-		}*/
+		thread_sleep(100);
 
 		// update local time
 		m_LocalTime = (time_get()-m_LocalStartTime)/(float)time_freq();
@@ -1464,9 +1378,7 @@ int main(int argc, const char **argv) // ignore_convention
 	pClient->RegisterInterfaces();
 
 	// create the components
-	int FlagMask = CFGFLAG_CLIENT;
 	IEngine *pEngine = CreateEngine("Teeworlds");
-	IConfigManager *pConfigManager = CreateConfigManager();
 
 	if(RandInitFailed)
 	{
@@ -1478,7 +1390,6 @@ int main(int argc, const char **argv) // ignore_convention
 		bool RegisterFail = false;
 
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pEngine);
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConfigManager);
 
 
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(CreateGameClient());
@@ -1488,7 +1399,6 @@ int main(int argc, const char **argv) // ignore_convention
 	}
 
 	pEngine->Init();
-	pConfigManager->Init(FlagMask);
 
 	// init client's interfaces
 	pClient->InitInterfaces();
@@ -1509,8 +1419,6 @@ int main(int argc, const char **argv) // ignore_convention
 
 	pKernel->RequestInterface<IGameClient>()->OnConsoleInit();
 
-	pConfigManager->RestoreStrings();
-
 	// run the client
 	dbg_msg("client", "starting...");
 	pClient->Run();
@@ -1520,7 +1428,6 @@ int main(int argc, const char **argv) // ignore_convention
 	mem_free(pClient);
 	delete pKernel;
 	delete pEngine;
-	delete pConfigManager;
 
 	secure_random_uninit();
 	cmdline_free(argc, argv);

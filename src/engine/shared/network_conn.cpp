@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/math.h>
 #include <base/system.h>
-#include "config.h"
 #include "network.h"
 
 
@@ -297,8 +296,7 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 					SetError(Str);
 				}
 
-				if(Config()->m_Debug)
-					dbg_msg("conn", "closed reason='%s'", Str);
+				dbg_msg("conn", "closed reason='%s'", Str);
 			}
 			return 0;
 		}
@@ -315,7 +313,7 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 					SendControlWithToken(NET_CTRLMSG_CONNECT);
 					dbg_msg("connection", "got token, replying, token=%x mytoken=%x", m_PeerToken, m_Token);
 				}
-				else if(Config()->m_Debug)
+				else
 					dbg_msg("connection", "got token, token=%x", m_PeerToken);
 			}
 			else
@@ -336,8 +334,7 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 						m_LastRecvTime = Now;
 						m_LastUpdateTime = Now;
 						SendControl(NET_CTRLMSG_ACCEPT, 0, 0);
-						if(Config()->m_Debug)
-							dbg_msg("connection", "got connection, sending accept");
+						dbg_msg("connection", "got connection, sending accept");
 					}
 				}
 				else if(State() == NET_CONNSTATE_CONNECT)
@@ -347,8 +344,7 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 					{
 						m_LastRecvTime = Now;
 						m_State = NET_CONNSTATE_ONLINE;
-						if(Config()->m_Debug)
-							dbg_msg("connection", "got accept. connection online");
+						dbg_msg("connection", "got accept. connection online");
 					}
 				}
 			}
@@ -360,8 +356,7 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 		{
 			m_LastRecvTime = Now;
 			m_State = NET_CONNSTATE_ONLINE;
-			if(Config()->m_Debug)
-				dbg_msg("connection", "connecting online");
+			dbg_msg("connection", "connecting online");
 		}
 	}
 
@@ -420,7 +415,7 @@ int CNetConnection::Update()
 		if(time_get()-m_LastSendTime > time_freq()/2) // flush connection after 500ms if needed
 		{
 			int NumFlushedChunks = Flush();
-			if(NumFlushedChunks && Config()->m_Debug)
+			if(NumFlushedChunks)
 				dbg_msg("connection", "flushed connection due to timeout. %d chunks.", NumFlushedChunks);
 		}
 

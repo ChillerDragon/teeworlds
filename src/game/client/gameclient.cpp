@@ -1,7 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/engine.h>
-#include <engine/shared/config.h>
 
 #include <generated/protocol.h>
 #include <generated/client_data.h>
@@ -186,7 +185,6 @@ void CGameClient::OnConsoleInit()
 	m_InitComplete = false;
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
 	m_pClient = Kernel()->RequestInterface<IClient>();
-	m_pConfig = Kernel()->RequestInterface<IConfigManager>()->Values();
 
 	// setup pointers
 	m_pBroadcast = &::gs_Broadcast;
@@ -388,7 +386,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 			if(pUnpacker->Error())
 				return;
 
-			m_pVoting->AddOption(pDescription);
+			dbg_msg("vote", "desc=%s", pDescription);
 		}
 	}
 	else if(MsgId == NETMSGTYPE_SV_GAMEMSG)
@@ -548,8 +546,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		{
 			if(m_LocalClientID != -1)
 			{
-				if(Config()->m_Debug)
-					dbg_msg("client", "invalid local clientinfo");
+				dbg_msg("client", "invalid local clientinfo");
 				return;
 			}
 			m_LocalClientID = pMsg->m_ClientID;
@@ -559,8 +556,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		{
 			if(m_aClients[pMsg->m_ClientID].m_Active)
 			{
-				if(Config()->m_Debug)
-					dbg_msg("client", "invalid clientinfo");
+				dbg_msg("client", "invalid clientinfo");
 				return;
 			}
 
@@ -610,8 +606,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 
 		if(m_LocalClientID == pMsg->m_ClientID || !m_aClients[pMsg->m_ClientID].m_Active)
 		{
-			if(Config()->m_Debug)
-				dbg_msg("client", "invalid clientdrop");
+			dbg_msg("client", "invalid clientdrop");
 			return;
 		}
 
@@ -640,8 +635,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 
 		if(!m_aClients[pMsg->m_ClientID].m_Active)
 		{
-			if(Config()->m_Debug)
-				dbg_msg("client", "invalid skin info");
+			dbg_msg("client", "invalid skin info");
 			return;
 		}
 
@@ -865,12 +859,9 @@ void CGameClient::OnNewSnapshot()
 			const void *pData = Client()->SnapGetItem(IClient::SNAP_CURRENT, Index, &Item);
 			if(m_NetObjHandler.ValidateObj(Item.m_Type, pData, Item.m_DataSize) != 0)
 			{
-				if(Config()->m_Debug)
-				{
-					char aBuf[256];
-					str_format(aBuf, sizeof(aBuf), "invalidated index=%d type=%d (%s) size=%d id=%d", Index, Item.m_Type, m_NetObjHandler.GetObjName(Item.m_Type), Item.m_DataSize, Item.m_ID);
-					dbg_msg("game", "%s", aBuf);
-				}
+				char aBuf[256];
+				str_format(aBuf, sizeof(aBuf), "invalidated index=%d type=%d (%s) size=%d id=%d", Index, Item.m_Type, m_NetObjHandler.GetObjName(Item.m_Type), Item.m_DataSize, Item.m_ID);
+				dbg_msg("game", "%s", aBuf);
 				Client()->SnapInvalidateItem(IClient::SNAP_CURRENT, Index);
 			}
 		}
@@ -1247,9 +1238,9 @@ void CGameClient::SendSwitchTeam(int Team)
 void CGameClient::SendStartInfo()
 {
 	CNetMsg_Cl_StartInfo Msg;
-	Msg.m_pName = Config()->m_PlayerName;
-	Msg.m_pClan = Config()->m_PlayerClan;
-	Msg.m_Country = Config()->m_PlayerCountry;
+	Msg.m_pName = "nameless tee";
+	Msg.m_pClan = "0.7";
+	Msg.m_Country = 0;
 	for(int p = 0; p < NUM_SKINPARTS; p++)
 	{
 		Msg.m_apSkinPartNames[p] = "greensward";

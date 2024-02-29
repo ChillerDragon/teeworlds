@@ -5,7 +5,6 @@
 
 #include <engine/engine.h>
 
-#include "config.h"
 #include "network.h"
 #include "huffman.h"
 
@@ -79,8 +78,7 @@ int CNetRecvUnpacker::FetchChunk(CNetChunk *pChunk)
 					continue;
 
 				// out of sequence, request resend
-				if(m_pConnection->Config()->m_Debug)
-					dbg_msg("conn", "asking for resend %d %d", Header.m_Sequence, (m_pConnection->m_Ack+1)%NET_MAX_SEQUENCE);
+				dbg_msg("conn", "asking for resend %d %d", Header.m_Sequence, (m_pConnection->m_Ack+1)%NET_MAX_SEQUENCE);
 				m_pConnection->SignalResend();
 				continue; // take the next chunk in the packet
 			}
@@ -100,7 +98,6 @@ CNetBase::CNetInitializer CNetBase::m_NetInitializer;
 CNetBase::CNetBase()
 {
 	net_invalidate_socket(&m_Socket);
-	m_pConfig = 0;
 	m_pEngine = 0;
 	m_DataLogSent = 0;
 	m_DataLogRecv = 0;
@@ -112,10 +109,9 @@ CNetBase::~CNetBase()
 		Shutdown();
 }
 
-void CNetBase::Init(NETSOCKET Socket, CConfig *pConfig, IEngine *pEngine)
+void CNetBase::Init(NETSOCKET Socket, IEngine *pEngine)
 {
 	m_Socket = Socket;
-	m_pConfig = pConfig;
 	m_pEngine = pEngine;
 	m_Huffman.Init();
 	mem_zero(m_aRequestTokenBuf, sizeof(m_aRequestTokenBuf));
@@ -245,8 +241,7 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 	// check the size
 	if(Size < NET_PACKETHEADERSIZE || Size > NET_MAX_PACKETSIZE)
 	{
-		if(m_pConfig->m_Debug)
-			dbg_msg("network", "packet too small, size=%d", Size);
+		dbg_msg("network", "packet too small, size=%d", Size);
 		return -1;
 	}
 
@@ -259,8 +254,7 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 	{
 		if(Size < NET_PACKETHEADERSIZE_CONNLESS)
 		{
-			if(m_pConfig->m_Debug)
-				dbg_msg("net", "connless packet too small, size=%d", Size);
+			dbg_msg("net", "connless packet too small, size=%d", Size);
 			return -1;
 		}
 
@@ -286,8 +280,7 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 	{
 		if(Size - NET_PACKETHEADERSIZE > NET_MAX_PAYLOAD)
 		{
-			if(m_pConfig->m_Debug)
-				dbg_msg("network", "packet payload too big, size=%d", Size);
+			dbg_msg("network", "packet payload too big, size=%d", Size);
 			return -1;
 		}
 
@@ -310,8 +303,7 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 	// check for errors
 	if(pPacket->m_DataSize < 0)
 	{
-		if(m_pConfig->m_Debug)
-			dbg_msg("network", "error during packet decoding");
+		dbg_msg("network", "error during packet decoding");
 		return -1;
 	}
 

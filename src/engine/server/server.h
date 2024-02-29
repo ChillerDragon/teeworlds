@@ -46,10 +46,8 @@ public:
 class CServer : public IServer
 {
 	class IGameServer *m_pGameServer;
-	class CConfig *m_pConfig;
 public:
 	class IGameServer *GameServer() { return m_pGameServer; }
-	class CConfig *Config() { return m_pConfig; }
 
 	enum
 	{
@@ -162,8 +160,6 @@ public:
 	int m_RconPasswordSet;
 	int m_GeneratedRconPassword;
 
-	CRegister m_Register;
-
 	CServer();
 
 	virtual void SetClientName(int ClientID, const char *pName);
@@ -223,7 +219,7 @@ public:
 	int GetPort();
 	int LoadMap(const char *pMapName);
 
-	void InitRegister(CNetServer *pNetServer, CConfig *pConfig);
+	void InitRegister(CNetServer *pNetServer);
 	void InitInterfaces(IKernel *pKernel);
 	int Run(bool shutdown);
 	void Free();

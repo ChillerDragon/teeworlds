@@ -2,8 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/math.h>
 
-#include <engine/shared/config.h>
-
 #include <game/client/gameclient.h>
 #include <game/client/component.h>
 #include <game/client/components/chat.h>
@@ -90,21 +88,6 @@ int CControls::SnapInput(int *pData)
 		m_InputData.m_Direction = -1;
 	if(!m_InputDirectionLeft && m_InputDirectionRight)
 		m_InputData.m_Direction = 1;
-
-	// stress testing
-	if(Config()->m_DbgStress)
-	{
-		float t = Client()->LocalTime();
-		mem_zero(&m_InputData, sizeof(m_InputData));
-
-		m_InputData.m_Direction = ((int)t/2)%3-1;
-		m_InputData.m_Jump = ((int)t)&1;
-		m_InputData.m_Fire = ((int)(t*10));
-		m_InputData.m_Hook = ((int)(t*2))&1;
-		m_InputData.m_WantedWeapon = ((int)t)%NUM_WEAPONS;
-		m_InputData.m_TargetX = (int)(sinf(t*3)*100.0f);
-		m_InputData.m_TargetY = (int)(cosf(t*3)*100.0f);
-	}
 
 	// check if we need to send input
 	if(m_InputData.m_Direction != m_LastData.m_Direction) Send = true;
