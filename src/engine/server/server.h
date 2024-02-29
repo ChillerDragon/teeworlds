@@ -171,7 +171,6 @@ public:
 	int Init();
 
 	void SetRconCID(int ClientID);
-	bool IsAuthed(int ClientID) const;
 	bool IsBanned(int ClientID);
 	int GetClientInfo(int ClientID, CClientInfo *pInfo) const;
 	void GetClientAddr(int ClientID, char *pAddrStr, int Size) const;
@@ -214,7 +213,6 @@ public:
 	int GetPort();
 	int LoadMap(const char *pMapName);
 
-	void InitRegister(CNetServer *pNetServer);
 	void InitInterfaces(IKernel *pKernel);
 	int Run(bool shutdown);
 	void Free();

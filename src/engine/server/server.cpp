@@ -236,11 +236,6 @@ void CServer::SetRconCID(int ClientID)
 	m_RconClientID = ClientID;
 }
 
-bool CServer::IsAuthed(int ClientID) const
-{
-	return m_aClients[ClientID].m_Authed;
-}
-
 bool CServer::IsBanned(int ClientID)
 {
 	return false;
@@ -1048,10 +1043,6 @@ int CServer::LoadMap(const char *pMapName)
 	return 1;
 }
 
-void CServer::InitRegister(CNetServer *pNetServer)
-{
-}
-
 void CServer::InitInterfaces(IKernel *pKernel)
 {
 	m_pGameServer = pKernel->RequestInterface<IGameServer>();
@@ -1313,8 +1304,6 @@ int main(int argc, const char **argv) // ignore_convention
 	// create the components
 	IEngine *pEngine = CreateEngine("Teeworlds_Server");
 	IGameServer *pGameServer = CreateGameServer();
-
-	pServer->InitRegister(&pServer->m_NetServer);
 
 	{
 		bool RegisterFail = false;

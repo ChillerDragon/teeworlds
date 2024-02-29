@@ -712,19 +712,11 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
 			int64 Now = Server()->Tick();
 
-			if(pMsg->m_Force)
-			{
-				if(!Server()->IsAuthed(ClientID))
-					return;
-			}
-			else
-			{
-				if((pPlayer->m_LastVoteCallTick && pPlayer->m_LastVoteCallTick+Server()->TickSpeed()*VOTE_COOLDOWN > Now) ||
-					pPlayer->GetTeam() == TEAM_SPECTATORS || m_VoteCloseTime)
-					return;
+			if((pPlayer->m_LastVoteCallTick && pPlayer->m_LastVoteCallTick+Server()->TickSpeed()*VOTE_COOLDOWN > Now) ||
+				pPlayer->GetTeam() == TEAM_SPECTATORS || m_VoteCloseTime)
+				return;
 
-				pPlayer->m_LastVoteTryTick = Now;
-			}
+			pPlayer->m_LastVoteTryTick = Now;
 
 			m_VoteType = VOTE_UNKNOWN;
 			char aDesc[VOTE_DESC_LENGTH] = {0};
@@ -768,7 +760,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			else if(str_comp_nocase(pMsg->m_Type, "kick") == 0)
 			{
 				int KickID = str_toint(pMsg->m_Value);
-				if(KickID < 0 || KickID >= MAX_CLIENTS || !m_apPlayers[KickID] || KickID == ClientID || Server()->IsAuthed(KickID))
+				if(KickID < 0 || KickID >= MAX_CLIENTS || !m_apPlayers[KickID] || KickID == ClientID)
 					return;
 
 				str_format(aDesc, sizeof(aDesc), "%2d: %s", KickID, Server()->ClientName(KickID));
