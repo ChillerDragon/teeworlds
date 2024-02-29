@@ -93,11 +93,11 @@ jobs:
     #     mv teeworlds_srv artifacts
     #     mv teeworlds artifacts
 
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v1
-      with:
-        name: teeworlds-${{ matrix.os }}
-        path: release/artifacts
+    # - name: Upload Artifacts
+    #   uses: actions/upload-artifact@v1
+    #   with:
+    #     name: teeworlds-${{ matrix.os }}
+    #     path: release/artifacts
 
   build-bam:
     runs-on: ${{ matrix.os }}
