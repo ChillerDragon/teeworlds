@@ -40,8 +40,6 @@ static int num_loggers = 0;
 
 static NETSTATS network_stats = {0};
 
-static NETSOCKET invalid_socket = {NETTYPE_INVALID, -1, -1};
-
 void dbg_logger(DBG_LOGGER logger)
 {
 	loggers[num_loggers++] = logger;
@@ -228,90 +226,6 @@ void net_addr_str(const NETADDR *addr, char *string, int max_length, int add_por
 	}
 	else
 		str_format(string, max_length, "unknown type %d", addr->type);
-}
-
-static int priv_net_extract(const char *hostname, char *host, int max_host, int *port)
-{
-	int i;
-
-	*port = 0;
-	host[0] = 0;
-
-	if(hostname[0] == '[')
-	{
-		// ipv6 mode
-		for(i = 1; i < max_host && hostname[i] && hostname[i] != ']'; i++)
-			host[i-1] = hostname[i];
-		host[i-1] = 0;
-		if(hostname[i] != ']') // malformatted
-			return -1;
-
-		i++;
-		if(hostname[i] == ':')
-			*port = atol(hostname+i+1);
-	}
-	else
-	{
-		// generic mode (ipv4, hostname etc)
-		for(i = 0; i < max_host-1 && hostname[i] && hostname[i] != ':'; i++)
-			host[i] = hostname[i];
-		host[i] = 0;
-
-		if(hostname[i] == ':')
-			*port = atol(hostname+i+1);
-	}
-
-	return 0;
-}
-
-static int parse_int(int *out, const char **str)
-{
-	int i = 0;
-	*out = 0;
-	if(**str < '0' || **str > '9')
-		return -1;
-
-	i = **str - '0';
-	(*str)++;
-
-	while(1)
-	{
-		if(**str < '0' || **str > '9')
-		{
-			*out = i;
-			return 0;
-		}
-
-		i = (i*10) + (**str - '0');
-		(*str)++;
-	}
-
-	return 0;
-}
-
-static int parse_char(char c, const char **str)
-{
-	if(**str != c) return -1;
-	(*str)++;
-	return 0;
-}
-
-static int parse_uint8(unsigned char *out, const char **str)
-{
-	int i;
-	if(parse_int(&i, str) != 0) return -1;
-	if(i < 0 || i > 0xff) return -1;
-	*out = i;
-	return 0;
-}
-
-static int parse_uint16(unsigned short *out, const char **str)
-{
-	int i;
-	if(parse_int(&i, str) != 0) return -1;
-	if(i < 0 || i > 0xffff) return -1;
-	*out = i;
-	return 0;
 }
 
 void swap_endian(void *data, unsigned elem_size, unsigned num)
