@@ -66,7 +66,6 @@ public:
 
 	//
 	int m_Vote;
-	int m_VotePos;
 	//
 	int m_LastVoteCallTick;
 	int m_LastVoteTryTick;

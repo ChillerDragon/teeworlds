@@ -474,12 +474,6 @@ int CServer::NewClientCallback(int ClientID, void *pUser)
 {
 	CServer *pThis = (CServer *)pUser;
 
-	// Remove non human player on same slot
-	if(pThis->GameServer()->IsClientBot(ClientID))
-	{
-		pThis->GameServer()->OnClientDrop(ClientID, "removing dummy");
-	}
-
 	pThis->m_aClients[ClientID].m_State = CClient::STATE_AUTH;
 	pThis->m_aClients[ClientID].m_aName[0] = 0;
 	pThis->m_aClients[ClientID].m_aClan[0] = 0;

@@ -13,32 +13,13 @@
 
 #include "eventhandler.h"
 
-/*
-	Tick
-		Game Context (CGameContext::tick)
-				All entities in the world (ENTITY::tick)
-				All entities in the world (ENTITY::tick_defered)
-			Game Controller (GAMECONTROLLER::tick)
-			All players (CPlayer::tick)
-
-
-	Snap
-		Game Context (CGameContext::snap)
-				All entities in the world (ENTITY::snap)
-			Game Controller (GAMECONTROLLER::snap)
-			Events handler (EVENT_HANDLER::snap)
-			All players (CPlayer::snap)
-
-*/
 class CGameContext : public IGameServer
 {
 	IServer *m_pServer;
 	CNetObjHandler m_NetObjHandler;
 
-	CGameContext(int Resetting);
-	void Construct(int Resetting);
+	void Construct();
 
-	bool m_Resetting;
 public:
 	IServer *Server() const { return m_pServer; }
 
@@ -55,23 +36,13 @@ public:
 	// helper functions
 	class CCharacter *GetPlayerChar(int ClientID);
 
-	int m_LockTeams;
-
 	// voting
 	void StartVote(const char *pDesc, const char *pCommand, const char *pReason);
 	void EndVote(int Type, bool Force);
 	void ForceVote(int Type, const char *pDescription, const char *pReason);
 	void SendVoteSet(int Type, int ToClientID);
 	void SendVoteStatus(int ClientID, int Total, int Yes, int No);
-	void AbortVoteOnDisconnect(int ClientID);
-	void AbortVoteOnTeamChange(int ClientID);
 
-	int m_VoteCreator;
-	int m_VoteType;
-	int64 m_VoteCloseTime;
-	int64 m_VoteCancelTime;
-	bool m_VoteUpdate;
-	int m_VotePos;
 	char m_aVoteDescription[VOTE_DESC_LENGTH];
 	char m_aVoteCommand[VOTE_CMD_LENGTH];
 	char m_aVoteReason[VOTE_REASON_LENGTH];
@@ -131,13 +102,11 @@ public:
 
 	virtual void OnClientConnected(int ClientID, bool AsSpec) { OnClientConnected(ClientID, false, AsSpec); }
 	void OnClientConnected(int ClientID, bool Dummy, bool AsSpec);
-	void OnClientTeamChange(int ClientID);
 	virtual void OnClientEnter(int ClientID);
 	virtual void OnClientDrop(int ClientID, const char *pReason);
 	virtual void OnClientDirectInput(int ClientID, void *pInput);
 	virtual void OnClientPredictedInput(int ClientID, void *pInput);
 
-	virtual bool IsClientBot(int ClientID) const;
 	virtual bool IsClientReady(int ClientID) const;
 	virtual bool IsClientPlayer(int ClientID) const;
 	virtual bool IsClientSpectator(int ClientID) const;

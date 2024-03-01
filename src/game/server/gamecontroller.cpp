@@ -698,7 +698,6 @@ void IGameController::DoTeamChange(CPlayer *pPlayer, int Team, bool DoChatMsg)
 			pPlayer->m_RespawnDisabled = GetStartRespawnState();
 	}
 	OnPlayerInfoChange(pPlayer);
-	GameServer()->OnClientTeamChange(ClientID);
 	CheckReadyStates();
 
 	// reset inactivity counter when joining the game
