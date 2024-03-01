@@ -446,14 +446,10 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   network.h
   network_client.cpp
   network_conn.cpp
-  network_console.cpp
-  network_console_conn.cpp
   network_server.cpp
   packer.cpp
   packer.h
   protocol.h
-  ringbuffer.cpp
-  ringbuffer.h
   snapshot.cpp
   snapshot.h
 )

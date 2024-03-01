@@ -6,74 +6,6 @@
 #include "network.h"
 
 
-bool CNetServer::Open(NETADDR BindAddr,
-	int MaxClients, int MaxClientsPerIP, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient, void *pUser)
-{
-	// zero out the whole structure
-	mem_zero(this, sizeof(*this));
-
-	// open socket
-	NETSOCKET Socket = net_udp_create(BindAddr, 0);
-	if(!Socket.type)
-		return false;
-
-	// init
-	Init(Socket);
-
-	m_NumClients = 0;
-	SetMaxClients(MaxClients);
-	SetMaxClientsPerIP(MaxClientsPerIP);
-
-	for(int i = 0; i < NET_MAX_CLIENTS; i++)
-		m_aSlots[i].m_Connection.Init(this, true);
-
-	m_pfnNewClient = pfnNewClient;
-	m_pfnDelClient = pfnDelClient;
-	m_UserPtr = pUser;
-
-	return true;
-}
-
-void CNetServer::Close(const char *pReason)
-{
-	for(int i = 0; i < NET_MAX_CLIENTS; i++)
-		Drop(i, pReason);
-
-	Shutdown();
-}
-
-void CNetServer::Drop(int ClientID, const char *pReason)
-{
-	if(ClientID < 0 || ClientID >= NET_MAX_CLIENTS || m_aSlots[ClientID].m_Connection.State() == NET_CONNSTATE_OFFLINE)
-		return;
-
-	if(m_pfnDelClient)
-		m_pfnDelClient(ClientID, pReason, m_UserPtr);
-
-	m_aSlots[ClientID].m_Connection.Disconnect(pReason);
-	m_NumClients--;
-}
-
-int CNetServer::Update()
-{
-	for(int i = 0; i < NET_MAX_CLIENTS; i++)
-	{
-		if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
-			continue;
-
-		m_aSlots[i].m_Connection.Update();
-		if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_ERROR)
-		{
-			Drop(i, "error");
-		}
-	}
-
-	return 0;
-}
-
-/*
-	TODO: chopp up this function into smaller working parts
-*/
 int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 {
 	while(1)
@@ -251,23 +183,11 @@ int CNetServer::Send(CNetChunk *pChunk, TOKEN Token)
 			return -1;
 		}
 
-		int Flags = 0;
 		dbg_assert(pChunk->m_ClientID >= 0, "errornous client id");
 		dbg_assert(pChunk->m_ClientID < NET_MAX_CLIENTS, "errornous client id");
 		dbg_assert(m_aSlots[pChunk->m_ClientID].m_Connection.State() != NET_CONNSTATE_OFFLINE, "errornous client id");
 
-		if(pChunk->m_Flags&NETSENDFLAG_VITAL)
-			Flags = NET_CHUNKFLAG_VITAL;
-
-		if(m_aSlots[pChunk->m_ClientID].m_Connection.QueueChunk(Flags, pChunk->m_DataSize, pChunk->m_pData) == 0)
-		{
-			if(pChunk->m_Flags&NETSENDFLAG_FLUSH)
-				m_aSlots[pChunk->m_ClientID].m_Connection.Flush();
-		}
-		else
-		{
-			Drop(pChunk->m_ClientID, "Error sending data");
-		}
+		// pChunk->m_DataSize, pChunk->m_pData
 	}
 	return 0;
 }

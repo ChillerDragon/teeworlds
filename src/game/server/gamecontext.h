@@ -103,7 +103,6 @@ public:
 	virtual void OnClientConnected(int ClientID, bool AsSpec) { OnClientConnected(ClientID, false, AsSpec); }
 	void OnClientConnected(int ClientID, bool Dummy, bool AsSpec);
 	virtual void OnClientEnter(int ClientID);
-	virtual void OnClientDrop(int ClientID, const char *pReason);
 	virtual void OnClientDirectInput(int ClientID, void *pInput);
 	virtual void OnClientPredictedInput(int ClientID, void *pInput);
 

@@ -77,7 +77,6 @@ int CNetRecvUnpacker::FetchChunk(CNetChunk *pChunk)
 
 				// out of sequence, request resend
 				dbg_msg("conn", "asking for resend %d %d", Header.m_Sequence, (m_pConnection->m_Ack+1)%NET_MAX_SEQUENCE);
-				m_pConnection->SignalResend();
 				continue; // take the next chunk in the packet
 			}
 		}

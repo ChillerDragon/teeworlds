@@ -467,14 +467,6 @@ void CGameContext::OnClientConnected(int ClientID, bool Dummy, bool AsSpec)
 	SendSettings(ClientID);
 }
 
-void CGameContext::OnClientDrop(int ClientID, const char *pReason)
-{
-	m_pController->OnPlayerDisconnect(m_apPlayers[ClientID]);
-
-	delete m_apPlayers[ClientID];
-	m_apPlayers[ClientID] = 0;
-}
-
 void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 {
 	void *pRawMsg = m_NetObjHandler.SecureUnpackMsg(MsgID, pUnpacker);

@@ -5,51 +5,6 @@
 #include "network.h"
 
 
-bool CNetClient::Open(NETADDR BindAddr, int Flags)
-{
-	// open socket
-	NETSOCKET Socket;
-	Socket = net_udp_create(BindAddr, (Flags&NETCREATE_FLAG_RANDOMPORT) ? 1 : 0);
-	if(!Socket.type)
-		return false;
-
-	// clean it
-	mem_zero(this, sizeof(*this));
-
-	// init
-	Init(Socket);
-	m_Connection.Init(this, false);
-
-	m_Flags = Flags;
-
-	return true;
-}
-
-void CNetClient::Close()
-{
-	m_Connection.Disconnect("Client shutdown");
-	Shutdown();
-}
-
-
-int CNetClient::Disconnect(const char *pReason)
-{
-	m_Connection.Disconnect(pReason);
-	return 0;
-}
-
-int CNetClient::Update()
-{
-	m_Connection.Update();
-	return 0;
-}
-
-int CNetClient::Connect(NETADDR *pAddr)
-{
-	m_Connection.Connect(pAddr);
-	return 0;
-}
-
 int CNetClient::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 {
 	while(1)

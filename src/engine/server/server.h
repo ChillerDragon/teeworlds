@@ -157,8 +157,6 @@ public:
 	virtual void SetClientCountry(int ClientID, int Country);
 	virtual void SetClientScore(int ClientID, int Score);
 
-	void Kick(int ClientID, const char *pReason);
-
 	int64 TickStartTime(int Tick);
 
 	int Init();

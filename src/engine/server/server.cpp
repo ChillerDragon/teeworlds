@@ -182,27 +182,6 @@ void CServer::SetClientScore(int ClientID, int Score)
 	m_aClients[ClientID].m_Score = Score;
 }
 
-void CServer::Kick(int ClientID, const char *pReason)
-{
-	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State == CClient::STATE_EMPTY)
-	{
-		dbg_msg("server", "invalid client id to kick");
-		return;
-	}
-	else if(m_RconClientID == ClientID)
-	{
-		dbg_msg("server", "you can't kick yourself");
- 		return;
-	}
-	else if(m_aClients[ClientID].m_Authed > m_RconAuthLevel)
-	{
-		dbg_msg("server", "kick command denied");
- 		return;
-	}
-
-	m_NetServer.Drop(ClientID, pReason);
-}
-
 int64 CServer::TickStartTime(int Tick)
 {
 	return m_GameStartTime + (time_freq()*Tick)/SERVER_TICK_SPEED;
@@ -484,36 +463,6 @@ int CServer::NewClientCallback(int ClientID, void *pUser)
 	return 0;
 }
 
-int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
-{
-	CServer *pThis = (CServer *)pUser;
-
-	char aAddrStr[NETADDR_MAXSTRSIZE];
-	net_addr_str(pThis->m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), true);
-	char aBuf[256];
-	str_format(aBuf, sizeof(aBuf), "client dropped. cid=%d addr=%s reason='%s'", ClientID, aAddrStr, pReason);
-	dbg_msg("server", "%s", aBuf);
-
-	// notify the mod about the drop
-	if(pThis->m_aClients[ClientID].m_State >= CClient::STATE_READY)
-	{
-		pThis->m_aClients[ClientID].m_Quitting = true;
-		pThis->GameServer()->OnClientDrop(ClientID, pReason);
-	}
-
-	pThis->m_aClients[ClientID].m_State = CClient::STATE_EMPTY;
-	pThis->m_aClients[ClientID].m_aName[0] = 0;
-	pThis->m_aClients[ClientID].m_aClan[0] = 0;
-	pThis->m_aClients[ClientID].m_Country = -1;
-	pThis->m_aClients[ClientID].m_Authed = AUTHED_NO;
-	pThis->m_aClients[ClientID].m_AuthTries = 0;
-	pThis->m_aClients[ClientID].m_pMapListEntryToSend = 0;
-	pThis->m_aClients[ClientID].m_NoRconNote = false;
-	pThis->m_aClients[ClientID].m_Quitting = false;
-	pThis->m_aClients[ClientID].m_Snapshots.PurgeAll();
-	return 0;
-}
-
 void CServer::SendMap(int ClientID)
 {
 	static const unsigned char DM1_SHA256[] = {0x49, 0x1a, 0xf1, 0x7a, 0x51, 0x02, 0x14, 0x50, 0x62, 0x70, 0x90, 0x4f, 0x14, 0x7a, 0x4c, 0x30, 0xae, 0x0a, 0x85, 0xb9, 0x1b, 0xb8, 0x54, 0x39, 0x5b, 0xef, 0x8c, 0x39, 0x7f, 0xc0, 0x78, 0xc3};
@@ -671,7 +620,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					// wrong version
 					char aReason[256];
 					str_format(aReason, sizeof(aReason), "Wrong version. Server is running '%s' and client '%s'", GameServer()->NetVersion(), pVersion);
-					m_NetServer.Drop(ClientID, aReason);
+					dbg_msg("server", "%s", aReason);
 					return;
 				}
 
@@ -938,8 +887,6 @@ void CServer::PumpNetwork()
 	static const unsigned char SERVERBROWSE_GETINFO[] = {255, 255, 255, 255, 'g', 'i', 'e', '3'};
 
 
-	m_NetServer.Update();
-
 	// process packets
 	while(m_NetServer.Recv(&Packet, &ResponseToken))
 	{
@@ -1009,13 +956,6 @@ int CServer::Run(bool shutdown)
 	mem_zero(&BindAddr, sizeof(BindAddr));
 	BindAddr.type = NETTYPE_ALL;
 	BindAddr.port = GetPort();
-
-	if(!m_NetServer.Open(BindAddr,
-		GetMaxClients(), GetMaxClientsPerIP(), NewClientCallback, DelClientCallback, this))
-	{
-		dbg_msg("server", "couldn't open socket. port %d might already be in use", GetPort());
-		return -1;
-	}
 
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "server name is '%s'", GetServerName());
@@ -1126,9 +1066,6 @@ int CServer::Run(bool shutdown)
 				m_RunServer = false;
 		}
 	}
-	// disconnect all clients on shutdown
-	m_NetServer.Close(m_aShutdownReason);
-
 	GameServer()->OnShutdown();
 	return 0;
 }

@@ -14,7 +14,6 @@
 #include <engine/shared/network.h>
 #include <engine/shared/packer.h>
 #include <engine/shared/protocol.h>
-#include <engine/shared/ringbuffer.h>
 #include <engine/shared/snapshot.h>
 
 #include <game/version.h>
@@ -682,7 +681,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 
 void CClient::PumpNetwork()
 {
-	m_NetClient.Update();
 	// process non-connless packets
 	CNetChunk Packet;
 	while(m_NetClient.Recv(&Packet))
@@ -692,7 +690,6 @@ void CClient::PumpNetwork()
 	}
 
 	// process connless packets data
-	m_ContactClient.Update();
 	while(m_ContactClient.Recv(&Packet))
 	{
 		if(Packet.m_Flags&NETSENDFLAG_CONNLESS)

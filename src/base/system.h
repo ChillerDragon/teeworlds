@@ -524,32 +524,6 @@ int net_udp_close(NETSOCKET sock);
 */
 NETSOCKET net_tcp_create(NETADDR bindaddr);
 
-/*
-	Function: net_tcp_set_linger
-		Sets behaviour when closing the socket.
-
-	Parameters:
-		sock - Socket to use.
-		state - What to do when closing the socket.
-				1 abort connection on close.
-				0 shutdown the connection properly on close.
-
-	Returns:
-		Returns 0 on success.
-*/
-int net_tcp_set_linger(NETSOCKET sock, int state);
-
-/*
-	Function: net_tcp_listen
-		Makes the socket start listening for new connections.
-
-	Parameters:
-		sock - Socket to start listen to.
-		backlog - Size of the queue of incomming connections to keep.
-
-	Returns:
-		Returns 0 on success.
-*/
 int net_tcp_listen(NETSOCKET sock, int backlog);
 
 /*

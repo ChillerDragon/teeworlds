@@ -3,7 +3,6 @@
 #ifndef ENGINE_SHARED_NETWORK_H
 #define ENGINE_SHARED_NETWORK_H
 
-#include "ringbuffer.h"
 #include "huffman.h"
 
 /*
@@ -159,18 +158,6 @@ public:
 	unsigned char *Unpack(unsigned char *pData);
 };
 
-class CNetChunkResend
-{
-public:
-	int m_Flags;
-	int m_DataSize;
-	unsigned char *m_pData;
-
-	int m_Sequence;
-	int64 m_LastSendTime;
-	int64 m_FirstSendTime;
-};
-
 class CNetPacketConstruct
 {
 public:
@@ -229,8 +216,6 @@ private:
 	int m_RemoteClosed;
 	bool m_BlockCloseMsg;
 
-	TStaticRingBuffer<CNetChunkResend, NET_CONN_BUFFERSIZE> m_Buffer;
-
 	int64 m_LastUpdateTime;
 	int64 m_LastRecvTime;
 	int64 m_LastSendTime;
@@ -247,13 +232,9 @@ private:
 	//
 	void Reset();
 	void ResetStats();
-	void AckChunks(int Ack);
-
 	int QueueChunkEx(int Flags, int DataSize, const void *pData, int Sequence);
 	void SendControl(int ControlMsg, const void *pExtra, int ExtraSize);
 	void SendControlWithToken(int ControlMsg);
-	void ResendChunk(CNetChunkResend *pResend);
-	void Resend();
 
 	static TOKEN GenerateToken(const NETADDR *pPeerAddr);
 
@@ -267,14 +248,12 @@ public:
 	TOKEN Token() const { return m_Token; }
 	TOKEN PeerToken() const { return m_PeerToken; }
 
-	int Update();
 	int Flush();
 
 	int Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr);
 	int QueueChunk(int Flags, int DataSize, const void *pData);
 	void SendPacketConnless(const char *pData, int DataSize);
 
-	void SignalResend();
 	int State() const { return m_State; }
 	const NETADDR *PeerAddress() const { return &m_PeerAddr; }
 
@@ -310,7 +289,6 @@ public:
 	const NETADDR *PeerAddress() const { return &m_PeerAddr; }
 
 	void Reset();
-	int Update();
 	int Send(const char *pLine);
 	int Recv(char *pLine, int MaxLength);
 };
@@ -355,19 +333,10 @@ class CNetServer : public CNetBase
 	CNetRecvUnpacker m_RecvUnpacker;
 
 public:
-	//
-	bool Open(NETADDR BindAddr,
-		int MaxClients, int MaxClientsPerIP, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient, void *pUser);
-	void Close(const char *pReason);
-
 	// the token parameter is only used for connless packets
 	int Recv(CNetChunk *pChunk, TOKEN *pResponseToken = 0);
 	int Send(CNetChunk *pChunk, TOKEN Token = NET_TOKEN_NONE);
-	int Update();
-	void AddToken(const NETADDR *pAddr, TOKEN Token) { return; }
 
-	//
-	void Drop(int ClientID, const char *pReason);
 
 	// status requests
 	const NETADDR *ClientAddr(int ClientID) const { return m_aSlots[ClientID].m_Connection.PeerAddress(); }
@@ -376,42 +345,6 @@ public:
 	void SetMaxClients(int MaxClients);
 	void SetMaxClientsPerIP(int MaxClientsPerIP);
 };
-
-class CNetConsole
-{
-	struct CSlot
-	{
-		CConsoleNetConnection m_Connection;
-	};
-
-	NETSOCKET m_Socket;
-	CSlot m_aSlots[NET_MAX_CONSOLE_CLIENTS];
-
-	NETFUNC_NEWCLIENT m_pfnNewClient;
-	NETFUNC_DELCLIENT m_pfnDelClient;
-	void *m_UserPtr;
-
-	CNetRecvUnpacker m_RecvUnpacker;
-
-public:
-	//
-	bool Open(NETADDR BindAddr, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient, void *pUser);
-	void Close();
-
-	//
-	int Recv(char *pLine, int MaxLength, int *pClientID = 0);
-	int Send(int ClientID, const char *pLine);
-	int Update();
-	void SetLingerState(int State);
-
-	//
-	int AcceptClient(NETSOCKET Socket, const NETADDR *pAddr);
-	void Drop(int ClientID, const char *pReason);
-
-	// status requests
-	const NETADDR *ClientAddr(int ClientID) const { return m_aSlots[ClientID].m_Connection.PeerAddress(); }
-};
-
 
 
 // client side
@@ -423,9 +356,6 @@ class CNetClient : public CNetBase
 	int m_Flags;
 
 public:
-	// openness
-	bool Open(NETADDR BindAddr, int Flags);
-	void Close();
 
 	// connection state
 	int Disconnect(const char *Reason);
@@ -437,7 +367,6 @@ public:
 	void PurgeStoredPacket(int TrackID);
 
 	// pumping
-	int Update();
 	int Flush();
 
 	// error and state

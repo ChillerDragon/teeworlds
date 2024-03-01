@@ -24,8 +24,6 @@ void CNetConnection::Reset()
 	m_PeerToken = NET_TOKEN_NONE;
 	mem_zero(&m_PeerAddr, sizeof(m_PeerAddr));
 
-	m_Buffer.Init();
-
 	mem_zero(&m_Construct, sizeof(m_Construct));
 }
 
@@ -46,26 +44,6 @@ void CNetConnection::Init(CNetBase *pNetBase, bool BlockCloseMsg)
 
 	m_pNetBase = pNetBase;
 	m_BlockCloseMsg = BlockCloseMsg;
-}
-
-void CNetConnection::AckChunks(int Ack)
-{
-	while(1)
-	{
-		CNetChunkResend *pResend = m_Buffer.First();
-		if(!pResend)
-			break;
-
-		if(IsSeqInBackroom(pResend->m_Sequence, Ack))
-			m_Buffer.PopFirst();
-		else
-			break;
-	}
-}
-
-void CNetConnection::SignalResend()
-{
-	m_Construct.m_Flags |= NET_PACKETFLAG_RESEND;
 }
 
 int CNetConnection::Flush()
@@ -109,30 +87,6 @@ int CNetConnection::QueueChunkEx(int Flags, int DataSize, const void *pData, int
 	m_Construct.m_NumChunks++;
 	m_Construct.m_DataSize = (int)(pChunkData-m_Construct.m_aChunkData);
 
-	// set packet flags aswell
-
-	if(Flags&NET_CHUNKFLAG_VITAL && !(Flags&NET_CHUNKFLAG_RESEND))
-	{
-		// save packet if we need to resend
-		CNetChunkResend *pResend = m_Buffer.Allocate(sizeof(CNetChunkResend)+DataSize);
-		if(pResend)
-		{
-			pResend->m_Sequence = Sequence;
-			pResend->m_Flags = Flags;
-			pResend->m_DataSize = DataSize;
-			pResend->m_pData = (unsigned char *)(pResend+1);
-			pResend->m_FirstSendTime = time_get();
-			pResend->m_LastSendTime = pResend->m_FirstSendTime;
-			mem_copy(pResend->m_pData, pData, DataSize);
-		}
-		else
-		{
-			// out of buffer
-			Disconnect("too weak connection (out of buffer)");
-			return -1;
-		}
-	}
-
 	return 0;
 }
 
@@ -159,18 +113,6 @@ void CNetConnection::SendControlWithToken(int ControlMsg)
 {
 	m_LastSendTime = time_get();
 	m_pNetBase->SendControlMsgWithToken(&m_PeerAddr, m_PeerToken, 0, ControlMsg, m_Token, true);
-}
-
-void CNetConnection::ResendChunk(CNetChunkResend *pResend)
-{
-	QueueChunkEx(pResend->m_Flags|NET_CHUNKFLAG_RESEND, pResend->m_DataSize, pResend->m_pData, pResend->m_Sequence);
-	pResend->m_LastSendTime = time_get();
-}
-
-void CNetConnection::Resend()
-{
-	for(CNetChunkResend *pResend = m_Buffer.First(); pResend; pResend = m_Buffer.Next(pResend))
-		ResendChunk(pResend);
 }
 
 int CNetConnection::Connect(NETADDR *pAddr)
@@ -220,10 +162,6 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 		dbg_msg("network_in", "feed wrong token=%x expected=%x or_none=%x", pPacket->m_Token, m_Token, NET_TOKEN_NONE);
 		return 0;
 	}
-
-	// check if resend is requested
-	if(pPacket->m_Flags&NET_PACKETFLAG_RESEND)
-		Resend();
 
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
 	{
@@ -310,64 +248,9 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 	if(State() == NET_CONNSTATE_ONLINE)
 	{
 		m_LastRecvTime = Now;
-		AckChunks(pPacket->m_Ack);
 	}
 
 	return 1;
-}
-
-int CNetConnection::Update()
-{
-	int64 Now = time_get();
-
-	// fix resends
-	if(m_Buffer.First())
-	{
-		CNetChunkResend *pResend = m_Buffer.First();
-
-		// check if we have some really old stuff laying around and abort if not acked
-		if(Now-pResend->m_FirstSendTime > time_freq()*10)
-		{
-			// SetError("Too weak connection (not acked for 10 seconds)");
-		}
-		else
-		{
-			// resend packet if we haven't got it acked in 1 second
-			if(Now-pResend->m_LastSendTime > time_freq())
-				ResendChunk(pResend);
-		}
-	}
-
-	// send keep alives if nothing has happend for 250ms
-	if(State() == NET_CONNSTATE_ONLINE)
-	{
-		if(time_get()-m_LastSendTime > time_freq()/2) // flush connection after 500ms if needed
-		{
-			int NumFlushedChunks = Flush();
-			if(NumFlushedChunks)
-				dbg_msg("connection", "flushed connection due to timeout. %d chunks.", NumFlushedChunks);
-		}
-
-		if(time_get()-m_LastSendTime > time_freq())
-			SendControl(NET_CTRLMSG_KEEPALIVE, 0, 0);
-	}
-	else if(State() == NET_CONNSTATE_TOKEN)
-	{
-		if(time_get()-m_LastSendTime > time_freq()/2) // send a new token request every 500ms
-			SendControlWithToken(NET_CTRLMSG_TOKEN);
-	}
-	else if(State() == NET_CONNSTATE_CONNECT)
-	{
-		if(time_get()-m_LastSendTime > time_freq()/2) // send a new connect every 500ms
-			SendControlWithToken(NET_CTRLMSG_CONNECT);
-	}
-	else if(State() == NET_CONNSTATE_PENDING)
-	{
-		if(time_get()-m_LastSendTime > time_freq()/2) // send a new connect/accept every 500ms
-			SendControl(NET_CTRLMSG_ACCEPT, 0, 0);
-	}
-
-	return 0;
 }
 
 int CNetConnection::IsSeqInBackroom(int Seq, int Ack)
