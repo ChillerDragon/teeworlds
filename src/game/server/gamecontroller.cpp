@@ -35,9 +35,6 @@ IGameController::IGameController(CGameContext *pGameServer)
 	m_GameInfo.m_ScoreLimit = 420;
 	m_GameInfo.m_TimeLimit = 69;
 
-	// map
-	m_aMapWish[0] = 0;
-
 	// spawn
 	m_aNumSpawnPoints[0] = 0;
 	m_aNumSpawnPoints[1] = 0;
@@ -569,8 +566,6 @@ void IGameController::UpdateGameInfo(int ClientID)
 
 void IGameController::ChangeMap(const char *pToMap)
 {
-	str_copy(m_aMapWish, pToMap, sizeof(m_aMapWish));
-
 	m_MatchCount = m_GameInfo.m_MatchNum-1;
 	SetGameState(IGS_GAME_RUNNING);
 	EndMatch();

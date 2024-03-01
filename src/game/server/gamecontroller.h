@@ -58,9 +58,6 @@ class IGameController
 	void StartMatch();
 	void StartRound();
 
-	// map
-	char m_aMapWish[128];
-
 	// spawn
 	struct CSpawnEval
 	{
