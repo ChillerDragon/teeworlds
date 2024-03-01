@@ -7,14 +7,7 @@
 
 #include "gameclient.h"
 
-#include "components/broadcast.h"
-#include "components/chat.h"
 #include "components/controls.h"
-#include "components/emoticon.h"
-#include "components/infomessages.h"
-#include "components/motd.h"
-#include "components/spectator.h"
-#include "components/voting.h"
 
 inline void StrToInts(int *pInts, int Num, const char *pStr)
 {
@@ -51,14 +44,7 @@ inline void IntsToStr(const int *pInts, int Num, char *pStr)
 }
 
 // instantiate all systems
-static CInfoMessages gs_InfoMessages;
-static CChat gs_Chat;
-static CMotd gs_Motd;
-static CBroadcast gs_Broadcast;
 static CControls gs_Controls;
-static CEmoticon gs_Emoticon;
-static CVoting gs_Voting;
-static CSpectator gs_Spectator;
 
 CGameClient::CStack::CStack() { m_Num = 0; }
 void CGameClient::CStack::Add(class CComponent *pComponent) { m_paComponents[m_Num++] = pComponent; }
@@ -229,7 +215,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 				{
 					int ClientID = clamp(aParaI[0], 0, MAX_CLIENTS - 1);
 					str_format(aBuf, sizeof(aBuf), "'%s' initiated a pause", m_aClients[ClientID].m_aName);
-					m_pChat->AddLine(aBuf);
+					dbg_msg("chat", "%s", aBuf);
 				}
 				break;
 			case GAMEMSG_CTF_CAPTURE:
@@ -260,7 +246,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 						str_format(aBuf, sizeof(aBuf), "The red flag was captured by '%s'", m_aClients[ClientID].m_aName);
 					}
 				}
-				m_pChat->AddLine(aBuf);
+				dbg_msg("chat", "%s", aBuf);
 			}
 			return;
 		}
@@ -276,7 +262,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		switch(gs_GameMsgList[GameMsgID].m_Action)
 		{
 		case DO_CHAT:
-			m_pChat->AddLine(pText);
+			dbg_msg("chat", "%s", pText);
 			break;
 		case DO_BROADCAST:
 			dbg_msg("client-broadcast", "%s", pText);
@@ -297,9 +283,71 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	for(int i = 0; i < m_All.m_Num; i++)
 		m_All.m_paComponents[i]->OnMessage(MsgId, pRawMsg);
 
-	if(MsgId == NETMSGTYPE_SV_CLIENTINFO)
+	bool Race = m_GameInfo.m_GameFlags&GAMEFLAG_RACE;
+
+	if(MsgId == NETMSGTYPE_SV_KILLMSG)
+	{
+		if(Race && m_Snap.m_pGameDataRace && m_Snap.m_pGameDataRace->m_RaceFlags&RACEFLAG_HIDE_KILLMSG)
+			return;
+
+		CNetMsg_Sv_KillMsg *pMsg = (CNetMsg_Sv_KillMsg *)pRawMsg;
+		dbg_msg("kill", "killer=%d", pMsg->m_Killer);
+	}
+	else if(MsgId == NETMSGTYPE_SV_RACEFINISH && Race)
+	{
+		CNetMsg_Sv_RaceFinish *pMsg = (CNetMsg_Sv_RaceFinish *)pRawMsg;
+
+		char aBuf[256];
+		char aTime[32];
+
+		str_format(aTime, sizeof(aTime), "%d", pMsg->m_Time);
+
+		str_format(aBuf, sizeof(aBuf), "%2d: %s: finished in %s", pMsg->m_ClientID, m_aClients[pMsg->m_ClientID].m_aName, aTime);
+		dbg_msg("race", "%s", aBuf);
+
+		if(m_Snap.m_pGameDataRace && m_Snap.m_pGameDataRace->m_RaceFlags&RACEFLAG_FINISHMSG_AS_CHAT)
+		{
+			if(!pMsg->m_RecordPersonal && !pMsg->m_RecordServer) // don't print the time twice
+			{
+				str_format(aBuf, sizeof(aBuf), "'%s' finished in: %s", m_aClients[pMsg->m_ClientID].m_aName, aTime);
+				dbg_msg("chat", "%s", aBuf);
+			}
+		}
+		else
+		{
+			dbg_msg("info", "INFOMSG_FINISH");
+		}
+	}
+	if(MsgId == NETMSGTYPE_SV_VOTESET)
+	{
+		// CNetMsg_Sv_VoteSet *pMsg = (CNetMsg_Sv_VoteSet *)pRawMsg;
+	}
+	else if(MsgId == NETMSGTYPE_SV_VOTESTATUS)
+	{
+		CNetMsg_Sv_VoteStatus *pMsg = (CNetMsg_Sv_VoteStatus *)pRawMsg;
+		dbg_msg("vote", "Yes=%d", pMsg->m_Yes);
+		dbg_msg("vote", "No=%d", pMsg->m_No);
+		dbg_msg("vote", "Pass=%d", pMsg->m_Pass);
+		dbg_msg("vote", "Total=%d", pMsg->m_Total);
+	}
+	else if(MsgId == NETMSGTYPE_SV_VOTECLEAROPTIONS)
+	{
+	}
+	else if(MsgId == NETMSGTYPE_SV_VOTEOPTIONADD)
+	{
+		// CNetMsg_Sv_VoteOptionAdd *pMsg = (CNetMsg_Sv_VoteOptionAdd *)pRawMsg;
+	}
+	else if(MsgId == NETMSGTYPE_SV_VOTEOPTIONREMOVE)
+	{
+		// CNetMsg_Sv_VoteOptionRemove *pMsg = (CNetMsg_Sv_VoteOptionRemove *)pRawMsg;
+	}
+	else if(MsgId == NETMSGTYPE_SV_CLIENTINFO)
 	{
 		// CNetMsg_Sv_ClientInfo *pMsg = (CNetMsg_Sv_ClientInfo *)pRawMsg;
+	}
+	else if(MsgId == NETMSGTYPE_SV_BROADCAST)
+	{
+		// CNetMsg_Sv_Broadcast *pMsg = (CNetMsg_Sv_Broadcast *)pRawMsg;
 	}
 	else if(MsgId == NETMSGTYPE_SV_CLIENTDROP)
 	{
@@ -343,6 +391,11 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		// CNetMsg_Sv_Emoticon *pMsg = (CNetMsg_Sv_Emoticon *)pRawMsg;
 		// pMsg->m_Emoticon;
 	}
+	else if(MsgId == NETMSGTYPE_SV_MOTD)
+	{
+		CNetMsg_Sv_Motd *pMsg = (CNetMsg_Sv_Motd *)pRawMsg;
+		dbg_msg("motd", "%s", pMsg->m_pMessage);
+	}
 	else if(MsgId == NETMSGTYPE_DE_CLIENTENTER)
 	{
 		// CNetMsg_De_ClientEnter *pMsg = (CNetMsg_De_ClientEnter *)pRawMsg;
@@ -354,6 +407,29 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		// CNetMsg_De_ClientLeave *pMsg = (CNetMsg_De_ClientLeave *)pRawMsg;
 		// DoLeaveMessage(pMsg->m_pName, pMsg->m_ClientID, pMsg->m_pReason);
 		// m_pStats->OnPlayerLeave(pMsg->m_ClientID);
+	}
+	else if(MsgId == NETMSGTYPE_SV_CHAT)
+	{
+		CNetMsg_Sv_Chat *pMsg = (CNetMsg_Sv_Chat *)pRawMsg;
+		if(pMsg->m_Mode == CHAT_WHISPER)
+			return;
+		dbg_msg("chat", "mode=%d clientid=%d target=%d msg=%s", pMsg->m_Mode, pMsg->m_ClientID, pMsg->m_TargetID, pMsg->m_pMessage);
+	}
+	else if(MsgId == NETMSGTYPE_SV_COMMANDINFO)
+	{
+		CNetMsg_Sv_CommandInfo *pMsg = (CNetMsg_Sv_CommandInfo *)pRawMsg;
+		dbg_msg("chat_commands", "adding server chat command: name='%s' args='%s' help='%s'", pMsg->m_Name, pMsg->m_ArgsFormat, pMsg->m_HelpText);
+	}
+	else if(MsgId == NETMSGTYPE_SV_COMMANDINFOREMOVE)
+	{
+		CNetMsg_Sv_CommandInfoRemove *pMsg = (CNetMsg_Sv_CommandInfoRemove *)pRawMsg;
+
+		dbg_msg("chat_commands", "removed chat command: name='%s'", pMsg->m_Name);
+	}
+	else if(MsgId == NETMSGTYPE_SV_WEAPONPICKUP)
+	{
+		// CNetMsg_Sv_WeaponPickup *pMsg = (CNetMsg_Sv_WeaponPickup *)pRawMsg;
+		// m_InputData.m_WantedWeapon = pMsg->m_Weapon+1; // auto switch
 	}
 }
 
@@ -595,6 +671,48 @@ void CGameClient::SendSkinChange()
 		Msg.m_aSkinPartColors[p] = 0;
 	}
 	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD|MSGFLAG_FLUSH);
+}
+
+void CGameClient::SendEmoticon(int Emoticon)
+{
+	CNetMsg_Cl_Emoticon Msg;
+	Msg.m_Emoticon = Emoticon;
+	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
+}
+
+void CGameClient::SendSpectate(int SpecMode, int SpectatorID)
+{
+	CNetMsg_Cl_SetSpectatorMode Msg;
+	Msg.m_SpecMode = SpecMode;
+	Msg.m_SpectatorID = SpectatorID;
+	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
+}
+
+void CGameClient::SendCallvote(const char *pType, const char *pValue, const char *pReason, bool ForceVote)
+{
+	CNetMsg_Cl_CallVote Msg = {0};
+	Msg.m_Type = pType;
+	Msg.m_Value = pValue;
+	Msg.m_Reason = pReason;
+	Msg.m_Force = ForceVote;
+	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
+}
+
+void CGameClient::SendVote(int Choice)
+{
+	CNetMsg_Cl_Vote Msg = { Choice };
+	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
+}
+
+void CGameClient::SendChat(int Mode, const char *pLine)
+{
+	int WhisperTarget = 0;
+	// send chat message
+	CNetMsg_Cl_Say Msg;
+	Msg.m_Mode = Mode;
+	Msg.m_Target = Mode==CHAT_WHISPER ? WhisperTarget : -1;
+	Msg.m_pMessage = pLine;
+	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
 }
 
 IGameClient *CreateGameClient()

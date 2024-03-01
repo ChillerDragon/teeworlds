@@ -4,7 +4,6 @@
 
 #include <game/client/gameclient.h>
 #include <game/client/component.h>
-#include <game/client/components/chat.h>
 
 #include "controls.h"
 
@@ -34,15 +33,6 @@ struct CInputSet
 	int *m_pVariable;
 	int m_Value;
 };
-
-void CControls::OnMessage(int Msg, void *pRawMsg)
-{
-	if(Msg == NETMSGTYPE_SV_WEAPONPICKUP)
-	{
-		CNetMsg_Sv_WeaponPickup *pMsg = (CNetMsg_Sv_WeaponPickup *)pRawMsg;
-		m_InputData.m_WantedWeapon = pMsg->m_Weapon+1; // auto switch
-	}
-}
 
 int CControls::SnapInput(int *pData)
 {

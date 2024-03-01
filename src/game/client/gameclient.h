@@ -165,13 +165,13 @@ public:
 	void SendKill();
 	void SendReadyChange();
 	void SendSkinChange();
+	void SendEmoticon(int Emoticon);
+	void SendSpectate(int SpecMode, int SpectatorID);
+	void SendCallvote(const char *pType, const char *pValue, const char *pReason, bool ForceVote);
+	void SendVote(int Choice);
+	void SendChat(int Mode, const char *pLine);
 
-	// pointers to all systems
-	class CBroadcast *m_pBroadcast;
-	class CChat *m_pChat;
 	class CControls *m_pControls;
-	class CMotd *m_pMotd;
-	class CVoting *m_pVoting;
 };
 
 

@@ -499,22 +499,8 @@ if(CLIENT)
   )
   set_src(GAME_CLIENT GLOB_RECURSE src/game/client
     component.h
-    components/broadcast.cpp
-    components/broadcast.h
-    components/chat.cpp
-    components/chat.h
     components/controls.cpp
     components/controls.h
-    components/emoticon.cpp
-    components/emoticon.h
-    components/infomessages.cpp
-    components/infomessages.h
-    components/motd.cpp
-    components/motd.h
-    components/spectator.cpp
-    components/spectator.h
-    components/voting.cpp
-    components/voting.h
     gameclient.cpp
     gameclient.h
   )
