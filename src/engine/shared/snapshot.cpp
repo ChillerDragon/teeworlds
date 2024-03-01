@@ -3,8 +3,6 @@
 #include <algorithm>
 #include <limits.h>
 
-#include <base/tl/algorithm.h>
-
 #include "snapshot.h"
 #include "compression.h"
 
@@ -24,16 +22,13 @@ int CSnapshot::GetItemSize(int Index) const
 
 int CSnapshot::GetItemIndex(int Key) const
 {
-	plain_range_sorted<int> Keys(SortedKeys(), SortedKeys() + m_NumItems);
-	plain_range_sorted<int> r = ::find_binary(Keys, Key);
-
-	if(r.empty())
-		return -1;
-
-	int Index = &r.front() - SortedKeys();
-	if(GetItem(Index)->Key() != Key)
-		return -1; // deleted
-	return Index;
+	// TODO: OPT: this should not be a linear search. very bad
+	for(int i = 0; i < m_NumItems; i++)
+	{
+		if(GetItem(i)->Key() == Key)
+			return i;
+	}
+	return -1;
 }
 
 void CSnapshot::InvalidateItem(int Index)

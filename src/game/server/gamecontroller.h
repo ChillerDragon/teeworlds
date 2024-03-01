@@ -4,7 +4,6 @@
 #define GAME_SERVER_GAMECONTROLLER_H
 
 #include <base/vmath.h>
-#include <base/tl/array.h>
 
 #include <generated/protocol.h>
 
