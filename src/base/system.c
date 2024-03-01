@@ -95,7 +95,7 @@ void dbg_msg(const char *sys, const char *fmt, ...)
 	va_list args;
 	char str[1024*4];
 	char *msg;
-	int i, len;
+	int len;
 
 	char timestr[80];
 	str_timestamp_format(timestr, sizeof(timestr), FORMAT_SPACE);
@@ -113,8 +113,7 @@ void dbg_msg(const char *sys, const char *fmt, ...)
 #endif
 	va_end(args);
 
-	for(i = 0; i < num_loggers; i++)
-		loggers[i](str);
+	puts(str);
 }
 
 #if defined(CONF_FAMILY_WINDOWS)
