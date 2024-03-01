@@ -352,9 +352,6 @@ endif()
 set(EXPECTED_DATA
   deadtee.png
   emoticons.png
-  fonts/DejaVuSans.ttf
-  fonts/SourceHanSans.ttc
-  fonts/index.json
   game.png
   particles.png
   race_flag.png
