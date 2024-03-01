@@ -209,27 +209,6 @@ void CPlayer::Snap(int SnappingClient)
 			pSpectatorInfo->m_Y = m_ViewPos.y;
 		}
 	}
-
-	// demo recording
-	if(SnappingClient == -1)
-	{
-		CNetObj_De_ClientInfo *pClientInfo = static_cast<CNetObj_De_ClientInfo *>(Server()->SnapNewItem(NETOBJTYPE_DE_CLIENTINFO, m_ClientID, sizeof(CNetObj_De_ClientInfo)));
-		if(!pClientInfo)
-			return;
-
-		pClientInfo->m_Local = 0;
-		pClientInfo->m_Team = m_Team;
-		StrToInts(pClientInfo->m_aName, 4, Server()->ClientName(m_ClientID));
-		StrToInts(pClientInfo->m_aClan, 3, Server()->ClientClan(m_ClientID));
-		pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
-
-		for(int p = 0; p < NUM_SKINPARTS; p++)
-		{
-			StrToInts(pClientInfo->m_aaSkinPartNames[p], 6, m_TeeInfos.m_aaSkinPartNames[p]);
-			pClientInfo->m_aUseCustomColors[p] = m_TeeInfos.m_aUseCustomColors[p];
-			pClientInfo->m_aSkinPartColors[p] = m_TeeInfos.m_aSkinPartColors[p];
-		}
-	}
 }
 
 void CPlayer::OnDisconnect()
@@ -343,8 +322,7 @@ bool CPlayer::SetSpectatorID(int SpecMode, int SpectatorID)
 
 bool CPlayer::DeadCanFollow(CPlayer *pPlayer) const
 {
-	// check if wanted player is in the same team and alive
-	return (!pPlayer->m_RespawnDisabled || (pPlayer->GetCharacter() && pPlayer->GetCharacter()->IsAlive())) && pPlayer->GetTeam() == m_Team;
+	return true;
 }
 
 void CPlayer::UpdateDeadSpecMode()
