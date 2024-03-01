@@ -30,133 +30,6 @@
 #undef main
 #endif
 
-void CGraph::Init(float Min, float Max)
-{
-	m_MinRange = m_Min = Min;
-	m_MaxRange = m_Max = Max;
-	m_Index = 0;
-}
-
-void CGraph::Scale()
-{
-	m_Min = m_MinRange;
-	m_Max = m_MaxRange;
-	for(int i = 0; i < MAX_VALUES; i++)
-	{
-		if(m_aValues[i] > m_Max)
-			m_Max = m_aValues[i];
-		else if(m_aValues[i] < m_Min)
-			m_Min = m_aValues[i];
-	}
-}
-
-void CGraph::Add(float v, float r, float g, float b)
-{
-	m_Index = (m_Index+1)%MAX_VALUES;
-	m_aValues[m_Index] = v;
-	m_aColors[m_Index][0] = r;
-	m_aColors[m_Index][1] = g;
-	m_aColors[m_Index][2] = b;
-}
-
-
-void CSmoothTime::Init(int64 Target)
-{
-	m_Snap = time_get();
-	m_Current = Target;
-	m_Target = Target;
-	m_aAdjustSpeed[0] = 0.3f;
-	m_aAdjustSpeed[1] = 0.3f;
-	m_Graph.Init(0.0f, 0.5f);
-	m_SpikeCounter = 0;
-	m_BadnessScore = -100;
-}
-
-void CSmoothTime::SetAdjustSpeed(int Direction, float Value)
-{
-	m_aAdjustSpeed[Direction] = Value;
-}
-
-int64 CSmoothTime::Get(int64 Now)
-{
-	int64 c = m_Current + (Now - m_Snap);
-	int64 t = m_Target + (Now - m_Snap);
-
-	// it's faster to adjust upward instead of downward
-	// we might need to adjust these abit
-
-	float AdjustSpeed = m_aAdjustSpeed[0];
-	if(t > c)
-		AdjustSpeed = m_aAdjustSpeed[1];
-
-	float a = ((Now-m_Snap)/(float)time_freq()) * AdjustSpeed;
-	if(a > 1.0f)
-		a = 1.0f;
-
-	int64 r = c + (int64)((t-c)*a);
-
-	m_Graph.Add(a+0.5f,1,1,1);
-
-	return r;
-}
-
-void CSmoothTime::UpdateInt(int64 Target)
-{
-	int64 Now = time_get();
-	m_Current = Get(Now);
-	m_Snap = Now;
-	m_Target = Target;
-}
-
-void CSmoothTime::Update(CGraph *pGraph, int64 Target, int TimeLeft, int AdjustDirection)
-{
-	int UpdateTimer = 1;
-
-	if(TimeLeft < 0)
-	{
-		int IsSpike = 0;
-		if(TimeLeft < -50)
-		{
-			IsSpike = 1;
-
-			m_SpikeCounter += 5;
-			if(m_SpikeCounter > 50)
-				m_SpikeCounter = 50;
-		}
-
-		if(IsSpike && m_SpikeCounter < 15)
-		{
-			// ignore this ping spike
-			UpdateTimer = 0;
-			pGraph->Add(TimeLeft, 1,1,0.3f); // yellow
-			m_BadnessScore += 10;
-		}
-		else
-		{
-			pGraph->Add(TimeLeft, 1,0.3f,0.3f); // red
-			m_BadnessScore += 50;
-			if(m_aAdjustSpeed[AdjustDirection] < 30.0f)
-				m_aAdjustSpeed[AdjustDirection] *= 2.0f;
-		}
-	}
-	else
-	{
-		if(m_SpikeCounter)
-			m_SpikeCounter--;
-
-		pGraph->Add(TimeLeft, 0.3f,1,0.3f); // green
-
-		m_aAdjustSpeed[AdjustDirection] *= 0.95f;
-		if(m_aAdjustSpeed[AdjustDirection] < 2.0f)
-			m_aAdjustSpeed[AdjustDirection] = 2.0f;
-	}
-
-	if(UpdateTimer)
-		UpdateInt(Target);
-
-	m_BadnessScore -= 1+m_BadnessScore/100;
-}
-
 CClient::CClient()
 {
 	m_pGameClient = 0;
@@ -172,14 +45,6 @@ CClient::CClient()
 	m_aVersionStr[0] = '0';
 	m_aVersionStr[1] = 0;
 
-	// pinging
-	m_PingStartTime = 0;
-
-	//
-	m_aCurrentMap[0] = 0;
-	m_CurrentMapCrc = 0;
-
-	//
 	m_aCmdConnect[0] = 0;
 
 	// map download
@@ -193,9 +58,6 @@ CClient::CClient()
 	m_MapdownloadTotalsize = -1;
 
 	m_CurrentInput = 0;
-
-	m_aServerAddressStr[0] = 0;
-	m_aServerPassword[0] = 0;
 
 	mem_zero(m_aSnapshots, sizeof(m_aSnapshots));
 	m_SnapshotStorage.Init();
@@ -281,6 +143,7 @@ void CClient::SendInput()
 
 	int AckGameTick = 10;
 	int PredTick = 10;
+	int PredTime = 10;
 
 	// pack input
 	CMsgPacker Msg(NETMSG_INPUT, true);
@@ -289,7 +152,7 @@ void CClient::SendInput()
 	Msg.AddInt(Size);
 
 	m_aInputs[m_CurrentInput].m_Tick = PredTick;
-	m_aInputs[m_CurrentInput].m_PredictedTime = m_PredictedTime.Get(Now);
+	m_aInputs[m_CurrentInput].m_PredictedTime = PredTime;
 	m_aInputs[m_CurrentInput].m_Time = Now;
 
 	// pack it
@@ -630,9 +493,9 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 		}
 		else if(Msg == NETMSG_PING_REPLY)
 		{
-			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "latency %.2f", (time_get() - m_PingStartTime)*1000 / (float)time_freq());
-			dbg_msg("client/network", "%s", aBuf);
+			// char aBuf[256];
+			// str_format(aBuf, sizeof(aBuf), "latency %.2f", (time_get() - m_PingStartTime)*1000 / (float)time_freq());
+			// dbg_msg("client/network", "%s", aBuf);
 		}
 		else if(Msg == NETMSG_INPUTTIMING)
 		{
@@ -650,9 +513,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 					break;
 				}
 			}
-
-			if(Target)
-				m_PredictedTime.Update(&m_InputtimeMarginGraph, Target, TimeLeft, 1);
 		}
 		else if(Msg == NETMSG_SNAP || Msg == NETMSG_SNAPSINGLE || Msg == NETMSG_SNAPEMPTY)
 		{
@@ -801,9 +661,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 					if(m_ReceivedSnapshots == 2)
 					{
 						// start at 200ms and work from there
-						m_PredictedTime.Init(GameTick * time_freq() / SERVER_TICK_SPEED);
-						m_PredictedTime.SetAdjustSpeed(1, 1000.0f);
-						m_GameTime.Init((GameTick - 1) * time_freq() / SERVER_TICK_SPEED);
 						m_aSnapshots[SNAP_PREV] = m_SnapshotStorage.m_pFirst;
 						m_aSnapshots[SNAP_CURRENT] = m_SnapshotStorage.m_pLast;
 					}
@@ -811,10 +668,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 					// adjust game time
 					if(m_ReceivedSnapshots > 2)
 					{
-						int64 Now = m_GameTime.Get(time_get());
-						int64 TickStart = GameTick * time_freq() / SERVER_TICK_SPEED;
-						int64 TimeLeft = (TickStart-Now)*1000 / time_freq();
-						m_GameTime.Update(&m_GametimeMarginGraph, (GameTick - 1) * time_freq() / SERVER_TICK_SPEED, TimeLeft, 0);
 					}
 
 					// ack snapshot

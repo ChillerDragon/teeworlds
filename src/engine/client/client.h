@@ -24,29 +24,6 @@ public:
 };
 
 
-class CSmoothTime
-{
-	int64 m_Snap;
-	int64 m_Current;
-	int64 m_Target;
-
-	CGraph m_Graph;
-
-	int m_SpikeCounter;
-	int m_BadnessScore; // ranges between -100 (perfect) and MAX_INT
-
-	float m_aAdjustSpeed[2]; // 0 = down, 1 = up
-public:
-	void Init(int64 Target);
-	void SetAdjustSpeed(int Direction, float Value);
-
-	int64 Get(int64 Now);
-	inline int GetStabilityScore() const { return m_BadnessScore; }
-
-	void UpdateInt(int64 Target);
-	void Update(CGraph *pGraph, int64 Target, int TimeLeft, int AdjustDirection);
-};
-
 
 class CClient : public IClient
 {
@@ -62,13 +39,11 @@ class CClient : public IClient
 	class CNetClient m_NetClient;
 	class CNetClient m_ContactClient;
 
-	char m_aServerAddressStr[256];
 	char m_aServerPassword[128];
 
 	unsigned m_SnapshotParts;
 	int64 m_LocalStartTime;
 
-	NETADDR m_ServerAddress;
 	int m_WindowMustRefocus;
 	int m_SnapCrcErrors;
 
@@ -80,15 +55,6 @@ class CClient : public IClient
 	// version-checking
 	char m_aVersionStr[10];
 
-	// pinging
-	int64 m_PingStartTime;
-
-	//
-	char m_aCurrentMap[256];
-	char m_aCurrentMapPath[IO_MAX_PATH_LENGTH];
-	unsigned m_CurrentMapCrc;
-
-	//
 	char m_aCmdConnect[256];
 
 	// map download
@@ -102,10 +68,6 @@ class CClient : public IClient
 	int m_MapdownloadCrc;
 	int m_MapdownloadAmount;
 	int m_MapdownloadTotalsize;
-
-	// time
-	CSmoothTime m_GameTime;
-	CSmoothTime m_PredictedTime;
 
 	// input
 	struct // TODO: handle input better
@@ -158,11 +120,6 @@ public:
 	void SendInput();
 
 
-	const char *ServerAddress() const { return m_aServerAddressStr; }
-
-
-	// ---
-
 	const void *SnapGetItem(int SnapID, int Index, CSnapItem *pItem) const;
 	void SnapInvalidateItem(int SnapID, int Index);
 	const void *SnapFindItem(int SnapID, int Type, int ID) const;
@@ -173,8 +130,6 @@ public:
 	void ProcessConnlessPacket(CNetChunk *pPacket);
 	void ProcessServerPacket(CNetChunk *pPacket);
 
-	const char *GetCurrentMapName() const { return m_aCurrentMap; }
-	const char *GetCurrentMapPath() const { return m_aCurrentMapPath; }
 	virtual const char *MapDownloadName() const { return m_aMapdownloadName; }
 	virtual int MapDownloadAmount() const { return m_MapdownloadAmount; }
 	virtual int MapDownloadTotalsize() const { return m_MapdownloadTotalsize; }

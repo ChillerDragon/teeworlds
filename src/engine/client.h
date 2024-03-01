@@ -19,8 +19,6 @@ public:
 		int m_DataSize;
 	};
 
-	virtual const char *GetCurrentMapName() const = 0;
-	virtual const char *GetCurrentMapPath() const = 0;
 	virtual const char *MapDownloadName() const = 0;
 	virtual int MapDownloadAmount() const = 0;
 	virtual int MapDownloadTotalsize() const = 0;
@@ -59,9 +57,6 @@ public:
 			return -1;
 		return SendMsg(&Packer, Flags);
 	}
-
-	//
-	virtual const char *ServerAddress() const = 0;
 };
 
 class IGameClient : public IInterface

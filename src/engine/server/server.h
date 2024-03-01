@@ -135,8 +135,6 @@ public:
 	{
 		MAP_CHUNK_SIZE=NET_MAX_PAYLOAD-NET_MAX_CHUNKHEADERSIZE-4, // msg type
 	};
-	char m_aCurrentMap[64];
-	unsigned m_CurrentMapCrc;
 	unsigned char *m_pCurrentMapData;
 	int m_CurrentMapSize;
 	int m_MapChunksPerRequest;
