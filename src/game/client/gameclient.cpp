@@ -7,8 +7,6 @@
 
 #include "gameclient.h"
 
-#include "components/controls.h"
-
 inline void StrToInts(int *pInts, int Num, const char *pStr)
 {
        int Index = 0;
@@ -42,12 +40,6 @@ inline void IntsToStr(const int *pInts, int Num, char *pStr)
        // null terminate
        pStr[-1] = 0;
 }
-
-// instantiate all systems
-static CControls gs_Controls;
-
-CGameClient::CStack::CStack() { m_Num = 0; }
-void CGameClient::CStack::Add(class CComponent *pComponent) { m_paComponents[m_Num++] = pComponent; }
 
 const char *CGameClient::Version() const { return GAME_VERSION; }
 const char *CGameClient::NetVersion() const { return GAME_NETVERSION; }
@@ -117,7 +109,7 @@ static CGameMsg gs_GameMsgList[NUM_GAMEMSGS] = {
 
 int CGameClient::OnSnapInput(int *pData)
 {
-	return m_pControls->SnapInput(pData);
+	return SnapInput(pData);
 }
 
 void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
@@ -278,10 +270,6 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		dbg_msg("client", "%s", aBuf);
 		return;
 	}
-
-	// TODO: this should be done smarter
-	for(int i = 0; i < m_All.m_Num; i++)
-		m_All.m_paComponents[i]->OnMessage(MsgId, pRawMsg);
 
 	bool Race = m_GameInfo.m_GameFlags&GAMEFLAG_RACE;
 
@@ -713,6 +701,32 @@ void CGameClient::SendChat(int Mode, const char *pLine)
 	Msg.m_Target = Mode==CHAT_WHISPER ? WhisperTarget : -1;
 	Msg.m_pMessage = pLine;
 	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
+}
+
+int CGameClient::SnapInput(int *pData)
+{
+	static int64 s_LastSendTime = 0;
+	bool Send = false;
+
+	m_InputData.m_PlayerFlags = PLAYERFLAG_CHATTING;
+	m_InputData.m_PlayerFlags |= PLAYERFLAG_SCOREBOARD;
+
+	m_InputData.m_TargetX = 10;
+	m_InputData.m_TargetY = 10;
+
+	// set direction
+	m_InputData.m_Direction = 0;
+
+	// send at at least 10hz
+	if(time_get() > s_LastSendTime + time_freq()/25)
+		Send = true;
+
+	if(!Send)
+		return 0;
+
+	s_LastSendTime = time_get();
+	mem_copy(pData, &m_InputData, sizeof(m_InputData));
+	return sizeof(m_InputData);
 }
 
 IGameClient *CreateGameClient()

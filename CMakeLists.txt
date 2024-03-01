@@ -498,9 +498,6 @@ if(CLIENT)
     client.h
   )
   set_src(GAME_CLIENT GLOB_RECURSE src/game/client
-    component.h
-    components/controls.cpp
-    components/controls.h
     gameclient.cpp
     gameclient.h
   )

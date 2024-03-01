@@ -10,23 +10,6 @@
 
 class CGameClient : public IGameClient
 {
-	class CStack
-	{
-	public:
-		enum
-		{
-			MAX_COMPONENTS = 64,
-		};
-
-		CStack();
-		void Add(class CComponent *pComponent);
-
-		class CComponent *m_paComponents[MAX_COMPONENTS];
-		int m_Num;
-	};
-
-	CStack m_All;
-	CStack m_Input;
 	CNetObjHandler m_NetObjHandler;
 
 	class IClient *m_pClient;
@@ -160,6 +143,9 @@ public:
 	virtual const char *NetVersionHashReal() const;
 	virtual int ClientVersion() const;
 
+	int SnapInput(int *pData);
+	CNetObj_PlayerInput m_InputData;
+
 	void SendSwitchTeam(int Team);
 	void SendStartInfo();
 	void SendKill();
@@ -170,8 +156,6 @@ public:
 	void SendCallvote(const char *pType, const char *pValue, const char *pReason, bool ForceVote);
 	void SendVote(int Choice);
 	void SendChat(int Mode, const char *pLine);
-
-	class CControls *m_pControls;
 };
 
 
