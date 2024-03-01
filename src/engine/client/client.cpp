@@ -162,14 +162,6 @@ CClient::CClient()
 {
 	m_pGameClient = 0;
 
-	m_RenderFrameTime = 0.0001f;
-	m_RenderFrameTimeLow = 1.0f;
-	m_RenderFrameTimeHigh = 0.0f;
-	m_RenderFrames = 0;
-	m_LastRenderTime = time_get();
-	m_LastCpuTime = time_get();
-	m_LastAvgCpuFrameTime = 0;
-
 	m_GameTickSpeed = SERVER_TICK_SPEED;
 
 	m_WindowMustRefocus = 0;
@@ -671,7 +663,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 		}
 		else if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && Msg == NETMSG_CON_READY)
 		{
-			GameClient()->OnConnected();
+			// GameClient()->SendStartInfo();
 		}
 		else if(Msg == NETMSG_PING)
 		{
@@ -1248,8 +1240,6 @@ int main(int argc, const char **argv) // ignore_convention
 			pClient->ConnectOnStart(pAddress);
 		}
 	}
-
-	pKernel->RequestInterface<IGameClient>()->OnConsoleInit();
 
 	// run the client
 	dbg_msg("client", "starting...");

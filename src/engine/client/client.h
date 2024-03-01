@@ -69,13 +69,6 @@ class CClient : public IClient
 	unsigned m_SnapshotParts;
 	int64 m_LocalStartTime;
 
-	int64 m_LastRenderTime;
-	int64 m_LastCpuTime;
-	float m_LastAvgCpuFrameTime;
-	float m_RenderFrameTimeLow;
-	float m_RenderFrameTimeHigh;
-	int m_RenderFrames;
-
 	NETADDR m_ServerAddress;
 	int m_WindowMustRefocus;
 	int m_SnapCrcErrors;

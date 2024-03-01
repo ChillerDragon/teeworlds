@@ -6,7 +6,6 @@
 
 class CBroadcast : public CComponent
 {
-	void OnBroadcastMessage(const CNetMsg_Sv_Broadcast *pMsg);
 public:
 	virtual void OnMessage(int MsgType, void *pRawMsg);
 };

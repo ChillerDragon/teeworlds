@@ -10,13 +10,8 @@
 
 void CBroadcast::OnMessage(int MsgType, void* pRawMsg)
 {
-	// process server broadcast message
 	if(MsgType == NETMSGTYPE_SV_BROADCAST)
 	{
-		OnBroadcastMessage((CNetMsg_Sv_Broadcast *)pRawMsg);
+		// CNetMsg_Sv_Broadcast *pMsg = (CNetMsg_Sv_Broadcast *)pRawMsg;
 	}
-}
-
-void CBroadcast::OnBroadcastMessage(const CNetMsg_Sv_Broadcast *pMsg)
-{
 }

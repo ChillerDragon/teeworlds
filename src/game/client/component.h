@@ -18,7 +18,6 @@ protected:
 public:
 	virtual ~CComponent() {}
 
-	virtual void OnConsoleInit() {}
 	virtual void OnReset() {}
 	virtual void OnMapLoad() {}
 	virtual void OnMessage(int Msg, void *pRawMsg) {}

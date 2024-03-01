@@ -712,10 +712,6 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
 			int64 Now = Server()->Tick();
 
-			if((pPlayer->m_LastVoteCallTick && pPlayer->m_LastVoteCallTick+Server()->TickSpeed()*VOTE_COOLDOWN > Now) ||
-				pPlayer->GetTeam() == TEAM_SPECTATORS || m_VoteCloseTime)
-				return;
-
 			pPlayer->m_LastVoteTryTick = Now;
 
 			m_VoteType = VOTE_UNKNOWN;

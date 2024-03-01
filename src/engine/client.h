@@ -128,11 +128,8 @@ class IGameClient : public IInterface
 	MACRO_INTERFACE("gameclient", 0)
 protected:
 public:
-	virtual void OnConsoleInit() = 0;
-
 	virtual void OnRconLine(const char *pLine) = 0;
 	virtual void OnNewSnapshot() = 0;
-	virtual void OnConnected() = 0;
 	virtual void OnMessage(int MsgID, CUnpacker *pUnpacker) = 0;
 
 	virtual int OnSnapInput(int *pData) = 0;

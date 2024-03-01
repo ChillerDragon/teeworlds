@@ -48,20 +48,6 @@ public:
 	int NetobjNumFailures() { return m_NetObjHandler.NumObjFailures(); }
 	const char *NetmsgFailedOn() { return m_NetObjHandler.FailedMsgOn(); }
 
-	enum
-	{
-		SERVERMODE_PURE=0,
-		SERVERMODE_MOD,
-		SERVERMODE_PUREMOD,
-	};
-	int m_ServerMode;
-
-	int m_DemoSpecMode;
-	int m_DemoSpecID;
-
-
-	// ---
-
 	struct CPlayerInfoItem
 	{
 		const CNetObj_PlayerInfo *m_pPlayerInfo;
@@ -162,21 +148,9 @@ public:
 
 	CGameInfo m_GameInfo;
 
-	struct CServerSettings
-	{
-		bool m_KickVote;
-		int m_KickMin;
-		bool m_SpecVote;
-		bool m_TeamLock;
-		bool m_TeamBalance;
-		int m_PlayerSlots;
-	} m_ServerSettings;
-
 	void OnReset();
 
 	// hooks
-	virtual void OnConnected();
-	virtual void OnConsoleInit();
 	virtual void OnMessage(int MsgId, CUnpacker *pUnpacker);
 	virtual void OnNewSnapshot();
 	virtual int OnSnapInput(int *pData);

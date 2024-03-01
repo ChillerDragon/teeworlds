@@ -131,54 +131,9 @@ static CGameMsg gs_GameMsgList[NUM_GAMEMSGS] = {
 	{/*GAMEMSG_GAME_PAUSED*/ DO_SPECIAL, PARA_I, ""},	// special - add player name
 };
 
-void CGameClient::OnConsoleInit()
-{
-	m_pEngine = Kernel()->RequestInterface<IEngine>();
-	m_pClient = Kernel()->RequestInterface<IClient>();
-
-	// setup pointers
-	m_pBroadcast = &::gs_Broadcast;
-	m_pChat = &::gs_Chat;
-	m_pControls = &::gs_Controls;
-	m_pMotd = &::gs_Motd;
-	m_pVoting = &::gs_Voting;
-
-	// make a list of all the systems, make sure to add them in the corrent render order
-	m_All.Add(m_pControls);
-	m_All.Add(m_pVoting);
-
-	m_All.Add(&gs_Spectator);
-	m_All.Add(&gs_Emoticon);
-	m_All.Add(&gs_InfoMessages);
-	m_All.Add(m_pChat);
-	m_All.Add(&gs_Broadcast);
-	m_All.Add(m_pMotd);
-
-	for(int i = 0; i < m_All.m_Num; i++)
-		m_All.m_paComponents[i]->m_pClient = this;
-
-	// let all the other components register their console commands
-	for(int i = 0; i < m_All.m_Num; i++)
-		m_All.m_paComponents[i]->OnConsoleInit();
-}
-
 int CGameClient::OnSnapInput(int *pData)
 {
 	return m_pControls->SnapInput(pData);
-}
-
-void CGameClient::OnConnected()
-{
-	for(int i = 0; i < m_All.m_Num; i++)
-	{
-		m_All.m_paComponents[i]->OnMapLoad();
-		m_All.m_paComponents[i]->OnReset();
-	}
-
-	m_ServerMode = SERVERMODE_PURE;
-
-	// send the inital info
-	SendStartInfo();
 }
 
 void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
@@ -451,23 +406,12 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	{
 		CNetMsg_Sv_ServerSettings *pMsg = (CNetMsg_Sv_ServerSettings *)pRawMsg;
 
-		if(!m_ServerSettings.m_TeamLock && pMsg->m_TeamLock)
-			dbg_msg("chat", "Teams were locked");
-		else if(m_ServerSettings.m_TeamLock && !pMsg->m_TeamLock)
-			dbg_msg("chat", "Teams were unlocked");
-
-		m_ServerSettings.m_KickVote = pMsg->m_KickVote;
-		m_ServerSettings.m_KickMin = pMsg->m_KickMin;
-		m_ServerSettings.m_SpecVote = pMsg->m_SpecVote;
-		m_ServerSettings.m_TeamLock = pMsg->m_TeamLock;
-		m_ServerSettings.m_TeamBalance = pMsg->m_TeamBalance;
-		m_ServerSettings.m_PlayerSlots = pMsg->m_PlayerSlots;
-		dbg_msg(
-			"network_in",
-			"NETMSGTYPE_SV_SERVERSETTINGS playerslots=%d specvote=%d",
-			pMsg->m_PlayerSlots,
-			pMsg->m_SpecVote
-		);
+		dbg_msg("server_settings", "KickVote=%d", pMsg->m_KickVote);
+		dbg_msg("server_settings", "KickMin=%d", pMsg->m_KickMin);
+		dbg_msg("server_settings", "SpecVote=%d", pMsg->m_SpecVote);
+		dbg_msg("server_settings", "TeamLock=%d", pMsg->m_TeamLock);
+		dbg_msg("server_settings", "TeamBalance=%d", pMsg->m_TeamBalance);
+		dbg_msg("server_settings", "PlayerSlots=%d", pMsg->m_PlayerSlots);
 	}
 	else if(MsgId == NETMSGTYPE_SV_TEAM)
 	{
