@@ -4,7 +4,6 @@
 #include <base/math.h>
 #include <base/system.h>
 
-#include <engine/engine.h>
 #include <engine/server.h>
 
 #include <engine/shared/compression.h>
@@ -145,7 +144,6 @@ CServer::CServer()
 	m_NumMapEntries = 0;
 	m_pFirstMapEntry = 0;
 	m_pLastMapEntry = 0;
-	m_pMapListHeap = 0;
 
 	m_MapReload = false;
 
@@ -901,8 +899,7 @@ void CServer::GenerateServerInfo(CPacker *pPacker, int Token)
 	// flags
 	int Flags = 0;
 	Flags |= SERVERINFO_FLAG_PASSWORD;
-	if(GameServer()->TimeScore())
-		Flags |= SERVERINFO_FLAG_TIMESCORE;
+	Flags |= SERVERINFO_FLAG_TIMESCORE;
 	pPacker->AddInt(Flags);
 
 	pPacker->AddInt(0);	// server skill level
@@ -1016,8 +1013,6 @@ int CServer::Run(bool shutdown)
 	//
 	m_PrintCBIndex = 1;
 
-	InitMapList();
-
 	m_MapChunksPerRequest = 1;
 
 	// start server
@@ -1026,7 +1021,7 @@ int CServer::Run(bool shutdown)
 	BindAddr.type = NETTYPE_ALL;
 	BindAddr.port = GetPort();
 
-	if(!m_NetServer.Open(BindAddr, Kernel()->RequestInterface<IEngine>(),
+	if(!m_NetServer.Open(BindAddr,
 		GetMaxClients(), GetMaxClientsPerIP(), NewClientCallback, DelClientCallback, this))
 	{
 		dbg_msg("server", "couldn't open socket. port %d might already be in use", GetPort());
@@ -1167,30 +1162,6 @@ void CServer::Free()
 	}
 }
 
-struct CSubdirCallbackUserdata
-{
-	CServer *m_pServer;
-	char m_aName[256];
-	bool m_StandardOnly;
-};
-
-int CServer::MapListEntryCallback(const char *pFilename, int IsDir, int DirType, void *pUser)
-{
-	return 0;
-}
-
-void CServer::InitMapList()
-{
-	m_pMapListHeap = new CHeap();
-
-	CSubdirCallbackUserdata Userdata;
-	Userdata.m_StandardOnly = false;
-
-	Userdata.m_pServer = this;
-	str_copy(Userdata.m_aName, "", sizeof(Userdata.m_aName));
-	dbg_msg("server", "%d maps added to maplist", m_NumMapEntries);
-}
-
 int CServer::SnapNewID()
 {
 	return m_IDPool.NewID();
@@ -1251,21 +1222,17 @@ int main(int argc, const char **argv) // ignore_convention
 	IKernel *pKernel = IKernel::Create();
 
 	// create the components
-	IEngine *pEngine = CreateEngine("Teeworlds_Server");
 	IGameServer *pGameServer = CreateGameServer();
 
 	{
 		bool RegisterFail = false;
 
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pServer); // register as both
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pEngine);
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pGameServer);
 
 		if(RegisterFail)
 			return -1;
 	}
-
-	pEngine->Init();
 
 	pServer->InitInterfaces(pKernel);
 
@@ -1276,7 +1243,6 @@ int main(int argc, const char **argv) // ignore_convention
 	// free
 	delete pServer;
 	delete pKernel;
-	delete pEngine;
 	delete pGameServer;
 
 	return Ret;

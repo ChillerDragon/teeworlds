@@ -443,7 +443,6 @@ set_src(BASE GLOB_RECURSE src/base
 )
 set_src(ENGINE_INTERFACE GLOB src/engine
   client.h
-  engine.h
   kernel.h
   message.h
   server.h
@@ -451,7 +450,6 @@ set_src(ENGINE_INTERFACE GLOB src/engine
 set_src(ENGINE_SHARED GLOB src/engine/shared
   compression.cpp
   compression.h
-  engine.cpp
   huffman.cpp
   huffman.h
   kernel.cpp

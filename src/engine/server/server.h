@@ -213,9 +213,6 @@ public:
 	int Run(bool shutdown);
 	void Free();
 
-	static int MapListEntryCallback(const char *pFilename, int IsDir, int DirType, void *pUser);
-	void InitMapList();
-
 	virtual int SnapNewID();
 	virtual void SnapFreeID(int ID);
 	virtual void *SnapNewItem(int Type, int ID, int Size);

@@ -51,7 +51,6 @@ public:
 class CClient : public IClient
 {
 	// needed interfaces
-	IEngine *m_pEngine;
 	IGameClient *m_pGameClient;
 
 	enum
@@ -140,7 +139,6 @@ class CClient : public IClient
 	int64 TickStartTime(int Tick);
 
 public:
-	IEngine *Engine() { return m_pEngine; }
 	IGameClient *GameClient() { return m_pGameClient; }
 
 	CClient();
@@ -159,10 +157,6 @@ public:
 
 	void SendInput();
 
-	const char *LatestVersion() const;
-	void VersionUpdate();
-
-	void OnClientOnline();
 
 	const char *ServerAddress() const { return m_aServerAddressStr; }
 
@@ -186,7 +180,5 @@ public:
 	virtual int MapDownloadTotalsize() const { return m_MapdownloadTotalsize; }
 
 	void PumpNetwork();
-
-	void Update();
 };
 #endif

@@ -5,7 +5,7 @@
 #include "network.h"
 
 
-bool CNetClient::Open(NETADDR BindAddr, IEngine *pEngine, int Flags)
+bool CNetClient::Open(NETADDR BindAddr, int Flags)
 {
 	// open socket
 	NETSOCKET Socket;
@@ -17,7 +17,7 @@ bool CNetClient::Open(NETADDR BindAddr, IEngine *pEngine, int Flags)
 	mem_zero(this, sizeof(*this));
 
 	// init
-	Init(Socket, pEngine);
+	Init(Socket);
 	m_Connection.Init(this, false);
 
 	m_TokenManager.Init(this);

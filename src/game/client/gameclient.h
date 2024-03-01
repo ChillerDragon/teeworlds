@@ -29,7 +29,6 @@ class CGameClient : public IGameClient
 	CStack m_Input;
 	CNetObjHandler m_NetObjHandler;
 
-	class IEngine *m_pEngine;
 	class IClient *m_pClient;
 
 	void ProcessEvents();
@@ -40,8 +39,6 @@ class CGameClient : public IGameClient
 	int m_LastNewPredictedTick;
 
 public:
-	IKernel *Kernel() { return IInterface::Kernel(); }
-	IEngine *Engine() const { return m_pEngine; }
 	class IClient *Client() const { return m_pClient; }
 
 	const char *NetobjFailedOn() { return m_NetObjHandler.FailedObjOn(); }

@@ -9,7 +9,6 @@
 #include <base/system.h>
 
 #include <engine/client.h>
-#include <engine/engine.h>
 
 #include <engine/shared/compression.h>
 #include <engine/shared/network.h>
@@ -309,11 +308,6 @@ void CClient::SendInput()
 	SendMsg(&Msg, MSGFLAG_FLUSH);
 }
 
-const char *CClient::LatestVersion() const
-{
-	return m_aVersionStr;
-}
-
 const void *CClient::SnapGetItem(int SnapID, int Index, CSnapItem *pItem) const
 {
 	dbg_assert(SnapID >= 0 && SnapID < NUM_SNAPSHOT_TYPES, "invalid SnapID");
@@ -549,9 +543,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 		}
 		else if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && Msg == NETMSG_MAP_DATA)
 		{
-			if(!m_MapdownloadFileTemp)
-				return;
-
 			int Size = minimum(m_MapDownloadChunkSize, m_MapdownloadTotalsize-m_MapdownloadAmount);
 			const unsigned char *pData = Unpacker.GetRaw(Size);
 			if(Unpacker.Error())
@@ -862,11 +853,6 @@ void CClient::PumpNetwork()
 	}
 }
 
-void CClient::Update()
-{
-	PumpNetwork();
-}
-
 static CClient *CreateClient()
 {
 	CClient *pClient = static_cast<CClient *>(mem_alloc(sizeof(CClient)));
@@ -877,31 +863,13 @@ static CClient *CreateClient()
 int main(int argc, const char **argv) // ignore_convention
 {
 	CClient *pClient = CreateClient();
-	IKernel *pKernel = IKernel::Create();
-	pKernel->RegisterInterface(pClient);
 
-	// create the components
-	IEngine *pEngine = CreateEngine("Teeworlds");
-
+	while(1)
 	{
-		bool RegisterFail = false;
-
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pEngine);
-
-
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(CreateGameClient());
-
-		if(RegisterFail)
-			return -1;
+		pClient->PumpNetwork();
 	}
 
-	pEngine->Init();
-
-	// free components
 	pClient->~CClient();
 	mem_free(pClient);
-	delete pKernel;
-	delete pEngine;
-
 	return 0;
 }

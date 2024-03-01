@@ -3,8 +3,6 @@
 #include <base/math.h>
 #include <base/system.h>
 
-#include <engine/engine.h>
-
 #include "network.h"
 #include "huffman.h"
 
@@ -98,7 +96,6 @@ CNetBase::CNetInitializer CNetBase::m_NetInitializer;
 CNetBase::CNetBase()
 {
 	net_invalidate_socket(&m_Socket);
-	m_pEngine = 0;
 	m_DataLogSent = 0;
 	m_DataLogRecv = 0;
 }
@@ -109,10 +106,9 @@ CNetBase::~CNetBase()
 		Shutdown();
 }
 
-void CNetBase::Init(NETSOCKET Socket, IEngine *pEngine)
+void CNetBase::Init(NETSOCKET Socket)
 {
 	m_Socket = Socket;
-	m_pEngine = pEngine;
 	m_Huffman.Init();
 	mem_zero(m_aRequestTokenBuf, sizeof(m_aRequestTokenBuf));
 }
@@ -414,10 +410,4 @@ unsigned char *CNetChunkHeader::Unpack(unsigned char *pData)
 		return pData + 3;
 	}
 	return pData + 2;
-}
-
-void CNetBase::UpdateLogHandles()
-{
-	if(Engine())
-		Engine()->QueryNetLogHandles(&m_DataLogSent, &m_DataLogRecv);
 }

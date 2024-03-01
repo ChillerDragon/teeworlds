@@ -13,7 +13,6 @@ protected:
 	CGameClient *m_pClient;
 
 	// perhaps propagte pointers for these as well
-	class IKernel *Kernel() const { return m_pClient->Kernel(); }
 	class IClient *Client() const { return m_pClient->Client(); }
 public:
 	virtual ~CComponent() {}

@@ -62,7 +62,6 @@ public:
 
 	//
 	virtual const char *ServerAddress() const = 0;
-	virtual const char *LatestVersion() const = 0;
 };
 
 class IGameClient : public IInterface
