@@ -431,7 +431,6 @@ set_src(BASE GLOB_RECURSE src/base
   system.h
   tl/allocator.h
   tl/string.h
-  tl/threading.h
   vmath.h
 )
 set_src(ENGINE_INTERFACE GLOB src/engine
