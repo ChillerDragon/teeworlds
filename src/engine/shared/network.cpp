@@ -91,33 +91,10 @@ int CNetRecvUnpacker::FetchChunk(CNetChunk *pChunk)
 	}
 }
 
-CNetBase::CNetBase()
-{
-	net_invalidate_socket(&m_Socket);
-}
-
-CNetBase::~CNetBase()
-{
-	if(m_Socket.type != NETTYPE_INVALID)
-		Shutdown();
-}
-
 void CNetBase::Init(NETSOCKET Socket)
 {
-	m_Socket = Socket;
 	m_Huffman.Init();
 	mem_zero(m_aRequestTokenBuf, sizeof(m_aRequestTokenBuf));
-}
-
-void CNetBase::Shutdown()
-{
-	net_udp_close(m_Socket);
-	net_invalidate_socket(&m_Socket);
-}
-
-void CNetBase::Wait(int Time)
-{
-	net_socket_read_wait(m_Socket, Time);
 }
 
 // packs the data tight and sends it
@@ -143,7 +120,7 @@ void CNetBase::SendPacketConnless(const NETADDR *pAddr, TOKEN Token, TOKEN Respo
 	dbg_assert(i == NET_PACKETHEADERSIZE_CONNLESS, "inconsistency");
 
 	mem_copy(&aBuffer[i], pData, DataSize);
-	net_udp_send(m_Socket, pAddr, aBuffer, i+DataSize);
+	// net_udp_send(m_Socket, pAddr, aBuffer, i+DataSize);
 }
 
 void CNetBase::SendPacket(const NETADDR *pAddr, CNetPacketConstruct *pPacket)
@@ -188,14 +165,15 @@ void CNetBase::SendPacket(const NETADDR *pAddr, CNetPacketConstruct *pPacket)
 
 		dbg_assert(i == NET_PACKETHEADERSIZE, "inconsistency");
 
-		net_udp_send(m_Socket, pAddr, aBuffer, FinalSize);
+		// net_udp_send(m_Socket, pAddr, aBuffer, FinalSize);
 	}
 }
 
 // TODO: rename this function
 int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketConstruct *pPacket)
 {
-	int Size = net_udp_recv(m_Socket, pAddr, pBuffer, NET_MAX_PACKETSIZE);
+	// int Size = net_udp_recv(m_Socket, pAddr, pBuffer, NET_MAX_PACKETSIZE);
+	int Size = 0;
 	// no more packets for now
 	if(Size <= 0)
 		return 1;

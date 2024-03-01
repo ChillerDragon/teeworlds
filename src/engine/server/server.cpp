@@ -131,8 +131,6 @@ CServer::CServer()
 	m_CurrentGameTick = 0;
 	m_RunServer = true;
 
-	str_copy(m_aShutdownReason, "Server shutdown", sizeof(m_aShutdownReason));
-
 	m_pCurrentMapData = 0;
 	m_CurrentMapSize = 0;
 
@@ -946,127 +944,7 @@ void CServer::InitInterfaces(IKernel *pKernel)
 
 int CServer::Run(bool shutdown)
 {
-	//
-	m_PrintCBIndex = 1;
-
-	m_MapChunksPerRequest = 1;
-
-	// start server
-	NETADDR BindAddr;
-	mem_zero(&BindAddr, sizeof(BindAddr));
-	BindAddr.type = NETTYPE_ALL;
-	BindAddr.port = GetPort();
-
-	char aBuf[256];
-	str_format(aBuf, sizeof(aBuf), "server name is '%s'", GetServerName());
-	dbg_msg("server", "%s", aBuf);
-
-	GameServer()->OnInit();
-	str_format(aBuf, sizeof(aBuf), "netversion %s", GameServer()->NetVersion());
-	dbg_msg("server", "%s", aBuf);
-	if(str_comp(GameServer()->NetVersionHashUsed(), GameServer()->NetVersionHashReal()))
-	{
-		dbg_msg("server", "WARNING: netversion hash differs");
-	}
-	str_format(aBuf, sizeof(aBuf), "game version %s", GameServer()->Version());
-	dbg_msg("server", "%s", aBuf);
-
-	// start game
-	{
-		m_GameStartTime = time_get();
-
-		while(m_RunServer)
-		{
-			// load new map
-			if(m_MapReload || m_CurrentGameTick >= 0x6FFFFFFF) //	force reload to make sure the ticks stay within a valid range
-			{
-				m_MapReload = false;
-
-				// load map
-				if(1)
-				{
-					// new map loaded
-					bool aSpecs[MAX_CLIENTS];
-					for(int c = 0; c < MAX_CLIENTS; c++)
-						aSpecs[c] = GameServer()->IsClientSpectator(c);
-
-					GameServer()->OnShutdown();
-
-					for(int c = 0; c < MAX_CLIENTS; c++)
-					{
-						if(m_aClients[c].m_State <= CClient::STATE_AUTH)
-							continue;
-
-						SendMap(c);
-						m_aClients[c].Reset();
-						m_aClients[c].m_State = aSpecs[c] ? CClient::STATE_CONNECTING_AS_SPEC : CClient::STATE_CONNECTING;
-					}
-
-					m_GameStartTime = time_get();
-					m_CurrentGameTick = 0;
-					Kernel()->ReregisterInterface(GameServer());
-					GameServer()->OnInit();
-				}
-				else
-				{
-					str_format(aBuf, sizeof(aBuf), "failed to load map. mapname='%s'", GetMapName());
-					dbg_msg("server", "%s", aBuf);
-				}
-			}
-
-			int64 Now = time_get();
-			bool NewTicks = false;
-			bool ShouldSnap = false;
-			while(Now > TickStartTime(m_CurrentGameTick+1))
-			{
-				m_CurrentGameTick++;
-				NewTicks = true;
-				if((m_CurrentGameTick%2) == 0)
-					ShouldSnap = true;
-
-				// apply new input
-				for(int c = 0; c < MAX_CLIENTS; c++)
-				{
-					if(m_aClients[c].m_State == CClient::STATE_EMPTY)
-						continue;
-					for(int i = 0; i < 200; i++)
-					{
-						if(m_aClients[c].m_aInputs[i].m_GameTick == Tick())
-						{
-							if(m_aClients[c].m_State == CClient::STATE_INGAME)
-								GameServer()->OnClientPredictedInput(c, m_aClients[c].m_aInputs[i].m_aData);
-							break;
-						}
-					}
-				}
-
-				GameServer()->OnTick();
-			}
-
-			// snap game
-			if(NewTicks)
-			{
-				if(ShouldSnap)
-					DoSnapshot();
-
-				UpdateClientMapListEntries();
-			}
-
-			PumpNetwork();
-
-			// wait for incoming data
-			m_NetServer.Wait(clamp(int((TickStartTime(m_CurrentGameTick+1)-time_get())*1000/time_freq()), 1, 1000/SERVER_TICK_SPEED/2));
-
-			if(InterruptSignaled)
-			{
-				dbg_msg("server", "interrupted");
-				break;
-			}
-			if(shutdown)
-				m_RunServer = false;
-		}
-	}
-	GameServer()->OnShutdown();
+	dbg_msg("server", "hello world");
 	return 0;
 }
 

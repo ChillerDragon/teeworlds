@@ -91,7 +91,6 @@ public:
 	// engine events
 	virtual void OnInit();
 	virtual void OnConsoleInit();
-	virtual void OnShutdown();
 
 	virtual void OnTick();
 	virtual void OnPreSnap();

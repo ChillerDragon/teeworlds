@@ -691,13 +691,6 @@ void CGameContext::OnInit()
 	m_pController = new CGameControllerDM(this);
 }
 
-void CGameContext::OnShutdown()
-{
-	delete m_pController;
-	m_pController = 0;
-	Clear();
-}
-
 void CGameContext::OnSnap(int ClientID)
 {
 	m_pController->Snap(ClientID);

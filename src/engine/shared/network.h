@@ -178,13 +178,9 @@ class CNetBase
 	unsigned char m_aRequestTokenBuf[NET_TOKENREQUEST_DATASIZE];
 
 public:
-	CNetBase();
-	~CNetBase();
 	int NetType() { return m_Socket.type; }
 
 	void Init(NETSOCKET Socket);
-	void Shutdown();
-	void Wait(int Time);
 
 	void SendControlMsg(const NETADDR *pAddr, TOKEN Token, int Ack, int ControlMsg, const void *pExtra, int ExtraSize);
 	void SendControlMsgWithToken(const NETADDR *pAddr, TOKEN Token, int Ack, int ControlMsg, TOKEN MyToken, bool Extended);
