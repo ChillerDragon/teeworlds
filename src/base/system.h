@@ -1772,36 +1772,6 @@ void str_utf8_copy_num(char *dst, const char *src, int dst_size, int num);
 */
 void str_utf8_stats(const char *str, int max_size, int max_count, int *size, int *count);
 
-/*
-	Function: secure_random_init
-		Initializes the secure random module.
-		You *MUST* check the return value of this function.
-
-	Returns:
-		0 - Initialization succeeded.
-		1 - Initialization failed.
-*/
-int secure_random_init();
-
-/*
-	Function: secure_random_uninit
-		Uninitializes the secure random module.
-
-	Returns:
-		0 - Uninitialization succeeded.
-		1 - Uninitialization failed.
-*/
-int secure_random_uninit();
-
-/*
-	Function: secure_random_fill
-		Fills the buffer with the specified amount of random bytes.
-
-	Parameters:
-		bytes - Pointer to the start of the buffer.
-		length - Length of the buffer.
-*/
-void secure_random_fill(void *bytes, unsigned length);
 
 /*
 	Function: pid
@@ -1811,32 +1781,6 @@ void secure_random_fill(void *bytes, unsigned length);
 		The process ID of the current process.
 */
 int pid();
-
-/*
-	Function: cmdline_fix
-		Fixes the command line arguments to be encoded in UTF-8 on all
-		systems.
-
-	Parameters:
-		argc - A pointer to the argc parameter that was passed to the main function.
-		argv - A pointer to the argv parameter that was passed to the main function.
-
-	Remarks:
-		- You need to call cmdline_free once you're no longer using the
-		results.
-*/
-void cmdline_fix(int *argc, const char ***argv);
-
-/*
-	Function: cmdline_free
-		Frees memory that was allocated by cmdline_fix.
-
-	Parameters:
-		argc - The argc obtained from cmdline_fix.
-		argv - The argv obtained from cmdline_fix.
-
-*/
-void cmdline_free(int argc, const char **argv);
 
 /*
 	Function: bytes_be_to_int
@@ -1883,7 +1827,6 @@ unsigned bytes_be_to_uint(const unsigned char *bytes);
 		- Assumes unsigned is 4 bytes
 */
 void uint_to_bytes_be(unsigned char *bytes, unsigned value);
-
 
 
 #ifdef __cplusplus

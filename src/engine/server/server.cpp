@@ -1228,7 +1228,6 @@ void HandleSigIntTerm(int Param)
 
 int main(int argc, const char **argv) // ignore_convention
 {
-	cmdline_fix(&argc, &argv);
 	bool shutdown = false;
 	for(int i = 1; i < argc; i++) // ignore_convention
 	{
@@ -1243,12 +1242,6 @@ int main(int argc, const char **argv) // ignore_convention
 		{
 			shutdown = true;
 		}
-	}
-
-	if(secure_random_init() != 0)
-	{
-		dbg_msg("secure", "could not initialize secure RNG");
-		return -1;
 	}
 
 	signal(SIGINT, HandleSigIntTerm);
@@ -1286,7 +1279,5 @@ int main(int argc, const char **argv) // ignore_convention
 	delete pEngine;
 	delete pGameServer;
 
-	secure_random_uninit();
-	cmdline_free(argc, argv);
 	return Ret;
 }

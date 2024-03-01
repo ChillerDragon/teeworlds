@@ -30,8 +30,7 @@ bool CNetClient::Open(NETADDR BindAddr, IEngine *pEngine, int Flags)
 
 void CNetClient::Close()
 {
-	if(m_Connection.State() != NET_CONNSTATE_OFFLINE)
-		m_Connection.Disconnect("Client shutdown");
+	m_Connection.Disconnect("Client shutdown");
 	Shutdown();
 }
 
@@ -45,8 +44,6 @@ int CNetClient::Disconnect(const char *pReason)
 int CNetClient::Update()
 {
 	m_Connection.Update();
-	if(m_Connection.State() == NET_CONNSTATE_ERROR)
-		Disconnect(m_Connection.ErrorString());
 	m_TokenManager.Update();
 	m_TokenCache.Update();
 	return 0;
@@ -55,12 +52,6 @@ int CNetClient::Update()
 int CNetClient::Connect(NETADDR *pAddr)
 {
 	m_Connection.Connect(pAddr);
-	return 0;
-}
-
-int CNetClient::ResetErrorString()
-{
-	m_Connection.ResetErrorString();
 	return 0;
 }
 
@@ -81,7 +72,7 @@ int CNetClient::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 
 		if(!Result)
 		{
-			if(m_Connection.State() != NET_CONNSTATE_OFFLINE && m_Connection.State() != NET_CONNSTATE_ERROR && net_addr_comp(m_Connection.PeerAddress(), &Addr, true) == 0)
+			if(net_addr_comp(m_Connection.PeerAddress(), &Addr, true) == 0)
 			{
 				if(m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr))
 				{
@@ -177,28 +168,4 @@ int CNetClient::Send(CNetChunk *pChunk, TOKEN Token, CSendCBData *pCallbackData)
 void CNetClient::PurgeStoredPacket(int TrackID)
 {
 	m_TokenCache.PurgeStoredPacket(TrackID);
-}
-
-int CNetClient::State() const
-{
-	if(m_Connection.State() == NET_CONNSTATE_ONLINE)
-		return NETSTATE_ONLINE;
-	if(m_Connection.State() == NET_CONNSTATE_OFFLINE)
-		return NETSTATE_OFFLINE;
-	return NETSTATE_CONNECTING;
-}
-
-int CNetClient::Flush()
-{
-	return m_Connection.Flush();
-}
-
-bool CNetClient::GotProblems() const
-{
-	return (time_get() - m_Connection.LastRecvTime() > time_freq());
-}
-
-const char *CNetClient::ErrorString() const
-{
-	return m_Connection.ErrorString();
 }

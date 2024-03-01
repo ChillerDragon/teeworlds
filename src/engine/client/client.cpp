@@ -162,8 +162,6 @@ CClient::CClient()
 {
 	m_pGameClient = 0;
 
-	m_GameTickSpeed = SERVER_TICK_SPEED;
-
 	m_WindowMustRefocus = 0;
 	m_SnapCrcErrors = 0;
 
@@ -197,7 +195,6 @@ CClient::CClient()
 
 	m_CurrentInput = 0;
 
-	m_State = IClient::STATE_OFFLINE;
 	m_aServerAddressStr[0] = 0;
 	m_aServerPassword[0] = 0;
 
@@ -210,9 +207,6 @@ CClient::CClient()
 int CClient::SendMsg(CMsgPacker *pMsg, int Flags)
 {
 	CNetChunk Packet;
-
-	if(State() == IClient::STATE_OFFLINE)
-		return 0;
 
 	mem_zero(&Packet, sizeof(CNetChunk));
 	Packet.m_ClientID = 0;
@@ -280,22 +274,22 @@ void CClient::SendInput()
 {
 	int64 Now = time_get();
 
-	if(m_PredTick <= 0)
-		return;
-
 	// fetch input
 	int Size = GameClient()->OnSnapInput(m_aInputs[m_CurrentInput].m_aData);
 
 	if(!Size)
 		return;
 
+	int AckGameTick = 10;
+	int PredTick = 10;
+
 	// pack input
 	CMsgPacker Msg(NETMSG_INPUT, true);
-	Msg.AddInt(m_AckGameTick);
-	Msg.AddInt(m_PredTick);
+	Msg.AddInt(AckGameTick);
+	Msg.AddInt(PredTick);
 	Msg.AddInt(Size);
 
-	m_aInputs[m_CurrentInput].m_Tick = m_PredTick;
+	m_aInputs[m_CurrentInput].m_Tick = PredTick;
 	m_aInputs[m_CurrentInput].m_PredictedTime = m_PredictedTime.Get(Now);
 	m_aInputs[m_CurrentInput].m_Time = Now;
 
@@ -319,72 +313,6 @@ const char *CClient::LatestVersion() const
 {
 	return m_aVersionStr;
 }
-
-void CClient::Connect(const char *pAddress)
-{
-	char aBuf[512];
-	int Port = 8303;
-
-	Disconnect();
-
-	str_copy(m_aServerAddressStr, pAddress, sizeof(m_aServerAddressStr));
-
-	str_format(aBuf, sizeof(aBuf), "connecting to '%s'", m_aServerAddressStr);
-	dbg_msg("client", "%s", aBuf);
-
-	if(net_addr_from_str(&m_ServerAddress, m_aServerAddressStr) != 0 && net_host_lookup(m_aServerAddressStr, &m_ServerAddress, m_NetClient.NetType()) != 0)
-	{
-		str_format(aBuf, sizeof(aBuf), "could not find the address of %s, connecting to localhost", m_aServerAddressStr);
-		dbg_msg("client", "%s", aBuf);
-		net_host_lookup("localhost", &m_ServerAddress, m_NetClient.NetType());
-	}
-
-	m_RconAuthed = 0;
-	m_UseTempRconCommands = 0;
-	if(m_ServerAddress.port == 0)
-		m_ServerAddress.port = Port;
-	m_NetClient.Connect(&m_ServerAddress);
-
-	m_InputtimeMarginGraph.Init(-150.0f, 150.0f);
-	m_GametimeMarginGraph.Init(-150.0f, 150.0f);
-}
-
-void CClient::DisconnectWithReason(const char *pReason)
-{
-	char aBuf[512];
-	str_format(aBuf, sizeof(aBuf), "disconnecting. reason='%s'", pReason?pReason:"unknown");
-	dbg_msg("client", "%s", aBuf);
-
-	//
-	m_RconAuthed = 0;
-	m_UseTempRconCommands = 0;
-	m_NetClient.Disconnect(pReason);
-
-	// disable all downloads
-	m_MapdownloadChunk = 0;
-	m_MapdownloadFileTemp = 0;
-	m_MapdownloadCrc = 0;
-	m_MapdownloadTotalsize = -1;
-	m_MapdownloadAmount = 0;
-
-	// clear the current server info
-	mem_zero(&m_ServerAddress, sizeof(m_ServerAddress));
-	m_aServerAddressStr[0] = 0;
-	m_aServerPassword[0] = 0;
-
-	// clear snapshots
-	m_aSnapshots[SNAP_CURRENT] = 0;
-	m_aSnapshots[SNAP_PREV] = 0;
-	m_ReceivedSnapshots = 0;
-}
-
-void CClient::Disconnect()
-{
-	DisconnectWithReason(0);
-}
-
-
-// ---
 
 const void *CClient::SnapGetItem(int SnapID, int Index, CSnapItem *pItem) const
 {
@@ -445,10 +373,6 @@ void CClient::SnapSetStaticsize(int ItemType, int Size)
 }
 
 
-const char *CClient::ErrorString() const
-{
-	return m_NetClient.ErrorString();
-}
 
 struct CMastersrvAddr
 {
@@ -587,7 +511,9 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 				pError = "invalid map size";
 
 			if(pError)
-				DisconnectWithReason(pError);
+			{
+				dbg_msg("client", "would disconnect because of error=%s", pError);
+			}
 			else
 			{
 				pError = 0;
@@ -747,10 +673,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 			int Crc = 0;
 			int CompleteSize = 0;
 			const char *pData = 0;
-
-			// we are not allowed to process snapshot yet
-			if(State() < IClient::STATE_LOADING)
-				return;
 
 			if(Msg == NETMSG_SNAP)
 			{
@@ -923,27 +845,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 void CClient::PumpNetwork()
 {
 	m_NetClient.Update();
-
-	if(State() != IClient::STATE_DEMOPLAYBACK)
-	{
-		// check for errors
-		if(State() != IClient::STATE_OFFLINE && State() != IClient::STATE_QUITING && m_NetClient.State() == NETSTATE_OFFLINE)
-		{
-			DisconnectWithReason(m_NetClient.ErrorString());
-			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "offline error='%s'", m_NetClient.ErrorString());
-			dbg_msg("client", "%s", aBuf);
-		}
-
-		//
-		if(State() == IClient::STATE_CONNECTING && m_NetClient.State() == NETSTATE_ONLINE)
-		{
-			// we switched to online
-			dbg_msg("client", "connected, sending info");
-			SendInfo();
-		}
-	}
-
 	// process non-connless packets
 	CNetChunk Packet;
 	while(m_NetClient.Recv(&Packet))
@@ -963,194 +864,7 @@ void CClient::PumpNetwork()
 
 void CClient::Update()
 {
-	if(State() == IClient::STATE_DEMOPLAYBACK)
-	{
-		// disconnect on error
-		Disconnect();
-	}
-	else if(State() == IClient::STATE_ONLINE && m_ReceivedSnapshots >= 3)
-	{
-		int64 Freq = time_freq();
-		int64 Now = m_GameTime.Get(time_get());
-		int64 PredNow = m_PredictedTime.Get(time_get());
-
-		while(1)
-		{
-			CSnapshotStorage::CHolder *pCur = m_aSnapshots[SNAP_CURRENT];
-			int64 TickStart = (pCur->m_Tick) * Freq / SERVER_TICK_SPEED;
-
-			if(TickStart < Now)
-			{
-				CSnapshotStorage::CHolder *pNext = m_aSnapshots[SNAP_CURRENT]->m_pNext;
-				if(pNext)
-				{
-					m_aSnapshots[SNAP_PREV] = m_aSnapshots[SNAP_CURRENT];
-					m_aSnapshots[SNAP_CURRENT] = pNext;
-
-					// set ticks
-					m_CurGameTick = m_aSnapshots[SNAP_CURRENT]->m_Tick;
-					m_PrevGameTick = m_aSnapshots[SNAP_PREV]->m_Tick;
-
-					if(m_aSnapshots[SNAP_CURRENT] && m_aSnapshots[SNAP_PREV])
-					{
-						GameClient()->OnNewSnapshot();
-					}
-				}
-				else
-					break;
-			}
-			else
-				break;
-		}
-
-		if(m_aSnapshots[SNAP_CURRENT] && m_aSnapshots[SNAP_PREV])
-		{
-			int64 CurtickStart = m_aSnapshots[SNAP_CURRENT]->m_Tick * Freq / SERVER_TICK_SPEED;
-			int64 PrevtickStart = m_aSnapshots[SNAP_PREV]->m_Tick * Freq / SERVER_TICK_SPEED;
-			int PrevPredTick = (int)(PredNow * SERVER_TICK_SPEED / Freq);
-			int NewPredTick = PrevPredTick+1;
-
-			m_GameIntraTick = (Now - PrevtickStart) / (float)(CurtickStart-PrevtickStart);
-			m_GameTickTime = (Now - PrevtickStart) / (float)Freq;
-
-			CurtickStart = NewPredTick * Freq / SERVER_TICK_SPEED;
-			PrevtickStart = PrevPredTick * Freq / SERVER_TICK_SPEED;
-			m_PredIntraTick = (PredNow - PrevtickStart) / (float)(CurtickStart-PrevtickStart);
-
-			if(NewPredTick < m_aSnapshots[SNAP_PREV]->m_Tick-SERVER_TICK_SPEED || NewPredTick > m_aSnapshots[SNAP_PREV]->m_Tick+SERVER_TICK_SPEED)
-			{
-				dbg_msg("client", "prediction time reset!");
-				m_PredictedTime.Init(m_aSnapshots[SNAP_CURRENT]->m_Tick * Freq / SERVER_TICK_SPEED);
-			}
-
-			if(NewPredTick > m_PredTick)
-			{
-				m_PredTick = NewPredTick;
-
-				// send input
-				SendInput();
-			}
-		}
-	}
-
-	// pump the network
 	PumpNetwork();
-}
-
-void CClient::VersionUpdate()
-{
-	// static const unsigned char VERSIONSRV_GETVERSION[] = {255, 255, 255, 255, 'v', 'e', 'r', 'g'};
-	// if(m_VersionInfo.m_State == CVersionInfo::STATE_INIT)
-	// {
-	// 	net_host_lookup(&m_VersionInfo.m_VersionServeraddr, "127.0.0.1", m_ContactClient.NetType()); // TODO: this doesnt work like that
-	// 	m_VersionInfo.m_State = CVersionInfo::STATE_START;
-	// }
-	// else if(m_VersionInfo.m_State == CVersionInfo::STATE_START)
-	// {
-	// 	if(m_VersionInfo.m_VersionServeraddr.m_Job.Status() == CJob::STATE_DONE)
-	// 	{
-	// 		if(m_VersionInfo.m_VersionServeraddr.m_Job.Result() == 0)
-	// 		{
-	// 			CNetChunk Packet;
-
-	// 			mem_zero(&Packet, sizeof(Packet));
-
-	// 			m_VersionInfo.m_VersionServeraddr.m_Addr.port = 8285;
-
-	// 			Packet.m_ClientID = -1;
-	// 			Packet.m_Address = m_VersionInfo.m_VersionServeraddr.m_Addr;
-	// 			Packet.m_pData = VERSIONSRV_GETVERSION;
-	// 			Packet.m_DataSize = sizeof(VERSIONSRV_GETVERSION);
-	// 			Packet.m_Flags = NETSENDFLAG_CONNLESS;
-
-	// 			m_ContactClient.Send(&Packet);
-	// 			m_VersionInfo.m_State = CVersionInfo::STATE_READY;
-	// 		}
-	// 		else
-	// 			m_VersionInfo.m_State = CVersionInfo::STATE_ERROR;
-	// 	}
-	// }
-}
-
-void CClient::RegisterInterfaces()
-{
-}
-
-void CClient::InitInterfaces()
-{
-	// fetch interfaces
-	m_pEngine = Kernel()->RequestInterface<IEngine>();
-	m_pGameClient = Kernel()->RequestInterface<IGameClient>();
-}
-
-void CClient::Run()
-{
-	m_LocalStartTime = time_get();
-	m_SnapshotParts = 0;
-
-	// open socket
-	{
-		NETADDR BindAddr;
-		mem_zero(&BindAddr, sizeof(BindAddr));
-		BindAddr.type = NETTYPE_ALL;
-		if(!m_NetClient.Open(BindAddr, Engine(), BindAddr.port ? 0 : NETCREATE_FLAG_RANDOMPORT))
-		{
-			dbg_msg("client", "couldn't open socket(net)");
-			return;
-		}
-		BindAddr.port = 0;
-		if(!m_ContactClient.Open(BindAddr, Engine(), 0))
-		{
-			dbg_msg("client", "couldn't open socket(contact)");
-			return;
-		}
-	}
-
-
-	char aBuf[256];
-	str_format(aBuf, sizeof(aBuf), "netversion %s", GameClient()->NetVersion());
-	dbg_msg("client", "%s", aBuf);
-	if(str_comp(GameClient()->NetVersionHashUsed(), GameClient()->NetVersionHashReal()))
-	{
-		dbg_msg("client", "WARNING: netversion hash differs");
-	}
-	str_format(aBuf, sizeof(aBuf), "game version %s", GameClient()->Version());
-	dbg_msg("client", "%s", aBuf);
-
-	//
-	m_FpsGraph.Init(0.0f, 120.0f);
-
-	while (1)
-	{
-		//
-		VersionUpdate();
-
-		// handle pending connects
-		if(m_aCmdConnect[0])
-		{
-			Connect(m_aCmdConnect);
-			m_aCmdConnect[0] = 0;
-		}
-
-		Update();
-
-		// check conditions
-		if(State() == IClient::STATE_QUITING)
-			break;
-
-		// beNice
-		thread_sleep(100);
-
-		// update local time
-		m_LocalTime = (time_get()-m_LocalStartTime)/(float)time_freq();
-	}
-
-	Disconnect();
-}
-
-int64 CClient::TickStartTime(int Tick)
-{
-	return m_LocalStartTime + (time_freq()*Tick)/m_GameTickSpeed;
 }
 
 static CClient *CreateClient()
@@ -1160,55 +874,14 @@ static CClient *CreateClient()
 	return new(pClient) CClient;
 }
 
-void CClient::ConnectOnStart(const char *pAddress)
-{
-	str_copy(m_aCmdConnect, pAddress, sizeof(m_aCmdConnect));
-}
-
-/*
-	Server Time
-	Client Mirror Time
-	Client Predicted Time
-
-	Snapshot Latency
-		Downstream latency
-
-	Prediction Latency
-		Upstream latency
-*/
-#if defined(CONF_PLATFORM_MACOSX)
-extern "C" int TWMain(int argc, const char **argv) // ignore_convention
-#else
 int main(int argc, const char **argv) // ignore_convention
-#endif
 {
-	cmdline_fix(&argc, &argv);
-#if defined(CONF_FAMILY_WINDOWS)
-	bool QuickEditMode = false;
-	for(int i = 1; i < argc; i++) // ignore_convention
-	{
-		if(str_comp("--quickeditmode", argv[i]) == 0) // ignore_convention
-		{
-			QuickEditMode = true;
-		}
-	}
-#endif
-
-	bool RandInitFailed = secure_random_init() != 0;
-
 	CClient *pClient = CreateClient();
 	IKernel *pKernel = IKernel::Create();
 	pKernel->RegisterInterface(pClient);
-	pClient->RegisterInterfaces();
 
 	// create the components
 	IEngine *pEngine = CreateEngine("Teeworlds");
-
-	if(RandInitFailed)
-	{
-		dbg_msg("secure", "could not initialize secure RNG");
-		return -1;
-	}
 
 	{
 		bool RegisterFail = false;
@@ -1224,34 +897,11 @@ int main(int argc, const char **argv) // ignore_convention
 
 	pEngine->Init();
 
-	// init client's interfaces
-	pClient->InitInterfaces();
-
-	// parse the command line arguments
-	if(argc > 1) // ignore_convention
-	{
-		const char *pAddress = 0;
-		if(argc == 2)
-		{
-			pAddress = str_startswith(argv[1], "teeworlds:");
-		}
-		if(pAddress)
-		{
-			pClient->ConnectOnStart(pAddress);
-		}
-	}
-
-	// run the client
-	dbg_msg("client", "starting...");
-	pClient->Run();
-
 	// free components
 	pClient->~CClient();
 	mem_free(pClient);
 	delete pKernel;
 	delete pEngine;
 
-	secure_random_uninit();
-	cmdline_free(argc, argv);
 	return 0;
 }

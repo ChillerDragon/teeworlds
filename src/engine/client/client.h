@@ -164,9 +164,6 @@ public:
 
 	void OnClientOnline();
 
-	virtual void Connect(const char *pAddress);
-	void DisconnectWithReason(const char *pReason);
-	virtual void Disconnect();
 	const char *ServerAddress() const { return m_aServerAddressStr; }
 
 
@@ -178,8 +175,6 @@ public:
 	int SnapNumItems(int SnapID) const;
 	void *SnapNewItem(int Type, int ID, int Size);
 	void SnapSetStaticsize(int ItemType, int Size);
-
-	virtual const char *ErrorString() const;
 
 	void ProcessConnlessPacket(CNetChunk *pPacket);
 	void ProcessServerPacket(CNetChunk *pPacket);
@@ -193,12 +188,5 @@ public:
 	void PumpNetwork();
 
 	void Update();
-
-	void RegisterInterfaces();
-	void InitInterfaces();
-
-	void Run();
-
-	void ConnectOnStart(const char *pAddress);
 };
 #endif

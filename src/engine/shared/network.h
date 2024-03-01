@@ -328,8 +328,6 @@ private:
 	int64 m_LastRecvTime;
 	int64 m_LastSendTime;
 
-	char m_ErrorString[256];
-
 	CNetPacketConstruct m_Construct;
 
 	TOKEN m_Token;
@@ -342,7 +340,6 @@ private:
 	//
 	void Reset();
 	void ResetStats();
-	void SetError(const char *pString);
 	void AckChunks(int Ack);
 
 	int QueueChunkEx(int Flags, int DataSize, const void *pData, int Sequence);
@@ -370,13 +367,10 @@ public:
 	int QueueChunk(int Flags, int DataSize, const void *pData);
 	void SendPacketConnless(const char *pData, int DataSize);
 
-	const char *ErrorString();
 	void SignalResend();
 	int State() const { return m_State; }
 	const NETADDR *PeerAddress() const { return &m_PeerAddr; }
 
-	void ResetErrorString() { m_ErrorString[0] = 0; }
-	const char *ErrorString() const { return m_ErrorString; }
 
 	// Needed for GotProblems in NetClient
 	int64 LastRecvTime() const { return m_LastRecvTime; }
@@ -398,8 +392,6 @@ private:
 	char m_aBuffer[NET_MAX_PACKETSIZE];
 	int m_BufferOffset;
 
-	char m_aErrorString[256];
-
 	bool m_LineEndingDetected;
 	char m_aLineEnding[3];
 
@@ -409,7 +401,6 @@ public:
 
 	int State() const { return m_State; }
 	const NETADDR *PeerAddress() const { return &m_PeerAddr; }
-	const char *ErrorString() const { return m_aErrorString; }
 
 	void Reset();
 	int Update();
@@ -548,12 +539,9 @@ public:
 	int Update();
 	int Flush();
 
-	int ResetErrorString();
-
 	// error and state
 	int State() const;
 	bool GotProblems() const;
-	const char *ErrorString() const;
 };
 
 #endif
