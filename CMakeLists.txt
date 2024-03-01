@@ -449,7 +449,6 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   network_console.cpp
   network_console_conn.cpp
   network_server.cpp
-  network_token.cpp
   packer.cpp
   packer.h
   protocol.h

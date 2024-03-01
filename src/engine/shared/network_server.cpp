@@ -20,9 +20,6 @@ bool CNetServer::Open(NETADDR BindAddr,
 	// init
 	Init(Socket);
 
-	m_TokenManager.Init(this);
-	m_TokenCache.Init(this, &m_TokenManager);
-
 	m_NumClients = 0;
 	SetMaxClients(MaxClients);
 	SetMaxClientsPerIP(MaxClientsPerIP);
@@ -70,9 +67,6 @@ int CNetServer::Update()
 			Drop(i, "error");
 		}
 	}
-
-	m_TokenManager.Update();
-	m_TokenCache.Update();
 
 	return 0;
 }
@@ -132,10 +126,6 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 			if(Found)
 				continue;
 
-			int Accept = m_TokenManager.ProcessMessage(&Addr, &m_RecvUnpacker.m_Data);
-			if(Accept <= 0)
-				continue;
-
 			if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONTROL)
 			{
 				if(m_RecvUnpacker.m_Data.m_aChunkData[0] == NET_CTRLMSG_CONNECT)
@@ -187,7 +177,9 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 					}
 				}
 				else if(m_RecvUnpacker.m_Data.m_aChunkData[0] == NET_CTRLMSG_TOKEN)
-					m_TokenCache.AddToken(&Addr, m_RecvUnpacker.m_Data.m_ResponseToken, NET_TOKENFLAG_RESPONSEONLY);
+				{
+					dbg_msg("server", "got client token = %d", m_RecvUnpacker.m_Data.m_ResponseToken);
+				}
 			}
 			else if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONNLESS)
 			{
@@ -233,13 +225,13 @@ int CNetServer::Send(CNetChunk *pChunk, TOKEN Token)
 
 		if(Token != NET_TOKEN_NONE)
 		{
-			SendPacketConnless(&pChunk->m_Address, Token, m_TokenManager.GenerateToken(&pChunk->m_Address), pChunk->m_pData, pChunk->m_DataSize);
+			SendPacketConnless(&pChunk->m_Address, Token, NET_TOKEN_SOME, pChunk->m_pData, pChunk->m_DataSize);
 		}
 		else
 		{
 			if(pChunk->m_ClientID == -1)
 			{
-				m_TokenCache.SendPacketConnless(&pChunk->m_Address, pChunk->m_pData, pChunk->m_DataSize);
+				SendPacketConnless(&pChunk->m_Address, Token, NET_TOKEN_SOME, pChunk->m_pData, pChunk->m_DataSize);
 			}
 			else
 			{

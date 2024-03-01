@@ -20,9 +20,6 @@ bool CNetClient::Open(NETADDR BindAddr, int Flags)
 	Init(Socket);
 	m_Connection.Init(this, false);
 
-	m_TokenManager.Init(this);
-	m_TokenCache.Init(this, &m_TokenManager);
-
 	m_Flags = Flags;
 
 	return true;
@@ -44,8 +41,6 @@ int CNetClient::Disconnect(const char *pReason)
 int CNetClient::Update()
 {
 	m_Connection.Update();
-	m_TokenManager.Update();
-	m_TokenCache.Update();
 	return 0;
 }
 
@@ -82,16 +77,14 @@ int CNetClient::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 			}
 			else
 			{
-				int Accept = m_TokenManager.ProcessMessage(&Addr, &m_RecvUnpacker.m_Data);
-				if(!Accept)
-					continue;
-
 				if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONTROL)
 				{
 					if(m_RecvUnpacker.m_Data.m_aChunkData[0] == NET_CTRLMSG_TOKEN)
-						m_TokenCache.AddToken(&Addr, m_RecvUnpacker.m_Data.m_ResponseToken, NET_TOKENFLAG_ALLOWBROADCAST|NET_TOKENFLAG_RESPONSEONLY);
+					{
+						dbg_msg("client", "got token = %d", m_RecvUnpacker.m_Data.m_ResponseToken);
+					}
 				}
-				else if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONNLESS && Accept != -1)
+				else if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONNLESS)
 				{
 					pChunk->m_Flags = NETSENDFLAG_CONNLESS;
 					pChunk->m_ClientID = -1;
@@ -128,13 +121,13 @@ int CNetClient::Send(CNetChunk *pChunk, TOKEN Token, CSendCBData *pCallbackData)
 
 		if(Token != NET_TOKEN_NONE)
 		{
-			SendPacketConnless(&pChunk->m_Address, Token, m_TokenManager.GenerateToken(&pChunk->m_Address), pChunk->m_pData, pChunk->m_DataSize);
+			SendPacketConnless(&pChunk->m_Address, Token, NET_TOKEN_SOME, pChunk->m_pData, pChunk->m_DataSize);
 		}
 		else
 		{
 			if(pChunk->m_ClientID == -1)
 			{
-				m_TokenCache.SendPacketConnless(&pChunk->m_Address, pChunk->m_pData, pChunk->m_DataSize, pCallbackData);
+				SendPacketConnless(&pChunk->m_Address, Token, NET_TOKEN_SOME, pChunk->m_pData, pChunk->m_DataSize);
 			}
 			else
 			{
@@ -167,5 +160,4 @@ int CNetClient::Send(CNetChunk *pChunk, TOKEN Token, CSendCBData *pCallbackData)
 
 void CNetClient::PurgeStoredPacket(int TrackID)
 {
-	m_TokenCache.PurgeStoredPacket(TrackID);
 }

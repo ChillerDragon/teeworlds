@@ -206,31 +206,6 @@ public:
 	int UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketConstruct *pPacket);
 };
 
-class CNetTokenManager
-{
-public:
-	void Init(CNetBase *pNetBase, int SeedTime = NET_SEEDTIME);
-	void Update();
-
-	void GenerateSeed();
-
-	int ProcessMessage(const NETADDR *pAddr, const CNetPacketConstruct *pPacket);
-
-	bool CheckToken(const NETADDR *pAddr, TOKEN Token, TOKEN ResponseToken, bool *BroadcastResponse);
-	TOKEN GenerateToken(const NETADDR *pAddr) const;
-	static TOKEN GenerateToken(const NETADDR *pAddr, int64 Seed);
-
-private:
-	CNetBase *m_pNetBase;
-
-	int64 m_Seed;
-	int64 m_PrevSeed;
-
-	TOKEN m_GlobalToken;
-	TOKEN m_PrevGlobalToken;
-
-};
-
 typedef void(*FSendCallback)(int TrackID, void *pUser);
 struct CSendCBData
 {
@@ -238,57 +213,6 @@ struct CSendCBData
 	void *m_pCallbackUser;
 	int m_TrackID;
 };
-
-class CNetTokenCache
-{
-public:
-	CNetTokenCache();
-	~CNetTokenCache();
-	void Init(CNetBase *pNetBase, const CNetTokenManager *pTokenManager);
-	void SendPacketConnless(const NETADDR *pAddr, const void *pData, int DataSize, CSendCBData *pCallbackData = 0);
-	void PurgeStoredPacket(int TrackID);
-	void FetchToken(const NETADDR *pAddr);
-	void AddToken(const NETADDR *pAddr, TOKEN PeerToken, int TokenFlag);
-	TOKEN GetToken(const NETADDR *pAddr);
-	void Update();
-
-private:
-	class CConnlessPacketInfo
-	{
-	private:
-		static int m_UniqueID;
-
-	public:
-		CConnlessPacketInfo() : m_TrackID(CConnlessPacketInfo::m_UniqueID++) {}
-
-		NETADDR m_Addr;
-		int m_DataSize;
-		char m_aData[NET_MAX_PAYLOAD];
-		int64 m_Expiry;
-		int64 m_LastTokenRequest;
-		const int m_TrackID;
-		FSendCallback m_pfnCallback;
-		void *m_pCallbackUser;
-		CConnlessPacketInfo *m_pNext;
-	};
-
-	struct CAddressInfo
-	{
-		NETADDR m_Addr;
-		TOKEN m_Token;
-		int64 m_Expiry;
-	};
-
-	TStaticRingBuffer<CAddressInfo,
-	                  NET_TOKENCACHE_SIZE * sizeof(CAddressInfo),
-	                  CRingBufferBase::FLAG_RECYCLE> m_TokenCache;
-
-	CConnlessPacketInfo *m_pConnlessPacketList; // TODO: enhance this, dynamic linked lists
-	                                            // are bad for performance
-	CNetBase *m_pNetBase;
-	const CNetTokenManager *m_pTokenManager;
-};
-
 
 class CNetConnection
 {
@@ -430,9 +354,6 @@ class CNetServer : public CNetBase
 
 	CNetRecvUnpacker m_RecvUnpacker;
 
-	CNetTokenManager m_TokenManager;
-	CNetTokenCache m_TokenCache;
-
 public:
 	//
 	bool Open(NETADDR BindAddr,
@@ -498,9 +419,6 @@ class CNetClient : public CNetBase
 {
 	CNetConnection m_Connection;
 	CNetRecvUnpacker m_RecvUnpacker;
-
-	CNetTokenCache m_TokenCache;
-	CNetTokenManager m_TokenManager;
 
 	int m_Flags;
 
