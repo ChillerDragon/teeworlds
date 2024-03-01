@@ -11,9 +11,11 @@
 
 class CCharacter
 {
-	MACRO_ALLOC_POOL_ID()
-
 public:
+	void *operator new(size_t Size, int id);
+	void operator delete(void *p, int id);
+	void operator delete(void *p);
+
 	vec2 m_Pos;
 	vec2 GetPos() { return m_Pos; }
 	//character's size

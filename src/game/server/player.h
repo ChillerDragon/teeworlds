@@ -16,9 +16,12 @@ enum
 // player object
 class CPlayer
 {
-	MACRO_ALLOC_POOL_ID()
 
 public:
+	void *operator new(size_t Size, int id);
+	void operator delete(void *p, int id);
+	void operator delete(void *p);
+
 	CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, bool AsSpec = false);
 	~CPlayer();
 

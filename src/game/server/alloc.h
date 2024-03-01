@@ -23,13 +23,6 @@
 	} \
 	private:
 
-#define MACRO_ALLOC_POOL_ID() \
-	public: \
-	void *operator new(size_t Size, int id); \
-	void operator delete(void *p, int id); \
-	void operator delete(void *p); \
-	private:
-
 #define MACRO_ALLOC_POOL_ID_IMPL(POOLTYPE, PoolSize) \
 	static char ms_PoolData##POOLTYPE[PoolSize][sizeof(POOLTYPE)] = {{0}}; \
 	static int ms_PoolUsed##POOLTYPE[PoolSize] = {0}; \

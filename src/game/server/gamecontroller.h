@@ -29,7 +29,6 @@ class IGameController
 		TBALANCE_OK,
 	};
 	int m_aTeamSize[NUM_TEAMS];
-	int m_UnbalancedTick;
 
 	virtual bool CanBeMovedOnBalance(int ClientID) const;
 

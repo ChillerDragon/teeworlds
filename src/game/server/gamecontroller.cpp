@@ -16,7 +16,6 @@ IGameController::IGameController(CGameContext *pGameServer)
 	// balancing
 	m_aTeamSize[TEAM_RED] = 0;
 	m_aTeamSize[TEAM_BLUE] = 0;
-	m_UnbalancedTick = TBALANCE_OK;
 
 	// game
 	m_GameState = IGS_GAME_RUNNING;
@@ -113,7 +112,6 @@ void IGameController::OnPlayerDisconnect(CPlayer *pPlayer)
 	if(pPlayer->GetTeam() != TEAM_SPECTATORS)
 	{
 		--m_aTeamSize[pPlayer->GetTeam()];
-		m_UnbalancedTick = TBALANCE_CHECK;
 	}
 
 	CheckReadyStates(ClientID);
@@ -685,12 +683,10 @@ void IGameController::DoTeamChange(CPlayer *pPlayer, int Team, bool DoChatMsg)
 	if(OldTeam != TEAM_SPECTATORS)
 	{
 		--m_aTeamSize[OldTeam];
-		m_UnbalancedTick = TBALANCE_CHECK;
 	}
 	if(Team != TEAM_SPECTATORS)
 	{
 		++m_aTeamSize[Team];
-		m_UnbalancedTick = TBALANCE_CHECK;
 		if(m_GameState == IGS_WARMUP_GAME && HasEnoughPlayers())
 			SetGameState(IGS_WARMUP_GAME, 0);
 		pPlayer->m_IsReadyToPlay = !IsPlayerReadyMode();
