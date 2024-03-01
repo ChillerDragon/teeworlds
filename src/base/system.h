@@ -883,128 +883,6 @@ int str_comp(const char *a, const char *b);
 int str_comp_num(const char *a, const char *b, const int num);
 
 /*
-	Function: str_comp_filenames
-		Compares two strings case sensitive, digit chars will be compared as numbers.
-
-	Parameters:
-		a - String to compare.
-		b - String to compare.
-
-	Returns:
-		<0 - String a is lesser then string b
-		0 - String a is equal to string b
-		>0 - String a is greater then string b
-
-	Remarks:
-		- The strings are treated as zero-terminated strings.
-*/
-int str_comp_filenames(const char *a, const char *b);
-
-/*
-	Function: str_startswith_nocase
-		Checks case insensitive whether the string begins with a certain prefix.
-
-	Parameter:
-		str - String to check.
-		prefix - Prefix to look for.
-
-	Returns:
-		A pointer to the string str after the string prefix, or 0 if
-		the string prefix isn't a prefix of the string str.
-
-	Remarks:
-		- The strings are treated as zero-terminated strings.
-*/
-const char *str_startswith_nocase(const char *str, const char *prefix);
-
-
-/*
-	Function: str_startswith
-		Checks case sensitive whether the string begins with a certain prefix.
-
-	Parameter:
-		str - String to check.
-		prefix - Prefix to look for.
-
-	Returns:
-		A pointer to the string str after the string prefix, or 0 if
-		the string prefix isn't a prefix of the string str.
-
-	Remarks:
-		- The strings are treated as zero-terminated strings.
-*/
-const char *str_startswith(const char *str, const char *prefix);
-
-/*
-	Function: str_endswith_nocase
-		Checks case insensitive whether the string ends with a certain suffix.
-
-	Parameter:
-		str - String to check.
-		suffix - Suffix to look for.
-
-	Returns:
-		A pointer to the beginning of the suffix in the string str, or
-		0 if the string suffix isn't a suffix of the string str.
-
-	Remarks:
-		- The strings are treated as zero-terminated strings.
-*/
-const char *str_endswith_nocase(const char *str, const char *suffix);
-
-/*
-	Function: str_endswith
-		Checks case sensitive whether the string ends with a certain suffix.
-
-	Parameter:
-		str - String to check.
-		suffix - Suffix to look for.
-
-	Returns:
-		A pointer to the beginning of the suffix in the string str, or
-		0 if the string suffix isn't a suffix of the string str.
-
-	Remarks:
-		- The strings are treated as zero-terminated strings.
-*/
-const char *str_endswith(const char *str, const char *suffix);
-
-/*
-	Function: str_find_nocase
-		Finds a string inside another string case insensitive.
-
-	Parameters:
-		haystack - String to search in
-		needle - String to search for
-
-	Returns:
-		A pointer into haystack where the needle was found.
-		Returns NULL of needle could not be found.
-
-	Remarks:
-		- Only garanted to work with a-z/A-Z.
-		- The strings are treated as zero-terminated strings.
-*/
-const char *str_find_nocase(const char *haystack, const char *needle);
-
-/*
-	Function: str_find
-		Finds a string inside another string case sensitive.
-
-	Parameters:
-		haystack - String to search in
-		needle - String to search for
-
-	Returns:
-		A pointer into haystack where the needle was found.
-		Returns NULL of needle could not be found.
-
-	Remarks:
-		- The strings are treated as zero-terminated strings.
-*/
-const char *str_find(const char *haystack, const char *needle);
-
-/*
 	Function: str_hex
 		Takes a datablock and generates a hexstring of it.
 
@@ -1112,7 +990,6 @@ int str_toint(const char *str);
 float str_tofloat(const char *str);
 int str_isspace(char c);
 char str_uppercase(char c);
-unsigned str_quickhash(const char *str);
 
 enum
 {

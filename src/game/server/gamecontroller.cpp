@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
 #include "entities/character.h"
-#include "entities/pickup.h"
 #include "gamecontext.h"
 #include "gamecontroller.h"
 #include "player.h"

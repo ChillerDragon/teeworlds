@@ -130,7 +130,6 @@ private:
 	// used for spectator mode
 	int m_SpecMode;
 	int m_SpectatorID;
-	class CFlag *m_pSpecFlag;
 	bool m_ActiveSpecSwitch;
 };
 

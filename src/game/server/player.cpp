@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
 #include "entities/character.h"
-#include "entities/flag.h"
 #include "gamecontext.h"
 #include "gamecontroller.h"
 #include "player.h"
@@ -57,7 +56,6 @@ CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, bool AsSpe
 	m_Team = AsSpec ? TEAM_SPECTATORS : GameServer()->m_pController->GetStartTeam();
 	m_SpecMode = SPEC_FREEVIEW;
 	m_SpectatorID = -1;
-	m_pSpecFlag = 0;
 	m_ActiveSpecSwitch = 0;
 	m_LastActionTick = Server()->Tick();
 	m_TeamChangeTick = Server()->Tick();
@@ -118,12 +116,9 @@ void CPlayer::Tick()
 		if(!m_pCharacter && m_DieTick+Server()->TickSpeed()*3 <= Server()->Tick() && !m_DeadSpecMode)
 			Respawn();
 
-		if(!m_pCharacter && m_Team == TEAM_SPECTATORS && m_pSpecFlag)
+		if(!m_pCharacter && m_Team == TEAM_SPECTATORS)
 		{
-			if(m_pSpecFlag->GetCarrier())
-				m_SpectatorID = m_pSpecFlag->GetCarrier()->GetPlayer()->GetCID();
-			else
-				m_SpectatorID = -1;
+			m_SpectatorID = -1;
 		}
 
 		if(m_pCharacter)
@@ -162,9 +157,7 @@ void CPlayer::PostTick()
 	// update view pos for spectators and dead players
 	if((m_Team == TEAM_SPECTATORS || m_DeadSpecMode) && m_SpecMode != SPEC_FREEVIEW)
 	{
-		if(m_pSpecFlag)
-			m_ViewPos = m_pSpecFlag->GetPos();
-		else if (GameServer()->m_apPlayers[m_SpectatorID])
+		if (GameServer()->m_apPlayers[m_SpectatorID])
 			m_ViewPos = GameServer()->m_apPlayers[m_SpectatorID]->m_ViewPos;
 	}
 }
@@ -198,16 +191,8 @@ void CPlayer::Snap(int SnappingClient)
 
 		pSpectatorInfo->m_SpecMode = m_SpecMode;
 		pSpectatorInfo->m_SpectatorID = m_SpectatorID;
-		if(m_pSpecFlag)
-		{
-			pSpectatorInfo->m_X = m_pSpecFlag->GetPos().x;
-			pSpectatorInfo->m_Y = m_pSpecFlag->GetPos().y;
-		}
-		else
-		{
-			pSpectatorInfo->m_X = m_ViewPos.x;
-			pSpectatorInfo->m_Y = m_ViewPos.y;
-		}
+		pSpectatorInfo->m_X = m_ViewPos.x;
+		pSpectatorInfo->m_Y = m_ViewPos.y;
 	}
 }
 
@@ -353,7 +338,6 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 	m_LastActionTick = Server()->Tick();
 	m_SpecMode = SPEC_FREEVIEW;
 	m_SpectatorID = -1;
-	m_pSpecFlag = 0;
 	m_DeadSpecMode = false;
 
 	// we got to wait 0.5 secs before respawning

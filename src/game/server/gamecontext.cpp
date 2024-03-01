@@ -6,7 +6,6 @@
 #include <game/version.h>
 
 #include "entities/character.h"
-#include "entities/projectile.h"
 #include "gamemodes/dm.h"
 #include "gamecontext.h"
 #include "player.h"

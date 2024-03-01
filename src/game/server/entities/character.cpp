@@ -6,8 +6,6 @@
 #include <game/server/player.h>
 
 #include "character.h"
-#include "laser.h"
-#include "projectile.h"
 
 //input count
 struct CInputCount

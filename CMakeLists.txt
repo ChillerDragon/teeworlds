@@ -537,14 +537,6 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   alloc.h
   entities/character.cpp
   entities/character.h
-  entities/flag.cpp
-  entities/flag.h
-  entities/laser.cpp
-  entities/laser.h
-  entities/pickup.cpp
-  entities/pickup.h
-  entities/projectile.cpp
-  entities/projectile.h
   eventhandler.cpp
   eventhandler.h
   gamecontext.cpp
