@@ -186,20 +186,7 @@ public:
 
 class CNetBase
 {
-	class CNetInitializer
-	{
-	public:
-		CNetInitializer()
-		{
-			// init the network
-			net_init();
-		}
-	};
-	static CNetInitializer m_NetInitializer;
-
 	NETSOCKET m_Socket;
-	IOHANDLE m_DataLogSent;
-	IOHANDLE m_DataLogRecv;
 	CHuffman m_Huffman;
 	unsigned char m_aRequestTokenBuf[NET_TOKENREQUEST_DATASIZE];
 

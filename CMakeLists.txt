@@ -429,8 +429,6 @@ set_src(BASE GLOB_RECURSE src/base
   math.h
   system.c
   system.h
-  tl/allocator.h
-  tl/string.h
   vmath.h
 )
 set_src(ENGINE_INTERFACE GLOB src/engine

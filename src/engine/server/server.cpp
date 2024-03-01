@@ -14,11 +14,6 @@
 
 #include "server.h"
 
-#if defined(CONF_FAMILY_WINDOWS)
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
-#endif
-
 #include <signal.h>
 
 volatile sig_atomic_t InterruptSignaled = 0;
@@ -1178,13 +1173,6 @@ int main(int argc, const char **argv) // ignore_convention
 	bool shutdown = false;
 	for(int i = 1; i < argc; i++) // ignore_convention
 	{
-#if defined(CONF_FAMILY_WINDOWS)
-		if(str_comp("-s", argv[i]) == 0 || str_comp("--silent", argv[i]) == 0) // ignore_convention
-		{
-			ShowWindow(GetConsoleWindow(), SW_HIDE);
-			break;
-		}
-#endif
 		if(str_comp("shutdown", argv[i]) == 0) // ignore_convention
 		{
 			shutdown = true;

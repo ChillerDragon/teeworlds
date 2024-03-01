@@ -91,13 +91,10 @@ int CNetRecvUnpacker::FetchChunk(CNetChunk *pChunk)
 		return 1;
 	}
 }
-CNetBase::CNetInitializer CNetBase::m_NetInitializer;
 
 CNetBase::CNetBase()
 {
 	net_invalidate_socket(&m_Socket);
-	m_DataLogSent = 0;
-	m_DataLogRecv = 0;
 }
 
 CNetBase::~CNetBase()
@@ -156,16 +153,6 @@ void CNetBase::SendPacket(const NETADDR *pAddr, CNetPacketConstruct *pPacket)
 	int CompressedSize = -1;
 	int FinalSize = -1;
 
-	// log the data
-	if(m_DataLogSent)
-	{
-		int Type = 1;
-		io_write(m_DataLogSent, &Type, sizeof(Type));
-		io_write(m_DataLogSent, &pPacket->m_DataSize, sizeof(pPacket->m_DataSize));
-		io_write(m_DataLogSent, &pPacket->m_aChunkData, pPacket->m_DataSize);
-		io_flush(m_DataLogSent);
-	}
-
 	dbg_assert((pPacket->m_Token&~NET_TOKEN_MASK) == 0, "token out of range");
 
 	// compress if not ctrl msg
@@ -203,16 +190,6 @@ void CNetBase::SendPacket(const NETADDR *pAddr, CNetPacketConstruct *pPacket)
 		dbg_assert(i == NET_PACKETHEADERSIZE, "inconsistency");
 
 		net_udp_send(m_Socket, pAddr, aBuffer, FinalSize);
-
-		// log raw socket data
-		if(m_DataLogSent)
-		{
-			int Type = 0;
-			io_write(m_DataLogSent, &Type, sizeof(Type));
-			io_write(m_DataLogSent, &FinalSize, sizeof(FinalSize));
-			io_write(m_DataLogSent, aBuffer, FinalSize);
-			io_flush(m_DataLogSent);
-		}
 	}
 }
 
@@ -223,16 +200,6 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 	// no more packets for now
 	if(Size <= 0)
 		return 1;
-
-	// log the data
-	if(m_DataLogRecv)
-	{
-		int Type = 0;
-		io_write(m_DataLogRecv, &Type, sizeof(Type));
-		io_write(m_DataLogRecv, &Size, sizeof(Size));
-		io_write(m_DataLogRecv, pBuffer, Size);
-		io_flush(m_DataLogRecv);
-	}
 
 	// check the size
 	if(Size < NET_PACKETHEADERSIZE || Size > NET_MAX_PACKETSIZE)
@@ -315,16 +282,6 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 					| (pPacket->m_aChunkData[3]<<8) | pPacket->m_aChunkData[4];
 			}
 		}
-	}
-
-	// log the data
-	if(m_DataLogRecv)
-	{
-		int Type = 1;
-		io_write(m_DataLogRecv, &Type, sizeof(Type));
-		io_write(m_DataLogRecv, &pPacket->m_DataSize, sizeof(pPacket->m_DataSize));
-		io_write(m_DataLogRecv, pPacket->m_aChunkData, pPacket->m_DataSize);
-		io_flush(m_DataLogRecv);
 	}
 
 	// return success

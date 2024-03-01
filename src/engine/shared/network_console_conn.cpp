@@ -13,15 +13,9 @@ void CConsoleNetConnection::Reset()
 	m_BufferOffset = 0;
 
 	m_LineEndingDetected = false;
-	#if defined(CONF_FAMILY_WINDOWS)
-		m_aLineEnding[0] = '\r';
-		m_aLineEnding[1] = '\n';
-		m_aLineEnding[2] = 0;
-	#else
-		m_aLineEnding[0] = '\n';
-		m_aLineEnding[1] = 0;
-		m_aLineEnding[2] = 0;
-	#endif
+	m_aLineEnding[0] = '\n';
+	m_aLineEnding[1] = 0;
+	m_aLineEnding[2] = 0;
 }
 
 void CConsoleNetConnection::Init(NETSOCKET Socket, const NETADDR *pAddr)
@@ -65,9 +59,6 @@ int CConsoleNetConnection::Update()
 		}
 		else if(Bytes < 0)
 		{
-			if(net_would_block()) // no data received
-				return 0;
-
 			m_State = NET_CONNSTATE_ERROR; // error
 			// str_copy(m_aErrorString, "connection failure", sizeof(m_aErrorString));
 			return -1;

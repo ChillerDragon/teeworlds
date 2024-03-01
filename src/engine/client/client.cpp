@@ -21,11 +21,6 @@
 
 #include "client.h"
 
-#if defined(CONF_FAMILY_WINDOWS)
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
-#endif
-
 #ifdef main
 #undef main
 #endif
@@ -51,7 +46,6 @@ CClient::CClient()
 	m_aMapdownloadFilename[0] = 0;
 	m_aMapdownloadFilenameTemp[0] = 0;
 	m_aMapdownloadName[0] = 0;
-	m_MapdownloadFileTemp = 0;
 	m_MapdownloadChunk = 0;
 	m_MapdownloadCrc = 0;
 	m_MapdownloadAmount = -1;
@@ -411,7 +405,10 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 			if(Unpacker.Error())
 				return;
 
-			io_write(m_MapdownloadFileTemp, pData, Size);
+			char aHex[512];
+			str_hex(aHex, sizeof(aHex), pData, Size);
+			dbg_msg("client", "map data=%s", aHex);
+
 			++m_MapdownloadChunk;
 			m_MapdownloadAmount += Size;
 
@@ -420,9 +417,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 				// map download complete
 				dbg_msg("client/network", "download complete, loading map");
 
-				if(m_MapdownloadFileTemp)
-					io_close(m_MapdownloadFileTemp);
-				m_MapdownloadFileTemp = 0;
 				m_MapdownloadAmount = 0;
 				m_MapdownloadTotalsize = -1;
 
