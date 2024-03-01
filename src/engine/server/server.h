@@ -4,7 +4,6 @@
 #define ENGINE_SERVER_SERVER_H
 
 #include <engine/server.h>
-#include <engine/shared/memheap.h>
 
 class CSnapIDPool
 {
@@ -147,7 +146,6 @@ public:
 		char m_aName[256];
 	};
 
-	CHeap *m_pMapListHeap;
 	CMapListEntry *m_pLastMapEntry;
 	CMapListEntry *m_pFirstMapEntry;
 	int m_NumMapEntries;
@@ -209,7 +207,6 @@ public:
 
 	void InitInterfaces(IKernel *pKernel);
 	int Run(bool shutdown);
-	void Free();
 
 	virtual int SnapNewID();
 	virtual void SnapFreeID(int ID);

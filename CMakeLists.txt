@@ -450,8 +450,6 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   huffman.cpp
   huffman.h
   kernel.cpp
-  memheap.cpp
-  memheap.h
   network.cpp
   network.h
   network_client.cpp

@@ -2,8 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/math.h>
 
-#include <engine/shared/memheap.h>
-
 #include <generated/server_data.h>
 #include <game/version.h>
 
@@ -36,9 +34,6 @@ void CGameContext::Construct(int Resetting)
 	m_pVoteOptionLast = 0;
 	m_NumVoteOptions = 0;
 	m_LockTeams = 0;
-
-	if(Resetting==NO_RESET)
-		m_pVoteOptionHeap = new CHeap();
 }
 
 CGameContext::CGameContext(int Resetting)
@@ -55,13 +50,10 @@ CGameContext::~CGameContext()
 {
 	for(int i = 0; i < MAX_CLIENTS; i++)
 		delete m_apPlayers[i];
-	if(!m_Resetting)
-		delete m_pVoteOptionHeap;
 }
 
 void CGameContext::Clear()
 {
-	CHeap *pVoteOptionHeap = m_pVoteOptionHeap;
 	CVoteOptionServer *pVoteOptionFirst = m_pVoteOptionFirst;
 	CVoteOptionServer *pVoteOptionLast = m_pVoteOptionLast;
 	int NumVoteOptions = m_NumVoteOptions;
@@ -70,7 +62,6 @@ void CGameContext::Clear()
 	mem_zero(this, sizeof(*this));
 	new (this) CGameContext(RESET);
 
-	m_pVoteOptionHeap = pVoteOptionHeap;
 	m_pVoteOptionFirst = pVoteOptionFirst;
 	m_pVoteOptionLast = pVoteOptionLast;
 	m_NumVoteOptions = NumVoteOptions;

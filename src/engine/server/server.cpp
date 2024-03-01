@@ -1025,7 +1025,6 @@ int CServer::Run(bool shutdown)
 		GetMaxClients(), GetMaxClientsPerIP(), NewClientCallback, DelClientCallback, this))
 	{
 		dbg_msg("server", "couldn't open socket. port %d might already be in use", GetPort());
-		Free();
 		return -1;
 	}
 
@@ -1142,24 +1141,7 @@ int CServer::Run(bool shutdown)
 	m_NetServer.Close(m_aShutdownReason);
 
 	GameServer()->OnShutdown();
-	Free();
-
 	return 0;
-}
-
-void CServer::Free()
-{
-	if(m_pCurrentMapData)
-	{
-		mem_free(m_pCurrentMapData);
-		m_pCurrentMapData = 0;
-	}
-
-	if(m_pMapListHeap)
-	{
-		delete m_pMapListHeap;
-		m_pMapListHeap = 0;
-	}
 }
 
 int CServer::SnapNewID()
