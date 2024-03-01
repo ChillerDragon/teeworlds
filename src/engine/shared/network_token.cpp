@@ -11,14 +11,12 @@ int CNetTokenCache::CConnlessPacketInfo::m_UniqueID = 0;
 void CNetTokenManager::Init(CNetBase *pNetBase, int SeedTime)
 {
 	m_pNetBase = pNetBase;
-	m_SeedTime = SeedTime;
 	GenerateSeed();
 }
 
 void CNetTokenManager::Update()
 {
-	if(time_get() > m_NextSeedTime)
-		GenerateSeed();
+	GenerateSeed();
 }
 
 int CNetTokenManager::ProcessMessage(const NETADDR *pAddr, const CNetPacketConstruct *pPacket)
@@ -64,8 +62,6 @@ void CNetTokenManager::GenerateSeed()
 
 	m_PrevGlobalToken = m_GlobalToken;
 	m_GlobalToken = GenerateToken(&NullAddr);
-
-	m_NextSeedTime = time_get() + time_freq() * m_SeedTime;
 }
 
 TOKEN CNetTokenManager::GenerateToken(const NETADDR *pAddr) const
@@ -75,52 +71,12 @@ TOKEN CNetTokenManager::GenerateToken(const NETADDR *pAddr) const
 
 TOKEN CNetTokenManager::GenerateToken(const NETADDR *pAddr, int64 Seed)
 {
-	static const NETADDR NullAddr = { 0 };
-	NETADDR Addr;
-	char aBuf[sizeof(NETADDR) + sizeof(int64)];
-	unsigned int Result;
-
-	if(pAddr->type & NETTYPE_LINK_BROADCAST)
-		return GenerateToken(&NullAddr, Seed);
-
-	mem_zero(&Addr, sizeof(NETADDR));
-	mem_copy(Addr.ip, pAddr->ip, sizeof(Addr.ip));
-	Addr.type = pAddr->type;
-
-	mem_copy(aBuf, &Addr, sizeof(NETADDR));
-	mem_copy(aBuf + sizeof(NETADDR), &Seed, sizeof(int64));
-
-	Result = Addr.ip[0] & NET_TOKEN_MASK;
-	if(Result == NET_TOKEN_NONE)
-		Result--;
-
-	return Result;
+	return NET_TOKEN_SOME;
 }
 
 bool CNetTokenManager::CheckToken(const NETADDR *pAddr, TOKEN Token, TOKEN ResponseToken, bool *BroadcastResponse)
 {
-	TOKEN CurrentToken = GenerateToken(pAddr, m_Seed);
-	if(CurrentToken == Token)
-		return true;
-
-	if(GenerateToken(pAddr, m_PrevSeed) == Token)
-	{
-		// no need to notify the peer, just a one time thing
-		return true;
-	}
-	else if(Token == m_GlobalToken)
-	{
-		*BroadcastResponse = true;
-		return true;
-	}
-	else if(Token == m_PrevGlobalToken)
-	{
-		// no need to notify the peer, just a broadcast token response
-		*BroadcastResponse = true;
-		return true;
-	}
-
-	return false;
+	return true;
 }
 
 
@@ -157,7 +113,7 @@ void CNetTokenCache::SendPacketConnless(const NETADDR *pAddr, const void *pData,
 	TOKEN Token = GetToken(pAddr);
 	if(Token != NET_TOKEN_NONE)
 	{
-		m_pNetBase->SendPacketConnless(pAddr, Token, m_pTokenManager->GenerateToken(pAddr), pData, DataSize);
+		m_pNetBase->SendPacketConnless(pAddr, Token, NET_TOKEN_SOME, pData, DataSize);
 	}
 	else
 	{

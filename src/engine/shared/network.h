@@ -242,8 +242,6 @@ private:
 	TOKEN m_GlobalToken;
 	TOKEN m_PrevGlobalToken;
 
-	int m_SeedTime;
-	int64 m_NextSeedTime;
 };
 
 typedef void(*FSendCallback)(int TrackID, void *pUser);
