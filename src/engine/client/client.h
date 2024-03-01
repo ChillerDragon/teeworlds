@@ -166,18 +166,9 @@ public:
 
 	void SendInput();
 
-	// TODO: OPT: do this alot smarter!
-	virtual const int *GetInput(int Tick) const;
-
 	const char *LatestVersion() const;
 	void VersionUpdate();
 
-	// ------ state handling -----
-	void SetState(int s);
-
-	// called when the map is loaded and we should init for a new round
-	void OnEnterGame();
-	virtual void EnterGame();
 	void OnClientOnline();
 
 	virtual void Connect(const char *pAddress);
@@ -195,13 +186,7 @@ public:
 	void *SnapNewItem(int Type, int ID, int Size);
 	void SnapSetStaticsize(int ItemType, int Size);
 
-	void Render();
-	void DebugRender();
-
-	virtual void Quit();
-
 	virtual const char *ErrorString() const;
-
 
 	void ProcessConnlessPacket(CNetChunk *pPacket);
 	void ProcessServerPacket(CNetChunk *pPacket);
@@ -222,8 +207,5 @@ public:
 	void Run();
 
 	void ConnectOnStart(const char *pAddress);
-
-	// chillers verbose network printer
-	void PrintSnapshot(int Msg, CUnpacker &Unpacker);
 };
 #endif

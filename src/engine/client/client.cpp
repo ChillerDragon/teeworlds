@@ -328,82 +328,6 @@ const char *CClient::LatestVersion() const
 	return m_aVersionStr;
 }
 
-// TODO: OPT: do this alot smarter!
-const int *CClient::GetInput(int Tick) const
-{
-	int Best = -1;
-	for(int i = 0; i < 200; i++)
-	{
-		if(m_aInputs[i].m_Tick <= Tick && (Best == -1 || m_aInputs[Best].m_Tick < m_aInputs[i].m_Tick))
-			Best = i;
-	}
-
-	if(Best != -1)
-		return (const int *)m_aInputs[Best].m_aData;
-	return 0;
-}
-
-// ------ state handling -----
-void CClient::SetState(int s)
-{
-	if(m_State == IClient::STATE_QUITING)
-		return;
-
-	int Old = m_State;
-	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "state change. last=%d current=%d", m_State, s);
-	dbg_msg("client", "%s", aBuf);
-	m_State = s;
-	if(Old != s)
-	{
-		GameClient()->OnStateChange(m_State, Old);
-		if(s == IClient::STATE_ONLINE)
-			OnClientOnline();
-	}
-}
-
-// called when the map is loaded and we should init for a new round
-void CClient::OnEnterGame()
-{
-	// reset input
-	int i;
-	for(i = 0; i < 200; i++)
-		m_aInputs[i].m_Tick = -1;
-	m_CurrentInput = 0;
-
-	// reset snapshots
-	m_aSnapshots[SNAP_CURRENT] = 0;
-	m_aSnapshots[SNAP_PREV] = 0;
-	m_SnapshotStorage.PurgeAll();
-	m_ReceivedSnapshots = 0;
-	m_SnapshotParts = 0;
-	m_PredTick = 0;
-	m_CurrentRecvTick = 0;
-	m_CurGameTick = 0;
-	m_PrevGameTick = 0;
-}
-
-void CClient::EnterGame()
-{
-	if(State() == IClient::STATE_DEMOPLAYBACK)
-		return;
-
-	if(State() == IClient::STATE_ONLINE)
-	{
-		// Don't reset everything while already in game.
-		return;
-	}
-
-	// now we will wait for two snapshots
-	// to finish the connection
-	SendEnterGame();
-	OnEnterGame();
-}
-
-void CClient::OnClientOnline()
-{
-}
-
 void CClient::Connect(const char *pAddress)
 {
 	char aBuf[512];
@@ -428,7 +352,6 @@ void CClient::Connect(const char *pAddress)
 	if(m_ServerAddress.port == 0)
 		m_ServerAddress.port = Port;
 	m_NetClient.Connect(&m_ServerAddress);
-	SetState(IClient::STATE_CONNECTING);
 
 	m_InputtimeMarginGraph.Init(-150.0f, 150.0f);
 	m_GametimeMarginGraph.Init(-150.0f, 150.0f);
@@ -444,7 +367,6 @@ void CClient::DisconnectWithReason(const char *pReason)
 	m_RconAuthed = 0;
 	m_UseTempRconCommands = 0;
 	m_NetClient.Disconnect(pReason);
-	SetState(IClient::STATE_OFFLINE);
 
 	// disable all downloads
 	m_MapdownloadChunk = 0;
@@ -531,24 +453,9 @@ void CClient::SnapSetStaticsize(int ItemType, int Size)
 }
 
 
-void CClient::DebugRender()
-{
-}
-
-void CClient::Quit()
-{
-	SetState(IClient::STATE_QUITING);
-}
-
 const char *CClient::ErrorString() const
 {
 	return m_NetClient.ErrorString();
-}
-
-void CClient::Render()
-{
-	GameClient()->OnRender();
-	DebugRender();
 }
 
 struct CMastersrvAddr
@@ -994,7 +901,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 						m_GameTime.Init((GameTick - 1) * time_freq() / SERVER_TICK_SPEED);
 						m_aSnapshots[SNAP_PREV] = m_SnapshotStorage.m_pFirst;
 						m_aSnapshots[SNAP_CURRENT] = m_SnapshotStorage.m_pLast;
-						SetState(IClient::STATE_ONLINE);
 					}
 
 					// adjust game time
@@ -1031,7 +937,6 @@ void CClient::PumpNetwork()
 		// check for errors
 		if(State() != IClient::STATE_OFFLINE && State() != IClient::STATE_QUITING && m_NetClient.State() == NETSTATE_OFFLINE)
 		{
-			SetState(IClient::STATE_OFFLINE);
 			DisconnectWithReason(m_NetClient.ErrorString());
 			char aBuf[256];
 			str_format(aBuf, sizeof(aBuf), "offline error='%s'", m_NetClient.ErrorString());
@@ -1043,7 +948,6 @@ void CClient::PumpNetwork()
 		{
 			// we switched to online
 			dbg_msg("client", "connected, sending info");
-			SetState(IClient::STATE_LOADING);
 			SendInfo();
 		}
 	}
@@ -1139,8 +1043,6 @@ void CClient::Update()
 
 	// pump the network
 	PumpNetwork();
-
-	GameClient()->OnUpdate();
 }
 
 void CClient::VersionUpdate()
@@ -1213,8 +1115,6 @@ void CClient::Run()
 	}
 
 
-	GameClient()->OnInit();
-
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "netversion %s", GameClient()->NetVersion());
 	dbg_msg("client", "%s", aBuf);
@@ -1253,7 +1153,6 @@ void CClient::Run()
 		m_LocalTime = (time_get()-m_LocalStartTime)/(float)time_freq();
 	}
 
-	GameClient()->OnShutdown();
 	Disconnect();
 }
 

@@ -74,10 +74,6 @@ public:
 	// actions
 	virtual void Connect(const char *pAddress) = 0;
 	virtual void Disconnect() = 0;
-	virtual void Quit() = 0;
-
-	// networking
-	virtual void EnterGame() = 0;
 
 	//
 	virtual const char *GetCurrentMapName() const = 0;
@@ -85,9 +81,6 @@ public:
 	virtual const char *MapDownloadName() const = 0;
 	virtual int MapDownloadAmount() const = 0;
 	virtual int MapDownloadTotalsize() const = 0;
-
-	// input
-	virtual const int *GetInput(int Tick) const = 0;
 
 	// remote console
 	virtual void RconAuth(const char *pUsername, const char *pPassword) = 0;
@@ -138,14 +131,7 @@ public:
 	virtual void OnConsoleInit() = 0;
 
 	virtual void OnRconLine(const char *pLine) = 0;
-	virtual void OnInit() = 0;
 	virtual void OnNewSnapshot() = 0;
-	virtual void OnDemoRecSnap() = 0;
-	virtual void OnEnterGame() = 0;
-	virtual void OnShutdown() = 0;
-	virtual void OnRender() = 0;
-	virtual void OnUpdate() = 0;
-	virtual void OnStateChange(int NewState, int OldState) = 0;
 	virtual void OnConnected() = 0;
 	virtual void OnMessage(int MsgID, CUnpacker *pUnpacker) = 0;
 

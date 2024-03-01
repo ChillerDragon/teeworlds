@@ -11,9 +11,6 @@
 
 void CInfoMessages::OnMessage(int MsgType, void *pRawMsg)
 {
-	if(m_pClient->m_SuppressEvents)
-		return;
-
 	bool Race = m_pClient->m_GameInfo.m_GameFlags&GAMEFLAG_RACE;
 
 	if(MsgType == NETMSGTYPE_SV_KILLMSG)
@@ -30,39 +27,18 @@ void CInfoMessages::OnMessage(int MsgType, void *pRawMsg)
 
 		char aBuf[256];
 		char aTime[32];
-		char aLabel[64];
 
-		FormatTime(aTime, sizeof(aTime), pMsg->m_Time, m_pClient->RacePrecision());
-		m_pClient->GetPlayerLabel(aLabel, sizeof(aLabel), pMsg->m_ClientID, m_pClient->m_aClients[pMsg->m_ClientID].m_aName);
+		str_format(aTime, sizeof(aTime), "%d", pMsg->m_Time);
 
 		str_format(aBuf, sizeof(aBuf), "%2d: %s: finished in %s", pMsg->m_ClientID, m_pClient->m_aClients[pMsg->m_ClientID].m_aName, aTime);
 		dbg_msg("race", "%s", aBuf);
-
-		if(pMsg->m_RecordPersonal || pMsg->m_RecordServer)
-		{
-			if(pMsg->m_RecordServer)
-				str_format(aBuf, sizeof(aBuf), Localize("'%s' has set a new map record: %s"), aLabel, aTime);
-			else // m_RecordPersonal
-				str_format(aBuf, sizeof(aBuf), Localize("'%s' has set a new personal record: %s"), aLabel, aTime);
-
-			if(pMsg->m_Diff < 0)
-			{
-				char aImprovement[64];
-				char aDiff[32];
-				FormatTimeDiff(aDiff, sizeof(aDiff), absolute(pMsg->m_Diff), m_pClient->RacePrecision(), false);
-				str_format(aImprovement, sizeof(aImprovement), Localize(" (%s seconds faster)"), aDiff);
-				str_append(aBuf, aImprovement, sizeof(aBuf));
-			}
-
-			m_pClient->m_pChat->AddLine(aBuf);
-		}
 
 		if(m_pClient->m_Snap.m_pGameDataRace && m_pClient->m_Snap.m_pGameDataRace->m_RaceFlags&RACEFLAG_FINISHMSG_AS_CHAT)
 		{
 			if(!pMsg->m_RecordPersonal && !pMsg->m_RecordServer) // don't print the time twice
 			{
-				str_format(aBuf, sizeof(aBuf), Localize("'%s' finished in: %s"), aLabel, aTime);
-				m_pClient->m_pChat->AddLine(aBuf);
+				str_format(aBuf, sizeof(aBuf), "'%s' finished in: %s", m_pClient->m_aClients[pMsg->m_ClientID].m_aName, aTime);
+				dbg_msg("chat", "%s", aBuf);
 			}
 		}
 		else

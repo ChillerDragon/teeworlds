@@ -3009,12 +3009,6 @@ void uint_to_bytes_be(unsigned char *bytes, unsigned value)
 	bytes[3] = value & 0xffu;
 }
 
-const char *Localize(const char *pStr, const char *pContext)
-{
-	return pStr;
-}
-
-
 #if defined(__cplusplus)
 }
 #endif

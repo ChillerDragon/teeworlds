@@ -19,7 +19,6 @@ public:
 	CControls();
 
 	virtual void OnReset();
-	virtual void OnRelease();
 	virtual void OnMessage(int MsgType, void *pRawMsg);
 
 	int SnapInput(int *pData);

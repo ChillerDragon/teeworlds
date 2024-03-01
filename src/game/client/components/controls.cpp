@@ -28,12 +28,6 @@ void CControls::OnReset()
 	m_InputDirectionRight = 0;
 }
 
-void CControls::OnRelease()
-{
-	OnReset();
-}
-
-
 struct CInputSet
 {
 	CControls *m_pControls;
