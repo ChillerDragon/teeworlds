@@ -93,6 +93,7 @@ enum
 {
 	NET_TOKEN_MAX = 0xffffffff,
 	NET_TOKEN_NONE = NET_TOKEN_MAX,
+	NET_TOKEN_SOME = NET_TOKEN_NONE - 1,
 	NET_TOKEN_MASK = NET_TOKEN_MAX,
 };
 enum
@@ -457,7 +458,7 @@ public:
 	int Recv(CNetChunk *pChunk, TOKEN *pResponseToken = 0);
 	int Send(CNetChunk *pChunk, TOKEN Token = NET_TOKEN_NONE);
 	int Update();
-	void AddToken(const NETADDR *pAddr, TOKEN Token) { m_TokenCache.AddToken(pAddr, Token, 0); }
+	void AddToken(const NETADDR *pAddr, TOKEN Token) { return; }
 
 	//
 	void Drop(int ClientID, const char *pReason);

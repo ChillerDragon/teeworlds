@@ -220,21 +220,12 @@ void CNetTokenCache::PurgeStoredPacket(int TrackID)
 
 TOKEN CNetTokenCache::GetToken(const NETADDR *pAddr)
 {
-	// traverse the list in the reverse direction
-	// newest caches are the best
-	CAddressInfo *pInfo = m_TokenCache.Last();
-	while(pInfo)
-	{
-		if(net_addr_comp(&pInfo->m_Addr, pAddr, true) == 0)
-			return pInfo->m_Token;
-		pInfo = m_TokenCache.Prev(pInfo);
-	}
-	return NET_TOKEN_NONE;
+	return NET_TOKEN_SOME;
 }
 
 void CNetTokenCache::FetchToken(const NETADDR *pAddr)
 {
-	m_pNetBase->SendControlMsgWithToken(pAddr, NET_TOKEN_NONE, 0, NET_CTRLMSG_TOKEN, m_pTokenManager->GenerateToken(pAddr), true);
+	m_pNetBase->SendControlMsgWithToken(pAddr, NET_TOKEN_NONE, 0, NET_CTRLMSG_TOKEN, NET_TOKEN_SOME, true);
 }
 
 void CNetTokenCache::AddToken(const NETADDR *pAddr, TOKEN Token, int TokenFLag)
@@ -256,7 +247,7 @@ void CNetTokenCache::AddToken(const NETADDR *pAddr, TOKEN Token, int TokenFLag)
 			// notify the user that the packet gets delivered
 			if(pInfo->m_pfnCallback)
 				pInfo->m_pfnCallback(pInfo->m_TrackID, pInfo->m_pCallbackUser);
-			m_pNetBase->SendPacketConnless(&(pInfo->m_Addr), Token, m_pTokenManager->GenerateToken(pAddr), pInfo->m_aData, pInfo->m_DataSize);
+			m_pNetBase->SendPacketConnless(&(pInfo->m_Addr), Token, NET_TOKEN_SOME, pInfo->m_aData, pInfo->m_DataSize);
 			CConnlessPacketInfo *pNext = pInfo->m_pNext;
 			if(pPrevInfo)
 				pPrevInfo->m_pNext = pNext;
@@ -289,11 +280,6 @@ void CNetTokenCache::AddToken(const NETADDR *pAddr, TOKEN Token, int TokenFLag)
 void CNetTokenCache::Update()
 {
 	int64 Now = time_get();
-
-	// drop expired address info
-	CAddressInfo *pAddrInfo;
-	while((pAddrInfo = m_TokenCache.First()) && (pAddrInfo->m_Expiry <= Now))
-		m_TokenCache.PopFirst();
 
 	// try to fetch the token again for stored packets
 	CConnlessPacketInfo * pEntry = m_pConnlessPacketList;
