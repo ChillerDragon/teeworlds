@@ -8,8 +8,22 @@
 #ifndef BASE_SYSTEM_H
 #define BASE_SYSTEM_H
 
-#include "detect.h"
 #include <time.h>
+
+/* use gcc endianness definitions when available */
+#if defined(__GNUC__) && !defined(__APPLE__) && !defined(__MINGW32__) && !defined(__sun)
+	#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+		#include <sys/endian.h>
+	#else
+		#include <endian.h>
+	#endif
+
+	#if __BYTE_ORDER == __LITTLE_ENDIAN
+		#define CONF_ARCH_ENDIAN_LITTLE 1
+	#elif __BYTE_ORDER == __BIG_ENDIAN
+		#define CONF_ARCH_ENDIAN_BIG 1
+	#endif
+#endif
 
 #ifdef __cplusplus
 extern "C" {
