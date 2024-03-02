@@ -26,8 +26,6 @@ public:
 	CGameContext();
 	~CGameContext();
 
-	void Clear();
-
 	CEventHandler m_Events;
 	class CPlayer *m_apPlayers[MAX_CLIENTS];
 
@@ -57,8 +55,6 @@ public:
 		MIN_SKINCHANGE_CLIENTVERSION = 0x0703,
 		MIN_RACE_CLIENTVERSION = 0x0704,
 	};
-	CVoteOptionServer *m_pVoteOptionFirst;
-	CVoteOptionServer *m_pVoteOptionLast;
 
 	// helper functions
 	void CreateDamage(vec2 Pos, int Id, vec2 Source, int HealthAmount, int ArmorAmount, bool Self);
@@ -76,6 +72,7 @@ public:
 	void SendMotd(int ClientID);
 	void SendSettings(int ClientID);
 	void SendSkinChange(int ClientID, int TargetID);
+	void SendVotes(int ClientID);
 
 	void SendGameMsg(int GameMsgID, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ClientID);

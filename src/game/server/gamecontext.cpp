@@ -32,21 +32,6 @@ CGameContext::~CGameContext()
 		delete m_apPlayers[i];
 }
 
-void CGameContext::Clear()
-{
-	CVoteOptionServer *pVoteOptionFirst = m_pVoteOptionFirst;
-	CVoteOptionServer *pVoteOptionLast = m_pVoteOptionLast;
-	int NumVoteOptions = m_NumVoteOptions;
-	this->~CGameContext();
-	mem_zero(this, sizeof(*this));
-	new (this) CGameContext();
-
-	m_pVoteOptionFirst = pVoteOptionFirst;
-	m_pVoteOptionLast = pVoteOptionLast;
-	m_NumVoteOptions = NumVoteOptions;
-}
-
-
 void CGameContext::CreateDamage(vec2 Pos, int Id, vec2 Source, int HealthAmount, int ArmorAmount, bool Self)
 {
 	float f = angle(Source);
@@ -533,23 +518,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			CNetMsg_Sv_VoteClearOptions ClearMsg;
 			Server()->SendPackMsg(&ClearMsg, MSGFLAG_VITAL, ClientID);
 
-			CVoteOptionServer *pCurrent = m_pVoteOptionFirst;
-			while(pCurrent)
-			{
-				// count options for actual packet
-				int NumOptions = 0;
-				for(CVoteOptionServer *p = pCurrent; p && NumOptions < MAX_VOTE_OPTION_ADD; p = p->m_pNext, ++NumOptions);
-
-				// pack and send vote list packet
-				CMsgPacker Msg(NETMSGTYPE_SV_VOTEOPTIONLISTADD);
-				Msg.AddInt(NumOptions);
-				while(pCurrent && NumOptions--)
-				{
-					Msg.AddString(pCurrent->m_aDescription, VOTE_DESC_LENGTH);
-					pCurrent = pCurrent->m_pNext;
-				}
-				Server()->SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
-			}
+			SendVotes(ClientID);
 
 			// client is ready to enter
 			pPlayer->m_IsReadyToEnter = true;
@@ -557,6 +526,16 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			Server()->SendPackMsg(&m, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
 		}
 	}
+}
+
+void CGameContext::SendVotes(int ClientID)
+{
+	CMsgPacker Msg(NETMSGTYPE_SV_VOTEOPTIONLISTADD);
+	Msg.AddInt(3);
+	Msg.AddString("foo", VOTE_DESC_LENGTH);
+	Msg.AddString("bar", VOTE_DESC_LENGTH);
+	Msg.AddString("baz", VOTE_DESC_LENGTH);
+	Server()->SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
 // void CGameContext::NewCommandHook(const CCommandManager::CCommand *pCommand, void *pContext)
