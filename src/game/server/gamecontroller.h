@@ -30,59 +30,6 @@ class IGameController
 	};
 	int m_aTeamSize[NUM_TEAMS];
 
-	virtual bool CanBeMovedOnBalance(int ClientID) const;
-
-	// game
-	enum EGameState
-	{
-		// internal game states
-		IGS_WARMUP_GAME,		// warmup started by game because there're not enough players (infinite)
-		IGS_WARMUP_USER,		// warmup started by user action via rcon or new match (infinite or timer)
-
-		IGS_START_COUNTDOWN,	// start countown to unpause the game or start match/round (tick timer)
-
-		IGS_GAME_PAUSED,		// game paused (infinite or tick timer)
-		IGS_GAME_RUNNING,		// game running (infinite)
-
-		IGS_END_MATCH,			// match is over (tick timer)
-		IGS_END_ROUND,			// round is over (tick timer)
- 	};
-	EGameState m_GameState;
-	int m_GameStateTimer;
-
-	virtual bool DoWincheckMatch();		// returns true when the match is over
-	virtual void DoWincheckRound() {}
-	bool HasEnoughPlayers() const { return (IsTeamplay() && m_aTeamSize[TEAM_RED] > 0 && m_aTeamSize[TEAM_BLUE] > 0) || (!IsTeamplay() && m_aTeamSize[TEAM_RED] > 1); }
-	void ResetGame();
-	void SetGameState(EGameState GameState, int Timer=0);
-	void StartMatch();
-	void StartRound();
-
-	// spawn
-	struct CSpawnEval
-	{
-		CSpawnEval()
-		{
-			m_Got = false;
-			m_FriendlyTeam = -1;
-			m_Pos = vec2(100,100);
-		}
-
-		vec2 m_Pos;
-		bool m_Got;
-		bool m_RandomSpawn;
-		int m_FriendlyTeam;
-		float m_Score;
-	};
-	vec2 m_aaSpawnPoints[3][64];
-	int m_aNumSpawnPoints[3];
-
-	float EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos) const;
-	void EvaluateSpawnType(CSpawnEval *pEval, int Type) const;
-
-	// team
-	int ClampTeam(int Team) const;
-
 protected:
 	CGameContext *GameServer() const { return m_pGameServer; }
 	IServer *Server() const { return m_pServer; }
@@ -93,9 +40,6 @@ protected:
 	int m_RoundCount;
 	int m_SuddenDeath;
 	int m_aTeamscore[NUM_TEAMS];
-
-	void EndMatch() { SetGameState(IGS_END_MATCH, TIMER_END); }
-	void EndRound() { SetGameState(IGS_END_ROUND, TIMER_END/2); }
 
 	// info
 	int m_GameFlags;
@@ -114,20 +58,6 @@ public:
 	IGameController(class CGameContext *pGameServer);
 	virtual ~IGameController() {}
 
-	// event
-	/*
-		Function: on_CCharacter_spawn
-			Called when a CCharacter spawns into the game world.
-
-		Arguments:
-			chr - The CCharacter that was spawned.
-	*/
-	virtual void OnCharacterSpawn(class CCharacter *pChr);
-
-	virtual void OnPlayerConnect(class CPlayer *pPlayer);
-	virtual void OnPlayerDisconnect(class CPlayer *pPlayer);
-	virtual void OnPlayerInfoChange(class CPlayer *pPlayer);
-	virtual void OnPlayerReadyChange(class CPlayer *pPlayer);
 	void OnPlayerCommand(class CPlayer *pPlayer, const char *pCommandName, const char *pCommandArgs);
 
 	void OnReset();
@@ -139,42 +69,15 @@ public:
 		TIMER_END = 10,
 	};
 
-	void DoWarmup(int Seconds)
-	{
-		SetGameState(IGS_WARMUP_USER, Seconds);
-	}
-	void AbortWarmup()
-	{
-		if((m_GameState == IGS_WARMUP_GAME || m_GameState == IGS_WARMUP_USER)
-			&& m_GameStateTimer != TIMER_INFINITE)
-		{
-			SetGameState(IGS_GAME_RUNNING);
-		}
-	}
-	void SwapTeamscore();
-
-	// general
 	virtual void Snap(int SnappingClient);
-	virtual void Tick();
 
 	// info
 	void CheckGameInfo();
-	bool IsFriendlyFire(int ClientID1, int ClientID2) const;
-	bool IsFriendlyTeamFire(int Team1, int Team2) const;
-	bool IsGamePaused() const { return m_GameState == IGS_GAME_PAUSED || m_GameState == IGS_START_COUNTDOWN; }
-	bool IsGameRunning() const { return m_GameState == IGS_GAME_RUNNING; }
-	bool IsPlayerReadyMode() const;
-	bool IsTeamChangeAllowed() const;
-	bool IsTeamplay() const { return m_GameFlags&GAMEFLAG_TEAMS; }
-	bool IsSurvival() const { return m_GameFlags&GAMEFLAG_SURVIVAL; }
-
-	const char *GetGameType() const { return m_pGameType; }
+	const char *GetGameType() const { return "dm"; }
 
 	// map
 	void ChangeMap(const char *pToMap);
 
-	//spawn
-	bool CanSpawn(int Team, vec2 *pPos) const;
 	bool GetStartRespawnState() const;
 
 	// team
@@ -184,7 +87,6 @@ public:
 	void DoTeamChange(class CPlayer *pPlayer, int Team, bool DoChatMsg=true);
 
 	int GetRealPlayerNum() const { return m_aTeamSize[TEAM_RED]+m_aTeamSize[TEAM_BLUE]; }
-	int GetStartTeam();
 
 };
 

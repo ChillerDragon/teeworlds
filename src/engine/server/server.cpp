@@ -682,23 +682,11 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		}
 		else if(Msg == NETMSG_ENTERGAME)
 		{
-			if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && m_aClients[ClientID].m_State == CClient::STATE_READY && GameServer()->IsClientReady(ClientID))
-			{
-				char aAddrStr[NETADDR_MAXSTRSIZE];
-				net_addr_str(m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), true);
-
-				char aBuf[256];
-				str_format(aBuf, sizeof(aBuf), "player has entered the game. ClientID=%d addr=%s", ClientID, aAddrStr);
-				dbg_msg("server", "%s", aBuf);
-				m_aClients[ClientID].m_State = CClient::STATE_INGAME;
-				SendServerInfo(ClientID);
-				GameServer()->OnClientEnter(ClientID);
-			}
+			SendServerInfo(ClientID);
+			GameServer()->OnClientEnter(ClientID);
 		}
 		else if(Msg == NETMSG_INPUT)
 		{
-			CClient::CInput *pInput;
-			int64 TagTime;
 			int64 Now = time_get();
 
 			m_aClients[ClientID].m_LastAckedSnapshot = Unpacker.GetInt();
@@ -708,9 +696,6 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 			// check for errors
 			if(Unpacker.Error() || Size/4 > MAX_INPUT_SIZE)
 				return;
-
-			if(m_aClients[ClientID].m_LastAckedSnapshot > 0)
-				m_aClients[ClientID].m_SnapRate = CClient::SNAPRATE_FULL;
 
 			// add message to report the input timing
 			// skip packets that are old
@@ -724,33 +709,14 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				SendMsg(&Msg, 0, ClientID);
 			}
 
-			m_aClients[ClientID].m_LastInputTick = IntendedTick;
-
-			pInput = &m_aClients[ClientID].m_aInputs[m_aClients[ClientID].m_CurrentInput];
-
-			if(IntendedTick <= Tick())
-				IntendedTick = Tick()+1;
-
-			pInput->m_GameTick = IntendedTick;
-
 			for(int i = 0; i < Size/4; i++)
-				pInput->m_aData[i] = Unpacker.GetInt();
-
-			int PingCorrection = clamp(Unpacker.GetInt(), 0, 50);
-			if(m_aClients[ClientID].m_Snapshots.Get(m_aClients[ClientID].m_LastAckedSnapshot, &TagTime, 0, 0) >= 0)
 			{
-				m_aClients[ClientID].m_Latency = (int)(((Now-TagTime)*1000)/time_freq());
-				m_aClients[ClientID].m_Latency = maximum(0, m_aClients[ClientID].m_Latency - PingCorrection);
+				int InputData = Unpacker.GetInt();
+				dbg_msg("server", "input data = %d", InputData);
 			}
 
-			mem_copy(m_aClients[ClientID].m_LatestInput.m_aData, pInput->m_aData, MAX_INPUT_SIZE*sizeof(int));
-
-			m_aClients[ClientID].m_CurrentInput++;
-			m_aClients[ClientID].m_CurrentInput %= 200;
-
-			// call the mod with the fresh input data
-			if(m_aClients[ClientID].m_State == CClient::STATE_INGAME)
-				GameServer()->OnClientDirectInput(ClientID, m_aClients[ClientID].m_LatestInput.m_aData);
+			int PingCorrection = clamp(Unpacker.GetInt(), 0, 50);
+			dbg_msg("server", "ping correction = %d", PingCorrection);
 		}
 		else if(Msg == NETMSG_RCON_CMD)
 		{
@@ -803,16 +769,6 @@ void CServer::GenerateServerInfo(CPacker *pPacker, int Token)
 {
 	// count the players
 	int PlayerCount = 0, ClientCount = 0;
-	for(int i = 0; i < MAX_CLIENTS; i++)
-	{
-		if(m_aClients[i].m_State != CClient::STATE_EMPTY)
-		{
-			if(GameServer()->IsClientPlayer(i))
-				PlayerCount++;
-
-			ClientCount++;
-		}
-	}
 
 	if(Token != -1)
 	{
@@ -852,7 +808,7 @@ void CServer::GenerateServerInfo(CPacker *pPacker, int Token)
 				pPacker->AddString(ClientClan(i), 0); // client clan
 				pPacker->AddInt(m_aClients[i].m_Country); // client country
 				pPacker->AddInt(m_aClients[i].m_Score); // client score
-				pPacker->AddInt(GameServer()->IsClientPlayer(i)?0:1); // flag spectator=1, bot=2 (player=0)
+				pPacker->AddInt(0); // flag spectator=1, bot=2 (player=0)
 			}
 		}
 	}

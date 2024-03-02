@@ -92,8 +92,6 @@ public:
 	int m_DieTick;
 	int m_Score;
 	int m_ScoreStartTick;
-	int m_LastActionTick;
-	int m_TeamChangeTick;
 
 	int m_InactivityTickCounter;
 

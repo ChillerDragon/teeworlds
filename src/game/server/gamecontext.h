@@ -91,7 +91,6 @@ public:
 	// engine events
 	virtual void OnInit(class IServer *pServer);
 
-	virtual void OnTick();
 	virtual void OnSnap(int ClientID);
 	virtual void OnPostSnap();
 
@@ -100,12 +99,6 @@ public:
 	virtual void OnClientConnected(int ClientID, bool AsSpec) { OnClientConnected(ClientID, false, AsSpec); }
 	void OnClientConnected(int ClientID, bool Dummy, bool AsSpec);
 	virtual void OnClientEnter(int ClientID);
-	virtual void OnClientDirectInput(int ClientID, void *pInput);
-	virtual void OnClientPredictedInput(int ClientID, void *pInput);
-
-	virtual bool IsClientReady(int ClientID) const;
-	virtual bool IsClientPlayer(int ClientID) const;
-	virtual bool IsClientSpectator(int ClientID) const;
 
 	virtual const char *GameType() const;
 	virtual const char *Version() const;

@@ -71,7 +71,6 @@ public:
 	virtual ~IGameServer() {}
 	virtual void OnInit(class IServer *pServer) = 0;
 
-	virtual void OnTick() = 0;
 	virtual void OnSnap(int ClientID) = 0;
 	virtual void OnPostSnap() = 0;
 
@@ -79,12 +78,6 @@ public:
 
 	virtual void OnClientConnected(int ClientID, bool AsSpec) = 0;
 	virtual void OnClientEnter(int ClientID) = 0;
-	virtual void OnClientDirectInput(int ClientID, void *pInput) = 0;
-	virtual void OnClientPredictedInput(int ClientID, void *pInput) = 0;
-
-	virtual bool IsClientReady(int ClientID) const = 0;
-	virtual bool IsClientPlayer(int ClientID) const = 0;
-	virtual bool IsClientSpectator(int ClientID) const = 0;
 
 	virtual const char *GameType() const = 0;
 	virtual const char *Version() const = 0;
