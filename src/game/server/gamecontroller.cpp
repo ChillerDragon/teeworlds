@@ -88,7 +88,7 @@ void IGameController::UpdateGameInfo(int ClientID)
 	}
 }
 
-void IGameController::DoTeamChange(CPlayer *pPlayer, int Team, bool DoChatMsg)
+void IGameController::SendTeamChange(CPlayer *pPlayer, int Team, bool DoChatMsg)
 {
 	CNetMsg_Sv_Team Msg;
 	Msg.m_ClientID = 1;

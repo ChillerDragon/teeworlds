@@ -14,10 +14,6 @@
 
 #include "server.h"
 
-#include <signal.h>
-
-volatile sig_atomic_t InterruptSignaled = 0;
-
 CSnapIDPool::CSnapIDPool()
 {
 	Reset();
@@ -204,11 +200,6 @@ int CServer::Init()
 void CServer::SetRconCID(int ClientID)
 {
 	m_RconClientID = ClientID;
-}
-
-bool CServer::IsBanned(int ClientID)
-{
-	return false;
 }
 
 int CServer::GetClientInfo(int ClientID, CClientInfo *pInfo) const
@@ -794,7 +785,7 @@ void CServer::GenerateServerInfo(CPacker *pPacker, int Token)
 	pPacker->AddInt(PlayerCount); // num players
 	pPacker->AddInt(10); // max players
 	pPacker->AddInt(ClientCount); // num clients
-	pPacker->AddInt(maximum(ClientCount, GetMaxClients())); // max clients
+	pPacker->AddInt(64); // max clients
 
 	if(Token != -1)
 	{
@@ -879,16 +870,6 @@ const char *CServer::GetServerName()
 	return "unnamed server";
 }
 
-int CServer::GetPort()
-{
-	return 8303;
-}
-
-void CServer::ChangeMap(const char *pMap)
-{
-	m_MapReload = true;
-}
-
 void CServer::Init(IGameServer *pGameServer)
 {
 	m_pGameServer = pGameServer;
@@ -925,16 +906,6 @@ void CServer::SnapSetStaticsize(int ItemType, int Size)
 
 static CServer *CreateServer() { return new CServer(); }
 
-
-void HandleSigIntTerm(int Param)
-{
-	InterruptSignaled = 1;
-
-	// Exit the next time a signal is received
-	signal(SIGINT, SIG_DFL);
-	signal(SIGTERM, SIG_DFL);
-}
-
 int main(int argc, const char **argv) // ignore_convention
 {
 	bool shutdown = false;
@@ -945,9 +916,6 @@ int main(int argc, const char **argv) // ignore_convention
 			shutdown = true;
 		}
 	}
-
-	signal(SIGINT, HandleSigIntTerm);
-	signal(SIGTERM, HandleSigIntTerm);
 
 	CServer *pServer = CreateServer();
 

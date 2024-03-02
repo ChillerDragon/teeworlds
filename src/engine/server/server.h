@@ -161,7 +161,6 @@ public:
 	int Init();
 
 	void SetRconCID(int ClientID);
-	bool IsBanned(int ClientID);
 	int GetClientInfo(int ClientID, CClientInfo *pInfo) const;
 	void GetClientAddr(int ClientID, char *pAddrStr, int Size) const;
 	int GetClientVersion(int ClientID) const;
@@ -195,12 +194,8 @@ public:
 
 	void PumpNetwork();
 
-	virtual void ChangeMap(const char *pMap);
 	const char *GetMapName();
 	const char *GetServerName();
-	int GetMaxClients() { return 64; }
-	int GetMaxClientsPerIP() { return 2; }
-	int GetPort();
 
 	void Init(IGameServer *pGameServer);
 	int Run(bool shutdown);

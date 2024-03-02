@@ -75,16 +75,8 @@ public:
 	void CheckGameInfo();
 	const char *GetGameType() const { return "dm"; }
 
-	// map
-	void ChangeMap(const char *pToMap);
 
-	bool GetStartRespawnState() const;
-
-	// team
-	bool CanJoinTeam(int Team, int NotThisID) const;
-	bool CanChangeTeam(CPlayer *pPplayer, int JoinTeam) const;
-
-	void DoTeamChange(class CPlayer *pPlayer, int Team, bool DoChatMsg=true);
+	void SendTeamChange(class CPlayer *pPlayer, int Team, bool DoChatMsg=true);
 
 	int GetRealPlayerNum() const { return m_aTeamSize[TEAM_RED]+m_aTeamSize[TEAM_BLUE]; }
 

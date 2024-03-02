@@ -10,13 +10,6 @@ IServer *CPlayer::Server() const { return m_pGameServer->Server(); }
 CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, bool AsSpec)
 {
 	m_pGameServer = pGameServer;
-	m_RespawnTick = Server()->Tick();
-	m_DieTick = Server()->Tick();
-	m_ScoreStartTick = Server()->Tick();
-	m_ClientID = ClientID;
-	m_Team = AsSpec ? TEAM_SPECTATORS : TEAM_RED;
-	m_SpecMode = SPEC_FREEVIEW;
-	m_SpectatorID = -1;
 	m_ActiveSpecSwitch = 0;
 	m_InactivityTickCounter = 0;
 	m_Dummy = Dummy;
@@ -31,9 +24,6 @@ CPlayer::~CPlayer()
 
 void CPlayer::Snap(int SnappingClient)
 {
-	if(!IsDummy() && !Server()->ClientIngame(m_ClientID))
-		return;
-
 	CNetObj_PlayerInfo *pPlayerInfo = static_cast<CNetObj_PlayerInfo *>(Server()->SnapNewItem(NETOBJTYPE_PLAYERINFO, m_ClientID, sizeof(CNetObj_PlayerInfo)));
 	if(!pPlayerInfo)
 		return;
