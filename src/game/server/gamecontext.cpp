@@ -11,20 +11,11 @@
 void CGameContext::Construct()
 {
 	m_pServer = 0;
-
-	for(int i = 0; i < MAX_CLIENTS; i++)
-		m_apPlayers[i] = 0;
 }
 
 CGameContext::CGameContext()
 {
 	Construct();
-}
-
-CGameContext::~CGameContext()
-{
-	for(int i = 0; i < MAX_CLIENTS; i++)
-		delete m_apPlayers[i];
 }
 
 void CGameContext::CreateDamage(vec2 Pos, int Id, vec2 Source, int HealthAmount, int ArmorAmount, bool Self)
@@ -104,65 +95,14 @@ void CGameContext::CreateSound(vec2 Pos, int Sound, int64 Mask)
 	}
 }
 
-void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
+void CGameContext::SendChat()
 {
-	char aBuf[256];
-	if(ChatterClientID >= 0 && ChatterClientID < MAX_CLIENTS)
-	{
-		if(Mode == CHAT_TEAM)
-		{
-			int TeamID = m_apPlayers[ChatterClientID]->GetTeam();
-			str_format(aBuf, sizeof(aBuf), "%d:%d:%d:%s: %s", Mode, TeamID, ChatterClientID, Server()->ClientName(ChatterClientID), pText);
-		}
-		else
-			str_format(aBuf, sizeof(aBuf), "%d:%d:%s: %s", Mode, ChatterClientID, Server()->ClientName(ChatterClientID), pText);
-	}
-	else
-		str_format(aBuf, sizeof(aBuf), "*** %s", pText);
-
-	const char *pModeStr;
-	if(Mode == CHAT_WHISPER)
-		pModeStr = 0;
-	else if(Mode == CHAT_TEAM)
-		pModeStr = "teamchat";
-	else
-		pModeStr = "chat";
-
-	if(pModeStr)
-	{
-		dbg_msg(pModeStr, "%s", aBuf);
-	}
-
-
 	CNetMsg_Sv_Chat Msg;
-	Msg.m_Mode = Mode;
-	Msg.m_ClientID = ChatterClientID;
-	Msg.m_pMessage = pText;
+	Msg.m_Mode = CHAT_ALL;
+	Msg.m_ClientID = 1;
+	Msg.m_pMessage = "hello world";
 	Msg.m_TargetID = -1;
-
-	if(Mode == CHAT_ALL)
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
-	else if(Mode == CHAT_TEAM)
-	{
-		// pack one for the recording only
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
-
-		To = m_apPlayers[ChatterClientID]->GetTeam();
-
-		// send to the clients
-		for(int i = 0; i < MAX_CLIENTS; i++)
-		{
-			if(m_apPlayers[i] && m_apPlayers[i]->GetTeam() == To)
-				Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i);
-		}
-	}
-	else // Mode == CHAT_WHISPER
-	{
-		// send to the clients
-		Msg.m_TargetID = To;
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ChatterClientID);
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, To);
-	}
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
 }
 
 void CGameContext::SendBroadcast(const char* pText, int ClientID)
@@ -212,9 +152,9 @@ void CGameContext::SendSkinChange(int ClientID, int TargetID)
 	Msg.m_ClientID = ClientID;
 	for(int p = 0; p < NUM_SKINPARTS; p++)
 	{
-		Msg.m_apSkinPartNames[p] = m_apPlayers[ClientID]->m_TeeInfos.m_aaSkinPartNames[p];
-		Msg.m_aUseCustomColors[p] = m_apPlayers[ClientID]->m_TeeInfos.m_aUseCustomColors[p];
-		Msg.m_aSkinPartColors[p] = m_apPlayers[ClientID]->m_TeeInfos.m_aSkinPartColors[p];
+		Msg.m_apSkinPartNames[p] = "greesward";
+		Msg.m_aUseCustomColors[p] = 0;
+		Msg.m_aSkinPartColors[p] = 0;
 	}
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID);
 }
@@ -270,16 +210,6 @@ void CGameContext::SendChatCommands(int ClientID)
 // 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 // }
 
-//
-void CGameContext::StartVote(const char *pDesc, const char *pCommand, const char *pReason)
-{
-}
-
-
-void CGameContext::EndVote(int Type, bool Force)
-{
-}
-
 void CGameContext::ForceVote(int Type, const char *pDescription, const char *pReason)
 {
 	CNetMsg_Sv_VoteSet Msg;
@@ -312,7 +242,6 @@ void CGameContext::SendVoteStatus(int ClientID, int Total, int Yes, int No)
 	Msg.m_Pass = Total - (Yes+No);
 
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-
 }
 
 void CGameContext::OnClientEnter(int ClientID)
@@ -324,20 +253,17 @@ void CGameContext::OnClientEnter(int ClientID)
 	CNetMsg_Sv_ClientInfo NewClientInfoMsg;
 	NewClientInfoMsg.m_ClientID = ClientID;
 	NewClientInfoMsg.m_Local = 0;
-	NewClientInfoMsg.m_Team = m_apPlayers[ClientID]->GetTeam();
-	NewClientInfoMsg.m_pName = Server()->ClientName(ClientID);
-	NewClientInfoMsg.m_pClan = Server()->ClientClan(ClientID);
-	NewClientInfoMsg.m_Country = Server()->ClientCountry(ClientID);
+	NewClientInfoMsg.m_Team = TEAM_RED;
+	NewClientInfoMsg.m_pName = "namless tee";
+	NewClientInfoMsg.m_pClan = "";
+	NewClientInfoMsg.m_Country = 0;
 	NewClientInfoMsg.m_Silent = false;
-
-	if(m_apPlayers[ClientID]->GetTeam() == TEAM_SPECTATORS)
-		NewClientInfoMsg.m_Silent = true;
 
 	for(int p = 0; p < NUM_SKINPARTS; p++)
 	{
-		NewClientInfoMsg.m_apSkinPartNames[p] = m_apPlayers[ClientID]->m_TeeInfos.m_aaSkinPartNames[p];
-		NewClientInfoMsg.m_aUseCustomColors[p] = m_apPlayers[ClientID]->m_TeeInfos.m_aUseCustomColors[p];
-		NewClientInfoMsg.m_aSkinPartColors[p] = m_apPlayers[ClientID]->m_TeeInfos.m_aSkinPartColors[p];
+		NewClientInfoMsg.m_apSkinPartNames[p] = "greensward";
+		NewClientInfoMsg.m_aUseCustomColors[p] = 0;
+		NewClientInfoMsg.m_aSkinPartColors[p] = 0;
 	}
 
 
@@ -354,16 +280,16 @@ void CGameContext::OnClientEnter(int ClientID)
 		CNetMsg_Sv_ClientInfo ClientInfoMsg;
 		ClientInfoMsg.m_ClientID = i;
 		ClientInfoMsg.m_Local = 0;
-		ClientInfoMsg.m_Team = m_apPlayers[i]->GetTeam();
-		ClientInfoMsg.m_pName = Server()->ClientName(i);
-		ClientInfoMsg.m_pClan = Server()->ClientClan(i);
-		ClientInfoMsg.m_Country = Server()->ClientCountry(i);
+		ClientInfoMsg.m_Team = TEAM_RED;
+		ClientInfoMsg.m_pName = "nameless tee";
+		ClientInfoMsg.m_pClan = "";
+		ClientInfoMsg.m_Country = 0;
 		ClientInfoMsg.m_Silent = false;
 		for(int p = 0; p < NUM_SKINPARTS; p++)
 		{
-			ClientInfoMsg.m_apSkinPartNames[p] = m_apPlayers[i]->m_TeeInfos.m_aaSkinPartNames[p];
-			ClientInfoMsg.m_aUseCustomColors[p] = m_apPlayers[i]->m_TeeInfos.m_aUseCustomColors[p];
-			ClientInfoMsg.m_aSkinPartColors[p] = m_apPlayers[i]->m_TeeInfos.m_aSkinPartColors[p];
+			ClientInfoMsg.m_apSkinPartNames[p] = "greensward";
+			ClientInfoMsg.m_aUseCustomColors[p] = 0;
+			ClientInfoMsg.m_aSkinPartColors[p] = 0;
 		}
 		Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
 	}
@@ -375,17 +301,7 @@ void CGameContext::OnClientEnter(int ClientID)
 
 void CGameContext::OnClientConnected(int ClientID, bool Dummy, bool AsSpec)
 {
-	dbg_assert(!m_apPlayers[ClientID], "non-free player slot");
-
-	m_apPlayers[ClientID] = new(ClientID) CPlayer(this, ClientID, Dummy, AsSpec);
-
-	if(Dummy)
-		return;
-
-	// send motd
 	SendMotd(ClientID);
-
-	// send settings
 	SendSettings(ClientID);
 }
 
@@ -439,10 +355,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return;
 
 			pPlayer->m_LastChatTeamTick = Server()->Tick();
-			int Mode = pMsg->m_Mode;
-
-			if(Mode != CHAT_NONE)
-				SendChat(ClientID, Mode, pMsg->m_Target, pMsg->m_pMessage);
+			dbg_msg("chat", "ClientID=%d pMsg->m_Mode=%d pMsg->m_Target=%d pMsg->m_pMessage=%s",ClientID, pMsg->m_Mode, pMsg->m_Target, pMsg->m_pMessage);
 		}
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
 		{
@@ -561,16 +474,7 @@ void CGameContext::OnInit(IServer *pServer)
 void CGameContext::OnSnap(int ClientID)
 {
 	m_Events.Snap(ClientID);
-
-	for(int i = 0; i < MAX_CLIENTS; i++)
-	{
-		if(m_apPlayers[i])
-			m_apPlayers[i]->Snap(ClientID);
-	}
-}
-void CGameContext::OnPostSnap()
-{
-	m_Events.Clear();
+	// m_apPlayers[i]->Snap(ClientID);
 }
 
 const char *CGameContext::GameType() const { return "dm"; }

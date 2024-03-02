@@ -72,7 +72,6 @@ public:
 	virtual void OnInit(class IServer *pServer) = 0;
 
 	virtual void OnSnap(int ClientID) = 0;
-	virtual void OnPostSnap() = 0;
 
 	virtual void OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID) = 0;
 

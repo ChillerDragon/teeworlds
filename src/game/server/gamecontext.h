@@ -24,7 +24,6 @@ public:
 	IServer *Server() const { return m_pServer; }
 
 	CGameContext();
-	~CGameContext();
 
 	CEventHandler m_Events;
 	class CPlayer *m_apPlayers[MAX_CLIENTS];
@@ -32,8 +31,6 @@ public:
 	class CCharacter *GetPlayerChar(int ClientID);
 
 	// voting
-	void StartVote(const char *pDesc, const char *pCommand, const char *pReason);
-	void EndVote(int Type, bool Force);
 	void ForceVote(int Type, const char *pDescription, const char *pReason);
 	void SendVoteSet(int Type, int ToClientID);
 	void SendVoteStatus(int ClientID, int Total, int Yes, int No);
@@ -62,7 +59,7 @@ public:
 	void CreateSound(vec2 Pos, int Sound, int64 Mask=-1);
 
 	// network
-	void SendChat(int ChatterClientID, int Mode, int To, const char *pText);
+	void SendChat();
 	void SendBroadcast(const char *pText, int ClientID);
 	void SendEmoticon(int ClientID, int Emoticon);
 	void SendWeaponPickup(int ClientID, int Weapon);
@@ -79,14 +76,10 @@ public:
 	void SendChatCommands(int ClientID);
 	// void SendRemoveChatCommand(const CCommandManager::CCommand *pCommand, int ClientID);
 
-	//
-	void SwapTeams();
-
 	// engine events
 	virtual void OnInit(class IServer *pServer);
 
 	virtual void OnSnap(int ClientID);
-	virtual void OnPostSnap();
 
 	virtual void OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID);
 

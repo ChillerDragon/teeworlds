@@ -435,8 +435,6 @@ void CServer::DoSnapshot()
 			}
 		}
 	}
-
-	GameServer()->OnPostSnap();
 }
 
 
