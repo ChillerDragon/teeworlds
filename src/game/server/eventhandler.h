@@ -15,17 +15,12 @@ class CEventHandler
 	int64 m_aClientMasks[MAX_EVENTS];
 	char m_aData[MAX_DATASIZE];
 
-	class CGameContext *m_pGameServer;
-
 	int m_CurrentOffset;
 	int m_NumEvents;
 public:
-	CGameContext *GameServer() const { return m_pGameServer; }
-	void SetGameServer(CGameContext *pGameServer);
 
-	CEventHandler();
 	void *Create(int Type, int Size, int64 Mask = -1);
-	void Snap(int SnappingClient);
+	void Snap(int SnappingClient, class CGameContext *pGameServer);
 };
 
 #endif

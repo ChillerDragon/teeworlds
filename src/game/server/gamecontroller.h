@@ -22,29 +22,9 @@ class IGameController
 	void SetPlayersReadyState(bool ReadyState);
 	void CheckReadyStates(int WithoutID = -1);
 
-	// balancing
-	enum
-	{
-		TBALANCE_CHECK=-2,
-		TBALANCE_OK,
-	};
-	int m_aTeamSize[NUM_TEAMS];
-
 protected:
 	CGameContext *GameServer() const { return m_pGameServer; }
 	IServer *Server() const { return m_pServer; }
-
-	// game
-	int m_GameStartTick;
-	int m_MatchCount;
-	int m_RoundCount;
-	int m_SuddenDeath;
-	int m_aTeamscore[NUM_TEAMS];
-
-	// info
-	int m_GameFlags;
-	const char *m_pGameType;
-
 	void UpdateGameInfo(int ClientID);
 
 public:

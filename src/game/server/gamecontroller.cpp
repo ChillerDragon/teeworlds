@@ -18,7 +18,7 @@ void IGameController::Snap(int SnappingClient)
 	if(!pGameData)
 		return;
 
-	pGameData->m_GameStartTick = m_GameStartTick;
+	pGameData->m_GameStartTick = 0;
 	pGameData->m_GameStateFlags = 0;
 	// pGameData->m_GameStateFlags |= GAMESTATEFLAG_WARMUP;
 	// pGameData->m_GameStateFlags |= GAMESTATEFLAG_STARTCOUNTDOWN|GAMESTATEFLAG_PAUSED;
@@ -53,7 +53,7 @@ void IGameController::Snap(int SnappingClient)
 void IGameController::UpdateGameInfo(int ClientID)
 {
 	CNetMsg_Sv_GameInfo GameInfoMsg;
-	GameInfoMsg.m_GameFlags = m_GameFlags;
+	GameInfoMsg.m_GameFlags = 0;
 	GameInfoMsg.m_ScoreLimit = 69;
 	GameInfoMsg.m_TimeLimit = 0;
 	GameInfoMsg.m_MatchNum = 0;

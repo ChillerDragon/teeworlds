@@ -462,7 +462,6 @@ void CGameContext::OnInit(IServer *pServer)
 {
 	// init everything
 	m_pServer = pServer;
-	m_Events.SetGameServer(this);
 
 	// HACK: only set static size for items, which were available in the first 0.7 release
 	// so new items don't break the snapshot delta
@@ -473,7 +472,7 @@ void CGameContext::OnInit(IServer *pServer)
 
 void CGameContext::OnSnap(int ClientID)
 {
-	m_Events.Snap(ClientID);
+	m_Events.Snap(ClientID, this);
 	// m_apPlayers[i]->Snap(ClientID);
 }
 

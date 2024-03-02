@@ -22,16 +22,12 @@ void *CEventHandler::Create(int Type, int Size, int64 Mask)
 	return p;
 }
 
-void CEventHandler::Snap(int SnappingClient)
+void CEventHandler::Snap(int SnappingClient, CGameContext *pGameServer)
 {
 	for(int i = 0; i < m_NumEvents; i++)
 	{
-		if(SnappingClient == -1 || CmaskIsSet(m_aClientMasks[i], SnappingClient))
-		{
-			CNetEvent_Common *ev = (CNetEvent_Common *)&m_aData[m_aOffsets[i]];
-			void *d = GameServer()->Server()->SnapNewItem(m_aTypes[i], i, m_aSizes[i]);
-			if(d)
-				mem_copy(d, &m_aData[m_aOffsets[i]], m_aSizes[i]);
-		}
+		void *d = pGameServer->Server()->SnapNewItem(m_aTypes[i], i, m_aSizes[i]);
+		if(d)
+			mem_copy(d, &m_aData[m_aOffsets[i]], m_aSizes[i]);
 	}
 }

@@ -56,21 +56,6 @@ enum
 	STR_TEAM_SPECTATORS,
 };
 
-static int GetStrTeam(int Team, bool Teamplay)
-{
-	if(Teamplay)
-	{
-		if(Team == TEAM_RED)
-			return STR_TEAM_RED;
-		else if(Team == TEAM_BLUE)
-			return STR_TEAM_BLUE;
-	}
-	else if(Team == 0)
-		return STR_TEAM_GAME;
-
-	return STR_TEAM_SPECTATORS;
-}
-
 enum
 {
 	DO_CHAT=0,
