@@ -5,11 +5,8 @@
 #include <generated/server_data.h>
 #include <game/version.h>
 
-#include "gamemodes/dm.h"
 #include "gamecontext.h"
 #include "player.h"
-
-#include <game/server/gamemodes/dm.h>
 
 void CGameContext::Construct()
 {
@@ -17,8 +14,6 @@ void CGameContext::Construct()
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
 		m_apPlayers[i] = 0;
-
-	m_pController = 0;
 }
 
 CGameContext::CGameContext()
@@ -561,13 +556,10 @@ void CGameContext::OnInit(IServer *pServer)
 	static const int OLD_NUM_NETOBJTYPES = 23;
 	for(int i = 0; i < OLD_NUM_NETOBJTYPES; i++)
 		Server()->SnapSetStaticsize(i, m_NetObjHandler.GetObjSize(i));
-
-	m_pController = new CGameControllerDM(this);
 }
 
 void CGameContext::OnSnap(int ClientID)
 {
-	m_pController->Snap(ClientID);
 	m_Events.Snap(ClientID);
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
@@ -581,7 +573,7 @@ void CGameContext::OnPostSnap()
 	m_Events.Clear();
 }
 
-const char *CGameContext::GameType() const { return m_pController && m_pController->GetGameType() ? m_pController->GetGameType() : ""; }
+const char *CGameContext::GameType() const { return "dm"; }
 const char *CGameContext::Version() const { return GAME_VERSION; }
 const char *CGameContext::NetVersion() const { return GAME_NETVERSION; }
 const char *CGameContext::NetVersionHashUsed() const { return GAME_NETVERSION_HASH_FORCED; }

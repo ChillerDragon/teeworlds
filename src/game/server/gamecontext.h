@@ -28,9 +28,6 @@ public:
 
 	CEventHandler m_Events;
 	class CPlayer *m_apPlayers[MAX_CLIENTS];
-
-	class IGameController *m_pController;
-
 	// helper functions
 	class CCharacter *GetPlayerChar(int ClientID);
 
