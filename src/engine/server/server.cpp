@@ -321,8 +321,6 @@ int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID)
 
 void CServer::DoSnapshot()
 {
-	GameServer()->OnPreSnap();
-
 	// create snapshots for all clients
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -937,9 +935,9 @@ void CServer::ChangeMap(const char *pMap)
 	m_MapReload = true;
 }
 
-void CServer::InitInterfaces(IKernel *pKernel)
+void CServer::Init(IGameServer *pGameServer)
 {
-	m_pGameServer = pKernel->RequestInterface<IGameServer>();
+	m_pGameServer = pGameServer;
 }
 
 int CServer::Run(bool shutdown)
@@ -998,22 +996,10 @@ int main(int argc, const char **argv) // ignore_convention
 	signal(SIGTERM, HandleSigIntTerm);
 
 	CServer *pServer = CreateServer();
-	IKernel *pKernel = IKernel::Create();
 
-	// create the components
 	IGameServer *pGameServer = CreateGameServer();
-
-	{
-		bool RegisterFail = false;
-
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pServer); // register as both
-		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pGameServer);
-
-		if(RegisterFail)
-			return -1;
-	}
-
-	pServer->InitInterfaces(pKernel);
+	pServer->Init(pGameServer);
+	pGameServer->OnInit(pServer);
 
 	// run the server
 	dbg_msg("server", "starting...");
@@ -1021,7 +1007,6 @@ int main(int argc, const char **argv) // ignore_convention
 
 	// free
 	delete pServer;
-	delete pKernel;
 	delete pGameServer;
 
 	return Ret;

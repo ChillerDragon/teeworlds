@@ -89,11 +89,9 @@ public:
 	void SwapTeams();
 
 	// engine events
-	virtual void OnInit();
-	virtual void OnConsoleInit();
+	virtual void OnInit(class IServer *pServer);
 
 	virtual void OnTick();
-	virtual void OnPreSnap();
 	virtual void OnSnap(int ClientID);
 	virtual void OnPostSnap();
 

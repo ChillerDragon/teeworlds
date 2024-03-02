@@ -2,17 +2,16 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef ENGINE_SERVER_H
 #define ENGINE_SERVER_H
-#include "kernel.h"
 #include "message.h"
 
-class IServer : public IInterface
+class IServer
 {
-	MACRO_INTERFACE("server", 0)
 protected:
 	int m_CurrentGameTick;
 	int m_TickSpeed;
 
 public:
+	virtual ~IServer() {}
 	/*
 		Structure: CClientInfo
 	*/
@@ -65,16 +64,14 @@ public:
 	virtual void ChangeMap(const char *pMap) = 0;
 };
 
-class IGameServer : public IInterface
+class IGameServer
 {
-	MACRO_INTERFACE("gameserver", 0)
 protected:
 public:
-	virtual void OnInit() = 0;
-	virtual void OnConsoleInit() = 0;
+	virtual ~IGameServer() {}
+	virtual void OnInit(class IServer *pServer) = 0;
 
 	virtual void OnTick() = 0;
-	virtual void OnPreSnap() = 0;
 	virtual void OnSnap(int ClientID) = 0;
 	virtual void OnPostSnap() = 0;
 

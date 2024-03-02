@@ -659,11 +659,6 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 	}
 }
 
-void CGameContext::OnConsoleInit()
-{
-	m_pServer = Kernel()->RequestInterface<IServer>();
-}
-
 // void CGameContext::NewCommandHook(const CCommandManager::CCommand *pCommand, void *pContext)
 // {
 // 	CGameContext *pSelf = (CGameContext *)pContext;
@@ -676,10 +671,10 @@ void CGameContext::OnConsoleInit()
 // 	pSelf->SendRemoveChatCommand(pCommand, -1);
 // }
 
-void CGameContext::OnInit()
+void CGameContext::OnInit(IServer *pServer)
 {
 	// init everything
-	m_pServer = Kernel()->RequestInterface<IServer>();
+	m_pServer = pServer;
 	m_Events.SetGameServer(this);
 
 	// HACK: only set static size for items, which were available in the first 0.7 release
@@ -702,7 +697,6 @@ void CGameContext::OnSnap(int ClientID)
 			m_apPlayers[i]->Snap(ClientID);
 	}
 }
-void CGameContext::OnPreSnap() {}
 void CGameContext::OnPostSnap()
 {
 	m_Events.Clear();

@@ -202,7 +202,7 @@ public:
 	int GetMaxClientsPerIP() { return 2; }
 	int GetPort();
 
-	void InitInterfaces(IKernel *pKernel);
+	void Init(IGameServer *pGameServer);
 	int Run(bool shutdown);
 
 	virtual int SnapNewID();

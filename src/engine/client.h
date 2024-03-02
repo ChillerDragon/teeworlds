@@ -2,13 +2,11 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef ENGINE_CLIENT_H
 #define ENGINE_CLIENT_H
-#include "kernel.h"
 
 #include "message.h"
 
-class IClient : public IInterface
+class IClient
 {
-	MACRO_INTERFACE("client", 0)
 public:
 
 	class CSnapItem
@@ -59,9 +57,8 @@ public:
 	}
 };
 
-class IGameClient : public IInterface
+class IGameClient
 {
-	MACRO_INTERFACE("gameclient", 0)
 protected:
 public:
 	virtual void OnRconLine(const char *pLine) = 0;

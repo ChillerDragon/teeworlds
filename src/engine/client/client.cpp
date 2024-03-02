@@ -20,10 +20,6 @@
 
 #include "client.h"
 
-#ifdef main
-#undef main
-#endif
-
 CClient::CClient()
 {
 	m_pGameClient = 0;
