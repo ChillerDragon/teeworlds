@@ -44,42 +44,16 @@ protected:
 	// info
 	int m_GameFlags;
 	const char *m_pGameType;
-	struct CGameInfo
-	{
-		int m_MatchCurrent;
-		int m_MatchNum;
-		int m_ScoreLimit;
-		int m_TimeLimit;
-	} m_GameInfo;
 
 	void UpdateGameInfo(int ClientID);
 
 public:
 	IGameController(class CGameContext *pGameServer);
 	virtual ~IGameController() {}
-
 	void OnPlayerCommand(class CPlayer *pPlayer, const char *pCommandName, const char *pCommandArgs);
-
 	void OnReset();
-
-	// game
-	enum
-	{
-		TIMER_INFINITE = -1,
-		TIMER_END = 10,
-	};
-
 	virtual void Snap(int SnappingClient);
-
-	// info
-	void CheckGameInfo();
-	const char *GetGameType() const { return "dm"; }
-
-
 	void SendTeamChange(class CPlayer *pPlayer, int Team, bool DoChatMsg=true);
-
-	int GetRealPlayerNum() const { return m_aTeamSize[TEAM_RED]+m_aTeamSize[TEAM_BLUE]; }
-
 };
 
 #endif

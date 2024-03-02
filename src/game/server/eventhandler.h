@@ -25,7 +25,6 @@ public:
 
 	CEventHandler();
 	void *Create(int Type, int Size, int64 Mask = -1);
-	void Clear();
 	void Snap(int SnappingClient);
 };
 

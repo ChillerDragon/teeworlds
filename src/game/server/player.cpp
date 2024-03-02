@@ -10,12 +10,6 @@ IServer *CPlayer::Server() const { return m_pGameServer->Server(); }
 CPlayer::CPlayer(CGameContext *pGameServer, int ClientID, bool Dummy, bool AsSpec)
 {
 	m_pGameServer = pGameServer;
-	m_ActiveSpecSwitch = 0;
-	m_InactivityTickCounter = 0;
-	m_Dummy = Dummy;
-	m_DeadSpecMode = false;
-	m_Spawning = false;
-	mem_zero(&m_Latency, sizeof(m_Latency));
 }
 
 CPlayer::~CPlayer()

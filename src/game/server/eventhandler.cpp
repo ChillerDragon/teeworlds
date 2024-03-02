@@ -10,13 +10,6 @@
 //////////////////////////////////////////////////
 CEventHandler::CEventHandler()
 {
-	m_pGameServer = 0;
-	Clear();
-}
-
-void CEventHandler::SetGameServer(CGameContext *pGameServer)
-{
-	m_pGameServer = pGameServer;
 }
 
 void *CEventHandler::Create(int Type, int Size, int64 Mask)
@@ -34,12 +27,6 @@ void *CEventHandler::Create(int Type, int Size, int64 Mask)
 	m_CurrentOffset += Size;
 	m_NumEvents++;
 	return p;
-}
-
-void CEventHandler::Clear()
-{
-	m_NumEvents = 0;
-	m_CurrentOffset = 0;
 }
 
 void CEventHandler::Snap(int SnappingClient)

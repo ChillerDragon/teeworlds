@@ -10,14 +10,6 @@ IGameController::IGameController(CGameContext *pGameServer)
 {
 	m_pGameServer = pGameServer;
 	m_pServer = m_pGameServer->Server();
-
-	// info
-	m_GameFlags = 0;
-	m_pGameType = "unknown";
-	m_GameInfo.m_MatchCurrent = m_MatchCount+1;
-	m_GameInfo.m_MatchNum = 0;
-	m_GameInfo.m_ScoreLimit = 420;
-	m_GameInfo.m_TimeLimit = 69;
 }
 
 void IGameController::Snap(int SnappingClient)
@@ -50,11 +42,11 @@ void IGameController::Snap(int SnappingClient)
 		if(!pGameInfo)
 			return;
 
-		pGameInfo->m_GameFlags = m_GameFlags;
-		pGameInfo->m_ScoreLimit = m_GameInfo.m_ScoreLimit;
-		pGameInfo->m_TimeLimit = m_GameInfo.m_TimeLimit;
-		pGameInfo->m_MatchNum = m_GameInfo.m_MatchNum;
-		pGameInfo->m_MatchCurrent = m_GameInfo.m_MatchCurrent;
+		pGameInfo->m_GameFlags = 0;
+		pGameInfo->m_ScoreLimit = 69;
+		pGameInfo->m_TimeLimit = 0;
+		pGameInfo->m_MatchNum = 0;
+		pGameInfo->m_MatchCurrent = 0;
 	}
 }
 
@@ -62,10 +54,10 @@ void IGameController::UpdateGameInfo(int ClientID)
 {
 	CNetMsg_Sv_GameInfo GameInfoMsg;
 	GameInfoMsg.m_GameFlags = m_GameFlags;
-	GameInfoMsg.m_ScoreLimit = m_GameInfo.m_ScoreLimit;
-	GameInfoMsg.m_TimeLimit = m_GameInfo.m_TimeLimit;
-	GameInfoMsg.m_MatchNum = m_GameInfo.m_MatchNum;
-	GameInfoMsg.m_MatchCurrent = m_GameInfo.m_MatchCurrent;
+	GameInfoMsg.m_ScoreLimit = 69;
+	GameInfoMsg.m_TimeLimit = 0;
+	GameInfoMsg.m_MatchNum = 0;
+	GameInfoMsg.m_MatchCurrent = 0;
 
 	CNetMsg_Sv_GameInfo GameInfoMsgNoRace = GameInfoMsg;
 	GameInfoMsgNoRace.m_GameFlags &= ~GAMEFLAG_RACE;

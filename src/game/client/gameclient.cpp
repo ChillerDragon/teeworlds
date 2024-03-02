@@ -159,7 +159,6 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 
 		// handle special messages
 		char aBuf[256];
-		bool TeamPlay = m_GameInfo.m_GameFlags&GAMEFLAG_TEAMS;
 		if(gs_GameMsgList[GameMsgID].m_Action == DO_SPECIAL)
 		{
 			switch(GameMsgID)
@@ -171,28 +170,10 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 				dbg_msg("sound", "CSounds::CHN_GLOBAL, SOUND_CTF_RETURN);");
 				break;
 			case GAMEMSG_TEAM_ALL:
-				{
-					const char *pMsg = "";
-					switch(GetStrTeam(aParaI[0], TeamPlay))
-					{
-					case STR_TEAM_GAME: pMsg = "All players were moved to the game"; break;
-					case STR_TEAM_RED: pMsg = "All players were moved to the red team"; break;
-					case STR_TEAM_BLUE: pMsg = "All players were moved to the blue team"; break;
-					case STR_TEAM_SPECTATORS: pMsg = "All players were moved to the spectators"; break;
-					}
-					dbg_msg("client-broadcast", "%s", pMsg);
-				}
+				dbg_msg("client-broadcast", "All players were moved to the team %d", aParaI[0]);
 				break;
 			case GAMEMSG_TEAM_BALANCE_VICTIM:
-				{
-					const char *pMsg = "";
-					switch(GetStrTeam(aParaI[0], TeamPlay))
-					{
-					case STR_TEAM_RED: pMsg = "You were moved to the red team due to team balancing"; break;
-					case STR_TEAM_BLUE: pMsg = "You were moved to the blue team due to team balancing"; break;
-					}
-					dbg_msg("client-broadcast", "%s", pMsg);
-				}
+				dbg_msg("client-broadcast", "You were moved to the %s team due to team balancing", aParaI[0] == 1 ? "red" : "blue");
 				break;
 			case GAMEMSG_CTF_GRAB:
 				if(m_LocalClientID != -1 && (m_aClients[m_LocalClientID].m_Team != aParaI[0] || (m_Snap.m_SpecInfo.m_Active &&
@@ -213,32 +194,8 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 			case GAMEMSG_CTF_CAPTURE:
 				dbg_msg("sound", "CSounds::CHN_GLOBAL, SOUND_CTF_CAPTURE);");
 				int ClientID = clamp(aParaI[1], 0, MAX_CLIENTS - 1);
-				// m_pStats->OnFlagCapture(ClientID);
-
 				float Time = aParaI[2] / (float)50;
-				if(Time <= 60)
-				{
-					if(aParaI[0])
-					{
-						str_format(aBuf, sizeof(aBuf), "The blue flag was captured by '%s' (%.2f seconds)", m_aClients[ClientID].m_aName, Time);
-					}
-					else
-					{
-						str_format(aBuf, sizeof(aBuf), "The red flag was captured by '%s' (%.2f seconds)", m_aClients[ClientID].m_aName, Time);
-					}
-				}
-				else
-				{
-					if(aParaI[0])
-					{
-						str_format(aBuf, sizeof(aBuf), "The blue flag was captured by '%s'", m_aClients[ClientID].m_aName);
-					}
-					else
-					{
-						str_format(aBuf, sizeof(aBuf), "The red flag was captured by '%s'", m_aClients[ClientID].m_aName);
-					}
-				}
-				dbg_msg("chat", "%s", aBuf);
+				dbg_msg("chat", "The %s flag was captured by %d in %.2f", aParaI[0] ? "blue" : "red", ClientID, Time);
 			}
 			return;
 		}
