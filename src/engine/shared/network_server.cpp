@@ -16,114 +16,113 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 
 		// TODO: empty the recvinfo
 		NETADDR Addr;
-		int Result = UnpackPacket(&Addr, m_RecvUnpacker.m_aBuffer, &m_RecvUnpacker.m_Data);
+		int Error = UnpackPacket(&Addr, m_RecvUnpacker.m_aBuffer, &m_RecvUnpacker.m_Data);
 		// no more packets for now
-		if(Result > 0)
+		if(Error > 0)
 			break;
+		if(Error)
+			continue;
 
-		if(!Result)
+		bool Found = false;
+		// try to find matching slot
+		for(int i = 0; i < NET_MAX_CLIENTS; i++)
 		{
-			bool Found = false;
-			// try to find matching slot
-			for(int i = 0; i < NET_MAX_CLIENTS; i++)
-			{
-				if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
-					continue;
-
-				if(net_addr_comp(m_aSlots[i].m_Connection.PeerAddress(), &Addr, true) == 0)
-				{
-					if(m_aSlots[i].m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr))
-					{
-						if(m_RecvUnpacker.m_Data.m_DataSize)
-						{
-							if(!(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONNLESS))
-								m_RecvUnpacker.Start(&Addr, &m_aSlots[i].m_Connection, i);
-							else
-							{
-								pChunk->m_Flags = NETSENDFLAG_CONNLESS;
-								pChunk->m_Address = *m_aSlots[i].m_Connection.PeerAddress();
-								pChunk->m_ClientID = i;
-								pChunk->m_DataSize = m_RecvUnpacker.m_Data.m_DataSize;
-								pChunk->m_pData = m_RecvUnpacker.m_Data.m_aChunkData;
-								if(pResponseToken)
-									*pResponseToken = NET_TOKEN_NONE;
-								return 1;
-							}
-						}
-					}
-					Found = true;
-				}
-			}
-
-			if(Found)
+			if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
 				continue;
 
-			if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONTROL)
+			if(net_addr_comp(m_aSlots[i].m_Connection.PeerAddress(), &Addr, true) == 0)
 			{
-				if(m_RecvUnpacker.m_Data.m_aChunkData[0] == NET_CTRLMSG_CONNECT)
+				if(m_aSlots[i].m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr))
 				{
-					// check if there are free slots
-					if(m_NumClients >= m_MaxClients)
+					if(m_RecvUnpacker.m_Data.m_DataSize)
 					{
-						const char FullMsg[] = "This server is full";
-						SendControlMsg(&Addr, m_RecvUnpacker.m_Data.m_ResponseToken, 0, NET_CTRLMSG_CLOSE, FullMsg, sizeof(FullMsg));
-						continue;
-					}
-
-					// only allow a specific number of players with the same ip
-					int FoundAddr = 1;
-
-					bool Continue = false;
-					for(int i = 0; i < NET_MAX_CLIENTS; i++)
-					{
-						if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
-							continue;
-
-						if(!net_addr_comp(&Addr, m_aSlots[i].m_Connection.PeerAddress(), false))
+						if(!(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONNLESS))
+							m_RecvUnpacker.Start(&Addr, &m_aSlots[i].m_Connection, i);
+						else
 						{
-							if(FoundAddr++ >= m_MaxClientsPerIP)
-							{
-								char aBuf[128];
-								str_format(aBuf, sizeof(aBuf), "Only %d players with the same IP are allowed", m_MaxClientsPerIP);
-								SendControlMsg(&Addr, m_RecvUnpacker.m_Data.m_ResponseToken, 0, NET_CTRLMSG_CLOSE, aBuf, str_length(aBuf) + 1);
-								Continue = true;
-								break;
-							}
+							pChunk->m_Flags = NETSENDFLAG_CONNLESS;
+							pChunk->m_Address = *m_aSlots[i].m_Connection.PeerAddress();
+							pChunk->m_ClientID = i;
+							pChunk->m_DataSize = m_RecvUnpacker.m_Data.m_DataSize;
+							pChunk->m_pData = m_RecvUnpacker.m_Data.m_aChunkData;
+							if(pResponseToken)
+								*pResponseToken = NET_TOKEN_NONE;
+							return 1;
 						}
 					}
+				}
+				Found = true;
+			}
+		}
 
-					if(Continue)
+		if(Found)
+			continue;
+
+		if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONTROL)
+		{
+			if(m_RecvUnpacker.m_Data.m_aChunkData[0] == NET_CTRLMSG_CONNECT)
+			{
+				// check if there are free slots
+				if(m_NumClients >= m_MaxClients)
+				{
+					const char FullMsg[] = "This server is full";
+					SendControlMsg(&Addr, m_RecvUnpacker.m_Data.m_ResponseToken, 0, NET_CTRLMSG_CLOSE, FullMsg, sizeof(FullMsg));
+					continue;
+				}
+
+				// only allow a specific number of players with the same ip
+				int FoundAddr = 1;
+
+				bool Continue = false;
+				for(int i = 0; i < NET_MAX_CLIENTS; i++)
+				{
+					if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
 						continue;
 
-					for(int i = 0; i < NET_MAX_CLIENTS; i++)
+					if(!net_addr_comp(&Addr, m_aSlots[i].m_Connection.PeerAddress(), false))
 					{
-						if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
+						if(FoundAddr++ >= m_MaxClientsPerIP)
 						{
-							m_NumClients++;
-							m_aSlots[i].m_Connection.SetToken(m_RecvUnpacker.m_Data.m_Token);
-							m_aSlots[i].m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr);
-							if(m_pfnNewClient)
-								m_pfnNewClient(i, m_UserPtr);
+							char aBuf[128];
+							str_format(aBuf, sizeof(aBuf), "Only %d players with the same IP are allowed", m_MaxClientsPerIP);
+							SendControlMsg(&Addr, m_RecvUnpacker.m_Data.m_ResponseToken, 0, NET_CTRLMSG_CLOSE, aBuf, str_length(aBuf) + 1);
+							Continue = true;
 							break;
 						}
 					}
 				}
-				else if(m_RecvUnpacker.m_Data.m_aChunkData[0] == NET_CTRLMSG_TOKEN)
+
+				if(Continue)
+					continue;
+
+				for(int i = 0; i < NET_MAX_CLIENTS; i++)
 				{
-					dbg_msg("server", "got client token = %d", m_RecvUnpacker.m_Data.m_ResponseToken);
+					if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
+					{
+						m_NumClients++;
+						m_aSlots[i].m_Connection.SetToken(m_RecvUnpacker.m_Data.m_Token);
+						m_aSlots[i].m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr);
+						if(m_pfnNewClient)
+							m_pfnNewClient(i, m_UserPtr);
+						break;
+					}
 				}
 			}
-			else if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONNLESS)
+			else if(m_RecvUnpacker.m_Data.m_aChunkData[0] == NET_CTRLMSG_TOKEN)
 			{
-				pChunk->m_Flags = NETSENDFLAG_CONNLESS;
-				pChunk->m_ClientID = -1;
-				pChunk->m_Address = Addr;
-				pChunk->m_DataSize = m_RecvUnpacker.m_Data.m_DataSize;
-				pChunk->m_pData = m_RecvUnpacker.m_Data.m_aChunkData;
-				if(pResponseToken)
-					*pResponseToken = m_RecvUnpacker.m_Data.m_ResponseToken;
-				return 1;
+				dbg_msg("server", "got client token = %d", m_RecvUnpacker.m_Data.m_ResponseToken);
 			}
+		}
+		else if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONNLESS)
+		{
+			pChunk->m_Flags = NETSENDFLAG_CONNLESS;
+			pChunk->m_ClientID = -1;
+			pChunk->m_Address = Addr;
+			pChunk->m_DataSize = m_RecvUnpacker.m_Data.m_DataSize;
+			pChunk->m_pData = m_RecvUnpacker.m_Data.m_aChunkData;
+			if(pResponseToken)
+				*pResponseToken = m_RecvUnpacker.m_Data.m_ResponseToken;
+			return 1;
 		}
 	}
 	return 0;
