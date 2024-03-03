@@ -232,8 +232,6 @@ private:
 	void SendControl(int ControlMsg, const void *pExtra, int ExtraSize);
 	void SendControlWithToken(int ControlMsg);
 
-	static TOKEN GenerateToken(const NETADDR *pPeerAddr);
-
 public:
 	void Init(CNetBase *pNetBase, bool BlockCloseMsg);
 	int Connect(NETADDR *pAddr);

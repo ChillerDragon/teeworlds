@@ -32,11 +32,6 @@ void CNetConnection::SetToken(TOKEN Token)
 	m_Token = Token;
 }
 
-TOKEN CNetConnection::GenerateToken(const NETADDR *pPeerAddr)
-{
-	return random_int() & NET_TOKEN_MASK;
-}
-
 void CNetConnection::Init(CNetBase *pNetBase, bool BlockCloseMsg)
 {
 	Reset();
@@ -122,7 +117,7 @@ int CNetConnection::Connect(NETADDR *pAddr)
 	m_LastRecvTime = time_get();
 	m_PeerAddr = *pAddr;
 	m_PeerToken = NET_TOKEN_NONE;
-	SetToken(GenerateToken(pAddr));
+	SetToken(NET_TOKEN_SOME);
 	m_State = NET_CONNSTATE_TOKEN;
 	SendControlWithToken(NET_CTRLMSG_TOKEN);
 	return 0;
