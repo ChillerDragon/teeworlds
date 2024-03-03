@@ -15,42 +15,41 @@ int CNetClient::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 
 		// TODO: empty the recvinfo
 		NETADDR Addr;
-		int Result = UnpackPacket(&Addr, m_RecvUnpacker.m_aBuffer, &m_RecvUnpacker.m_Data);
+		int Error = UnpackPacket(&Addr, m_RecvUnpacker.m_aBuffer, &m_RecvUnpacker.m_Data);
 		// no more packets for now
-		if(Result > 0)
+		if(Error > 0)
 			break;
+		if(Error)
+			continue;
 
-		if(!Result)
+		if(net_addr_comp(m_Connection.PeerAddress(), &Addr, true) == 0)
 		{
-			if(net_addr_comp(m_Connection.PeerAddress(), &Addr, true) == 0)
+			if(m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr))
 			{
-				if(m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr))
+				if(!(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONNLESS))
+					m_RecvUnpacker.Start(&Addr, &m_Connection, 0);
+			}
+		}
+		else
+		{
+			if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONTROL)
+			{
+				if(m_RecvUnpacker.m_Data.m_aChunkData[0] == NET_CTRLMSG_TOKEN)
 				{
-					if(!(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONNLESS))
-						m_RecvUnpacker.Start(&Addr, &m_Connection, 0);
+					dbg_msg("client", "got token = %d", m_RecvUnpacker.m_Data.m_ResponseToken);
 				}
 			}
-			else
+			else if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONNLESS)
 			{
-				if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONTROL)
-				{
-					if(m_RecvUnpacker.m_Data.m_aChunkData[0] == NET_CTRLMSG_TOKEN)
-					{
-						dbg_msg("client", "got token = %d", m_RecvUnpacker.m_Data.m_ResponseToken);
-					}
-				}
-				else if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONNLESS)
-				{
-					pChunk->m_Flags = NETSENDFLAG_CONNLESS;
-					pChunk->m_ClientID = -1;
-					pChunk->m_Address = Addr;
-					pChunk->m_DataSize = m_RecvUnpacker.m_Data.m_DataSize;
-					pChunk->m_pData = m_RecvUnpacker.m_Data.m_aChunkData;
+				pChunk->m_Flags = NETSENDFLAG_CONNLESS;
+				pChunk->m_ClientID = -1;
+				pChunk->m_Address = Addr;
+				pChunk->m_DataSize = m_RecvUnpacker.m_Data.m_DataSize;
+				pChunk->m_pData = m_RecvUnpacker.m_Data.m_aChunkData;
 
-					if(pResponseToken)
-						*pResponseToken = m_RecvUnpacker.m_Data.m_ResponseToken;
-					return 1;
-				}
+				if(pResponseToken)
+					*pResponseToken = m_RecvUnpacker.m_Data.m_ResponseToken;
+				return 1;
 			}
 		}
 	}
