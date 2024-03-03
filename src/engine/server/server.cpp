@@ -142,40 +142,6 @@ CServer::CServer()
 	Init();
 }
 
-
-void CServer::SetClientName(int ClientID, const char *pName)
-{
-	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY || !pName)
-		return;
-
-	const char *pDefaultName = "(1)";
-	pName = str_utf8_skip_whitespaces(pName);
-	str_utf8_copy_num(m_aClients[ClientID].m_aName, *pName ? pName : pDefaultName, sizeof(m_aClients[ClientID].m_aName), MAX_NAME_LENGTH);
-}
-
-void CServer::SetClientClan(int ClientID, const char *pClan)
-{
-	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY || !pClan)
-		return;
-
-	str_utf8_copy_num(m_aClients[ClientID].m_aClan, pClan, sizeof(m_aClients[ClientID].m_aClan), MAX_CLAN_LENGTH);
-}
-
-void CServer::SetClientCountry(int ClientID, int Country)
-{
-	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
-		return;
-
-	m_aClients[ClientID].m_Country = Country;
-}
-
-void CServer::SetClientScore(int ClientID, int Score)
-{
-	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
-		return;
-	m_aClients[ClientID].m_Score = Score;
-}
-
 int64 CServer::TickStartTime(int Tick)
 {
 	return m_GameStartTime + (time_freq()*Tick)/SERVER_TICK_SPEED;

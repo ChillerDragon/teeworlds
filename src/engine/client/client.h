@@ -82,7 +82,6 @@ class CClient : public IClient
 	// graphs
 	CGraph m_InputtimeMarginGraph;
 	CGraph m_GametimeMarginGraph;
-	CGraph m_FpsGraph;
 
 	// the game snapshots are modifiable by the game
 	class CSnapshotStorage m_SnapshotStorage;

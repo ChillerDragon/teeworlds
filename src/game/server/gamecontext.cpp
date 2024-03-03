@@ -408,18 +408,15 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		if (MsgID == NETMSGTYPE_CL_STARTINFO)
 		{
 			CNetMsg_Cl_StartInfo *pMsg = (CNetMsg_Cl_StartInfo *)pRawMsg;
-			pPlayer->m_LastChangeInfoTick = Server()->Tick();
-
-			// set start infos
-			Server()->SetClientName(ClientID, pMsg->m_pName);
-			Server()->SetClientClan(ClientID, pMsg->m_pClan);
-			Server()->SetClientCountry(ClientID, pMsg->m_Country);
+			dbg_msg("server", "Name=%s", pMsg->m_pName);
+			dbg_msg("server", "Clan=%s", pMsg->m_pClan);
+			dbg_msg("server", "Country=%d", pMsg->m_Country);
 
 			for(int p = 0; p < NUM_SKINPARTS; p++)
 			{
-				str_utf8_copy_num(pPlayer->m_TeeInfos.m_aaSkinPartNames[p], pMsg->m_apSkinPartNames[p], sizeof(pPlayer->m_TeeInfos.m_aaSkinPartNames[p]), MAX_SKIN_LENGTH);
-				pPlayer->m_TeeInfos.m_aUseCustomColors[p] = pMsg->m_aUseCustomColors[p];
-				pPlayer->m_TeeInfos.m_aSkinPartColors[p] = pMsg->m_aSkinPartColors[p];
+				dbg_msg("server", "pSkinPartNames=%s", pMsg->m_apSkinPartNames[p]);
+				dbg_msg("server", "UseCustomColors=%d", pMsg->m_aUseCustomColors[p]);
+				dbg_msg("server", "SkinPartColors=%d", pMsg->m_aSkinPartColors[p]);
 			}
 
 			// send vote options
