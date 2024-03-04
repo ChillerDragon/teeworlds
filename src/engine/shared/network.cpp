@@ -61,25 +61,10 @@ int CNetRecvUnpacker::FetchChunk(CNetChunk *pChunk)
 			return 0;
 		}
 
-		// handle sequence stuff
-		if(m_pConnection && (Header.m_Flags&NET_CHUNKFLAG_VITAL))
-		{
-			if(Header.m_Sequence == (m_pConnection->m_Ack+1)%NET_MAX_SEQUENCE)
-			{
-				// in sequence
-				m_pConnection->m_Ack = (m_pConnection->m_Ack+1)%NET_MAX_SEQUENCE;
-			}
-			else
-			{
-				// old packet that we already got
-				if(m_pConnection->IsSeqInBackroom(Header.m_Sequence, m_pConnection->m_Ack))
-					continue;
-
-				// out of sequence, request resend
-				dbg_msg("conn", "asking for resend %d %d", Header.m_Sequence, (m_pConnection->m_Ack+1)%NET_MAX_SEQUENCE);
-				continue; // take the next chunk in the packet
-			}
-		}
+		// removed a seq check here
+		// teeworlds would drop vital packages here
+		// which are already known
+		// or ask for a resend if something is missing
 
 		// fill in the info
 		pChunk->m_ClientID = m_ClientID;

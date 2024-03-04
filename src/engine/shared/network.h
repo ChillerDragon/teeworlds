@@ -250,15 +250,6 @@ public:
 
 	int State() const { return m_State; }
 	const NETADDR *PeerAddress() const { return &m_PeerAddr; }
-
-
-	// Needed for GotProblems in NetClient
-	int64 LastRecvTime() const { return m_LastRecvTime; }
-	int64 ConnectTime() const { return m_LastUpdateTime; }
-
-	int AckSequence() const { return m_Ack; }
-	// The backroom is ack-NET_MAX_SEQUENCE/2. Used for knowing if we acked a packet or not
-	static int IsSeqInBackroom(int Seq, int Ack);
 };
 
 class CConsoleNetConnection

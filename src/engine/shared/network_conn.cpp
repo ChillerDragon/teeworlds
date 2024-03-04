@@ -12,13 +12,6 @@ void CNetConnection::ResetStats()
 
 void CNetConnection::Reset()
 {
-	m_Sequence = 0;
-	m_Ack = 0;
-	m_RemoteClosed = 0;
-
-	m_LastSendTime = 0;
-	m_LastRecvTime = 0;
-	m_LastUpdateTime = 0;
 	m_Token = NET_TOKEN_NONE;
 	m_PeerToken = NET_TOKEN_NONE;
 	mem_zero(&m_PeerAddr, sizeof(m_PeerAddr));
@@ -102,24 +95,25 @@ void CNetConnection::SendControl(int ControlMsg, const void *pExtra, int ExtraSi
 
 void CNetConnection::SendPacketConnless(const char *pData, int DataSize)
 {
-	m_pNetBase->SendPacketConnless(&m_PeerAddr, m_PeerToken, m_Token, pData, DataSize);
+	TOKEN PeerToken = NET_TOKEN_SOME;
+	TOKEN Token = NET_TOKEN_SOME;
+	m_pNetBase->SendPacketConnless(&m_PeerAddr, PeerToken, Token, pData, DataSize);
 }
 
 void CNetConnection::SendControlWithToken(int ControlMsg)
 {
-	m_LastSendTime = time_get();
-	m_pNetBase->SendControlMsgWithToken(&m_PeerAddr, m_PeerToken, 0, ControlMsg, m_Token, true);
+	TOKEN PeerToken = NET_TOKEN_SOME;
+	TOKEN Token = NET_TOKEN_SOME;
+	m_pNetBase->SendControlMsgWithToken(&m_PeerAddr, PeerToken, 0, ControlMsg, Token, true);
 }
 
 int CNetConnection::Connect(NETADDR *pAddr)
 {
 	// init connection
 	Reset();
-	m_LastRecvTime = time_get();
 	m_PeerAddr = *pAddr;
 	m_PeerToken = NET_TOKEN_NONE;
 	SetToken(NET_TOKEN_SOME);
-	m_State = NET_CONNSTATE_TOKEN;
 	SendControlWithToken(NET_CTRLMSG_TOKEN);
 	return 0;
 }
@@ -132,12 +126,7 @@ void CNetConnection::Disconnect(const char *pReason)
 
 int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 {
-	if(pPacket->m_Token == NET_TOKEN_NONE || pPacket->m_Token != m_Token)
-	{
-		dbg_msg("network_in", "feed wrong token=%x expected=%x or_none=%x", pPacket->m_Token, m_Token, NET_TOKEN_NONE);
-		return 0;
-	}
-
+	// would do token check here
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
 	{
 		dbg_msg("network_in", "feed not connless");
@@ -153,8 +142,6 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 			if(net_addr_comp(&m_PeerAddr, pAddr, true) == 0)
 			{
 				m_State = NET_CONNSTATE_ERROR;
-				m_RemoteClosed = 1;
-
 				char Str[128] = {0};
 				if(pPacket->m_DataSize > 1)
 				{
@@ -174,16 +161,15 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 		{
 			if(CtrlMsg == NET_CTRLMSG_TOKEN)
 			{
-				m_PeerToken = pPacket->m_ResponseToken;
+				TOKEN PeerToken = pPacket->m_ResponseToken;
 
 				if(State() == NET_CONNSTATE_TOKEN)
 				{
-					m_State = NET_CONNSTATE_CONNECT;
 					SendControlWithToken(NET_CTRLMSG_CONNECT);
-					dbg_msg("connection", "got token, replying, token=%x mytoken=%x", m_PeerToken, m_Token);
+					dbg_msg("connection", "got token, replying, token=%x", PeerToken);
 				}
 				else
-					dbg_msg("connection", "got token, token=%x", m_PeerToken);
+					dbg_msg("connection", "got token, token=%x", PeerToken);
 			}
 			else if(CtrlMsg == NET_CTRLMSG_CONNECT)
 			{
@@ -200,37 +186,10 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 			// connection made
 			else if(CtrlMsg == NET_CTRLMSG_ACCEPT)
 			{
-				m_State = NET_CONNSTATE_ONLINE;
 				dbg_msg("connection", "got accept. connection online");
 			}
-		}
-	}
-	else
-	{
-		if(State() == NET_CONNSTATE_PENDING)
-		{
-			m_State = NET_CONNSTATE_ONLINE;
-			dbg_msg("connection", "connecting online");
 		}
 	}
 	return 1;
 }
 
-int CNetConnection::IsSeqInBackroom(int Seq, int Ack)
-{
-	int Bottom = (Ack - NET_MAX_SEQUENCE / 2);
-	if(Bottom < 0)
-	{
-		if(Seq <= Ack)
-			return 1;
-		if(Seq >= (Bottom + NET_MAX_SEQUENCE))
-			return 1;
-	}
-	else
-	{
-		if(Seq <= Ack && Seq >= Bottom)
-			return 1;
-	}
-
-	return 0;
-}
