@@ -14,7 +14,6 @@ void CNetConnection::Reset()
 {
 	m_Sequence = 0;
 	m_Ack = 0;
-	m_PeerAck = 0;
 	m_RemoteClosed = 0;
 
 	m_LastSendTime = 0;
@@ -96,7 +95,9 @@ void CNetConnection::SendControl(int ControlMsg, const void *pExtra, int ExtraSi
 {
 	// send the control message
 	m_LastSendTime = time_get();
-	m_pNetBase->SendControlMsg(&m_PeerAddr, m_PeerToken, m_Ack, ControlMsg, pExtra, ExtraSize);
+	TOKEN PeerToken = NET_TOKEN_SOME;
+	int Ack = 0;
+	m_pNetBase->SendControlMsg(&m_PeerAddr, PeerToken, Ack, ControlMsg, pExtra, ExtraSize);
 }
 
 void CNetConnection::SendPacketConnless(const char *pData, int DataSize)
@@ -131,27 +132,6 @@ void CNetConnection::Disconnect(const char *pReason)
 
 int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 {
-	// check if actual ack value is valid(own sequence..latest peer ack)
-	if(m_Sequence >= m_PeerAck)
-	{
-		if(pPacket->m_Ack < m_PeerAck || pPacket->m_Ack > m_Sequence)
-		{
-			dbg_msg("network_in", "feed wrong ack 1");
-			return 0;
-		}
-	}
-	else
-	{
-		if(pPacket->m_Ack < m_PeerAck && pPacket->m_Ack > m_Sequence)
-		{
-			dbg_msg("network_in", "feed wrong ack 2");
-			return 0;
-		}
-	}
-	m_PeerAck = pPacket->m_Ack;
-
-	int64 Now = time_get();
-
 	if(pPacket->m_Token == NET_TOKEN_NONE || pPacket->m_Token != m_Token)
 	{
 		dbg_msg("network_in", "feed wrong token=%x expected=%x or_none=%x", pPacket->m_Token, m_Token, NET_TOKEN_NONE);
@@ -198,7 +178,6 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 
 				if(State() == NET_CONNSTATE_TOKEN)
 				{
-					m_LastRecvTime = Now;
 					m_State = NET_CONNSTATE_CONNECT;
 					SendControlWithToken(NET_CTRLMSG_CONNECT);
 					dbg_msg("connection", "got token, replying, token=%x mytoken=%x", m_PeerToken, m_Token);
@@ -215,16 +194,12 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 				m_PeerAddr = *pAddr;
 				m_PeerToken = pPacket->m_ResponseToken;
 				m_Token = Token;
-				m_LastSendTime = Now;
-				m_LastRecvTime = Now;
-				m_LastUpdateTime = Now;
 				SendControl(NET_CTRLMSG_ACCEPT, 0, 0);
 				dbg_msg("connection", "got connection, sending accept");
 			}
 			// connection made
 			else if(CtrlMsg == NET_CTRLMSG_ACCEPT)
 			{
-				m_LastRecvTime = Now;
 				m_State = NET_CONNSTATE_ONLINE;
 				dbg_msg("connection", "got accept. connection online");
 			}
@@ -234,17 +209,10 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 	{
 		if(State() == NET_CONNSTATE_PENDING)
 		{
-			m_LastRecvTime = Now;
 			m_State = NET_CONNSTATE_ONLINE;
 			dbg_msg("connection", "connecting online");
 		}
 	}
-
-	if(State() == NET_CONNSTATE_ONLINE)
-	{
-		m_LastRecvTime = Now;
-	}
-
 	return 1;
 }
 
