@@ -61,14 +61,6 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 		{
 			if(m_RecvUnpacker.m_Data.m_aChunkData[0] == NET_CTRLMSG_CONNECT)
 			{
-				// check if there are free slots
-				if(m_NumClients >= m_MaxClients)
-				{
-					const char FullMsg[] = "This server is full";
-					SendControlMsg(&Addr, m_RecvUnpacker.m_Data.m_ResponseToken, 0, NET_CTRLMSG_CLOSE, FullMsg, sizeof(FullMsg));
-					continue;
-				}
-
 				for(int i = 0; i < NET_MAX_CLIENTS; i++)
 				{
 					if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
