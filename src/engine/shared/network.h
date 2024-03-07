@@ -325,10 +325,6 @@ public:
 
 	// status requests
 	const NETADDR *ClientAddr(int ClientID) const { return m_aSlots[ClientID].m_Connection.PeerAddress(); }
-
-	//
-	void SetMaxClients(int MaxClients);
-	void SetMaxClientsPerIP(int MaxClientsPerIP);
 };
 
 

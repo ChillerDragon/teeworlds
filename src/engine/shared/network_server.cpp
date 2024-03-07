@@ -14,7 +14,6 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 		if(m_RecvUnpacker.IsActive() && m_RecvUnpacker.FetchChunk(pChunk))
 			return 1;
 
-		// TODO: empty the recvinfo
 		NETADDR Addr;
 		int Error = UnpackPacket(&Addr, m_RecvUnpacker.m_aBuffer, &m_RecvUnpacker.m_Data);
 		// no more packets for now
@@ -69,31 +68,6 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 					SendControlMsg(&Addr, m_RecvUnpacker.m_Data.m_ResponseToken, 0, NET_CTRLMSG_CLOSE, FullMsg, sizeof(FullMsg));
 					continue;
 				}
-
-				// only allow a specific number of players with the same ip
-				int FoundAddr = 1;
-
-				bool Continue = false;
-				for(int i = 0; i < NET_MAX_CLIENTS; i++)
-				{
-					if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
-						continue;
-
-					if(!net_addr_comp(&Addr, m_aSlots[i].m_Connection.PeerAddress(), false))
-					{
-						if(FoundAddr++ >= m_MaxClientsPerIP)
-						{
-							char aBuf[128];
-							str_format(aBuf, sizeof(aBuf), "Only %d players with the same IP are allowed", m_MaxClientsPerIP);
-							SendControlMsg(&Addr, m_RecvUnpacker.m_Data.m_ResponseToken, 0, NET_CTRLMSG_CLOSE, aBuf, str_length(aBuf) + 1);
-							Continue = true;
-							break;
-						}
-					}
-				}
-
-				if(Continue)
-					continue;
 
 				for(int i = 0; i < NET_MAX_CLIENTS; i++)
 				{
@@ -191,12 +165,3 @@ int CNetServer::Send(CNetChunk *pChunk, TOKEN Token)
 	return 0;
 }
 
-void CNetServer::SetMaxClients(int MaxClients)
-{
-	m_MaxClients = clamp(MaxClients, 1, int(NET_MAX_CLIENTS));
-}
-
-void CNetServer::SetMaxClientsPerIP(int MaxClientsPerIP)
-{
-	m_MaxClientsPerIP = clamp(MaxClientsPerIP, 1, int(NET_MAX_CLIENTS));
-}
