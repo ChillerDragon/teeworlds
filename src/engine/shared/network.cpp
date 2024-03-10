@@ -47,12 +47,12 @@ int CNetRecvUnpacker::FetchChunk(CNetChunk *pChunk)
 		// TODO: add checking here so we don't read too far
 		for(int i = 0; i < m_CurrentChunk; i++)
 		{
-			pData = Header.Unpack(pData);
+			pData = Header.Unpack075(pData);
 			pData += Header.m_Size;
 		}
 
 		// unpack the header
-		pData = Header.Unpack(pData);
+		pData = Header.Unpack075(pData);
 		m_CurrentChunk++;
 
 		if(pData+Header.m_Size > pEnd)
@@ -298,7 +298,7 @@ void CNetBase::SendControlMsgWithToken(const NETADDR *pAddr, TOKEN Token, int Ac
 	SendControlMsg(pAddr, Token, 0, ControlMsg, m_aRequestTokenBuf, Extended ? sizeof(m_aRequestTokenBuf) : 4);
 }
 
-unsigned char *CNetChunkHeader::Pack(unsigned char *pData)
+unsigned char *CNetChunkHeader::Pack075(unsigned char *pData)
 {
 	pData[0] = ((m_Flags&0x03)<<6) | ((m_Size>>6)&0x3F);
 	pData[1] = (m_Size&0x3F);
@@ -311,7 +311,7 @@ unsigned char *CNetChunkHeader::Pack(unsigned char *pData)
 	return pData + 2;
 }
 
-unsigned char *CNetChunkHeader::Unpack(unsigned char *pData)
+unsigned char *CNetChunkHeader::Unpack075(unsigned char *pData)
 {
 	m_Flags = (pData[0]>>6)&0x03;
 	m_Size = ((pData[0]&0x3F)<<6) | (pData[1]&0x3F);
@@ -326,6 +326,32 @@ unsigned char *CNetChunkHeader::Unpack(unsigned char *pData)
 	if(m_Flags&NET_CHUNKFLAG_VITAL)
 	{
 		m_Sequence = ((pData[1]&0xC0)<<2) | pData[2];
+		return pData + 3;
+	}
+	return pData + 2;
+}
+
+unsigned char *CNetChunkHeader::Pack065(unsigned char *pData)
+{
+	pData[0] = ((m_Flags&3)<<6)|((m_Size>>4)&0x3f);
+	pData[1] = (m_Size&0xf);
+	if(m_Flags&NET_CHUNKFLAG_VITAL)
+	{
+		pData[1] |= (m_Sequence>>2)&0xf0;
+		pData[2] = m_Sequence&0xff;
+		return pData + 3;
+	}
+	return pData + 2;
+}
+
+unsigned char *CNetChunkHeader::Unpack065(unsigned char *pData)
+{
+	m_Flags = (pData[0]>>6)&3;
+	m_Size = ((pData[0]&0x3f)<<4) | (pData[1]&0xf);
+	m_Sequence = -1;
+	if(m_Flags&NET_CHUNKFLAG_VITAL)
+	{
+		m_Sequence = ((pData[1]&0xf0)<<2) | pData[2];
 		return pData + 3;
 	}
 	return pData + 2;

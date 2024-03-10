@@ -66,7 +66,7 @@ int CNetConnection::QueueChunkEx(int Flags, int DataSize, const void *pData, int
 	Header.m_Size = DataSize;
 	Header.m_Sequence = Sequence;
 	pChunkData = &m_Construct.m_aChunkData[m_Construct.m_DataSize];
-	pChunkData = Header.Pack(pChunkData);
+	pChunkData = Header.Pack075(pChunkData);
 	mem_copy(pChunkData, pData, DataSize);
 	pChunkData += DataSize;
 

@@ -154,8 +154,23 @@ public:
 	int m_Size;
 	int m_Sequence;
 
-	unsigned char *Pack(unsigned char *pData);
-	unsigned char *Unpack(unsigned char *pData);
+	/*
+	* 0.6.5 implementation of chunk header packing
+	*/
+	unsigned char *Pack065(unsigned char *pData);
+	/*
+	* 0.6.5 implementation of chunk header unpacking
+	*/
+	unsigned char *Unpack065(unsigned char *pData);
+
+	/*
+	* 0.7.5 implementation of chunk header packing
+	*/
+	unsigned char *Pack075(unsigned char *pData);
+	/*
+	* 0.7.5 implementation of chunk header unpacking
+	*/
+	unsigned char *Unpack075(unsigned char *pData);
 };
 
 class CNetPacketConstruct
