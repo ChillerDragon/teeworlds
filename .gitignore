@@ -35,6 +35,7 @@ teeworlds_srv*
 !other/bash-completion/teeworlds_srv
 testrunner
 versionsrv*
+test
 
 # IDE project files
 .cache
