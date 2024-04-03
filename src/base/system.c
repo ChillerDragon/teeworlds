@@ -28,7 +28,7 @@
 
 	#include <dirent.h>
 
-	#if defined(CONF_PLATFORM_MACOSX)
+	#if defined(CONF_PLATFORM_MACOS)
 		#include <Carbon/Carbon.h>
 	#endif
 
@@ -281,6 +281,11 @@ void dbg_console_cleanup()
 {
 	SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), old_console_mode);
 }
+
+void dbg_console_hide()
+{
+	FreeConsole();
+}
 #endif
 /* */
 
@@ -313,12 +318,12 @@ IOHANDLE io_open_impl(const char *filename, int flags)
 {
 	dbg_assert(flags == (IOFLAG_READ | IOFLAG_SKIP_BOM) || flags == IOFLAG_READ || flags == IOFLAG_WRITE || flags == IOFLAG_APPEND, "flags must be read, read+skipbom, write or append");
 #if defined(CONF_FAMILY_WINDOWS)
-	WCHAR wBuffer[IO_MAX_PATH_LENGTH];
 	if((flags & IOFLAG_READ) != 0)
 	{
 		// check for filename case sensitive
 		WIN32_FIND_DATAW finddata;
 		HANDLE handle;
+		WCHAR wBuffer[IO_MAX_PATH_LENGTH];
 		char buffer[IO_MAX_PATH_LENGTH];
 
 		int length = str_length(filename);
@@ -339,11 +344,13 @@ IOHANDLE io_open_impl(const char *filename, int flags)
 	}
 	if(flags == IOFLAG_WRITE)
 	{
+		WCHAR wBuffer[IO_MAX_PATH_LENGTH];
 		MultiByteToWideChar(CP_UTF8, 0, filename, -1, wBuffer, sizeof(wBuffer) / sizeof(WCHAR));
 		return (IOHANDLE)_wfsopen(wBuffer, L"wb", _SH_DENYNO);
 	}
 	if(flags == IOFLAG_APPEND)
 	{
+		WCHAR wBuffer[IO_MAX_PATH_LENGTH];
 		MultiByteToWideChar(CP_UTF8, 0, filename, -1, wBuffer, sizeof(wBuffer) / sizeof(WCHAR));
 		return (IOHANDLE)_wfsopen(wBuffer, L"ab", _SH_DENYNO);
 	}
@@ -672,7 +679,7 @@ void lock_unlock(LOCK lock)
 #endif
 }
 
-#if !defined(CONF_PLATFORM_MACOSX)
+#if !defined(CONF_PLATFORM_MACOS)
 	#if defined(CONF_FAMILY_UNIX)
 	void semaphore_init(SEMAPHORE *sem) { sem_init(sem, 0, 0); }
 	void semaphore_wait(SEMAPHORE *sem) { sem_wait(sem); }
@@ -1523,7 +1530,7 @@ static inline time_t filetime_to_unixtime(LPFILETIME filetime)
 	li.QuadPart -= 11644473600LL; // Windows epoch is in the past
 
 	t = li.QuadPart;
-	return t == li.QuadPart ? t : (time_t)-1;
+	return t == (time_t)li.QuadPart ? t : (time_t)-1;
 }
 #endif
 
@@ -1605,10 +1612,10 @@ void fs_listdir_fileinfo(const char *dir, FS_LISTDIR_CALLBACK_FILEINFO cb, int t
 	/* add all the entries */
 	do
 	{
+		CFsFileInfo info;
 		WideCharToMultiByte(CP_UTF8, 0, finddata.cFileName, -1, buffer2, sizeof(buffer2), NULL, NULL);
 		str_copy(buffer+length, buffer2, (int)sizeof(buffer)-length);
 
-		CFsFileInfo info;
 		info.m_pName = buffer2;
 		info.m_TimeCreated = filetime_to_unixtime(&finddata.ftCreationTime);
 		info.m_TimeModified = filetime_to_unixtime(&finddata.ftLastWriteTime);
@@ -1671,7 +1678,7 @@ int fs_storage_path(const char *appname, char *path, int max)
 	if(!home)
 		return -1;
 
-#if defined(CONF_PLATFORM_MACOSX)
+#if defined(CONF_PLATFORM_MACOS)
 	str_format(path, max, "%s/Library/Application Support/%s", home, appname);
 	return 0;
 #endif
@@ -1757,8 +1764,9 @@ int fs_is_dir(const char *path)
 {
 #if defined(CONF_FAMILY_WINDOWS)
 	WCHAR wPath[IO_MAX_PATH_LENGTH];
+	DWORD attributes;
 	MultiByteToWideChar(CP_UTF8, 0, path, -1, wPath, sizeof(wPath) / sizeof(WCHAR));
-	DWORD attributes = GetFileAttributesW(wPath);
+	attributes = GetFileAttributesW(wPath);
 	return attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) ? 1 : 0;
 #else
 	struct stat sb;
@@ -2102,9 +2110,8 @@ void str_append(char *dst, const char *src, int dst_size)
 void str_copy(char *dst, const char *src, int dst_size)
 {
 	dbg_assert(dst_size > 0, "dst_size invalid");
-
-	strncpy(dst, src, dst_size-1);
-	dst[dst_size-1] = 0; /* assure null termination */
+	dst[0] = '\0';
+	strncat(dst, src, dst_size - 1);
 }
 
 void str_truncate(char *dst, int dst_size, const char *src, int truncation_len)
@@ -2928,10 +2935,11 @@ void cmdline_fix(int *argc, const char ***argv)
 {
 #if defined(CONF_FAMILY_WINDOWS)
 	int wide_argc = 0;
+	int total_size = 0;
+	int remaining_size;
+	char **new_argv;
 	WCHAR **wide_argv = CommandLineToArgvW(GetCommandLineW(), &wide_argc);
 	dbg_assert(wide_argv != NULL, "CommandLineToArgvW failure");
-
-	int total_size = 0;
 
 	for(int i = 0; i < wide_argc; i++)
 	{
@@ -2940,11 +2948,11 @@ void cmdline_fix(int *argc, const char ***argv)
 		total_size += size;
 	}
 
-	char **new_argv = (char **)malloc((wide_argc + 1) * sizeof(*new_argv));
+	new_argv = (char **)malloc((wide_argc + 1) * sizeof(*new_argv));
 	new_argv[0] = (char *)malloc(total_size);
 	mem_zero(new_argv[0], total_size);
 
-	int remaining_size = total_size;
+	remaining_size = total_size;
 	for(int i = 0; i < wide_argc; i++)
 	{
 		int size = WideCharToMultiByte(CP_UTF8, 0, wide_argv[i], -1, new_argv[i], remaining_size, NULL, NULL);

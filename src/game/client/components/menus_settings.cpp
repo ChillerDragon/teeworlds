@@ -850,8 +850,6 @@ void CMenus::RenderSettingsGeneral(CUIRect MainView)
 
 	// render client menu background
 	NumOptions = 4;
-	if(Config()->m_ClAutoDemoRecord) NumOptions += 1;
-	if(Config()->m_ClAutoScreenshot) NumOptions += 1;
 	BackgroundHeight = (float)(NumOptions+1)*ButtonHeight+(float)NumOptions*Spacing;
 
 	MainView.HSplitTop(10.0f, 0, &MainView);
@@ -941,7 +939,7 @@ void CMenus::RenderSettingsGeneral(CUIRect MainView)
 	CUIRect CheckBoxShowHud, CheckBoxHideScore;
 	Button.VSplitMid(&CheckBoxShowHud, &CheckBoxHideScore);
 
-	if(DoButton_CheckBox(&Config()->m_ClShowhud, Localize("Show ingame HUD"), Config()->m_ClShowhud, &CheckBoxShowHud))
+	if(DoButton_CheckBox(&Config()->m_ClShowhud, Localize("Show in-game HUD"), Config()->m_ClShowhud, &CheckBoxShowHud))
 		Config()->m_ClShowhud ^= 1;
 
 	if(DoButton_CheckBox(&Config()->m_ClHideSelfScore, Localize("Hide player's score"), Config()->m_ClHideSelfScore, &CheckBoxHideScore))
@@ -980,40 +978,37 @@ void CMenus::RenderSettingsGeneral(CUIRect MainView)
 	Client.HSplitTop(ButtonHeight, &Label, &Client);
 	UI()->DoLabel(&Label, Localize("Client"), ButtonHeight*CUI::ms_FontmodHeight*0.8f, TEXTALIGN_MC);
 
+	CUIRect ClientLeft, ClientRight;
 	Client.HSplitTop(Spacing, 0, &Client);
-	Client.HSplitTop(ButtonHeight, &Button, &Client);
-	if(DoButton_CheckBox(&Config()->m_ClSkipStartMenu, Localize("Skip the main menu"), Config()->m_ClSkipStartMenu, &Button))
+	Client.HSplitTop(ButtonHeight, &ClientLeft, &Client);
+	ClientLeft.VSplitMid(&ClientLeft, &ClientRight, Spacing);
+	if(DoButton_CheckBox(&Config()->m_ClSkipStartMenu, Localize("Skip the main menu"), Config()->m_ClSkipStartMenu, &ClientLeft))
 		Config()->m_ClSkipStartMenu ^= 1;
+
+	if(DoButton_CheckBox(&Config()->m_UiWideview, Localize("Wide menu"), Config()->m_UiWideview, &ClientRight))
+		Config()->m_UiWideview ^= 1;
 
 	Client.HSplitTop(Spacing, 0, &Client);
 	Client.HSplitTop(ButtonHeight, &Button, &Client);
 	UI()->DoScrollbarOption(&Config()->m_ClMenuAlpha, &Config()->m_ClMenuAlpha, &Button, Localize("Menu background opacity"), 0, 75);
 
 	Client.HSplitTop(Spacing, 0, &Client);
-	Client.HSplitTop(ButtonHeight, &Button, &Client);
-	if(DoButton_CheckBox(&Config()->m_ClAutoDemoRecord, Localize("Automatically record demos"), Config()->m_ClAutoDemoRecord, &Button))
+	Client.HSplitTop(ButtonHeight, &ClientLeft, &Client);
+	ClientLeft.VSplitMid(&ClientLeft, &ClientRight, Spacing);
+	if(DoButton_CheckBox(&Config()->m_ClAutoDemoRecord, Localize("Automatically record demos"), Config()->m_ClAutoDemoRecord, &ClientLeft))
 		Config()->m_ClAutoDemoRecord ^= 1;
 
 	if(Config()->m_ClAutoDemoRecord)
-	{
-		Client.HSplitTop(Spacing, 0, &Client);
-		Client.HSplitTop(ButtonHeight, &Button, &Client);
-		Button.VSplitLeft(ButtonHeight, 0, &Button);
-		UI()->DoScrollbarOption(&Config()->m_ClAutoDemoMax, &Config()->m_ClAutoDemoMax, &Button, Localize("Max"), 0, 1000, &LogarithmicScrollbarScale, true);
-	}
+		UI()->DoScrollbarOption(&Config()->m_ClAutoDemoMax, &Config()->m_ClAutoDemoMax, &ClientRight, Localize("Max"), 0, 1000, &CUI::ms_LogarithmicScrollbarScale, true);
 
 	Client.HSplitTop(Spacing, 0, &Client);
-	Client.HSplitTop(ButtonHeight, &Button, &Client);
-	if(DoButton_CheckBox(&Config()->m_ClAutoScreenshot, Localize("Automatically take game over screenshot"), Config()->m_ClAutoScreenshot, &Button))
+	Client.HSplitTop(ButtonHeight, &ClientLeft, &Client);
+	ClientLeft.VSplitMid(&ClientLeft, &ClientRight, Spacing);
+	if(DoButton_CheckBox(&Config()->m_ClAutoScreenshot, Localize("Automatically take game over screenshot"), Config()->m_ClAutoScreenshot, &ClientLeft))
 		Config()->m_ClAutoScreenshot ^= 1;
 
 	if(Config()->m_ClAutoScreenshot)
-	{
-		Client.HSplitTop(Spacing, 0, &Client);
-		Client.HSplitTop(ButtonHeight, &Button, &Client);
-		Button.VSplitLeft(ButtonHeight, 0, &Button);
-		UI()->DoScrollbarOption(&Config()->m_ClAutoScreenshotMax, &Config()->m_ClAutoScreenshotMax, &Button, Localize("Max"), 0, 1000, &LogarithmicScrollbarScale, true);
-	}
+		UI()->DoScrollbarOption(&Config()->m_ClAutoScreenshotMax, &Config()->m_ClAutoScreenshotMax, &ClientRight, Localize("Max"), 0, 1000, &CUI::ms_LogarithmicScrollbarScale, true);
 
 	MainView.HSplitTop(10.0f, 0, &MainView);
 
@@ -1501,8 +1496,8 @@ float CMenus::RenderSettingsControlsStats(CUIRect View)
 	CUIRect Button;
 
 	View.HSplitTop(RowHeight, &Button, &View);
-	if(DoButton_CheckBox(s_aCheckboxIds + 0, Localize("Frags"), Config()->m_ClStatboardInfos & TC_STATS_FRAGS, &Button))
-		Config()->m_ClStatboardInfos ^= TC_STATS_FRAGS;
+	if(DoButton_CheckBox(s_aCheckboxIds + 0, Localize("Kills"), Config()->m_ClStatboardInfos & TC_STATS_KILLS, &Button))
+		Config()->m_ClStatboardInfos ^= TC_STATS_KILLS;
 
 	View.HSplitTop(RowHeight, &Button, &View);
 	if(DoButton_CheckBox(s_aCheckboxIds + 1, Localize("Deaths"), Config()->m_ClStatboardInfos & TC_STATS_DEATHS, &Button))
@@ -1515,16 +1510,16 @@ float CMenus::RenderSettingsControlsStats(CUIRect View)
 	View.HSplitTop(RowHeight, &Button, &View);
 	if(DoButton_CheckBox(s_aCheckboxIds + 3, Localize("Ratio"), Config()->m_ClStatboardInfos & TC_STATS_RATIO, &Button))
 		Config()->m_ClStatboardInfos ^= TC_STATS_RATIO;
-	UI()->DoTooltip(s_aCheckboxIds + 3, &Button, Localize("The ratio of frags to deaths."));
+	UI()->DoTooltip(s_aCheckboxIds + 3, &Button, Localize("The ratio of kills to deaths."));
 
 	View.HSplitTop(RowHeight, &Button, &View);
 	if(DoButton_CheckBox(s_aCheckboxIds + 4, Localize("Net score"), Config()->m_ClStatboardInfos & TC_STATS_NET, &Button))
 		Config()->m_ClStatboardInfos ^= TC_STATS_NET;
-	UI()->DoTooltip(s_aCheckboxIds + 4, &Button, Localize("The number of frags minus the number of deaths."));
+	UI()->DoTooltip(s_aCheckboxIds + 4, &Button, Localize("The number of kills minus the number of deaths."));
 
 	View.HSplitTop(RowHeight, &Button, &View);
-	if(DoButton_CheckBox(s_aCheckboxIds + 5, Localize("Frags per minute"), Config()->m_ClStatboardInfos & TC_STATS_FPM, &Button))
-		Config()->m_ClStatboardInfos ^= TC_STATS_FPM;
+	if(DoButton_CheckBox(s_aCheckboxIds + 5, Localize("Kills per minute"), Config()->m_ClStatboardInfos & TC_STATS_KPM, &Button))
+		Config()->m_ClStatboardInfos ^= TC_STATS_KPM;
 
 	View.HSplitTop(RowHeight, &Button, &View);
 	if(DoButton_CheckBox(s_aCheckboxIds + 6, Localize("Current spree"), Config()->m_ClStatboardInfos & TC_STATS_SPREE, &Button))
@@ -1537,7 +1532,7 @@ float CMenus::RenderSettingsControlsStats(CUIRect View)
 	View.HSplitTop(RowHeight, &Button, &View);
 	if(DoButton_CheckBox(s_aCheckboxIds + 8, Localize("Weapons stats"), Config()->m_ClStatboardInfos & TC_STATS_WEAPS, &Button))
 		Config()->m_ClStatboardInfos ^= TC_STATS_WEAPS;
-	UI()->DoTooltip(s_aCheckboxIds + 8, &Button, Localize("The proportion of frags gotten with each weapon."));
+	UI()->DoTooltip(s_aCheckboxIds + 8, &Button, Localize("The proportion of kills gotten with each weapon."));
 
 	View.HSplitTop(RowHeight, &Button, &View);
 	if(DoButton_CheckBox(s_aCheckboxIds + 9, Localize("Flag grabs"), Config()->m_ClStatboardInfos & TC_STATS_FLAGGRABS, &Button))
@@ -1596,7 +1591,7 @@ bool CMenus::DoResolutionList(CUIRect* pRect, CListBox* pListBox,
 void CMenus::RenderSettingsGraphics(CUIRect MainView)
 {
 	bool CheckFullscreen = false;
-	#ifdef CONF_PLATFORM_MACOSX
+	#ifdef CONF_PLATFORM_MACOS
 	CheckFullscreen = true;
 	#endif
 
@@ -1895,7 +1890,7 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 		Sound.HSplitTop(Spacing, 0, &Sound);
 		Sound.HSplitTop(ButtonHeight, &Button, &Sound);
 		Button.VSplitLeft(ButtonHeight, 0, &Button);
-		if(DoButton_CheckBox(&Config()->m_SndNonactiveMute, Localize("Mute when not active"), Config()->m_SndNonactiveMute, &Button))
+		if(DoButton_CheckBox(&Config()->m_SndNonactiveMute, Localize("Mute when window is inactive"), Config()->m_SndNonactiveMute, &Button))
 			Config()->m_SndNonactiveMute ^= 1;
 
 		// render detail menu
@@ -1940,7 +1935,7 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 		}
 
 		Right.HSplitTop(ButtonHeight, &Button, &Right);
-		UI()->DoScrollbarOption(&Config()->m_SndVolume, &Config()->m_SndVolume, &Button, Localize("Volume"), 0, 100, &LogarithmicScrollbarScale);
+		UI()->DoScrollbarOption(&Config()->m_SndVolume, &Config()->m_SndVolume, &Button, Localize("Volume"), 0, 100, &CUI::ms_LogarithmicScrollbarScale);
 	}
 	else
 	{
@@ -2006,6 +2001,15 @@ void CMenus::ResetSettingsGeneral()
 void CMenus::ResetSettingsControls()
 {
 	m_pClient->m_pBinds->SetDefaults();
+
+	Config()->m_JoystickEnable = 0;
+	Config()->m_JoystickGUID[0] = '\0';
+	Config()->m_JoystickAbsolute = 0;
+	Config()->m_JoystickSens = 100;
+	Config()->m_JoystickX = 0;
+	Config()->m_JoystickY = 1;
+	Config()->m_JoystickTolerance = 5;
+	Config()->m_UiJoystickSens = 100;
 }
 
 void CMenus::ResetSettingsGraphics()

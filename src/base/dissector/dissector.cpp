@@ -236,7 +236,7 @@ void netmsg_to_s(int Msg, char *pBuf, int Size)
     else if(Msg == NETMSG_RCON_LINE) { str_copy(pBuf, "NETMSG_RCON_LINE", Size); }
     else if(Msg == NETMSG_RCON_CMD_ADD) { str_copy(pBuf, "NETMSG_RCON_CMD_ADD", Size); }
     else if(Msg == NETMSG_RCON_CMD_REM) { str_copy(pBuf, "NETMSG_RCON_CMD_REM", Size); }
-    else if(Msg == NETMSG_AUTH_CHALLANGE) { str_copy(pBuf, "NETMSG_AUTH_CHALLANGE", Size); }
+    else if(Msg == NETMSG_AUTH_CHALLENGE) { str_copy(pBuf, "NETMSG_AUTH_CHALLENGE", Size); }
     else if(Msg == NETMSG_AUTH_RESULT) { str_copy(pBuf, "NETMSG_AUTH_RESULT", Size); }
     else if(Msg == NETMSG_READY) { str_copy(pBuf, "NETMSG_READY", Size); }
     else if(Msg == NETMSG_ENTERGAME) { str_copy(pBuf, "NETMSG_ENTERGAME", Size); }

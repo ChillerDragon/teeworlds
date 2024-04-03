@@ -901,11 +901,14 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		{
 			DoLeaveMessage(m_aClients[pMsg->m_ClientID].m_aName, pMsg->m_ClientID, pMsg->m_pReason);
 
-			CNetMsg_De_ClientLeave Msg;
-			Msg.m_pName = m_aClients[pMsg->m_ClientID].m_aName;
-			Msg.m_ClientID = pMsg->m_ClientID;
-			Msg.m_pReason = pMsg->m_pReason;
-			Client()->SendPackMsg(&Msg, MSGFLAG_NOSEND | MSGFLAG_RECORD);
+			if(m_pDemoRecorder->IsRecording())
+			{
+				CNetMsg_De_ClientLeave Msg;
+				Msg.m_pName = m_aClients[pMsg->m_ClientID].m_aName;
+				Msg.m_ClientID = pMsg->m_ClientID;
+				Msg.m_pReason = pMsg->m_pReason;
+				Client()->SendPackMsg(&Msg, MSGFLAG_NOSEND | MSGFLAG_RECORD);
+			}
 		}
 
 		m_GameInfo.m_NumPlayers--;
@@ -1167,6 +1170,7 @@ void CGameClient::OnNewSnapshot()
 
 	ProcessEvents();
 
+#ifdef CONF_DEBUG
 	if(Config()->m_DbgStress)
 	{
 		if((Client()->GameTick()%100) == 0)
@@ -1184,6 +1188,7 @@ void CGameClient::OnNewSnapshot()
 			Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
 		}
 	}
+#endif
 
 	CTuningParams StandardTuning;
 	if(Client()->State() == IClient::STATE_DEMOPLAYBACK)

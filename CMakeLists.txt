@@ -138,8 +138,7 @@ endfunction()
 
 if(NOT MSVC)
   # Protect the stack pointer.
-  # -fstack-protector-all doesn't work on MinGW.
-  add_c_compiler_flag_if_supported(OUR_FLAGS -fstack-protector-strong)
+  add_c_compiler_flag_if_supported(OUR_FLAGS -fstack-protector-all)
 
   # Protect the stack from clashing.
   add_c_compiler_flag_if_supported(OUR_FLAGS -fstack-clash-protection)
@@ -392,7 +391,7 @@ elseif(TARGET_OS STREQUAL "mac")
   find_library(COCOA Cocoa)
   find_library(OPENGL OpenGL)
   set(PLATFORM_CLIENT
-    src/osxlaunch/client.m
+    src/macoslaunch/client.m
   )
   set(PLATFORM_CLIENT_LIBS ${COCOA} ${OPENGL})
   set(PLATFORM_LIBS ${CARBON})
@@ -417,7 +416,7 @@ endif()
 ########################################################################
 
 if(NOT(GTEST_FOUND) AND DOWNLOAD_GTEST)
-  set(TEEWORLDS_GTEST_VERSION release-1.8.1)
+  set(TEEWORLDS_GTEST_VERSION 5c8ca58edfb304b2dd5e6061f83387470826dd87) # master as of 2021-04-07
   configure_file(cmake/Download_GTest_CMakeLists.txt.in googletest-download/CMakeLists.txt)
   execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
     RESULT_VARIABLE result
@@ -435,15 +434,6 @@ if(NOT(GTEST_FOUND) AND DOWNLOAD_GTEST)
       message(WARNING "Build step for googletest failed: ${result}")
       set(DOWNLOAD_GTEST OFF)
     else()
-      file(GLOB_RECURSE DDNET_GTEST_CMAKELISTS ${CMAKE_BINARY_DIR}/googletest-src/CMakeLists.txt)
-      foreach(file ${DDNET_GTEST_CMAKELISTS})
-        file(READ ${file} CONTENTS)
-        string(REPLACE "cmake_minimum_required(VERSION 2.6.4)" "cmake_minimum_required(VERSION 2.8.12...3.19.1)" CONTENTS "${CONTENTS}")
-        string(REPLACE "cmake_minimum_required(VERSION 2.6.4)" "cmake_minimum_required(VERSION 2.8.12...3.19.1)" CONTENTS "${CONTENTS}")
-        string(REPLACE "cmake_minimum_required(VERSION 2.8.8)" "cmake_minimum_required(VERSION 2.8.12...3.19.1)" CONTENTS "${CONTENTS}")
-        file(WRITE ${file} "${CONTENTS}")
-      endforeach()
-
       # Prevent overriding the parent project's compiler/linker settings on Windows
       set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
@@ -1674,7 +1664,7 @@ list(APPEND TARGETS_OWN ${TARGET_SERVER})
 list(APPEND TARGETS_LINK ${TARGET_SERVER})
 
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
-  set(SERVER_LAUNCHER_SRC src/osxlaunch/server.mm)
+  set(SERVER_LAUNCHER_SRC src/macoslaunch/server.mm)
   set(TARGET_SERVER_LAUNCHER ${TARGET_SERVER}-Launcher)
   add_executable(${TARGET_SERVER_LAUNCHER} ${SERVER_LAUNCHER_SRC})
   target_link_libraries(${TARGET_SERVER_LAUNCHER} ${COCOA})
@@ -1745,6 +1735,7 @@ if(GTEST_FOUND OR DOWNLOAD_GTEST)
     hash.cpp
     io.cpp
     jsonwriter.cpp
+    packer.cpp
     sorted_array.cpp
     storage.cpp
     str.cpp
@@ -1862,7 +1853,7 @@ if(TARGET_OS AND TARGET_BITS)
       set(CPACK_SYSTEM_NAME "linux_x86_64")
     endif()
   elseif(TARGET_OS STREQUAL "mac")
-    set(CPACK_SYSTEM_NAME "osx")
+    set(CPACK_SYSTEM_NAME "macos")
     set(CPACK_GENERATOR DMG)
   endif()
 endif()
@@ -2135,6 +2126,7 @@ foreach(target ${TARGETS_OWN})
     target_compile_options(${target} PRIVATE /wd4800) # Implicit conversion of int to bool.
   endif()
   if(TARGET_OS STREQUAL "windows")
+    target_compile_definitions(${target} PRIVATE _WIN32_WINNT=0x0501)
     target_compile_definitions(${target} PRIVATE UNICODE) # Windows headers
     target_compile_definitions(${target} PRIVATE _UNICODE) # C-runtime
   endif()
