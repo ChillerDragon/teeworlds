@@ -201,13 +201,17 @@ void CDemoRecorder::Write(int Type, const void *pData, int Size)
 	Size = CVariableInt::Compress(aBuffer2, Size, aBuffer, sizeof(aBuffer)); // buffer2 -> buffer
 	if(Size < 0)
 	{
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_recorder", "error during intpack compression");
+		char aBuf[512];
+		str_format(aBuf, sizeof(aBuf), "error during network compression. var int size = %d", Size);
+		m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_recorder", aBuf);
 		return;
 	}
 	Size = m_Huffman.Compress(aBuffer, Size, aBuffer2, sizeof(aBuffer2)); // buffer -> buffer2
 	if(Size < 0)
 	{
-		m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_recorder", "error during network compression");
+		char aBuf[512];
+		str_format(aBuf, sizeof(aBuf), "error during network compression. huffman size = %d", Size);
+		m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_recorder", aBuf);
 		return;
 	}
 
@@ -525,7 +529,9 @@ void CDemoPlayer::DoTick()
 			if(DataSize < 0)
 			{
 				// stop on error or eof
-				m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_player", "error during network decompression");
+				char aBuf[512];
+				str_format(aBuf, sizeof(aBuf), "error during network decompression. huffman size = %d", DataSize);
+				m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_player", aBuf);
 				Stop();
 				break;
 			}
@@ -533,7 +539,9 @@ void CDemoPlayer::DoTick()
 			DataSize = CVariableInt::Decompress(aDecompressed, DataSize, aData, sizeof(aData));
 			if(DataSize < 0)
 			{
-				m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_player", "error during intpack decompression");
+				char aBuf[512];
+				str_format(aBuf, sizeof(aBuf), "error during network decompression. var int size = %d", DataSize);
+				m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "demo_player", aBuf);
 				Stop();
 				break;
 			}
