@@ -230,7 +230,14 @@ int CHuffman::Decompress(const void *pInput, int InputSize, void *pOutput, int O
 			pNode = m_apDecodeLut[Bits&HUFFMAN_LUTMASK];
 
 		if(!pNode)
-			return -1;
+		{
+			char aHex[512];
+			str_hex(aHex, sizeof(aHex), pInput, InputSize);
+			dbg_msg("huffman", "failed to decompress data. (!pNode)");
+			dbg_msg("huffman", "  size=%d", InputSize);
+			dbg_msg("huffman", "  raw=%s", aHex);
+			return -10;
+		}
 
 		// {D} check if we hit a symbol already
 		if(pNode->m_NumBits)
@@ -261,7 +268,14 @@ int CHuffman::Decompress(const void *pInput, int InputSize, void *pOutput, int O
 
 				// no more bits, decoding error
 				if(Bitcount == 0)
-					return -1;
+				{
+					char aHex[512];
+					str_hex(aHex, sizeof(aHex), pInput, InputSize);
+					dbg_msg("huffman", "failed to decompress data. (no more bits)");
+					dbg_msg("huffman", "  size=%d", InputSize);
+					dbg_msg("huffman", "  raw=%s", aHex);
+					return -20;
+				}
 			}
 		}
 
@@ -271,7 +285,14 @@ int CHuffman::Decompress(const void *pInput, int InputSize, void *pOutput, int O
 
 		// output character
 		if(pDst == pDstEnd)
-			return -1;
+		{
+			char aHex[512];
+			str_hex(aHex, sizeof(aHex), pInput, InputSize);
+			dbg_msg("huffman", "failed to decompress data. (pDst == pDstEnd)");
+			dbg_msg("huffman", "  size=%d", InputSize);
+			dbg_msg("huffman", "  raw=%s", aHex);
+			return -30;
+		}
 		*pDst++ = pNode->m_Symbol;
 	}
 
