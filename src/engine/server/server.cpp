@@ -13,6 +13,7 @@
 #include <engine/shared/snapshot.h>
 
 #include "server.h"
+#include "game/collision.h"
 
 CSnapIDPool::CSnapIDPool()
 {
@@ -841,9 +842,69 @@ void CServer::Init(IGameServer *pGameServer)
 	m_pGameServer = pGameServer;
 }
 
+#include <chrono>
+#include <thread>
+#include <dlfcn.h>
+
+#include <bots/bot.h>
+#include <cstdio>
+
+void *LoadTick(FBotTick *pfnBotTick)
+{
+	*pfnBotTick = nullptr;
+
+	dlerror(); // clear old error
+	void *pHandle = dlopen("./libtwbl_bottick.so", RTLD_NOW | RTLD_GLOBAL);
+	const char *pError = dlerror();
+	if(!pHandle || pError)
+	{
+		fprintf(stderr, "dlopen failed: %s\n", pError);
+		if(pHandle)
+			dlclose(pHandle);
+		return nullptr;
+	}
+
+	*pfnBotTick = (FBotTick)dlsym(pHandle, "BotTick");
+	pError = dlerror();
+	if(!*pfnBotTick || pError)
+	{
+		fprintf(stderr, "dlsym failed: %s\n", pError);
+		if(pHandle)
+			dlclose(pHandle);
+		return nullptr;
+	}
+	return pHandle;
+}
+
+void Sleep(int Miliseconds)
+{
+	std::this_thread::sleep_for(std::chrono::milliseconds(Miliseconds));
+}
+
 int CServer::Run(bool shutdown)
 {
 	dbg_msg("server", "hello world");
+
+	CCollision Col;
+	Col.Init();
+
+	while(true)
+	{
+		FBotTick pfnBotTick;
+		void *pHandle = LoadTick(&pfnBotTick);
+		if(pHandle)
+		{
+			pfnBotTick(&Col);
+			dlclose(pHandle);
+		}
+		else
+		{
+			BotTick(&Col);
+		}
+
+		Sleep(20);
+	}
+
 	return 0;
 }
 

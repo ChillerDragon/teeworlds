@@ -453,6 +453,8 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
 )
 set(ENGINE_GENERATED_SHARED src/generated/protocol.cpp src/generated/protocol.h)
 set_src(GAME_SHARED GLOB src/game
+  collision.cpp
+  collision.h
   version.h
   voting.h
 )
@@ -468,6 +470,8 @@ set(LIBS ${CMAKE_THREAD_LIBS_INIT} ${CRYPTO_LIBRARIES} ${PLATFORM_LIBS})
 add_library(engine-shared EXCLUDE_FROM_ALL OBJECT ${ENGINE_INTERFACE} ${ENGINE_SHARED} ${ENGINE_GENERATED_SHARED} ${BASE})
 add_library(game-shared EXCLUDE_FROM_ALL OBJECT ${GAME_SHARED} ${GAME_GENERATED_SHARED})
 list(APPEND TARGETS_OWN engine-shared game-shared)
+
+
 
 
 ########################################################################
@@ -545,6 +549,52 @@ set(SERVER_SRC ${ENGINE_SERVER} ${GAME_SERVER} ${GAME_GENERATED_SERVER})
 
 # Libraries
 set(LIBS_SERVER ${LIBS})
+
+# twbl start
+set(TWBL_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/twbl)
+# add_subdirectory(${TWBL_ROOT})
+include_directories(${TWBL_ROOT}/src)
+FILE(GLOB TWBL_SRC
+  ${TWBL_ROOT}/src/bots/*.cpp
+  ${TWBL_ROOT}/src/bots/*.h
+)
+
+# add_library(twbl_bottick_lite SHARED ${TWBL_SRC})
+set(SERVER_SRC ${SERVER_SRC} ${TWBL_SRC})
+# set(SERVER_SRC ${SERVER_SRC}
+#   ${TWBL_ROOT}/src/shared/hotreload.cpp
+#   ${TWBL_ROOT}/src/shared/hotreload.h
+#   ${TWBL_ROOT}/src/shared/types.h
+#   ${TWBL_ROOT}/src/bots/base.cpp
+#   ${TWBL_ROOT}/src/bots/base.h
+# )
+
+
+add_library(twbl_bottick SHARED
+  ${GAME_SHARED}
+  ${TWBL_SRC}
+  ${GAME_GENERATED_SHARED})
+
+# add_library(md5 EXCLUDE_FROM_ALL OBJECT ${DEP_MD5_SRC})
+target_link_libraries(twbl_bottick
+  PRIVATE
+  ${CRYPTO_LIBRARIES}
+    ${DEP_MD5_SRC}
+)
+
+target_include_directories(twbl_bottick SYSTEM PRIVATE ${CRYPTO_INCLUDE_DIRS})
+target_compile_definitions(twbl_bottick PRIVATE TWBL_SHARED_OBJECT=1)
+
+target_include_directories(twbl_bottick PRIVATE src)
+target_include_directories(twbl_bottick PRIVATE ${PROJECT_BINARY_DIR}/src)
+target_compile_options(twbl_bottick PUBLIC -rdynamic)
+target_compile_options(twbl_bottick PUBLIC -fno-gnu-unique)
+target_compile_options(twbl_bottick PUBLIC -fPIC)
+
+# set_own_rpath(game-server)
+
+# twbl end
+
 
 # Target
 set(TARGET_SERVER ${SERVER_EXECUTABLE})
