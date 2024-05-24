@@ -402,15 +402,6 @@ if(GIT_FOUND)
     )
   endif()
 endif()
-add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src/generated/git_revision.cpp
-  COMMAND ${Python3_EXECUTABLE}
-    scripts/git_revision.py
-    > ${PROJECT_BINARY_DIR}/src/generated/git_revision.cpp
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-  DEPENDS
-    ${GIT_REVISION_EXTRA_DEPS}
-    scripts/git_revision.py
-)
 generate_source("src/generated/client_data.cpp" "client_content_source")
 generate_source("src/generated/client_data.h" "client_content_header")
 generate_source("src/generated/protocol.cpp" "network_source")
@@ -459,7 +450,6 @@ set_src(GAME_SHARED GLOB src/game
   voting.h
 )
 set(GAME_GENERATED_SHARED
-  src/generated/git_revision.cpp
   src/generated/protocol.h
 )
 
