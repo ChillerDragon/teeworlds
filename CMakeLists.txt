@@ -566,11 +566,6 @@ add_library(twbl_bottick SHARED
   ${GAME_GENERATED_SHARED})
 
 # add_library(md5 EXCLUDE_FROM_ALL OBJECT ${DEP_MD5_SRC})
-target_link_libraries(twbl_bottick
-  PRIVATE
-  ${CRYPTO_LIBRARIES}
-    ${DEP_MD5_SRC}
-)
 
 target_include_directories(twbl_bottick SYSTEM PRIVATE ${CRYPTO_INCLUDE_DIRS})
 target_compile_definitions(twbl_bottick PRIVATE TWBL_SHARED_OBJECT=1)
@@ -578,8 +573,6 @@ target_compile_definitions(twbl_bottick PRIVATE TWBL_SHARED_OBJECT=1)
 target_include_directories(twbl_bottick PRIVATE src)
 target_include_directories(twbl_bottick PRIVATE ${PROJECT_BINARY_DIR}/src)
 target_compile_options(twbl_bottick PUBLIC -rdynamic)
-target_compile_options(twbl_bottick PUBLIC -fno-gnu-unique)
-target_compile_options(twbl_bottick PUBLIC -fPIC)
 
 # set_own_rpath(game-server)
 
