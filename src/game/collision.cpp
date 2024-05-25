@@ -15,3 +15,6 @@ void CCollision::Init()
 	SetTile(1, 1, 11);
 }
 
+void CCollision::SetTile(int x, int y, int Tile) const { m_pTiles[x + y * m_Width] = Tile; }
+
+int CCollision::GetTile(int x, int y) const { return m_pTiles[x + y * m_Width]; }

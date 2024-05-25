@@ -10,8 +10,8 @@ public:
 	int *m_pTiles;
 
 	void Init();
-	void SetTile(int x, int y, int Tile) const { m_pTiles[x + y * m_Width] = Tile; }
-	int GetTile(int x, int y) const { return m_pTiles[x + y * m_Width]; }
+	void SetTile(int x, int y, int Tile) const;
+	int GetTile(int x, int y) const;
 };
 
 #endif
