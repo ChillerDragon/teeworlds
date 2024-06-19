@@ -27,6 +27,8 @@
 
 #include <mastersrv/mastersrv.h>
 
+#include <generated/protocol.h>
+
 #include "register.h"
 #include "server.h"
 
@@ -810,43 +812,88 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 	}
 
 	int Msg = Unpacker.Type();
-	if(m_pConfig->m_Debug > 2)
+	if(m_pConfig->m_Debug > 2 || Msg != NETMSG_INPUT)
 	{
 		const char *pMsg = "unkown";
-		if(Msg == NETMSG_NULL) { pMsg = "NULL"; }
-		else if(Msg == NETMSG_INFO) { pMsg = "INFO"; }
-		else if(Msg == NETMSG_MAP_CHANGE) { pMsg = "MAP_CHANGE"; }
-		else if(Msg == NETMSG_MAP_DATA) { pMsg = "MAP_DATA"; }
-		else if(Msg == NETMSG_SERVERINFO) { pMsg = "SERVERINFO"; }
-		else if(Msg == NETMSG_CON_READY) { pMsg = "CON_READY"; }
-		else if(Msg == NETMSG_SNAP) { pMsg = "SNAP"; }
-		else if(Msg == NETMSG_SNAPEMPTY) { pMsg = "SNAPEMPTY"; }
-		else if(Msg == NETMSG_SNAPSINGLE) { pMsg = "SNAPSINGLE"; }
-		else if(Msg == NETMSG_SNAPSMALL) { pMsg = "SNAPSMALL"; }
-		else if(Msg == NETMSG_INPUTTIMING) { pMsg = "INPUTTIMING"; }
-		else if(Msg == NETMSG_RCON_AUTH_ON) { pMsg = "RCON_AUTH_ON"; }
-		else if(Msg == NETMSG_RCON_AUTH_OFF) { pMsg = "RCON_AUTH_OFF"; }
-		else if(Msg == NETMSG_RCON_LINE) { pMsg = "RCON_LINE"; }
-		else if(Msg == NETMSG_RCON_CMD_ADD) { pMsg = "RCON_CMD_ADD"; }
-		else if(Msg == NETMSG_RCON_CMD_REM) { pMsg = "RCON_CMD_REM"; }
-		else if(Msg == NETMSG_AUTH_CHALLENGE) { pMsg = "AUTH_CHALLENGE"; }
-		else if(Msg == NETMSG_AUTH_RESULT) { pMsg = "AUTH_RESULT"; }
-		else if(Msg == NETMSG_READY) { pMsg = "READY"; }
-		else if(Msg == NETMSG_ENTERGAME) { pMsg = "ENTERGAME"; }
-		else if(Msg == NETMSG_INPUT) { pMsg = "INPUT"; }
-		else if(Msg == NETMSG_RCON_CMD) { pMsg = "RCON_CMD"; }
-		else if(Msg == NETMSG_RCON_AUTH) { pMsg = "RCON_AUTH"; }
-		else if(Msg == NETMSG_REQUEST_MAP_DATA) { pMsg = "REQUEST_MAP_DATA"; }
-		else if(Msg == NETMSG_AUTH_START) { pMsg = "AUTH_START"; }
-		else if(Msg == NETMSG_AUTH_RESPONSE) { pMsg = "AUTH_RESPONSE"; }
-		else if(Msg == NETMSG_PING) { pMsg = "PING"; }
-		else if(Msg == NETMSG_PING_REPLY) { pMsg = "PING_REPLY"; }
-		else if(Msg == NETMSG_ERROR) { pMsg = "ERROR"; }
-		else if(Msg == NETMSG_MAPLIST_ENTRY_ADD) { pMsg = "MAPLIST_ENTRY_ADD"; }
-		else if(Msg == NETMSG_MAPLIST_ENTRY_REM) { pMsg = "MAPLIST_ENTRY_REM"; }
+		if (Unpacker.System())
+		{
+			if(Msg == NETMSG_NULL) { pMsg = "NULL"; }
+			else if(Msg == NETMSG_INFO) { pMsg = "INFO"; }
+			else if(Msg == NETMSG_MAP_CHANGE) { pMsg = "MAP_CHANGE"; }
+			else if(Msg == NETMSG_MAP_DATA) { pMsg = "MAP_DATA"; }
+			else if(Msg == NETMSG_SERVERINFO) { pMsg = "SERVERINFO"; }
+			else if(Msg == NETMSG_CON_READY) { pMsg = "CON_READY"; }
+			else if(Msg == NETMSG_SNAP) { pMsg = "SNAP"; }
+			else if(Msg == NETMSG_SNAPEMPTY) { pMsg = "SNAPEMPTY"; }
+			else if(Msg == NETMSG_SNAPSINGLE) { pMsg = "SNAPSINGLE"; }
+			else if(Msg == NETMSG_SNAPSMALL) { pMsg = "SNAPSMALL"; }
+			else if(Msg == NETMSG_INPUTTIMING) { pMsg = "INPUTTIMING"; }
+			else if(Msg == NETMSG_RCON_AUTH_ON) { pMsg = "RCON_AUTH_ON"; }
+			else if(Msg == NETMSG_RCON_AUTH_OFF) { pMsg = "RCON_AUTH_OFF"; }
+			else if(Msg == NETMSG_RCON_LINE) { pMsg = "RCON_LINE"; }
+			else if(Msg == NETMSG_RCON_CMD_ADD) { pMsg = "RCON_CMD_ADD"; }
+			else if(Msg == NETMSG_RCON_CMD_REM) { pMsg = "RCON_CMD_REM"; }
+			else if(Msg == NETMSG_AUTH_CHALLENGE) { pMsg = "AUTH_CHALLENGE"; }
+			else if(Msg == NETMSG_AUTH_RESULT) { pMsg = "AUTH_RESULT"; }
+			else if(Msg == NETMSG_READY) { pMsg = "READY"; }
+			else if(Msg == NETMSG_ENTERGAME) { pMsg = "ENTERGAME"; }
+			else if(Msg == NETMSG_INPUT) { pMsg = "INPUT"; }
+			else if(Msg == NETMSG_RCON_CMD) { pMsg = "RCON_CMD"; }
+			else if(Msg == NETMSG_RCON_AUTH) { pMsg = "RCON_AUTH"; }
+			else if(Msg == NETMSG_REQUEST_MAP_DATA) { pMsg = "REQUEST_MAP_DATA"; }
+			else if(Msg == NETMSG_AUTH_START) { pMsg = "AUTH_START"; }
+			else if(Msg == NETMSG_AUTH_RESPONSE) { pMsg = "AUTH_RESPONSE"; }
+			else if(Msg == NETMSG_PING) { pMsg = "PING"; }
+			else if(Msg == NETMSG_PING_REPLY) { pMsg = "PING_REPLY"; }
+			else if(Msg == NETMSG_ERROR) { pMsg = "ERROR"; }
+			else if(Msg == NETMSG_MAPLIST_ENTRY_ADD) { pMsg = "MAPLIST_ENTRY_ADD"; }
+			else if(Msg == NETMSG_MAPLIST_ENTRY_REM) { pMsg = "MAPLIST_ENTRY_REM"; }
+		}
+		else
+		{
+			if(Msg == NETMSG_NULL) { pMsg = "NULL"; }
+			else if(Msg == NETMSGTYPE_SV_MOTD) { pMsg = "MOTD"; }
+			else if(Msg == NETMSGTYPE_SV_BROADCAST) { pMsg = "BROADCAST"; }
+			else if(Msg == NETMSGTYPE_SV_CHAT) { pMsg = "CHAT"; }
+			else if(Msg == NETMSGTYPE_SV_TEAM) { pMsg = "TEAM"; }
+			else if(Msg == NETMSGTYPE_SV_KILLMSG) { pMsg = "KILLMSG"; }
+			else if(Msg == NETMSGTYPE_SV_TUNEPARAMS) { pMsg = "TUNEPARAMS"; }
+			else if(Msg == NETMSGTYPE_SV_EXTRAPROJECTILE) { pMsg = "EXTRAPROJECTILE"; }
+			else if(Msg == NETMSGTYPE_SV_READYTOENTER) { pMsg = "READYTOENTER"; }
+			else if(Msg == NETMSGTYPE_SV_WEAPONPICKUP) { pMsg = "WEAPONPICKUP"; }
+			else if(Msg == NETMSGTYPE_SV_EMOTICON) { pMsg = "EMOTICON"; }
+			else if(Msg == NETMSGTYPE_SV_VOTECLEAROPTIONS) { pMsg = "VOTECLEAROPTIONS"; }
+			else if(Msg == NETMSGTYPE_SV_VOTEOPTIONLISTADD) { pMsg = "VOTEOPTIONLISTADD"; }
+			else if(Msg == NETMSGTYPE_SV_VOTEOPTIONADD) { pMsg = "VOTEOPTIONADD"; }
+			else if(Msg == NETMSGTYPE_SV_VOTEOPTIONREMOVE) { pMsg = "VOTEOPTIONREMOVE"; }
+			else if(Msg == NETMSGTYPE_SV_VOTESET) { pMsg = "VOTESET"; }
+			else if(Msg == NETMSGTYPE_SV_VOTESTATUS) { pMsg = "VOTESTATUS"; }
+			else if(Msg == NETMSGTYPE_SV_SERVERSETTINGS) { pMsg = "SERVERSETTINGS"; }
+			else if(Msg == NETMSGTYPE_SV_CLIENTINFO) { pMsg = "CLIENTINFO"; }
+			else if(Msg == NETMSGTYPE_SV_GAMEINFO) { pMsg = "GAMEINFO"; }
+			else if(Msg == NETMSGTYPE_SV_CLIENTDROP) { pMsg = "CLIENTDROP"; }
+			else if(Msg == NETMSGTYPE_SV_GAMEMSG) { pMsg = "GAMEMSG"; }
+			else if(Msg == NETMSGTYPE_DE_CLIENTENTER) { pMsg = "CLIENTENTER"; }
+			else if(Msg == NETMSGTYPE_DE_CLIENTLEAVE) { pMsg = "CLIENTLEAVE"; }
+			else if(Msg == NETMSGTYPE_CL_SAY) { pMsg = "SAY"; }
+			else if(Msg == NETMSGTYPE_CL_SETTEAM) { pMsg = "SETTEAM"; }
+			else if(Msg == NETMSGTYPE_CL_SETSPECTATORMODE) { pMsg = "SETSPECTATORMODE"; }
+			else if(Msg == NETMSGTYPE_CL_STARTINFO) { pMsg = "STARTINFO"; }
+			else if(Msg == NETMSGTYPE_CL_KILL) { pMsg = "KILL"; }
+			else if(Msg == NETMSGTYPE_CL_READYCHANGE) { pMsg = "READYCHANGE"; }
+			else if(Msg == NETMSGTYPE_CL_EMOTICON) { pMsg = "EMOTICON"; }
+			else if(Msg == NETMSGTYPE_CL_VOTE) { pMsg = "VOTE"; }
+			else if(Msg == NETMSGTYPE_CL_CALLVOTE) { pMsg = "CALLVOTE"; }
+			else if(Msg == NETMSGTYPE_SV_SKINCHANGE) { pMsg = "SKINCHANGE"; }
+			else if(Msg == NETMSGTYPE_CL_SKINCHANGE) { pMsg = "SKINCHANGE"; }
+			else if(Msg == NETMSGTYPE_SV_RACEFINISH) { pMsg = "RACEFINISH"; }
+			else if(Msg == NETMSGTYPE_SV_CHECKPOINT) { pMsg = "CHECKPOINT"; }
+			else if(Msg == NETMSGTYPE_SV_COMMANDINFO) { pMsg = "COMMANDINFO"; }
+			else if(Msg == NETMSGTYPE_SV_COMMANDINFOREMOVE) { pMsg = "COMMANDINFOREMOVE"; }
+			else if(Msg == NETMSGTYPE_CL_COMMAND) { pMsg = "COMMAND"; }
+		}
 		dbg_msg("network_in", "  client packet datasize=%d sys=%d msg=%d (%s)", pPacket->m_DataSize, Unpacker.System(), Unpacker.Type(), pMsg);
 	}
-
 
 	const int ClientID = pPacket->m_ClientID;
 	if(Unpacker.System())
@@ -1110,6 +1157,15 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		// game message
 		if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && m_aClients[ClientID].m_State >= CClient::STATE_READY)
 			GameServer()->OnMessage(Unpacker.Type(), &Unpacker, ClientID);
+		else
+		{
+			const char *pReason = "";
+			if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) == 0)
+				pReason = "no vital flag";
+			if(m_aClients[ClientID].m_State < CClient::STATE_READY)
+				pReason = "client not in state ready";
+			dbg_msg("network_in", "not processing message because: %s", pReason);
+		}
 	}
 }
 
