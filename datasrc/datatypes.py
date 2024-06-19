@@ -314,7 +314,10 @@ class NetStringStrict(NetVariable):
 	def emit_declaration(self):
 		return ["const char *%s;"%self.name]
 	def emit_unpack(self):
-		return ["pMsg->%s = pUnpacker->GetString(CUnpacker::SANITIZE_CC|CUnpacker::SKIP_START_WHITESPACES);" % self.name]
+		return [
+			"pMsg->%s = pUnpacker->GetString(CUnpacker::SANITIZE_CC|CUnpacker::SKIP_START_WHITESPACES);"
+			"if (pUnpacker->Error() && !m_pMsgFailedOn) { m_pMsgFailedOn = \"%s\";m_pFailReason = pUnpacker->ErrorMsg(); }" % (self.name, self.name)
+		]
 	def emit_pack(self):
 		return ["pPacker->AddString(%s, -1);" % self.name]
 
@@ -323,7 +326,10 @@ class NetIntAny(NetVariable):
 		return ["int %s;"%self.name]
 	def emit_unpack(self):
 		if self.default is None:
-			return ["pMsg->%s = pUnpacker->GetInt();" % self.name]
+			return [
+				"pMsg->%s = pUnpacker->GetInt();"
+				"if (pUnpacker->Error() && !m_pMsgFailedOn) { m_pMsgFailedOn = \"%s\";m_pFailReason = pUnpacker->ErrorMsg(); }" % (self.name, self.name)
+			]
 		else:
 			return ["pMsg->%s = pUnpacker->GetIntOrDefault(%s);" % (self.name, self.default)]
 	def emit_pack(self):

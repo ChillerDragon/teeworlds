@@ -90,6 +90,7 @@ int CUnpacker::GetInt()
 	if(RemainingSize() <= 0)
 	{
 		m_Error = true;
+		m_pError = "no remaining size";
 		return 0;
 	}
 
@@ -98,6 +99,7 @@ int CUnpacker::GetInt()
 	if(!pNext)
 	{
 		m_Error = true;
+		m_pError = "no next";
 		return 0;
 	}
 	m_pCurrent = pNext;
@@ -123,6 +125,7 @@ const char *CUnpacker::GetString(int SanitizeType)
 	if(RemainingSize() <= 0)
 	{
 		m_Error = true;
+		m_pError = "no remaining size";
 		return "";
 	}
 
@@ -134,6 +137,7 @@ const char *CUnpacker::GetString(int SanitizeType)
 		if(m_pCurrent == m_pEnd)
 		{
 			m_Error = true;
+			m_pError = "unexpected end";
 			return "";
 		}
 	}

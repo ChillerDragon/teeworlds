@@ -129,6 +129,7 @@ class CNetObjHandler
 	const char *m_pMsgFailedOn;
 	char m_aMsgData[1024];
 	const char *m_pObjFailedOn;
+	const char *m_pFailReason;
 	int m_NumObjFailures;
 	bool CheckInt(const char *pErrorMsg, int Value, int Min, int Max);
 	bool CheckFlag(const char *pErrorMsg, int Value, int Mask);
@@ -149,6 +150,7 @@ public:
 	const char *GetMsgName(int Type) const;
 	void *SecureUnpackMsg(int Type, CUnpacker *pUnpacker);
 	const char *FailedMsgOn() const;
+	const char *FailReason() const;
 };
 
 """)
@@ -168,12 +170,14 @@ if gen_network_source:
 	lines += ['{']
 	lines += ['\tm_pMsgFailedOn = "";']
 	lines += ['\tm_pObjFailedOn = "";']
+	lines += ['\tm_pFailReason = "";']
 	lines += ['\tm_NumObjFailures = 0;']
 	lines += ['}']
 	lines += ['']
 	lines += ['const char *CNetObjHandler::FailedObjOn() const { return m_pObjFailedOn; }']
 	lines += ['int CNetObjHandler::NumObjFailures() const { return m_NumObjFailures; }']
 	lines += ['const char *CNetObjHandler::FailedMsgOn() const { return m_pMsgFailedOn; }']
+	lines += ['const char *CNetObjHandler::FailReason() const { return m_pFailReason; }']
 	lines += ['']
 	lines += ['']
 	lines += ['']
@@ -302,6 +306,7 @@ if gen_network_source:
 	lines += ['{']
 	lines += ['\tm_pMsgFailedOn = 0;']
 	lines += ['\tm_pObjFailedOn = 0;']
+	lines += ['\tm_pFailReason = 0;']
 	lines += ['\tswitch(Type)']
 	lines += ['\t{']
 
@@ -313,10 +318,11 @@ if gen_network_source:
 
 	lines += ['\tdefault:']
 	lines += ['\t\tm_pMsgFailedOn = "(type out of range)";']
+	lines += ['\t\tm_pFailReason = "(unknown)";']
 	lines += ['\t\tbreak;']
 	lines += ['\t}']
 	lines += ['\t']
-	lines += ['\tif(pUnpacker->Error())']
+	lines += ['\tif(pUnpacker->Error() && !m_pMsgFailedOn)']
 	lines += ['\t\tm_pMsgFailedOn = "(unpack error)";']
 	lines += ['\t']
 	lines += ['\tif(m_pMsgFailedOn || m_pObjFailedOn) {']
@@ -328,6 +334,7 @@ if gen_network_source:
 	lines += ['\t}']
 	lines += ['\tm_pMsgFailedOn = "";']
 	lines += ['\tm_pObjFailedOn = "";']
+	lines += ['\tm_pFailReason = "";']
 	lines += ['\treturn m_aMsgData;']
 	lines += ['};']
 	lines += ['']

@@ -100,6 +100,7 @@ public:
 	const char *NetobjFailedOn() { return m_NetObjHandler.FailedObjOn(); }
 	int NetobjNumFailures() { return m_NetObjHandler.NumObjFailures(); }
 	const char *NetmsgFailedOn() { return m_NetObjHandler.FailedMsgOn(); }
+	const char *NetmsgFailReason() { return m_NetObjHandler.FailReason(); }
 
 	bool m_SuppressEvents;
 
