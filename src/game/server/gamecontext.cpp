@@ -1,6 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/math.h>
+#include <base/system.h>
 
 #include <engine/shared/config.h>
 #include <engine/shared/memheap.h>
@@ -1108,7 +1109,10 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		if (MsgID == NETMSGTYPE_CL_STARTINFO)
 		{
 			if(pPlayer->m_IsReadyToEnter)
+			{
+				dbg_msg("network_in", "dropped start info because player is not ready to enter");
 				return;
+			}
 
 			CNetMsg_Cl_StartInfo *pMsg = (CNetMsg_Cl_StartInfo *)pRawMsg;
 			pPlayer->m_LastChangeInfoTick = Server()->Tick();
