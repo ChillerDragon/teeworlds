@@ -37,7 +37,10 @@ public:
 		Reset(pData, Size);
 		const int Msg = GetInt();
 		if(Msg < 0)
+		{
 			m_Error = true;
+			m_pError = "MsgId is negative";
+		}
 		if(m_Error)
 		{
 			m_System = false;

@@ -804,7 +804,10 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 {
 	CMsgUnpacker Unpacker(pPacket->m_pData, pPacket->m_DataSize);
 	if(Unpacker.Error())
+	{
+		dbg_msg("network_in", "unpacker error: %s", Unpacker.ErrorMsg());
 		return;
+	}
 
 	int Msg = Unpacker.Type();
 	if(m_pConfig->m_Debug > 2)

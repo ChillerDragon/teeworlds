@@ -39,6 +39,7 @@ class CUnpacker
 
 protected:
 	bool m_Error;
+	const char *m_pError = "";
 
 public:
 	enum
@@ -59,6 +60,7 @@ public:
 	int CompleteSize() const { return m_pEnd - m_pStart; }
 	const unsigned char *Data() const { return m_pStart; }
 	bool Error() const { return m_Error; }
+	const char *ErrorMsg() const { return m_pError; }
 };
 
 #endif
