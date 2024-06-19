@@ -69,7 +69,15 @@ int CNetRecvUnpacker::FetchChunk(CNetChunk *pChunk)
 
 		if(pData+Header.m_Size > pEnd)
 		{
-			dbg_msg("network_in", "dropping chunk with wrong size set in header. header.size=%d end=%d", Header.m_Size, m_Data.m_DataSize);
+			int Bytes = pData+Header.m_Size-pEnd;
+			dbg_msg(
+				"network_in",
+				"dropping chunk with wrong size set in header. header.size=%d is %d bytes too big",
+				Header.m_Size,
+				Bytes);
+			char aHex[512];
+			str_hex(aHex, sizeof(aHex), pData, m_Data.m_DataSize);
+			dbg_msg("network_in", "  chunk data: %s", aHex);
 			Clear();
 			return 0;
 		}
