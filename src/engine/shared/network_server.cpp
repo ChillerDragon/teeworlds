@@ -159,7 +159,10 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
 
 			int Accept = m_TokenManager.ProcessMessage(&Addr, &m_RecvUnpacker.m_Data);
 			if(Accept <= 0)
+			{
+				// dbg_msg("network_in", "drop packet with wrong token");
 				continue;
+			}
 
 			if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONTROL)
 			{

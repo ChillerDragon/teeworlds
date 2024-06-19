@@ -69,6 +69,7 @@ int CNetRecvUnpacker::FetchChunk(CNetChunk *pChunk)
 
 		if(pData+Header.m_Size > pEnd)
 		{
+			dbg_msg("network_in", "dropping chunk with wrong size set in header. header.size=%d end=%d", Header.m_Size, m_Data.m_DataSize);
 			Clear();
 			return 0;
 		}
