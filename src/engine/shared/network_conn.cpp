@@ -237,7 +237,7 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 	{
 		if(pPacket->m_Ack < m_PeerAck || pPacket->m_Ack > m_Sequence)
 		{
-			dbg_msg("network_in", "feed wrong ack 1");
+			dbg_msg("network_in", "feed wrong ack pack.ack=%d < peerack=%d || pack.ack=%d > seq=%d", pPacket->m_Ack, m_PeerAck, pPacket->m_Ack, m_Sequence);
 			return 0;
 		}
 	}
@@ -245,7 +245,7 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 	{
 		if(pPacket->m_Ack < m_PeerAck && pPacket->m_Ack > m_Sequence)
 		{
-			dbg_msg("network_in", "feed wrong ack 2");
+			dbg_msg("network_in", "feed wrong ack pack.ack=%d < PeerAck=%d && pack.ack=%d > seq=%d", pPacket->m_Ack, m_PeerAck, pPacket->m_Ack, m_Sequence);
 			return 0;
 		}
 	}
