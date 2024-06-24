@@ -326,6 +326,11 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 		pPacket->m_NumChunks = pBuffer[2];
 			// NNNNNNNN
 
+		if(pPacket->m_NumChunks && pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
+		{
+			dbg_msg("network_in", "ERROR: got control packet with num chunks set to %d expected 0", pPacket->m_NumChunks);
+		}
+
 		pPacket->m_DataSize = Size - NET_PACKETHEADERSIZE;
 		pPacket->m_Token = (pBuffer[3] << 24) | (pBuffer[4] << 16) | (pBuffer[5] << 8) | pBuffer[6];
 			// TTTTTTTT TTTTTTTT TTTTTTTT TTTTTTTT
