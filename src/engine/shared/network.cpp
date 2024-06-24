@@ -94,11 +94,13 @@ int CNetRecvUnpacker::FetchChunk(CNetChunk *pChunk)
 			{
 				// old packet that we already got
 				if(m_pConnection->IsSeqInBackroom(Header.m_Sequence, m_pConnection->m_Ack))
+				{
+					dbg_msg("network_in", "dropping chunk because seq=%d is already known. (This should only happen when there is packet loss and lags)", Header.m_Sequence);
 					continue;
+				}
 
 				// out of sequence, request resend
-				if(m_pConnection->Config()->m_Debug)
-					dbg_msg("conn", "asking for resend %d %d", Header.m_Sequence, (m_pConnection->m_Ack+1)%NET_MAX_SEQUENCE);
+				dbg_msg("conn", "asking for resend %d %d", Header.m_Sequence, (m_pConnection->m_Ack+1)%NET_MAX_SEQUENCE);
 				m_pConnection->SignalResend();
 				continue; // take the next chunk in the packet
 			}

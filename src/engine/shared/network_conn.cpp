@@ -261,7 +261,10 @@ int CNetConnection::Feed(CNetPacketConstruct *pPacket, NETADDR *pAddr)
 
 	// check if resend is requested
 	if(pPacket->m_Flags&NET_PACKETFLAG_RESEND)
+	{
+		dbg_msg("network_in", "peer requested resend. That should only happen if the internet connection is unstable");
 		Resend();
+	}
 
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
 	{
@@ -410,7 +413,10 @@ int CNetConnection::Update()
 		{
 			// resend packet if we haven't got it acked in 1 second
 			if(Now-pResend->m_LastSendTime > time_freq())
+			{
+				dbg_msg("network_out", "the peer failed to ack our vital packet in time. resending...");
 				ResendChunk(pResend);
+			}
 		}
 	}
 
