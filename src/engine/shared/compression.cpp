@@ -38,7 +38,10 @@ unsigned char *CVariableInt::Pack(unsigned char *pDst, int i, int DstSize)
 const unsigned char *CVariableInt::Unpack(const unsigned char *pSrc, int *pInOut, int SrcSize)
 {
 	if(SrcSize <= 0)
+	{
+		dbg_msg("network_in", "  CVariableInt::Unpack() int unpack failed. trying to unpack something of size=%d", SrcSize);
 		return 0;
+	}
 
 	const int Sign = (*pSrc >> 6) & 1;
 	*pInOut = *pSrc & 0x3F;
@@ -52,7 +55,10 @@ const unsigned char *CVariableInt::Unpack(const unsigned char *pSrc, int *pInOut
 		if(!(*pSrc & 0x80))
 			break;
 		if(SrcSize <= 0)
+		{
+			dbg_msg("network_in", "  CVariableInt::Unpack() extension bit set but no bytes left");
 			return 0;
+		}
 		SrcSize--;
 		pSrc++;
 		*pInOut |= (*pSrc & s_aMasks[i]) << s_aShifts[i];
@@ -74,10 +80,16 @@ long CVariableInt::Decompress(const void *pSrc_, int SrcSize, void *pDst_, int D
 	while(pSrc < pSrcEnd)
 	{
 		if(pDst >= pDstEnd)
+		{
+			dbg_msg("network_in", "  CVaribaleInt::Decompress() int decompress failed destination buffer too small");
 			return -1;
+		}
 		pSrc = CVariableInt::Unpack(pSrc, pDst, pSrcEnd - pSrc);
 		if(!pSrc)
-			return -1;
+		{
+			dbg_msg("network_in", "  CVaribaleInt::Decompress() int unpack failed see error above");
+			return -2;
+		}
 		pDst++;
 	}
 	return (long)((unsigned char *)pDst - (unsigned char *)pDst_);

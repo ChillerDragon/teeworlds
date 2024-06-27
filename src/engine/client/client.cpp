@@ -1506,7 +1506,10 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 						int IntSize = CVariableInt::Decompress(m_aSnapshotIncomingData, CompleteSize, aTmpBuffer2, sizeof(aTmpBuffer2));
 
 						if(IntSize < 0) // failure during decompression, bail
+						{
+							dbg_msg("network_in", "  CLIENT.CPP !!!!! IntSize=%d failure during decompression, bail", IntSize);
 							return;
+						}
 
 						pDeltaData = aTmpBuffer2;
 						DeltaSize = IntSize;
