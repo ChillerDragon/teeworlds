@@ -108,6 +108,9 @@ MACRO_CONFIG_INT(EcOutputLevel, ec_output_level, 1, 0, 2, CFGFLAG_SAVE|CFGFLAG_E
 
 MACRO_CONFIG_INT(NetTcpAbortOnClose, net_tcp_abort_on_close, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER|CFGFLAG_ECON, "Aborts tcp connection on close")
 
+
+MACRO_CONFIG_INT(ClPort, cl_port, 0, 0, 65535, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Port to use for client connections to server (0 to choose a random port, 1024 or higher to set a manual port, requires a restart)")
+
 MACRO_CONFIG_INT(Debug, debug, 0, 0, 4, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Debug mode")
 MACRO_CONFIG_INT(Clean, Clean, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Clean log output to hide all non network related messages")
 MACRO_CONFIG_INT(DbgMaster, dbg_master, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Verbose master data logging")

@@ -2028,6 +2028,7 @@ void CClient::Run()
 			mem_zero(&BindAddr, sizeof(BindAddr));
 			BindAddr.type = NETTYPE_ALL;
 		}
+		BindAddr.port = m_pConfig->m_ClPort;
 		if(!m_NetClient.Open(BindAddr, Config(), Console(), Engine(), BindAddr.port ? 0 : NETCREATE_FLAG_RANDOMPORT))
 		{
 			dbg_msg("client", "couldn't open socket(net)");
