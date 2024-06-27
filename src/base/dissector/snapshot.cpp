@@ -335,7 +335,7 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 	if(pData > pEnd)
 	{
 		dbg_msg("network_in", "    failed to unpack too many deletedItems=%d", pDelta->m_NumDeletedItems);
-		return -1;
+		return -2;
 	}
 
 	// copy all non deleted stuff
@@ -368,24 +368,27 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 	{
 		const int *pItemData = pData;
 		if(pData+2 > pEnd)
-			return -1;
+		{
+			dbg_msg("network_in", "    reading past end");
+			return -3;
+		}
 
 		Type = *pData++;
 		if(Type < 0 || Type > CSnapshot::MAX_TYPE)
-			return -3;
+			return -4;
 
 		ID = *pData++;
 		if(ID < 0 || ID > CSnapshot::MAX_ID)
-			return -3;
+			return -5;
 
 		if(Type < _MAX_NETOBJSIZES && ppItemSizes[Type])
 			ItemSize = ppItemSizes[Type];
 		else
 		{
 			if(pData+1 > pEnd)
-				return -2;
+				return -6;
 			if(*pData < 0 || *pData > INT_MAX / 4)
-				return -3;
+				return -7;
 			ItemSize = (*pData++) * 4;
 		}
 

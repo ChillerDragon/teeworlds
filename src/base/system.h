@@ -11,6 +11,18 @@
 #include "detect.h"
 #include <time.h>
 
+#ifdef __MINGW32__
+#undef PRId64
+#undef PRIu64
+#undef PRIX64
+#define PRId64 "I64d"
+#define PRIu64 "I64u"
+#define PRIX64 "I64X"
+#define PRIzu "Iu"
+#else
+#define PRIzu "zu"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

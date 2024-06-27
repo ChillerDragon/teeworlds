@@ -90,6 +90,8 @@ public:
 	int UnpackDelta(const class CSnapshot *pFrom, class CSnapshot *pTo, const void *pSrcData, int DataSize);
 
 	short m_aItemSizes[MAX_NETOBJSIZES];
+
+	int DebugDumpDelta(const void *pSrcData, int DataSize);
 };
 
 
