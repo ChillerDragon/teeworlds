@@ -343,7 +343,16 @@ function SharedManifests(compiler)
 end
 
 function BuildEngineCommon(settings)
-	settings.link.extrafiles:Merge(Compile(settings, Collect("src/engine/shared/*.cpp", "src/base/*.c")))
+	settings.link.extrafiles:Merge(
+		Compile(
+			settings,
+			Collect(
+				"src/engine/shared/*.cpp",
+				"src/base/*.c",
+				"src/base/dissector/*.cpp"
+			)
+		)
+	)
 end
 
 function BuildGameCommon(settings)
