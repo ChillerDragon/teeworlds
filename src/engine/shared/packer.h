@@ -39,7 +39,7 @@ class CUnpacker
 
 protected:
 	bool m_Error;
-	const char *m_pError = "";
+	const char *m_pError;
 
 public:
 	enum

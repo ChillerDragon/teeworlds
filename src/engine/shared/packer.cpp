@@ -76,6 +76,7 @@ void CPacker::AddRaw(const void *pData, int Size)
 
 void CUnpacker::Reset(const void *pData, int Size)
 {
+	m_pError = "";
 	m_Error = false;
 	m_pStart = (const unsigned char *)pData;
 	m_pEnd = m_pStart + Size;
