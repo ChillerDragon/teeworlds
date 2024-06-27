@@ -204,6 +204,11 @@ void print_hex_row_highlight_three(
 	dbg_msg(type, "%s%*s%s", prefix, offset2, " ", note2);
 }
 
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
 void print_hex_row_highlighted(const char *type, const char *prefix, const void *data, int data_size, int from, int to, const char *note, ...)
 {
 	char aHexData[1024];
@@ -253,6 +258,9 @@ void print_hex_row_highlighted(const char *type, const char *prefix, const void 
 
 	free(msg);
 }
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 void print_hex(const char *type, const char *prefix, const void *data, int data_size, int max_width)
 {
