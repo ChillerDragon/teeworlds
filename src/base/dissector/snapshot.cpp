@@ -8,9 +8,6 @@
 #include <base/math.h>
 #include <engine/shared/config.h>
 
-#include <new>
-#include <algorithm>
-
 #include <stdarg.h>
 
 #include <base/math.h>
@@ -301,7 +298,7 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 	const CSnapshotItem *pFromItem;
 	int Keep, ItemSize;
 	const int *pDeleted;
-	int ID, Type, Key;
+	int Id, Type, Key;
 	int FromIndex;
 	int *pNewData;
 
@@ -375,20 +372,32 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 
 		Type = *pData++;
 		if(Type < 0 || Type > CSnapshot::MAX_TYPE)
+		{
+			dbg_msg("network_in", "    type=%d out of bounds", Type);
 			return -4;
+		}
 
-		ID = *pData++;
-		if(ID < 0 || ID > CSnapshot::MAX_ID)
+		Id = *pData++;
+		if(Id < 0 || Id > CSnapshot::MAX_ID)
+		{
+			dbg_msg("network_in", "    id=%d out of bounds", Id);
 			return -5;
+		}
 
 		if(Type < _MAX_NETOBJSIZES && ppItemSizes[Type])
 			ItemSize = ppItemSizes[Type];
 		else
 		{
 			if(pData+1 > pEnd)
+			{
+				dbg_msg("network_in", "    reading past end 2");
 				return -6;
+			}
 			if(*pData < 0 || *pData > INT_MAX / 4)
+			{
+				dbg_msg("network_in", "    int out of bounds");
 				return -7;
+			}
 			ItemSize = (*pData++) * 4;
 		}
 
@@ -412,7 +421,7 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 
 		// if(RangeCheck(pEnd, pData, ItemSize) || ItemSize < 0) return -3;
 
-		Key = (Type<<16)|(ID&0xffff);
+		Key = (Type<<16)|(Id&0xffff);
 
 		// create the item if needed
 		pNewData = Builder.GetItemData(Key);
@@ -445,7 +454,7 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 		char aTypeNote[512];
 		char aIdNote[512];
 		str_format(aTypeNote, sizeof(aTypeNote), "Type=%d (%s)", Type, aType);
-		str_format(aIdNote, sizeof(aIdNote), "ID=%d", ID);
+		str_format(aIdNote, sizeof(aIdNote), "ID=%d", Id);
 		aCutNote[0] = '\0';
 		if(ItemSize != PrintItemLen)
 			str_format(aCutNote, sizeof(aCutNote), "[CUT OFF %d BYTES]", ItemSize - PrintItemLen);
