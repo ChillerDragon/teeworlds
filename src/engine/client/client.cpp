@@ -1394,6 +1394,13 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 		}
 		else if(Unpacker.Type() == NETMSG_SNAP || Unpacker.Type() == NETMSG_SNAPSINGLE || Unpacker.Type() == NETMSG_SNAPEMPTY)
 		{
+			// we are not allowed to process snapshot yet
+			if(State() < IClient::STATE_LOADING)
+			{
+				dbg_msg("client.cpp", "drop snapshot in state loading ...");
+				return;
+			}
+
 			CUnpacker PrintPacker = Unpacker; // create copy that will be modified during print
 			print_snapshot(Unpacker.Type(),
 				PrintPacker,
