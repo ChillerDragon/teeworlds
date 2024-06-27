@@ -306,6 +306,7 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 
 	Builder.Init();
 
+	dbg_msg("network_in", "  this is the new snapshot items we got in this snap. it contains only the changed items.");
 	dbg_msg("network_in", "  CSnapshotDelta_UnpackDelta unpacking %d items:", pDelta->m_NumUpdateItems);
 	if(!Sixup)
 	{
@@ -639,7 +640,7 @@ void print_snapshot(int Msg,
 			{
 				int DeltashotSize = m_SnapshotStorage.Get(DeltaTick, 0, &pDeltaShot, 0);
 
-				dbg_msg("network_in", "  pDeltaShot->DebugDump():");
+				dbg_msg("network_in", "  pDeltaShot->DebugDump() this is the old snap we delta against from the storage:");
 				// pDeltaShot->DebugDump();
 				debug_dump(pDeltaShot);
 
