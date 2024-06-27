@@ -1,6 +1,8 @@
 // ChillerDragon 2022 - dissector
 
-#include "byte_printer.h"
+#include <base/dissector/color.h>
+#include <base/dissector/byte_printer.h>
+
 #include "dissector.h"
 
 #include <engine/shared/packer.h>
@@ -598,7 +600,19 @@ void print_snapshot(int Msg,
 		}
 
 		// TODO: clean this up abit
-		mem_copy((char*)local_m_aSnapshotIncomingData + Part*MAX_SNAPSHOT_PACKSIZE, pData, PartSize);
+		if(pData)
+		{
+			mem_copy((char*)local_m_aSnapshotIncomingData + Part*MAX_SNAPSHOT_PACKSIZE, pData, PartSize);
+		}
+		else
+		{
+			// dbg_msg("network_in", "  unpack snapshot got pData=nil! Is this an error?????");
+
+			// TODO: this might be wrong
+			// not sure about this one but i think this is meant for snap empty
+			// so it should reuse the old data??
+			mem_copy(local_m_aSnapshotIncomingData, m_aSnapshotIncomingData, CSnapshot::MAX_SIZE);
+		}
 		local_m_SnapshotParts |= 1<<Part;
 
 		if(local_m_SnapshotParts == (unsigned)((1<<NumParts)-1))
@@ -651,11 +665,25 @@ void print_snapshot(int Msg,
 
 			if(CompleteSize)
 			{
-				int IntSize = CVariableInt::Decompress(m_aSnapshotIncomingData, CompleteSize, aTmpBuffer2, sizeof(aTmpBuffer2));
+				int IntSize = CVariableInt::Decompress(local_m_aSnapshotIncomingData, CompleteSize, aTmpBuffer2, sizeof(aTmpBuffer2));
 
 				if(IntSize < 0) // failure during decompression, bail
 				{
-					dbg_msg("network_in", "  IntSize=%d failure during decompression, bail", IntSize);
+					for(int e = 0; e < 10; e++)
+						dbg_msg("network_in", "  %sERROR DECOMPRESS DATA!!!%s", TERM_RED, TERM_RESET);
+					dbg_msg("network_in", "  GameTick=%d IntSize=%d failure during decompression, bail", GameTick, IntSize);
+
+					char aHex[2048];
+					str_hex(aHex, sizeof(aHex), local_m_aSnapshotIncomingData, CompleteSize);
+
+					dbg_msg(
+						"network_in",
+						"  t=%d local_m_aSnapshotIncomingData=%s Size=%d",
+						GameTick,
+						aHex,
+						CompleteSize
+					);
+
 					return;
 				}
 
