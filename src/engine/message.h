@@ -20,6 +20,7 @@ public:
 		if(Type < 0 || Type > 0x3FFFFFFF)
 		{
 			m_Error = true;
+			dbg_msg("network_out", "error: pack sys=%d msg=%d message is out of bounds", System, Type);
 			return;
 		}
 		AddInt((Type << 1) | (System ? 1 : 0));

@@ -161,8 +161,24 @@ const unsigned char *CUnpacker::GetRaw(int Size)
 		return 0;
 
 	// check for nasty sizes
-	if(Size <= 0 || Size > RemainingSize())
+	if(Size == 0)
 	{
+		m_pError = "GetRaw requested no data size=0";
+		m_Error = true;
+		return 0;
+	}
+	if(Size <= 0)
+	{
+		m_pError = "GetRaw size is negative";
+		m_Error = true;
+		return 0;
+	}
+	if(Size > RemainingSize())
+	{
+		if(RemainingSize() == 0)
+			m_pError = "GetRaw remaining size is zero";
+		else
+			m_pError = "GetRaw not enough data";
 		m_Error = true;
 		return 0;
 	}

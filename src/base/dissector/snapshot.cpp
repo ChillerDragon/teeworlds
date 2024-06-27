@@ -507,9 +507,12 @@ void print_snapshot(int Msg,
 	if(Msg == NETMSG_SNAPEMPTY)
 		pMsg = "NETMSG_SNAPEMPTY";
 
-	dbg_msg("network_in", "SnapShot Msg=%d (%s) receivedSnaps=%d", Msg, pMsg, m_ReceivedSnapshots);
-	dbg_msg("network_in", "  gametick=%d", GameTick);
-	dbg_msg("network_in", "  deltatick=%d", DeltaTick);
+	if(Msg != NETMSG_SNAPEMPTY || pConfig->m_DbgSnap > 1)
+	{
+		dbg_msg("network_in", "SnapShot Msg=%d (%s) receivedSnaps=%d", Msg, pMsg, m_ReceivedSnapshots);
+		dbg_msg("network_in", "  gametick=%d", GameTick);
+		dbg_msg("network_in", "  deltatick=%d", DeltaTick);
+	}
 
 	// we are not allowed to process snapshot yet
 	if(pClient->State() < IClient::STATE_LOADING)
@@ -529,17 +532,43 @@ void print_snapshot(int Msg,
 	{
 		Crc = Unpacker.GetInt();
 		PartSize = Unpacker.GetInt();
-		dbg_msg("network_in", "  NETMSG_SNAPEMPTY Crc=%x PartSize=%d", Crc, PartSize);
+		dbg_msg("network_in", "  Crc=%x PartSize=%d", Crc, PartSize);
+	}
+
+	// empty part sizes are expected and should be ignored silently
+	// because they happen frequently
+	// without this check we would trip the unpacker because it can not unpack
+	// GetRaw(Size=0)
+	if(PartSize == 0 && Msg == NETMSG_SNAPEMPTY)
+		return;
+	if(PartSize != 0 && Msg == NETMSG_SNAPEMPTY)
+	{
+		dbg_msg("network_in", "  got weird snapshot:");
+		dbg_msg("network_in", "    snap empty with PartSize=%d (expected PartSize=0)", PartSize);
 	}
 
 	pData = (const char *)Unpacker.GetRaw(PartSize);
 
-	if(Unpacker.Error() || NumParts < 1 || NumParts > CSnapshot::MAX_PARTS || Part < 0 || Part >= NumParts || PartSize < 0 || PartSize > MAX_SNAPSHOT_PACKSIZE)
+
+	if(Unpacker.Error())
 	{
 		dbg_msg("network_in", "  failed to unpack snapshot:");
-		dbg_msg("network_in", "    Unpacker.Error() = %d", Unpacker.Error());
+		dbg_msg("network_in", "    Unpacker.GetRaw(PartSize=%d) => %p", PartSize, pData);
+		dbg_msg("network_in", "    Unpacker.ErrorMsg() = %s", Unpacker.ErrorMsg());
+		return;
+	}
+
+	if(NumParts < 1 || NumParts > CSnapshot::MAX_PARTS || Part < 0 || Part >= NumParts)
+	{
+		dbg_msg("network_in", "  failed to unpack snapshot:");
 		dbg_msg("network_in", "    NumParts=%d (has to be in range 1 - CSnapshot::MAX_PARTS (%d))", NumParts, CSnapshot::MAX_PARTS);
 		dbg_msg("network_in", "    Part=%d (has to be in range 0 - NumParts (%d))", Part, NumParts);
+		return;
+	}
+
+	if(PartSize < 0 || PartSize > MAX_SNAPSHOT_PACKSIZE)
+	{
+		dbg_msg("network_in", "  failed to unpack snapshot:");
 		dbg_msg("network_in", "    PartSize=%d (has to be in range 0 - MAX_SNAPSHOT_PACKSIZE (%d))", PartSize, MAX_SNAPSHOT_PACKSIZE);
 		return;
 	}
