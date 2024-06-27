@@ -42,7 +42,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
                 dbg_msg("network_in", "  	int m_VelX = %d;", Item.m_VelX);
@@ -59,7 +59,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
                 dbg_msg("network_in", "  	int m_FromX = %d;", Item.m_FromX);
@@ -75,7 +75,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X    = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y    = %d;", Item.m_Y);
                 dbg_msg("network_in", "  	int m_Type = %d;", Item.m_Type);
@@ -89,7 +89,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
                 dbg_msg("network_in", "  	int m_Team = %d;", Item.m_Team);
@@ -103,7 +103,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "    {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "    	int m_GameStartTick    %d", Item.m_GameStartTick);
                 dbg_msg("network_in", "    	int m_GameStateFlags   %d", Item.m_GameStateFlags);
                 dbg_msg("network_in", "    	int m_GameStateEndTick %d", Item.m_GameStateEndTick);
@@ -117,7 +117,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_TeamscoreRed = %d;", Item.m_TeamscoreRed);
                 dbg_msg("network_in", "  	int m_TeamscoreBlue = %d;", Item.m_TeamscoreBlue);
                 dbg_msg("network_in", "  };");
@@ -130,7 +130,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_FlagCarrierRed = %d;", Item.m_FlagCarrierRed);
                 dbg_msg("network_in", "  	int m_FlagCarrierBlue = %d;", Item.m_FlagCarrierBlue);
                 dbg_msg("network_in", "  	int m_FlagDropTickRed = %d;", Item.m_FlagDropTickRed);
@@ -149,7 +149,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_Tick = %d;", Item.m_Tick);
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
@@ -165,7 +165,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  	int m_HookY = %d;", Item.m_HookY);
                 dbg_msg("network_in", "  	int m_HookDx = %d;", Item.m_HookDx);
                 dbg_msg("network_in", "  	int m_HookDy = %d;", Item.m_HookDy);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_Health = %d;", Item.m_Health);
                 dbg_msg("network_in", "  	int m_Armor = %d;", Item.m_Armor);
                 dbg_msg("network_in", "  	int m_AmmoCount = %d;", Item.m_AmmoCount);
@@ -183,7 +183,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_PlayerFlags = %d;", Item.m_PlayerFlags);
                 dbg_msg("network_in", "  	int m_Score       = %d;", Item.m_Score);
                 dbg_msg("network_in", "  	int m_Latency     = %d;", Item.m_Latency);
@@ -197,7 +197,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_SpecMode = %d;", Item.m_SpecMode);
                 dbg_msg("network_in", "  	int m_SpectatorID = %d;", Item.m_SpectatorID);
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
@@ -212,7 +212,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_Local;");
                 dbg_msg("network_in", "  	int m_Team;");
                 dbg_msg("network_in", "  	int m_aName[4];");
@@ -231,7 +231,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_GameFlags = %d;", Item.m_GameFlags);
                 dbg_msg("network_in", "  	int m_ScoreLimit = %d;", Item.m_ScoreLimit);
                 dbg_msg("network_in", "  	int m_TimeLimit = %d;", Item.m_TimeLimit);
@@ -247,7 +247,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_aTuneParams[32];");
                 dbg_msg("network_in", "  };");
         }
@@ -259,7 +259,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
                 dbg_msg("network_in", "  };");
@@ -272,7 +272,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
                 dbg_msg("network_in", "  };");
@@ -285,7 +285,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
                 dbg_msg("network_in", "  };");
@@ -298,7 +298,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
                 dbg_msg("network_in", "  };");
@@ -311,7 +311,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
                 dbg_msg("network_in", "  	int m_ClientID = %d;", Item.m_ClientID);
@@ -325,7 +325,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
                 dbg_msg("network_in", "  	int m_SoundID = %d;", Item.m_SoundID);
@@ -339,7 +339,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
                 dbg_msg("network_in", "  	int m_ClientID = %d;", Item.m_ClientID);
@@ -357,7 +357,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_RaceStartTick = %d;", Item.m_RaceStartTick);
                 dbg_msg("network_in", "  };");
         }
@@ -369,11 +369,11 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  {");
                 dbg_msg("network_in", "    	int TypeId = %d;", Type);
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
-                dbg_msg("network_in", "");
+                dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_BestTime  = %d;", Item.m_BestTime);
                 dbg_msg("network_in", "  	int m_Precision = %d;", Item.m_Precision);
                 dbg_msg("network_in", "  	int m_RaceFlags = %d;", Item.m_RaceFlags);
                 dbg_msg("network_in", "  };");
         }
-        dbg_msg("network_in", "");
+        dbg_msg("network_in", " ");
 }
