@@ -2,6 +2,7 @@
 
 #include <base/dissector/color.h>
 #include <base/dissector/byte_printer.h>
+#include <base/dissector/item_printer.h>
 
 #include "dissector.h"
 
@@ -73,7 +74,6 @@
 #if __has_include(<generated/protocol.h>)
 #include <generated/protocol.h>
 #endif
-#include <engine/shared/protocol.h>
 #include <limits.h>
 
 #include "compat.h"
@@ -450,7 +450,7 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 		pData += ItemSize/4;
 
 		dbg_msg("network_in", "    UnpackItem of size=%d", ItemSize);
-    char aType[128];
+		char aType[128];
 		netobj_to_str(Type, aType, sizeof(aType));
 		int PrintItemLen = minimum(20, ItemSize);
 		char aCutNote[512];
@@ -470,6 +470,7 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 			1, 1,
 			aIdNote,
 			aCutNote);
+		print_netobj_as_struct(pItemData);
 	}
 
 	// finish up
