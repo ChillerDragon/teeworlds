@@ -532,7 +532,7 @@ void print_snapshot(int Msg,
 	{
 		Crc = Unpacker.GetInt();
 		PartSize = Unpacker.GetInt();
-		dbg_msg("network_in", "  Crc=%x PartSize=%d", Crc, PartSize);
+		dbg_msg("network_in", "  Crc=%d PartSize=%d", Crc, PartSize);
 	}
 
 	// empty part sizes are expected and should be ignored silently
