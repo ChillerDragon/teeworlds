@@ -1,10 +1,11 @@
-
 #include <engine/shared/protocol.h>
 #include <engine/shared/network.h>
 
 #if __has_include(<generated/protocol.h>)
 #include <generated/protocol.h>
 #endif
+
+#include <base/dissector/enum_to_str.h>
 
 #include "item_printer.h"
 
@@ -78,7 +79,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X    = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y    = %d;", Item.m_Y);
-                dbg_msg("network_in", "  	int m_Type = %d;", Item.m_Type);
+                dbg_msg("network_in", "  	int m_Type = %d; // %s", Item.m_Type, enum_pickup_to_str(Item.m_Type));
                 dbg_msg("network_in", "  };");
         }
         else if(Type == NETOBJTYPE_FLAG)
@@ -92,7 +93,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
-                dbg_msg("network_in", "  	int m_Team = %d;", Item.m_Team);
+                dbg_msg("network_in", "  	int m_Team = %d; // %s", Item.m_Team, enum_team_to_str(Item.m_Team));
                 dbg_msg("network_in", "  };");
         }
         else if(Type == NETOBJTYPE_GAMEDATA)
@@ -151,8 +152,8 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "    	int Id     = %d;", Id);
                 dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_Tick = %d;", Item.m_Tick);
-                dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
-                dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
+                dbg_msg("network_in", "  	int m_X = %d; // tile %d", Item.m_X, Item.m_X / 32);
+                dbg_msg("network_in", "  	int m_Y = %d; // tile %d", Item.m_Y, Item.m_Y / 32);
                 dbg_msg("network_in", "  	int m_VelX = %d;", Item.m_VelX);
                 dbg_msg("network_in", "  	int m_VelY = %d;", Item.m_VelY);
                 dbg_msg("network_in", "  	int m_Angle = %d;", Item.m_Angle);
@@ -170,7 +171,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", "  	int m_Armor = %d;", Item.m_Armor);
                 dbg_msg("network_in", "  	int m_AmmoCount = %d;", Item.m_AmmoCount);
                 dbg_msg("network_in", "  	int m_Weapon = %d;", Item.m_Weapon);
-                dbg_msg("network_in", "  	int m_Emote = %d;", Item.m_Emote);
+                dbg_msg("network_in", "  	int m_Emote = %d; // %s", Item.m_Emote, enum_emote_to_str(Item.m_Emote));
                 dbg_msg("network_in", "  	int m_AttackTick = %d;", Item.m_AttackTick);
                 dbg_msg("network_in", "  	int m_TriggeredEvents = %d;", Item.m_TriggeredEvents);
                 dbg_msg("network_in", "  };");
@@ -328,7 +329,7 @@ void print_netobj_as_struct(const int *pData)
                 dbg_msg("network_in", " ");
                 dbg_msg("network_in", "  	int m_X = %d;", Item.m_X);
                 dbg_msg("network_in", "  	int m_Y = %d;", Item.m_Y);
-                dbg_msg("network_in", "  	int m_SoundID = %d;", Item.m_SoundID);
+                dbg_msg("network_in", "  	int m_SoundID = %d; // %s", Item.m_SoundID, enum_sound_to_str(Item.m_SoundID));
                 dbg_msg("network_in", "  };");
         }
         else if(Type == NETEVENTTYPE_DAMAGE)

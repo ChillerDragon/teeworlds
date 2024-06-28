@@ -1264,6 +1264,8 @@ set_src(BASE GLOB_RECURSE src/base
   dissector/compat.h
   dissector/dissector.cpp
   dissector/dissector.h
+  dissector/enum_to_str.cpp
+  dissector/enum_to_str.h
   dissector/item_printer.cpp
   dissector/item_printer.h
   dissector/snapshot.cpp
