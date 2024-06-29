@@ -449,7 +449,8 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 
 		pData += ItemSize/4;
 
-		dbg_msg("network_in", "    UnpackItem of size=%d", ItemSize);
+		dbg_msg("network_in", "  ------------------------------------------------");
+		dbg_msg("network_in", "    UpdatedDeltaItem %d/%d of size=%d", i + 1, pDelta->m_NumUpdateItems, ItemSize);
 		char aType[128];
 		netobj_to_str(Type, aType, sizeof(aType));
 		int PrintItemLen = minimum(20, ItemSize);
