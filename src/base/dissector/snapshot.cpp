@@ -4,6 +4,7 @@
 #include <base/dissector/byte_printer.h>
 #include <base/dissector/item_printer.h>
 #include <base/dissector/delta_int.h>
+#include <base/dissector/netobj_to_str.h>
 
 #include "dissector.h"
 
@@ -210,8 +211,7 @@ void debug_dump(CSnapshot *pSnapShot)
 		const CSnapshotItem *pItem = pSnapShot->GetItem(i);
 		int Size = pSnapShot->GetItemSize(i);
 		char aType[128];
-		netobj_to_str(pItem->Type(), aType, sizeof(aType));
-		dbg_msg("snapshot", "\ttype=%d (%s)  id=%d", pItem->Type(), aType, pItem->ID());
+		dbg_msg("snapshot", "\ttype=%d (%s)  id=%d", pItem->Type(), netobj_to_str(pItem->Type()), pItem->ID());
 
 #ifdef _PROTOCOL_VERSION_6
 #else
@@ -229,62 +229,6 @@ void debug_dump(CSnapshot *pSnapShot)
 		for(int b = 0; b < Size / 4; b++)
 			dbg_msg("snapshot", "\t\t%3d %12d\t%08x", b, pItem->Data()[b], pItem->Data()[b]);
 	}
-}
-
-void netobj_to_str(int Type, char *pBuf, int Size)
-{
-	init_compat();
-	const char *pType = "unkown";
-#ifdef _PROTOCOL_VERSION_6
-	if(Type == NETOBJTYPE_EX) pType = "NETOBJTYPE_EX";
-	if(Type == NETOBJTYPE_PLAYERINPUT) pType = "NETOBJTYPE_PLAYERINPUT";
-	if(Type == NETOBJTYPE_PROJECTILE) pType = "NETOBJTYPE_PROJECTILE";
-	if(Type == NETOBJTYPE_LASER) pType = "NETOBJTYPE_LASER";
-	if(Type == NETOBJTYPE_PICKUP) pType = "NETOBJTYPE_PICKUP";
-	if(Type == NETOBJTYPE_FLAG) pType = "NETOBJTYPE_FLAG";
-	if(Type == NETOBJTYPE_GAMEINFO) pType = "NETOBJTYPE_GAMEINFO";
-	if(Type == NETOBJTYPE_GAMEDATA) pType = "NETOBJTYPE_GAMEDATA";
-	if(Type == NETOBJTYPE_CHARACTERCORE) pType = "NETOBJTYPE_CHARACTERCORE";
-	if(Type == NETOBJTYPE_CHARACTER) pType = "NETOBJTYPE_CHARACTER";
-	if(Type == NETOBJTYPE_PLAYERINFO) pType = "NETOBJTYPE_PLAYERINFO";
-	if(Type == NETOBJTYPE_CLIENTINFO) pType = "NETOBJTYPE_CLIENTINFO";
-	if(Type == NETOBJTYPE_SPECTATORINFO) pType = "NETOBJTYPE_SPECTATORINFO";
-	if(Type == NETEVENTTYPE_COMMON) pType = "NETEVENTTYPE_COMMON";
-	if(Type == NETEVENTTYPE_EXPLOSION) pType = "NETEVENTTYPE_EXPLOSION";
-	if(Type == NETEVENTTYPE_SPAWN) pType = "NETEVENTTYPE_SPAWN";
-	if(Type == NETEVENTTYPE_HAMMERHIT) pType = "NETEVENTTYPE_HAMMERHIT";
-	if(Type == NETEVENTTYPE_DEATH) pType = "NETEVENTTYPE_DEATH";
-	if(Type == NETEVENTTYPE_SOUNDGLOBAL) pType = "NETEVENTTYPE_SOUNDGLOBAL";
-	if(Type == NETEVENTTYPE_SOUNDWORLD) pType = "NETEVENTTYPE_SOUNDWORLD";
-	if(Type == NETEVENTTYPE_DAMAGEIND) pType = "NETEVENTTYPE_DAMAGEIND";
-#else
-	if(Type == NETOBJ_INVALID) pType = "NETOBJ_INVALID";
-	if(Type == NETOBJTYPE_PLAYERINPUT) pType = "NETOBJTYPE_PLAYERINPUT";
-	if(Type == NETOBJTYPE_PROJECTILE) pType = "NETOBJTYPE_PROJECTILE";
-	if(Type == NETOBJTYPE_LASER) pType = "NETOBJTYPE_LASER";
-	if(Type == NETOBJTYPE_PICKUP) pType = "NETOBJTYPE_PICKUP";
-	if(Type == NETOBJTYPE_FLAG) pType = "NETOBJTYPE_FLAG";
-	if(Type == NETOBJTYPE_GAMEDATA) pType = "NETOBJTYPE_GAMEDATA";
-	if(Type == NETOBJTYPE_GAMEDATATEAM) pType = "NETOBJTYPE_GAMEDATATEAM";
-	if(Type == NETOBJTYPE_GAMEDATAFLAG) pType = "NETOBJTYPE_GAMEDATAFLAG";
-	if(Type == NETOBJTYPE_CHARACTERCORE) pType = "NETOBJTYPE_CHARACTERCORE";
-	if(Type == NETOBJTYPE_CHARACTER) pType = "NETOBJTYPE_CHARACTER";
-	if(Type == NETOBJTYPE_PLAYERINFO) pType = "NETOBJTYPE_PLAYERINFO";
-	if(Type == NETOBJTYPE_SPECTATORINFO) pType = "NETOBJTYPE_SPECTATORINFO";
-	if(Type == NETOBJTYPE_DE_CLIENTINFO) pType = "NETOBJTYPE_DE_CLIENTINFO";
-	if(Type == NETOBJTYPE_DE_GAMEINFO) pType = "NETOBJTYPE_DE_GAMEINFO";
-	if(Type == NETOBJTYPE_DE_TUNEPARAMS) pType = "NETOBJTYPE_DE_TUNEPARAMS";
-	if(Type == NETEVENTTYPE_COMMON) pType = "NETEVENTTYPE_COMMON";
-	if(Type == NETEVENTTYPE_EXPLOSION) pType = "NETEVENTTYPE_EXPLOSION";
-	if(Type == NETEVENTTYPE_SPAWN) pType = "NETEVENTTYPE_SPAWN";
-	if(Type == NETEVENTTYPE_HAMMERHIT) pType = "NETEVENTTYPE_HAMMERHIT";
-	if(Type == NETEVENTTYPE_DEATH) pType = "NETEVENTTYPE_DEATH";
-	if(Type == NETEVENTTYPE_SOUNDWORLD) pType = "NETEVENTTYPE_SOUNDWORLD";
-	if(Type == NETEVENTTYPE_DAMAGE) pType = "NETEVENTTYPE_DAMAGE";
-	if(Type == NETOBJTYPE_PLAYERINFORACE) pType = "NETOBJTYPE_PLAYERINFORACE";
-	if(Type == NETOBJTYPE_GAMEDATARACE) pType = "NETOBJTYPE_GAMEDATARACE";
-#endif
-	str_copy(pBuf, pType, Size);
 }
 
 int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const void *pSrcData, int DataSize, const short *ppItemSizes, bool Sixup)
@@ -454,13 +398,11 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 
 		dbg_msg("network_in", "  ------------------------------------------------");
 		dbg_msg("network_in", "    UpdatedDeltaItem %d/%d of size=%d", i + 1, pDelta->m_NumUpdateItems, ItemSize);
-		char aType[128];
-		netobj_to_str(Type, aType, sizeof(aType));
 		int PrintItemLen = minimum(20, ItemSize);
 		char aCutNote[512];
 		char aTypeNote[512];
 		char aIdNote[512];
-		str_format(aTypeNote, sizeof(aTypeNote), "Type=%d (%s)", Type, aType);
+		str_format(aTypeNote, sizeof(aTypeNote), "Type=%d (%s)", Type, netobj_to_str(Type));
 		str_format(aIdNote, sizeof(aIdNote), "ID=%d", Id);
 		aCutNote[0] = '\0';
 		if(ItemSize != PrintItemLen)

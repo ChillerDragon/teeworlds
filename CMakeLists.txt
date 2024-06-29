@@ -1270,6 +1270,8 @@ set_src(BASE GLOB_RECURSE src/base
   dissector/enum_to_str.h
   dissector/item_printer.cpp
   dissector/item_printer.h
+  dissector/netobj_to_str.cpp
+  dissector/netobj_to_str.h
   dissector/snapshot.cpp
   dissector/snapshot.h
   hash.c

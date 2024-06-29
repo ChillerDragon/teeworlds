@@ -1,6 +1,7 @@
 #include <base/dissector/color.h>
 #include <base/dissector/byte_printer.h>
 #include <base/dissector/item_printer.h>
+#include <base/dissector/netobj_to_str.h>
 
 #include <engine/shared/packer.h>
 #include <engine/shared/network.h>
@@ -87,6 +88,22 @@ static int _RangeCheck(const void *pEnd, const void *pPtr, int Size)
 	return 0;
 }
 
+#define SEP dbg_msg("network_in", "  * +---------+------+--------------------------+----------------------------------+---------------------------+");
+
+void print_snap_int(int Index, const char *pDescription, int Value, int ItemNum, int MaxItems)
+{
+	CPacker Packer;
+	Packer.Reset();
+	Packer.AddInt(Value);
+	char aHex[512];
+	str_hex(aHex, sizeof(aHex), Packer.Data(), Packer.Size());
+	char aItemNum[16];
+	aItemNum[0] = '\0';
+	if(ItemNum && MaxItems)
+		str_format(aItemNum, sizeof(aItemNum), "%d/%d", ItemNum, MaxItems);
+	dbg_msg("network_in", "  * | %-7s | %-4d | %-24d | %-32s | %-25s |", aItemNum, Index, Value, pDescription, aHex); 
+}
+
 int snapshot_delta_intdump(const CSnapshot *pFrom, CSnapshot *pTo, const void *pSrcData, int DataSize, const short *ppItemSizes, bool Sixup)
 {
 	const CSnapshotDelta::CData *pDelta = (const CSnapshotDelta::CData *)pSrcData;
@@ -119,25 +136,27 @@ int snapshot_delta_intdump(const CSnapshot *pFrom, CSnapshot *pTo, const void *p
 	if(pData > pEnd)
 		return -2;
 
-	// 	int m_NumDeletedItems;
-	// 	int m_NumUpdateItems;
-	// 	int m_NumTempItems; // needed?
-	// 	int m_pData[1];
+
+	SEP;
+	dbg_msg("network_in", "  * | %-7s | %-4s | %-24s | %-32s | %-25s |", "Item", "Idx", "Value", "Description", "Network raw (int packed)"); 
+	SEP;
+
 
 	int IntNum = 0;
-	dbg_msg("network_in", "  * UnpackedInt[%d] = %d; // NumDeletedItems", IntNum++, pDelta->m_NumDeletedItems); 
-	dbg_msg("network_in", "  * UnpackedInt[%d] = %d; // NumUpdatedItems", IntNum++, pDelta->m_NumUpdateItems); 
-	dbg_msg("network_in", "  * UnpackedInt[%d] = %d; // NumTempItems", IntNum++, pDelta->m_NumTempItems); 
+	print_snap_int(IntNum++, "NumDeletedItems", pDelta->m_NumDeletedItems, 0, 0);
+	print_snap_int(IntNum++, "NumUpdatedItems", pDelta->m_NumUpdateItems, 0, 0); 
+	print_snap_int(IntNum++, "NumTempItems", pDelta->m_NumTempItems, 0, 0); 
 
 	for(int i = 0; i < pDelta->m_NumDeletedItems; i++)
 	{
-		dbg_msg("network_in", "  * UnpackedInt[%d] = %d; // deleted key", IntNum++, pDeleted[i]); 
+		print_snap_int(IntNum++, "deleted key", pDeleted[i], 0, 0); 
 	}
+
 
 	// unpack updated stuff
 	for(int i = 0; i < pDelta->m_NumUpdateItems; i++)
 	{
-		dbg_msg("network_in", "  ** item %d/%d", i + 1, pDelta->m_NumUpdateItems);
+		SEP;
 		if(pData+2 > pEnd)
 		{
 			dbg_msg("network_in", "    reading past end");
@@ -150,7 +169,9 @@ int snapshot_delta_intdump(const CSnapshot *pFrom, CSnapshot *pTo, const void *p
 			dbg_msg("network_in", "    type=%d out of bounds", Type);
 			return -4;
 		}
-		dbg_msg("network_in", "  * UnpackedInt[%d] = %d; // ItemType", IntNum++, Type); 
+		char aBuf[512];
+		str_format(aBuf, sizeof(aBuf), "ItemType (%s)", netobj_to_str(Type));
+		print_snap_int(IntNum++, aBuf, Type, i + 1, pDelta->m_NumUpdateItems); 
 
 		Id = *pData++;
 		if(Id < 0 || Id > CSnapshot::MAX_ID)
@@ -158,7 +179,7 @@ int snapshot_delta_intdump(const CSnapshot *pFrom, CSnapshot *pTo, const void *p
 			dbg_msg("network_in", "    id=%d out of bounds", Id);
 			return -5;
 		}
-		dbg_msg("network_in", "  * UnpackedInt[%d] = %d; // ItemId", IntNum++, Id); 
+		print_snap_int(IntNum++, "ItemId", Id, i + 1, pDelta->m_NumUpdateItems); 
 
 		if(Type < _MAX_NETOBJSIZES && ppItemSizes[Type])
 			ItemSize = ppItemSizes[Type];
@@ -175,7 +196,7 @@ int snapshot_delta_intdump(const CSnapshot *pFrom, CSnapshot *pTo, const void *p
 				return -7;
 			}
 			ItemSize = (*pData++) * 4;
-			dbg_msg("network_in", "  * UnpackedInt[%d] = %d; // ItemSize", IntNum++, ItemSize); 
+			print_snap_int(IntNum++, "ItemSize", ItemSize, i + 1, pDelta->m_NumUpdateItems); 
 		}
 
 		if(ItemSize < 0 || _RangeCheck(pEnd, pData, ItemSize))
@@ -197,11 +218,11 @@ int snapshot_delta_intdump(const CSnapshot *pFrom, CSnapshot *pTo, const void *p
 		}
 
 		for(int b = 0; b < ItemSize/4; b++)
-			dbg_msg("network_in", "  * UnpackedInt[%d] = %d; // item payload", IntNum++, pData[b]); 
+			print_snap_int(IntNum++, "item payload", pData[b], i + 1, pDelta->m_NumUpdateItems); 
 
 		pData += ItemSize/4;
 
-		dbg_msg("network_in", "  **");
 	}
+	SEP;
 	return 0;
 }
