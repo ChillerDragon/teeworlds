@@ -471,7 +471,7 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 			1, 1,
 			aIdNote,
 			aCutNote);
-		print_netobj_as_struct(pItemData);
+		print_netobj_as_struct(pItemData, "    ");
 	}
 
 	// finish up
