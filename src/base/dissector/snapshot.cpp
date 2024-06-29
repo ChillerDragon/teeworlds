@@ -210,7 +210,6 @@ void debug_dump(CSnapshot *pSnapShot)
 	{
 		const CSnapshotItem *pItem = pSnapShot->GetItem(i);
 		int Size = pSnapShot->GetItemSize(i);
-		char aType[128];
 		dbg_msg("snapshot", "\ttype=%d (%s)  id=%d", pItem->Type(), netobj_to_str(pItem->Type()), pItem->ID());
 
 #ifdef _PROTOCOL_VERSION_6
@@ -398,6 +397,9 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 
 		dbg_msg("network_in", "  ------------------------------------------------");
 		dbg_msg("network_in", "    UpdatedDeltaItem %d/%d of size=%d", i + 1, pDelta->m_NumUpdateItems, ItemSize);
+		dbg_msg("network_in", " ");
+		dbg_msg("network_in", "    Unpacked integers as raw bytes. This is the snap payload after huffman decompress AND int unpack");
+		dbg_msg("network_in", "    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
 		int PrintItemLen = minimum(20, ItemSize);
 		char aCutNote[512];
 		char aTypeNote[512];
