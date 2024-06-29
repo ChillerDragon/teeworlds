@@ -171,7 +171,7 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
                 dbg_msg("network_in", "%s	%sint%s m_Health = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Health);
                 dbg_msg("network_in", "%s	%sint%s m_Armor = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Armor);
                 dbg_msg("network_in", "%s	%sint%s m_AmmoCount = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_AmmoCount);
-                dbg_msg("network_in", "%s	%sint%s m_Weapon = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Weapon);
+                dbg_msg("network_in", "%s	%sint%s m_Weapon = %d; %s// %s%s", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Weapon, TERM_GREEN, enum_weapon_to_str(Item.m_Weapon), TERM_RESET);
                 dbg_msg("network_in", "%s	%sint%s m_Emote = %d; %s// %s%s", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Emote, TERM_GREEN, enum_emote_to_str(Item.m_Emote), TERM_RESET);
                 dbg_msg("network_in", "%s	%sint%s m_AttackTick = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_AttackTick);
                 dbg_msg("network_in", "%s	%sint%s m_TriggeredEvents = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_TriggeredEvents);

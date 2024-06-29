@@ -14,5 +14,6 @@ const char *enum_chat_to_str(int Value);
 const char *enum_gamemsg_to_str(int Value);
 const char *enum_team_to_str(int Value);
 const char *enum_sound_to_str(int Value);
+const char *enum_weapon_to_str(int Value);
 
 #endif

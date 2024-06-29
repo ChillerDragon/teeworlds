@@ -146,3 +146,15 @@ const char *enum_sound_to_str(int Value)
 	return "(unknown enum value)";
 }
 
+const char *enum_weapon_to_str(int Value)
+{
+	if(Value == WEAPON_HAMMER) { return "WEAPON_HAMMER"; }
+	if(Value == WEAPON_GUN) { return "WEAPON_GUN"; }
+	if(Value == WEAPON_SHOTGUN) { return "WEAPON_SHOTGUN"; }
+	if(Value == WEAPON_GRENADE) { return "WEAPON_GRENADE"; }
+	if(Value == WEAPON_LASER) { return "WEAPON_LASER"; }
+	if(Value == WEAPON_NINJA) { return "WEAPON_NINJA"; }
+	if(Value == NUM_WEAPONS) { return "NUM_WEAPONS"; }
+	return "(unknown enum value)";
+}
+
