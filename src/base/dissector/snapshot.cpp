@@ -3,6 +3,7 @@
 #include <base/dissector/color.h>
 #include <base/dissector/byte_printer.h>
 #include <base/dissector/item_printer.h>
+#include <base/dissector/delta_int.h>
 
 #include "dissector.h"
 
@@ -288,6 +289,8 @@ void netobj_to_str(int Type, char *pBuf, int Size)
 
 int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const void *pSrcData, int DataSize, const short *ppItemSizes, bool Sixup)
 {
+	snapshot_delta_intdump(pFrom, pTo, pSrcData, DataSize, ppItemSizes, Sixup);
+
 	CSnapshotBuilder Builder;
 	const CSnapshotDelta::CData *pDelta = (const CSnapshotDelta::CData *)pSrcData;
 #ifdef _PROTOCOL_VERSION_7
