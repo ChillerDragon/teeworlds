@@ -27,6 +27,15 @@ And then there are also additional config variables
 ![dbg_snap 1 ints](https://raw.githubusercontent.com/ChillerDragon/cdn/master/client_snap_int_tabel.png)
 ![dbg_snap 1 structs](https://raw.githubusercontent.com/ChillerDragon/cdn/master/client_snap_int_structs.png)
 
+Most of the time the snap item sizes are not actually included in the snapshot data. But they are looked up in a table.
+Because client and server already know the fixed sizes of all snap items. But if there are new snap items added after a major
+release without a breaking change. Then these new items contain a size field. This can be used by official releases to add new optional
+items that get dropped by older clients (used by 0.7.5 race extension). And by custom modifications to extend the protocol (used by ddnet).
+
+Those size fields are marked yellow to indicate this special case.
+
+![dbg_snap 1 size](https://raw.githubusercontent.com/ChillerDragon/cdn/master/unknown_size_snap_item.png)
+
 ## errors are always printed
 
 Here you can see me downloading a map with a wifi connection and 300 ping

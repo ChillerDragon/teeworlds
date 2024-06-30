@@ -12,4 +12,6 @@
 #define TERM_CYAN    "\033[36;1m"
 #define TERM_WHITE   "\033[37;1m"
 
+int count_color_code_len(const char *pStr);
+
 #endif

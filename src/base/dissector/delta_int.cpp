@@ -3,6 +3,7 @@
 #include <base/dissector/item_printer.h>
 #include <base/dissector/netobj_to_str.h>
 
+#include <cstring>
 #include <engine/shared/packer.h>
 #include <engine/shared/network.h>
 #include <base/math.h>
@@ -101,7 +102,8 @@ void print_snap_int(int Index, const char *pDescription, int Value, int ItemNum,
 	aItemNum[0] = '\0';
 	if(ItemNum && MaxItems)
 		str_format(aItemNum, sizeof(aItemNum), "%d/%d", ItemNum, MaxItems);
-	dbg_msg("network_in", "  * | %-7s | %-4d | %-24d | %-32s | %-25s |", aItemNum, Index, Value, pDescription, aHex); 
+	int DescLen = 32 + count_color_code_len(pDescription);
+	dbg_msg("network_in", "  * | %-7s | %-4d | %-24d | %-*s | %-25s |", aItemNum, Index, Value, DescLen, pDescription, aHex);
 }
 
 int snapshot_delta_intdump(const CSnapshot *pFrom, CSnapshot *pTo, const void *pSrcData, int DataSize, const short *ppItemSizes, bool Sixup)
@@ -196,7 +198,8 @@ int snapshot_delta_intdump(const CSnapshot *pFrom, CSnapshot *pTo, const void *p
 				return -7;
 			}
 			ItemSize = (*pData++) * 4;
-			print_snap_int(IntNum++, "ItemSize", ItemSize, i + 1, pDelta->m_NumUpdateItems); 
+			str_format(aBuf, sizeof(aBuf), "%s! ItemSize ! (0.7.X compat mode)%s", TERM_YELLOW, TERM_RESET);
+			print_snap_int(IntNum++, aBuf, ItemSize, i + 1, pDelta->m_NumUpdateItems);
 		}
 
 		if(ItemSize < 0 || _RangeCheck(pEnd, pData, ItemSize))

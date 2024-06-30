@@ -1259,6 +1259,7 @@ set_src(BASE GLOB_RECURSE src/base
   detect.h
   dissector/byte_printer.cpp
   dissector/byte_printer.h
+  dissector/color.cpp
   dissector/color.h
   dissector/compat.cpp
   dissector/compat.h
