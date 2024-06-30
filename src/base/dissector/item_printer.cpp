@@ -1,3 +1,4 @@
+#include "base/system.h"
 #include <engine/shared/protocol.h>
 #include <engine/shared/network.h>
 
@@ -353,24 +354,28 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
         }
         else if(Type == NETOBJTYPE_PLAYERINFORACE)
         {
+                int ItemSize = (*pData++) * 4;
                 CNetObj_PlayerInfoRace Item;
                 mem_copy(&Item, pData, sizeof(Item));
                 dbg_msg("network_in", "%s%sstruct%s CNetObj_PlayerInfoRace", pPrefix, TERM_MAGENTA, TERM_RESET);
                 dbg_msg("network_in", "%s{", pPrefix);
                 dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
                 dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s	%sint%s Size   = %d;", pPrefix, TERM_BLUE, TERM_RESET, ItemSize);
                 dbg_msg("network_in", "%s", pPrefix);
                 dbg_msg("network_in", "%s	%sint%s m_RaceStartTick = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_RaceStartTick);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_GAMEDATARACE)
         {
+                int ItemSize = (*pData++) * 4;
                 CNetObj_GameDataRace Item;
                 mem_copy(&Item, pData, sizeof(Item));
                 dbg_msg("network_in", "%s%sstruct%s CNetObj_GameDataRace", pPrefix, TERM_MAGENTA, TERM_RESET);
                 dbg_msg("network_in", "%s{", pPrefix);
                 dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
                 dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s	%sint%s Size   = %d;", pPrefix, TERM_BLUE, TERM_RESET, ItemSize);
                 dbg_msg("network_in", "%s", pPrefix);
                 dbg_msg("network_in", "%s	%sint%s m_BestTime  = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_BestTime);
                 dbg_msg("network_in", "%s	%sint%s m_Precision = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Precision);
