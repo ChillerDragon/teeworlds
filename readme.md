@@ -27,3 +27,9 @@ And then there are also additional config variables
 ![dbg_snap 1 ints](https://raw.githubusercontent.com/ChillerDragon/cdn/master/client_snap_int_tabel.png)
 ![dbg_snap 1 structs](https://raw.githubusercontent.com/ChillerDragon/cdn/master/client_snap_int_structs.png)
 
+## errors are always printed
+
+Here you can see me downloading a map with a wifi connection and 300 ping
+
+![300 ping map download](https://raw.githubusercontent.com/ChillerDragon/cdn/master/300_ping_map_download.png)
+
