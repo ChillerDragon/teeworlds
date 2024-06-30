@@ -333,8 +333,12 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 			return -5;
 		}
 
+		bool KnownSize = false;
 		if(Type < _MAX_NETOBJSIZES && ppItemSizes[Type])
+		{
 			ItemSize = ppItemSizes[Type];
+			KnownSize = true;
+		}
 		else
 		{
 			if(pData+1 > pEnd)
@@ -396,28 +400,51 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 		pData += ItemSize/4;
 
 		dbg_msg("network_in", "  ------------------------------------------------");
-		dbg_msg("network_in", "    UpdatedDeltaItem %d/%d of size=%d", i + 1, pDelta->m_NumUpdateItems, ItemSize);
+		dbg_msg("network_in", "    UpdatedDeltaItem %d/%d of size=%d (in bytes)", i + 1, pDelta->m_NumUpdateItems, ItemSize);
 		dbg_msg("network_in", " ");
 		dbg_msg("network_in", "    Unpacked integers as raw bytes. This is the snap payload after huffman decompress AND int unpack");
 		dbg_msg("network_in", "    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
-		int PrintItemLen = minimum(20, ItemSize);
+		int FullItemSize = ItemSize + (3 - (int)KnownSize) * sizeof(int);
+		int PrintItemLen = minimum(20, FullItemSize);
 		char aCutNote[512];
 		char aTypeNote[512];
 		char aIdNote[512];
 		str_format(aTypeNote, sizeof(aTypeNote), "Type=%d (%s)", Type, netobj_to_str(Type));
 		str_format(aIdNote, sizeof(aIdNote), "ID=%d", Id);
 		aCutNote[0] = '\0';
-		if(ItemSize != PrintItemLen)
-			str_format(aCutNote, sizeof(aCutNote), "[CUT OFF %d BYTES]", ItemSize - PrintItemLen);
-		print_hex_row_highlight_two(
-			"network_in",
-			"    ",
-			pItemData, PrintItemLen,
-			0, 0,
-			aTypeNote,
-			1, 1,
-			aIdNote,
-			aCutNote);
+		if(FullItemSize != PrintItemLen)
+			str_format(aCutNote, sizeof(aCutNote), "[CUT OFF %d BYTES]", FullItemSize - PrintItemLen);
+		if(KnownSize)
+		{
+			print_hex_row_highlight_two(
+				"network_in",
+				"    ",
+				pItemData, PrintItemLen,
+				0, 3,
+				aTypeNote,
+				4, 7,
+				aIdNote,
+				aCutNote);
+		}
+		else
+		{
+			char aSizeNote[512];
+			str_format(aSizeNote, sizeof(aSizeNote), "Size: %d fields(ints) %d bytes", ItemSize / (int)sizeof(int), ItemSize);
+			print_hex_row_highlight_three(
+				"network_in",
+				"    ",
+				pItemData, PrintItemLen,
+				0, 3,
+				aTypeNote,
+				4, 7,
+				aIdNote,
+				8, 11,
+				aSizeNote,
+				aCutNote);
+		}
+		// char aHex[512];
+		// str_hex(aHex, sizeof(aHex), pItemData, FullItemSize);
+		// dbg_msg("network_in", "     sizeknown=%d pItemData=%s", KnownSize, aHex);
 		print_netobj_as_struct(pItemData, "    ");
 	}
 

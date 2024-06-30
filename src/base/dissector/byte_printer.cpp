@@ -164,6 +164,23 @@ void print_hex_row_highlight_two(const char *type, const char *prefix, const voi
 	}
 }
 
+
+// tested by putting this into gameclient.cpp oninit
+//
+// unsigned char aData[16] = {0xFF, 0x00, 0xAA, 0x00};
+// print_hex_row_highlight_three(
+// 	"network_in",
+// 	"    ",
+// 	aData, sizeof(aData),
+// 	0, 0,
+// 	"note1",
+// 	1, 1,
+// 	"note2",
+// 	2, 2,
+// 	"note3",
+// 	"[CUT X bytes UWU]");
+// exit(0);
+//
 void print_hex_row_highlight_three(
 	const char *type,
 	const char *prefix,
@@ -193,15 +210,17 @@ void print_hex_row_highlight_three(
 	str_hex_highlight_three(aHexData, sizeof(aHexData), data, data_size, from1, to1, from2, to2, from3, to3);
 	str_raw(aRawData, sizeof(aRawData), pChunkData, data_size);
 	dbg_msg(type, "%s%s    %s  %s", prefix, aHexData, aRawData, info);
+
 	offset1 = from1 * 4;
 	offset2 = from2 * 4;
 	offset3 = from3 * 4;
 	offset_arrow_2 = (offset2 - offset1) - 1;
-	offset_note_2 = (offset_arrow_2 - str_length(note1)) + 1;
+	offset_note_2 = offset_arrow_2;
 	offset_arrow_3 = (offset3 - (offset_arrow_2 + offset1 + 1)) - 1;
-	dbg_msg(type, "%s%*s^%*s^%*s^", prefix, offset1, " ", offset_arrow_2, " ", offset_arrow_3, " ");
-	dbg_msg(type, "%s%*s%s%*s%s%*s%s", prefix, offset1, " ", note1, offset_note_2, " ", "|", offset_arrow_3, " ", note3);
-	dbg_msg(type, "%s%*s%s", prefix, offset2, " ", note2);
+	dbg_msg(type, "%s%*s%s%*s%s%*s%s", prefix, offset1, " ", "^", offset_arrow_2, " ", "^", offset_arrow_3, " ", "^");
+	dbg_msg(type, "%s%*s%s%*s%s%*s%s", prefix, offset1, " ", "|", offset_note_2, " ", "|", offset_arrow_3, " ", note3);
+	dbg_msg(type, "%s%*s%s%*s%s", prefix, offset1, " ", "|", offset_note_2, " ", note2);
+	dbg_msg(type, "%s%*s%s", prefix, offset1, " ", note1);
 }
 
 
