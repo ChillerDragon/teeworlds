@@ -53,6 +53,7 @@ public:
 	int Serialize(char *pDstData) const;
 
 	int Crc() const;
+	int VerboseCrc() const;
 	void DebugDump() const;
 };
 
@@ -150,6 +151,8 @@ public:
 	int *GetItemData(int Key) const;
 
 	int Finish(void *pSnapdata);
+
+	int NumItems() { return m_NumItems; }
 };
 
 

@@ -8,6 +8,7 @@
 #include <base/tl/algorithm.h>
 
 #include "snapshot.h"
+#include "base/dissector/netobj_to_str.h"
 #include "compression.h"
 
 // CSnapshot
@@ -67,6 +68,26 @@ int CSnapshot::Crc() const
 		for(int b = 0; b < Size/4; b++)
 			Crc += pItem->Data()[b];
 	}
+	return Crc;
+}
+
+int CSnapshot::VerboseCrc() const
+{
+	int Crc = 0;
+	dbg_msg("snapshot", "computing crc data_size=%d num_items=%d ...", m_DataSize, m_NumItems);
+	for(int i = 0; i < m_NumItems; i++)
+	{
+		const CSnapshotItem *pItem = GetItem(i);
+		int Size = GetItemSize(i);
+		dbg_msg("snapshot", "\ttype=%d (%s) id=%d size=%d", pItem->Type(), netobj_to_str(pItem->Type()), pItem->ID(), Size);
+
+		for(int b = 0; b < Size/4; b++)
+		{
+			Crc += pItem->Data()[b];
+			dbg_msg("snapshot", "\t\tdata=%d total_crc=%d", pItem->Data()[b], Crc);
+		}
+	}
+	dbg_msg("snapshot", "  computed final crc=%d", Crc);
 	return Crc;
 }
 

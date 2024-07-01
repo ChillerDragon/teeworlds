@@ -230,6 +230,18 @@ void debug_dump(CSnapshot *pSnapShot)
 	}
 }
 
+static void UndiffItem(const int *pPast, const int *pDiff, int *pOut, int Size)
+{
+	while(Size)
+	{
+		*pOut = *pPast+*pDiff;
+		pOut++;
+		pPast++;
+		pDiff++;
+		Size--;
+	}
+}
+
 int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const void *pSrcData, int DataSize, const short *ppItemSizes, bool Sixup)
 {
 	snapshot_delta_intdump(pFrom, pTo, pSrcData, DataSize, ppItemSizes, Sixup);
@@ -387,12 +399,12 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 		if(FromIndex != -1)
 		{
 			// we got an update so we need to apply the diff
-			// UndiffItem(pFrom->GetItem(FromIndex)->Data(), pData, pNewData, ItemSize / 4, &m_aSnapshotDataRate[Type]);
+			UndiffItem(pFrom->GetItem(FromIndex)->Data(), pData, pNewData, ItemSize / 4);
 			// m_aSnapshotDataUpdates[Type]++;
 		}
 		else // no previous, just copy the pData
 		{
-			// mem_copy(pNewData, pData, ItemSize);
+			mem_copy(pNewData, pData, ItemSize);
 			// m_aSnapshotDataRate[Type] += ItemSize * 8;
 			// m_aSnapshotDataUpdates[Type]++;
 		}
@@ -447,6 +459,8 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 		// dbg_msg("network_in", "     sizeknown=%d pItemData=%s", KnownSize, aHex);
 		print_netobj_as_struct(pItemData, "    ");
 	}
+
+	dbg_msg("network_in", "finish up snap build items %d", Builder.NumItems());
 
 	// finish up
 	return Builder.Finish(pTo);
@@ -687,13 +701,19 @@ void print_snapshot(int Msg,
 				return;
 			}
 
+			dbg_msg("network_in", "tmp3->crc=%d gametick=%d", pTmpBuffer3->Crc(), GameTick);
+			dbg_msg("network_in", "tmp3->numitems=%d gametick=%d", pTmpBuffer3->NumItems(), GameTick);
+
+			if(pConfig->m_DbgSnapCrc)
+			{
+				dbg_msg("network_in", "computing crc of snapshot after delta unpack (gametick=%d)", GameTick);
+				pTmpBuffer3->VerboseCrc();
+			}
+
 			if(Msg != NETMSG_SNAPEMPTY && pTmpBuffer3->Crc() != Crc)
 			{
-				if(pConfig->m_Debug)
-				{
-					dbg_msg("network_in", "  snapshot crc error #%d - tick=%d wantedcrc=%d gotcrc=%d compressed_size=%d delta_tick=%d",
-						m_SnapCrcErrors, GameTick, Crc, pTmpBuffer3->Crc(), CompleteSize, DeltaTick);
-				}
+				dbg_msg("network_in", "  snapshot crc error #%d - tick=%d wantedcrc=%d gotcrc=%d compressed_size=%d delta_tick=%d",
+					m_SnapCrcErrors, GameTick, Crc, pTmpBuffer3->Crc(), CompleteSize, DeltaTick);
 
 				// m_SnapCrcErrors++;
 				if(m_SnapCrcErrors > 10)

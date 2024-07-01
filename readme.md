@@ -17,6 +17,7 @@ And then there are also additional config variables
 - `clean` Clean log output to hide all non network related messages
 - `dbg_master` Verbose master data logging
 - `dbg_snap` Verbose snap data logging 0=off 1=non empty 2=including empty snaps
+- `dbg_snap_crc` Verbose output of the snapshot crc being summed
 
 ## debug snapshot payloads
 

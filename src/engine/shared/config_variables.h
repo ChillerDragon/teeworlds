@@ -115,6 +115,7 @@ MACRO_CONFIG_INT(Debug, debug, 0, 0, 4, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Debug mo
 MACRO_CONFIG_INT(Clean, Clean, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Clean log output to hide all non network related messages")
 MACRO_CONFIG_INT(DbgMaster, dbg_master, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Verbose master data logging")
 MACRO_CONFIG_INT(DbgSnap, dbg_snap, 0, 0, 2, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Verbose snap data logging 0=off 1=non empty 2=including empty snaps")
+MACRO_CONFIG_INT(DbgSnapCrc, dbg_snap_crc, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Verbose output of the snapshot crc being summed")
 MACRO_CONFIG_INT(DbgStress, dbg_stress, 0, 0, 0, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Stress systems")
 MACRO_CONFIG_INT(DbgStressNetwork, dbg_stress_network, 0, 0, 0, CFGFLAG_CLIENT|CFGFLAG_SERVER, "Stress network")
 MACRO_CONFIG_INT(DbgPref, dbg_pref, 0, 0, 1, CFGFLAG_SERVER, "Performance outputs")
