@@ -1528,13 +1528,10 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 
 					if(Unpacker.Type() != NETMSG_SNAPEMPTY && pTmpBuffer3->Crc() != Crc)
 					{
-						if(Config()->m_Debug)
-						{
-							char aBuf[256];
-							str_format(aBuf, sizeof(aBuf), "snapshot crc error #%d - tick=%d wantedcrc=%d gotcrc=%d compressed_size=%d delta_tick=%d",
-								m_SnapCrcErrors, GameTick, Crc, pTmpBuffer3->Crc(), CompleteSize, DeltaTick);
-							m_pConsole->Print(IConsole::OUTPUT_LEVEL_DEBUG, "client", aBuf);
-						}
+						char aBuf[256];
+						str_format(aBuf, sizeof(aBuf), "snapshot crc error #%d - tick=%d wantedcrc=%d gotcrc=%d compressed_size=%d delta_tick=%d",
+							m_SnapCrcErrors, GameTick, Crc, pTmpBuffer3->Crc(), CompleteSize, DeltaTick);
+						m_pConsole->Print(IConsole::OUTPUT_LEVEL_DEBUG, "client", aBuf);
 
 						m_SnapCrcErrors++;
 						if(m_SnapCrcErrors > 10)
