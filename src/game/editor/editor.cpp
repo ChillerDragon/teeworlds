@@ -24,6 +24,7 @@
 #include <generated/client_data.h>
 
 #include "auto_map.h"
+#include "base/math.h"
 #include "editor.h"
 
 const void* CEditor::ms_pUiGotContext;
@@ -2408,6 +2409,39 @@ void CEditor::RenderLayers(CUIRect LayersBox)
 
 		LayersBox.HSplitTop(5.0f, &Slot, &LayersBox);
 		s_ScrollRegion.AddRect(Slot);
+	}
+
+	if(Input()->KeyPress(KEY_DOWN) && m_Dialog == DIALOG_NONE && CLineInput::GetActiveInput() == nullptr)
+	{
+		int NextLayer = minimum(m_SelectedLayer + 1, m_Map.m_lGroups[m_SelectedGroup]->m_lLayers.size() - 1);
+		int NextGroup = m_SelectedGroup;
+		if (NextLayer == m_SelectedLayer || m_Map.m_lGroups[m_SelectedGroup]->m_lLayers.size() == 0)
+		{
+			NextGroup = minimum(m_SelectedGroup + 1, m_Map.m_lGroups.size() - 1);
+			if (NextGroup == m_SelectedGroup)
+			{
+				NextGroup = 0;
+				NextLayer = 0;
+			}
+		}
+		m_SelectedLayer = NextLayer;
+		m_SelectedGroup = NextGroup;
+	}
+	if(Input()->KeyPress(KEY_UP) && m_Dialog == DIALOG_NONE && CLineInput::GetActiveInput() == nullptr)
+	{
+		int NextLayer = maximum(m_SelectedLayer - 1, 0);
+		int NextGroup = m_SelectedGroup;
+		if (NextLayer == m_SelectedLayer || m_Map.m_lGroups[m_SelectedGroup]->m_lLayers.size() == 0)
+		{
+			NextGroup = maximum(m_SelectedGroup - 1, 0);
+			if (NextGroup == m_SelectedGroup)
+			{
+				NextGroup = m_Map.m_lGroups.size() - 1;
+				NextLayer = m_Map.m_lGroups[NextGroup]->m_lLayers.size() - 1;
+			}
+		}
+		m_SelectedLayer = NextLayer;
+		m_SelectedGroup = NextGroup;
 	}
 
 	CUIRect AddGroupButton;
