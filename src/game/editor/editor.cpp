@@ -634,6 +634,21 @@ void CEditor::DoToolbar(CUIRect ToolBar)
 			InvokeFileDialog(IStorage::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", "", CallbackSaveMap, this);
 	}
 
+	// ctrl+n for new map
+	if(Input()->KeyPress(KEY_N) && (Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL)) && m_Dialog == DIALOG_NONE)
+	{
+		if(HasUnsavedData())
+		{
+			m_PopupEventType = POPEVENT_NEW;
+			m_PopupEventActivated = true;
+		}
+		else
+		{
+			Reset();
+			m_aFileName[0] = 0;
+		}
+	}
+
 	// detail button
 	TB_Top.VSplitLeft(30.0f, &Button, &TB_Top);
 	static int s_HqButton = 0;
