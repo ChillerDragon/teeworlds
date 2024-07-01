@@ -1994,6 +1994,19 @@ void CEditor::DoMapEditor(CUIRect View)
 				UI()->SetActiveItem(0);
 			}
 		}
+
+		if(!(Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL)) && m_Dialog == DIALOG_NONE && CLineInput::GetActiveInput() == nullptr)
+		{
+			float PanSpeed = (Input()->KeyIsPressed(KEY_LSHIFT) || Input()->KeyIsPressed(KEY_RSHIFT)) ? 200.0f : 64.0f;
+			if(Input()->KeyPress(KEY_A))
+				m_EditorOffsetX -= PanSpeed * m_WorldZoom;
+			else if(Input()->KeyPress(KEY_D))
+				m_EditorOffsetX += PanSpeed * m_WorldZoom;
+			if(Input()->KeyPress(KEY_W))
+				m_EditorOffsetY -= PanSpeed * m_WorldZoom;
+			else if(Input()->KeyPress(KEY_S))
+				m_EditorOffsetY += PanSpeed * m_WorldZoom;
+		}
 	}
 	else if(UI()->CheckActiveItem(s_pEditorID))
 	{
@@ -3759,7 +3772,7 @@ void CEditor::RenderMenubar(CUIRect MenuBar)
 	str_format(aBuf, sizeof(aBuf), "File: %s", m_aFileName);
 	UI()->DoLabel(&MenuBar, aBuf, 10.0f, TEXTALIGN_LEFT);
 
-	str_format(aBuf, sizeof(aBuf), "Z: %i, A: %.1f, G: %i", m_ZoomLevel, m_AnimateSpeed, m_GridFactor);
+	str_format(aBuf, sizeof(aBuf), "X: %f Y: %f Z: %i, A: %.1f, G: %i", m_WorldOffsetX, m_WorldOffsetY, m_ZoomLevel, m_AnimateSpeed, m_GridFactor);
 	UI()->DoLabel(&Info, aBuf, 10.0f, TEXTALIGN_RIGHT);
 
 	// Exit editor button
