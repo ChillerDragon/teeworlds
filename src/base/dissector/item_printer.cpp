@@ -23,121 +23,113 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
         {
                 CNetObj_PlayerInput Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_PlayerInput", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_Direction     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Direction);
-                dbg_msg("network_in", "%s	%sint%s m_TargetX       = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_TargetX);
-                dbg_msg("network_in", "%s	%sint%s m_TargetY       = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_TargetY);
-                dbg_msg("network_in", "%s	%sint%s m_Jump      = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Jump);
-                dbg_msg("network_in", "%s	%sint%s m_Fire      = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Fire);
-                dbg_msg("network_in", "%s	%sint%s m_Hook      = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Hook);
-                dbg_msg("network_in", "%s	%sint%s m_PlayerFlags       = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_PlayerFlags);
-                dbg_msg("network_in", "%s	%sint%s m_WantedWeapon      = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_WantedWeapon);
-                dbg_msg("network_in", "%s	%sint%s m_NextWeapon        = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_NextWeapon);
-                dbg_msg("network_in", "%s	%sint%s m_PrevWeapon        = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_PrevWeapon);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_PlayerInput Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Direction     = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Direction, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_TargetX       = %s%d%s,", pPrefix, TERM_BLUE, Item.m_TargetX, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_TargetY       = %s%d%s,", pPrefix, TERM_BLUE, Item.m_TargetY, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Jump      = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Jump, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Fire      = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Fire, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Hook      = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Hook, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_PlayerFlags       = %s%d%s,", pPrefix, TERM_BLUE, Item.m_PlayerFlags, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_WantedWeapon      = %s%d%s,", pPrefix, TERM_BLUE, Item.m_WantedWeapon, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_NextWeapon        = %s%d%s,", pPrefix, TERM_BLUE, Item.m_NextWeapon, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_PrevWeapon        = %s%d%s,", pPrefix, TERM_BLUE, Item.m_PrevWeapon, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_PROJECTILE)
         {
                 CNetObj_Projectile Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_Projectile", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_Projectile Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_X = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_X);
-                dbg_msg("network_in", "%s	%sint%s m_Y = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Y);
-                dbg_msg("network_in", "%s	%sint%s m_VelX = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_VelX);
-                dbg_msg("network_in", "%s	%sint%s m_VelY = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_VelY);
-                dbg_msg("network_in", "%s	%sint%s m_Type = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Type);
-                dbg_msg("network_in", "%s	%sint%s m_StartTick = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_StartTick);
+                dbg_msg("network_in", "%s	.m_X = %s%d%s,", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_VelX = %s%d%s,", pPrefix, TERM_BLUE, Item.m_VelX, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_VelY = %s%d%s,", pPrefix, TERM_BLUE, Item.m_VelY, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Type = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_StartTick = %s%d%s,", pPrefix, TERM_BLUE, Item.m_StartTick, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_LASER)
         {
                 CNetObj_Laser Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_Laser", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_Laser Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_X = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_X);
-                dbg_msg("network_in", "%s	%sint%s m_Y = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Y);
-                dbg_msg("network_in", "%s	%sint%s m_FromX = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_FromX);
-                dbg_msg("network_in", "%s	%sint%s m_FromY = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_FromY);
-                dbg_msg("network_in", "%s	%sint%s m_StartTick = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_StartTick);
+                dbg_msg("network_in", "%s	.m_X = %s%d%s,", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_FromX = %s%d%s,", pPrefix, TERM_BLUE, Item.m_FromX, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_FromY = %s%d%s,", pPrefix, TERM_BLUE, Item.m_FromY, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_StartTick = %s%d%s,", pPrefix, TERM_BLUE, Item.m_StartTick, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_PICKUP)
         {
                 CNetObj_Pickup Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_Pickup", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_Pickup Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_X    = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_X);
-                dbg_msg("network_in", "%s	%sint%s m_Y    = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Y);
-                dbg_msg("network_in", "%s	%sint%s m_Type = %d; // %s", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Type, enum_pickup_to_str(Item.m_Type));
+                dbg_msg("network_in", "%s	.m_X    = %s%d%s,", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y    = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Type = %s%d%s; %s// %s%s", pPrefix, TERM_BLUE, Item.m_Type, TERM_RESET, TERM_GREEN, enum_pickup_to_str(Item.m_Type), TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_FLAG)
         {
                 CNetObj_Flag Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_Flag", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_Flag Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_X = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_X);
-                dbg_msg("network_in", "%s	%sint%s m_Y = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Y);
-                dbg_msg("network_in", "%s	%sint%s m_Team = %d; // %s", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Team, enum_team_to_str(Item.m_Team));
+                dbg_msg("network_in", "%s	.m_X = %s%d%s,", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Team = %s%d%s; %s// %s%s", pPrefix, TERM_BLUE, Item.m_Team, TERM_RESET, TERM_GREEN, enum_team_to_str(Item.m_Team), TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_GAMEDATA)
         {
                 CNetObj_GameData Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_GameData", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_GameData Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_GameStartTick    = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_GameStartTick);
-                dbg_msg("network_in", "%s	%sint%s m_GameStateFlags   = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_GameStateFlags);
-                dbg_msg("network_in", "%s	%sint%s m_GameStateEndTick = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_GameStateEndTick);
+                dbg_msg("network_in", "%s	.m_GameStartTick    = %s%d%s,", pPrefix, TERM_BLUE, Item.m_GameStartTick, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_GameStateFlags   = %s%d%s,", pPrefix, TERM_BLUE, Item.m_GameStateFlags, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_GameStateEndTick = %s%d%s,", pPrefix, TERM_BLUE, Item.m_GameStateEndTick, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_GAMEDATATEAM)
         {
                 CNetObj_GameDataTeam Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_GameDataTeam", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_GameDataTeam Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_TeamscoreRed = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_TeamscoreRed);
-                dbg_msg("network_in", "%s	%sint%s m_TeamscoreBlue = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_TeamscoreBlue);
+                dbg_msg("network_in", "%s	.m_TeamscoreRed = %s%d%s,", pPrefix, TERM_BLUE, Item.m_TeamscoreRed, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_TeamscoreBlue = %s%d%s,", pPrefix, TERM_BLUE, Item.m_TeamscoreBlue, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_GAMEDATAFLAG)
         {
                 CNetObj_GameDataFlag Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_GameDataFlag", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_GameDataFlag Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_FlagCarrierRed = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_FlagCarrierRed);
-                dbg_msg("network_in", "%s	%sint%s m_FlagCarrierBlue = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_FlagCarrierBlue);
-                dbg_msg("network_in", "%s	%sint%s m_FlagDropTickRed = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_FlagDropTickRed);
-                dbg_msg("network_in", "%s	%sint%s m_FlagDropTickBlue = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_FlagDropTickBlue);
+                dbg_msg("network_in", "%s	.m_FlagCarrierRed = %s%d%s,", pPrefix, TERM_BLUE, Item.m_FlagCarrierRed, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_FlagCarrierBlue = %s%d%s,", pPrefix, TERM_BLUE, Item.m_FlagCarrierBlue, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_FlagDropTickRed = %s%d%s,", pPrefix, TERM_BLUE, Item.m_FlagDropTickRed, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_FlagDropTickBlue = %s%d%s,", pPrefix, TERM_BLUE, Item.m_FlagDropTickBlue, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_CHARACTERCORE)
@@ -148,73 +140,69 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
         {
                 CNetObj_Character Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_Character", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_Character Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_Tick = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Tick);
-                dbg_msg("network_in", "%s	%sint%s m_X = %d; %s// tile %d%s", pPrefix, TERM_BLUE, TERM_RESET, Item.m_X, TERM_GREEN, Item.m_X / 32, TERM_RESET);
-                dbg_msg("network_in", "%s	%sint%s m_Y = %d; %s// tile %d%s", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Y, TERM_GREEN, Item.m_Y / 32, TERM_RESET);
-                dbg_msg("network_in", "%s	%sint%s m_VelX = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_VelX);
-                dbg_msg("network_in", "%s	%sint%s m_VelY = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_VelY);
-                dbg_msg("network_in", "%s	%sint%s m_Angle = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Angle);
-                dbg_msg("network_in", "%s	%sint%s m_Direction = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Direction);
-                dbg_msg("network_in", "%s	%sint%s m_Jumped = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Jumped);
-                dbg_msg("network_in", "%s	%sint%s m_HookedPlayer = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_HookedPlayer);
-                dbg_msg("network_in", "%s	%sint%s m_HookState = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_HookState);
-                dbg_msg("network_in", "%s	%sint%s m_HookTick = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_HookTick);
-                dbg_msg("network_in", "%s	%sint%s m_HookX = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_HookX);
-                dbg_msg("network_in", "%s	%sint%s m_HookY = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_HookY);
-                dbg_msg("network_in", "%s	%sint%s m_HookDx = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_HookDx);
-                dbg_msg("network_in", "%s	%sint%s m_HookDy = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_HookDy);
+                dbg_msg("network_in", "%s	.m_Tick = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Tick, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_X = %s%d%s; %s// tile %d%s", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET, TERM_GREEN, Item.m_X / 32, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y = %s%d%s; %s// tile %d%s", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET, TERM_GREEN, Item.m_Y / 32, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_VelX = %s%d%s,", pPrefix, TERM_BLUE, Item.m_VelX, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_VelY = %s%d%s,", pPrefix, TERM_BLUE, Item.m_VelY, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Angle = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Angle, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Direction = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Direction, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Jumped = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Jumped, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_HookedPlayer = %s%d%s,", pPrefix, TERM_BLUE, Item.m_HookedPlayer, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_HookState = %s%d%s,", pPrefix, TERM_BLUE, Item.m_HookState, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_HookTick = %s%d%s,", pPrefix, TERM_BLUE, Item.m_HookTick, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_HookX = %s%d%s,", pPrefix, TERM_BLUE, Item.m_HookX, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_HookY = %s%d%s,", pPrefix, TERM_BLUE, Item.m_HookY, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_HookDx = %s%d%s,", pPrefix, TERM_BLUE, Item.m_HookDx, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_HookDy = %s%d%s,", pPrefix, TERM_BLUE, Item.m_HookDy, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_Health = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Health);
-                dbg_msg("network_in", "%s	%sint%s m_Armor = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Armor);
-                dbg_msg("network_in", "%s	%sint%s m_AmmoCount = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_AmmoCount);
-                dbg_msg("network_in", "%s	%sint%s m_Weapon = %d; %s// %s%s", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Weapon, TERM_GREEN, enum_weapon_to_str(Item.m_Weapon), TERM_RESET);
-                dbg_msg("network_in", "%s	%sint%s m_Emote = %d; %s// %s%s", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Emote, TERM_GREEN, enum_emote_to_str(Item.m_Emote), TERM_RESET);
-                dbg_msg("network_in", "%s	%sint%s m_AttackTick = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_AttackTick);
-                dbg_msg("network_in", "%s	%sint%s m_TriggeredEvents = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_TriggeredEvents);
+                dbg_msg("network_in", "%s	.m_Health = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Health, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Armor = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Armor, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_AmmoCount = %s%d%s,", pPrefix, TERM_BLUE, Item.m_AmmoCount, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Weapon = %s%d%s; %s// %s%s", pPrefix, TERM_BLUE, Item.m_Weapon, TERM_RESET, TERM_GREEN, enum_weapon_to_str(Item.m_Weapon), TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Emote = %s%d%s; %s// %s%s", pPrefix, TERM_BLUE, Item.m_Emote, TERM_RESET, TERM_GREEN, enum_emote_to_str(Item.m_Emote), TERM_RESET);
+                dbg_msg("network_in", "%s	.m_AttackTick = %s%d%s,", pPrefix, TERM_BLUE, Item.m_AttackTick, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_TriggeredEvents = %s%d%s,", pPrefix, TERM_BLUE, Item.m_TriggeredEvents, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_PLAYERINFO)
         {
                 CNetObj_PlayerInfo Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_PlayerInfo", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_PlayerInfo Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_PlayerFlags = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_PlayerFlags);
-                dbg_msg("network_in", "%s	%sint%s m_Score       = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Score);
-                dbg_msg("network_in", "%s	%sint%s m_Latency     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Latency);
+                dbg_msg("network_in", "%s	.m_PlayerFlags = %s%d%s,", pPrefix, TERM_BLUE, Item.m_PlayerFlags, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Score       = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Score, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Latency     = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Latency, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_SPECTATORINFO)
         {
                 CNetObj_SpectatorInfo Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_SpectatorInfo", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_SpectatorInfo Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_SpecMode = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_SpecMode);
-                dbg_msg("network_in", "%s	%sint%s m_SpectatorID = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_SpectatorID);
-                dbg_msg("network_in", "%s	%sint%s m_X = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_X);
-                dbg_msg("network_in", "%s	%sint%s m_Y = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Y);
+                dbg_msg("network_in", "%s	.m_SpecMode = %s%d%s,", pPrefix, TERM_BLUE, Item.m_SpecMode, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_SpectatorID = %s%d%s,", pPrefix, TERM_BLUE, Item.m_SpectatorID, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_X = %s%d%s,", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_DE_CLIENTINFO)
         {
                 CNetObj_De_ClientInfo Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_De_ClientInfo", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_De_ClientInfo Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
                 dbg_msg("network_in", "%s	%sint%s m_Local;", pPrefix, TERM_BLUE, TERM_RESET);
                 dbg_msg("network_in", "%s	%sint%s m_Team;", pPrefix, TERM_BLUE, TERM_RESET);
@@ -230,26 +218,24 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
         {
                 CNetObj_De_GameInfo Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_De_GameInfo", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_De_GameInfo Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_GameFlags = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_GameFlags);
-                dbg_msg("network_in", "%s	%sint%s m_ScoreLimit = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_ScoreLimit);
-                dbg_msg("network_in", "%s	%sint%s m_TimeLimit = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_TimeLimit);
-                dbg_msg("network_in", "%s	%sint%s m_MatchNum = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_MatchNum);
-                dbg_msg("network_in", "%s	%sint%s m_MatchCurrent = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_MatchCurrent);
+                dbg_msg("network_in", "%s	.m_GameFlags = %s%d%s,", pPrefix, TERM_BLUE, Item.m_GameFlags, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_ScoreLimit = %s%d%s,", pPrefix, TERM_BLUE, Item.m_ScoreLimit, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_TimeLimit = %s%d%s,", pPrefix, TERM_BLUE, Item.m_TimeLimit, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_MatchNum = %s%d%s,", pPrefix, TERM_BLUE, Item.m_MatchNum, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_MatchCurrent = %s%d%s,", pPrefix, TERM_BLUE, Item.m_MatchCurrent, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_DE_TUNEPARAMS)
         {
                 // CNetObj_De_TuneParams Item;
                 // mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_De_TuneParams", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_De_TuneParams Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
                 dbg_msg("network_in", "%s	%sint%s m_aTuneParams[32];", pPrefix, TERM_BLUE, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
@@ -260,11 +246,11 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
                 mem_copy(&Item, pData, sizeof(Item));
                 dbg_msg("network_in", "%sstruct CNetEvent_Common", pPrefix);
                 dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_X = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_X);
-                dbg_msg("network_in", "%s	%sint%s m_Y = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Y);
+                dbg_msg("network_in", "%s	.m_X = %s%d%s,", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETEVENTTYPE_EXPLOSION)
@@ -273,11 +259,11 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
                 mem_copy(&Item, pData, sizeof(Item));
                 dbg_msg("network_in", "%sstruct CNetEvent_Explosion : public CNetEvent_Common", pPrefix);
                 dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_X = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_X);
-                dbg_msg("network_in", "%s	%sint%s m_Y = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Y);
+                dbg_msg("network_in", "%s	.m_X = %s%d%s,", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETEVENTTYPE_SPAWN)
@@ -286,11 +272,11 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
                 mem_copy(&Item, pData, sizeof(Item));
                 dbg_msg("network_in", "%sstruct CNetEvent_Spawn : public CNetEvent_Common", pPrefix);
                 dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_X = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_X);
-                dbg_msg("network_in", "%s	%sint%s m_Y = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Y);
+                dbg_msg("network_in", "%s	.m_X = %s%d%s,", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETEVENTTYPE_HAMMERHIT)
@@ -299,11 +285,11 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
                 mem_copy(&Item, pData, sizeof(Item));
                 dbg_msg("network_in", "%sstruct CNetEvent_HammerHit : public CNetEvent_Common", pPrefix);
                 dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_X = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_X);
-                dbg_msg("network_in", "%s	%sint%s m_Y = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Y);
+                dbg_msg("network_in", "%s	.m_X = %s%d%s,", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETEVENTTYPE_DEATH)
@@ -312,12 +298,12 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
                 mem_copy(&Item, pData, sizeof(Item));
                 dbg_msg("network_in", "%sstruct CNetEvent_Death : public CNetEvent_Common", pPrefix);
                 dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_X = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_X);
-                dbg_msg("network_in", "%s	%sint%s m_Y = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Y);
-                dbg_msg("network_in", "%s	%sint%s m_ClientID = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_ClientID);
+                dbg_msg("network_in", "%s	.m_X = %s%d%s,", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_ClientID = %s%d%s,", pPrefix, TERM_BLUE, Item.m_ClientID, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETEVENTTYPE_SOUNDWORLD)
@@ -326,12 +312,12 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
                 mem_copy(&Item, pData, sizeof(Item));
                 dbg_msg("network_in", "%sstruct CNetEvent_SoundWorld : public CNetEvent_Common", pPrefix);
                 dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_X = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_X);
-                dbg_msg("network_in", "%s	%sint%s m_Y = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Y);
-                dbg_msg("network_in", "%s	%sint%s m_SoundID = %d; %s// %s%s", pPrefix, TERM_BLUE, TERM_RESET, Item.m_SoundID, TERM_GREEN, enum_sound_to_str(Item.m_SoundID), TERM_RESET);
+                dbg_msg("network_in", "%s	.m_X = %s%d%s,", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_SoundID = %s%d%s; %s// %s%s", pPrefix, TERM_BLUE, Item.m_SoundID, TERM_RESET, TERM_GREEN, enum_sound_to_str(Item.m_SoundID), TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETEVENTTYPE_DAMAGE)
@@ -340,16 +326,16 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
                 mem_copy(&Item, pData, sizeof(Item));
                 dbg_msg("network_in", "%sstruct CNetEvent_Damage : public CNetEvent_Common", pPrefix);
                 dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_X = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_X);
-                dbg_msg("network_in", "%s	%sint%s m_Y = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Y);
-                dbg_msg("network_in", "%s	%sint%s m_ClientID = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_ClientID);
-                dbg_msg("network_in", "%s	%sint%s m_Angle = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Angle);
-                dbg_msg("network_in", "%s	%sint%s m_HealthAmount = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_HealthAmount);
-                dbg_msg("network_in", "%s	%sint%s m_ArmorAmount = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_ArmorAmount);
-                dbg_msg("network_in", "%s	%sint%s m_Self = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Self);
+                dbg_msg("network_in", "%s	.m_X = %s%d%s,", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_ClientID = %s%d%s,", pPrefix, TERM_BLUE, Item.m_ClientID, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Angle = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Angle, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_HealthAmount = %s%d%s,", pPrefix, TERM_BLUE, Item.m_HealthAmount, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_ArmorAmount = %s%d%s,", pPrefix, TERM_BLUE, Item.m_ArmorAmount, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Self = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Self, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_PLAYERINFORACE)
@@ -357,13 +343,12 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
                 int ItemSize = (*pData++) * 4;
                 CNetObj_PlayerInfoRace Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_PlayerInfoRace", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
-                dbg_msg("network_in", "%s	%sint%s Size   = %d;", pPrefix, TERM_BLUE, TERM_RESET, ItemSize);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_PlayerInfoRace Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
+                dbg_msg("network_in", "%s	.Size   = %s%d%s,", pPrefix, TERM_BLUE, ItemSize, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_RaceStartTick = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_RaceStartTick);
+                dbg_msg("network_in", "%s	.m_RaceStartTick = %s%d%s,", pPrefix, TERM_BLUE, Item.m_RaceStartTick, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         else if(Type == NETOBJTYPE_GAMEDATARACE)
@@ -371,15 +356,14 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
                 int ItemSize = (*pData++) * 4;
                 CNetObj_GameDataRace Item;
                 mem_copy(&Item, pData, sizeof(Item));
-                dbg_msg("network_in", "%s%sstruct%s CNetObj_GameDataRace", pPrefix, TERM_MAGENTA, TERM_RESET);
-                dbg_msg("network_in", "%s{", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s TypeId = %d;", pPrefix, TERM_BLUE, TERM_RESET, Type);
-                dbg_msg("network_in", "%s	%sint%s Id     = %d;", pPrefix, TERM_BLUE, TERM_RESET, Id);
-                dbg_msg("network_in", "%s	%sint%s Size   = %d;", pPrefix, TERM_BLUE, TERM_RESET, ItemSize);
+                dbg_msg("network_in", "%s%sstruct%s CNetObj_GameDataRace Item = {", pPrefix, TERM_MAGENTA, TERM_RESET);
+                dbg_msg("network_in", "%s	.TypeId = %s%d%s,", pPrefix, TERM_BLUE, Type, TERM_RESET);
+                dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
+                dbg_msg("network_in", "%s	.Size   = %s%d%s,", pPrefix, TERM_BLUE, ItemSize, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
-                dbg_msg("network_in", "%s	%sint%s m_BestTime  = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_BestTime);
-                dbg_msg("network_in", "%s	%sint%s m_Precision = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_Precision);
-                dbg_msg("network_in", "%s	%sint%s m_RaceFlags = %d;", pPrefix, TERM_BLUE, TERM_RESET, Item.m_RaceFlags);
+                dbg_msg("network_in", "%s	.m_BestTime  = %s%d%s,", pPrefix, TERM_BLUE, Item.m_BestTime, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Precision = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Precision, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_RaceFlags = %s%d%s,", pPrefix, TERM_BLUE, Item.m_RaceFlags, TERM_RESET);
                 dbg_msg("network_in", "%s};", pPrefix);
         }
         dbg_msg("network_in", "%s", pPrefix);
