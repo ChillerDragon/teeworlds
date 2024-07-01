@@ -145,8 +145,8 @@ void print_netobj_as_struct(const int *pData, const char *pPrefix)
                 dbg_msg("network_in", "%s	.Id     = %s%d%s,", pPrefix, TERM_BLUE, Id, TERM_RESET);
                 dbg_msg("network_in", "%s", pPrefix);
                 dbg_msg("network_in", "%s	.m_Tick = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Tick, TERM_RESET);
-                dbg_msg("network_in", "%s	.m_X = %s%d%s; %s// tile %d%s", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET, TERM_GREEN, Item.m_X / 32, TERM_RESET);
-                dbg_msg("network_in", "%s	.m_Y = %s%d%s; %s// tile %d%s", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET, TERM_GREEN, Item.m_Y / 32, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_X = %s%d%s; %s// %d tiles (divided by 32)%s", pPrefix, TERM_BLUE, Item.m_X, TERM_RESET, TERM_GREEN, Item.m_X / 32, TERM_RESET);
+                dbg_msg("network_in", "%s	.m_Y = %s%d%s; %s// %d tiles (divided by 32)%s", pPrefix, TERM_BLUE, Item.m_Y, TERM_RESET, TERM_GREEN, Item.m_Y / 32, TERM_RESET);
                 dbg_msg("network_in", "%s	.m_VelX = %s%d%s,", pPrefix, TERM_BLUE, Item.m_VelX, TERM_RESET);
                 dbg_msg("network_in", "%s	.m_VelY = %s%d%s,", pPrefix, TERM_BLUE, Item.m_VelY, TERM_RESET);
                 dbg_msg("network_in", "%s	.m_Angle = %s%d%s,", pPrefix, TERM_BLUE, Item.m_Angle, TERM_RESET);
