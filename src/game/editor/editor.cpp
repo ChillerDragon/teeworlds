@@ -3772,7 +3772,7 @@ void CEditor::RenderMenubar(CUIRect MenuBar)
 	str_format(aBuf, sizeof(aBuf), "File: %s", m_aFileName);
 	UI()->DoLabel(&MenuBar, aBuf, 10.0f, TEXTALIGN_LEFT);
 
-	str_format(aBuf, sizeof(aBuf), "X: %f Y: %f Z: %i, A: %.1f, G: %i", m_WorldOffsetX, m_WorldOffsetY, m_ZoomLevel, m_AnimateSpeed, m_GridFactor);
+	str_format(aBuf, sizeof(aBuf), "X: %f Y: %f Z: %i, A: %.1f, G: %i", m_EditorOffsetX, m_EditorOffsetY, m_ZoomLevel, m_AnimateSpeed, m_GridFactor);
 	UI()->DoLabel(&Info, aBuf, 10.0f, TEXTALIGN_RIGHT);
 
 	// Exit editor button
