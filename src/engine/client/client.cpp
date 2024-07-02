@@ -1562,6 +1562,15 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 					// add new
 					m_SnapshotStorage.Add(GameTick, time_get(), SnapSize, pTmpBuffer3, 1);
 
+					if(m_pConfig->m_DbgSnap > 1)
+					{
+						CSnapshotStorage::CHolder *pHolder = m_SnapshotStorage.m_pFirst;
+						int NumStorage = 0;
+						for(;pHolder; pHolder = pHolder->m_pNext)
+							NumStorage++;
+						dbg_msg("client.cpp", "%d snapshots in storage got delta=%d purged_until=%d", NumStorage, DeltaTick, PurgeTick);
+					}
+
 					// add snapshot to demo
 					if(m_DemoRecorder.IsRecording())
 					{
