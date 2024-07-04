@@ -187,9 +187,7 @@ void print_packet(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int 
 			Msg >>= 1;
 
 			char aMsg[512];
-			char aMsgName[512];
-			netmsg_to_s(Msg, aMsgName, sizeof(aMsgName));
-			str_format(aMsg, sizeof(aMsg), "Msg=%d (%s) Sys=%d", Msg, aMsgName, Sys);
+			str_format(aMsg, sizeof(aMsg), "Msg=%d (%s) Sys=%d", Msg, netmsg_to_s(Msg), Sys);
 
 			dbg_msg(Direction == NETWORK_IN ? "network_in" : "network_out", "  decompressed_data:");
 			print_hex_row_highlight_two(
@@ -218,42 +216,41 @@ bool show_addr(const NETADDR *pAddr)
 	return str_startswith(aAddrStr, "[0:0:0:0:0:0:0:1]:") || str_startswith(aAddrStr, "127.0.0.1:") || str_startswith(aAddrStr, "[::1]:");
 }
 
-void netmsg_to_s(int Msg, char *pBuf, int Size)
+const char *netmsg_to_s(int Msg)
 {
-    if(Msg == _NETMSG_NULL) { str_copy(pBuf, "NETMSG_NULL", Size); }
-    else if(Msg == NETMSG_INFO) { str_copy(pBuf, "NETMSG_INFO", Size); }
-    else if(Msg == NETMSG_MAP_CHANGE) { str_copy(pBuf, "NETMSG_MAP_CHANGE", Size); }
-    else if(Msg == NETMSG_MAP_DATA) { str_copy(pBuf, "NETMSG_MAP_DATA", Size); }
-    else if(Msg == _NETMSG_SERVERINFO) { str_copy(pBuf, "NETMSG_SERVERINFO", Size); }
-    else if(Msg == NETMSG_CON_READY) { str_copy(pBuf, "NETMSG_CON_READY", Size); }
-    else if(Msg == NETMSG_SNAP) { str_copy(pBuf, "NETMSG_SNAP", Size); }
-    else if(Msg == NETMSG_SNAPEMPTY) { str_copy(pBuf, "NETMSG_SNAPEMPTY", Size); }
-    else if(Msg == NETMSG_SNAPSINGLE) { str_copy(pBuf, "NETMSG_SNAPSINGLE", Size); }
-    else if(Msg == NETMSG_SNAPSMALL) { str_copy(pBuf, "NETMSG_SNAPSMALL", Size); }
-    else if(Msg == NETMSG_INPUTTIMING) { str_copy(pBuf, "NETMSG_INPUTTIMING", Size); }
-    else if(Msg == _NETMSG_RCON_AUTH_ON) { str_copy(pBuf, "NETMSG_RCON_AUTH_ON", Size); }
-    else if(Msg == _NETMSG_RCON_AUTH_OFF) { str_copy(pBuf, "NETMSG_RCON_AUTH_OFF", Size); }
-    else if(Msg == NETMSG_RCON_LINE) { str_copy(pBuf, "NETMSG_RCON_LINE", Size); }
-    else if(Msg == NETMSG_RCON_CMD_ADD) { str_copy(pBuf, "NETMSG_RCON_CMD_ADD", Size); }
-    else if(Msg == NETMSG_RCON_CMD_REM) { str_copy(pBuf, "NETMSG_RCON_CMD_REM", Size); }
-    else if(Msg == NETMSG_AUTH_CHALLENGE) { str_copy(pBuf, "NETMSG_AUTH_CHALLENGE", Size); }
-    else if(Msg == NETMSG_AUTH_RESULT) { str_copy(pBuf, "NETMSG_AUTH_RESULT", Size); }
-    else if(Msg == NETMSG_READY) { str_copy(pBuf, "NETMSG_READY", Size); }
-    else if(Msg == NETMSG_ENTERGAME) { str_copy(pBuf, "NETMSG_ENTERGAME", Size); }
-    else if(Msg == NETMSG_INPUT) { str_copy(pBuf, "NETMSG_INPUT", Size); }
-    else if(Msg == NETMSG_RCON_CMD) { str_copy(pBuf, "NETMSG_RCON_CMD", Size); }
-    else if(Msg == NETMSG_RCON_AUTH) { str_copy(pBuf, "NETMSG_RCON_AUTH", Size); }
-    else if(Msg == NETMSG_REQUEST_MAP_DATA) { str_copy(pBuf, "NETMSG_REQUEST_MAP_DATA", Size); }
-    else if(Msg == NETMSG_AUTH_START) { str_copy(pBuf, "NETMSG_AUTH_START", Size); }
-    else if(Msg == NETMSG_AUTH_RESPONSE) { str_copy(pBuf, "NETMSG_AUTH_RESPONSE", Size); }
-    else if(Msg == NETMSG_PING) { str_copy(pBuf, "NETMSG_PING", Size); }
-    else if(Msg == NETMSG_PING_REPLY) { str_copy(pBuf, "NETMSG_PING_REPLY", Size); }
-    else if(Msg == NETMSG_ERROR) { str_copy(pBuf, "NETMSG_ERROR", Size); }
-    else if(Msg == _NETMSG_MAPLIST_ENTRY_ADD) { str_copy(pBuf, "NETMSG_MAPLIST_ENTRY_ADD", Size); }
-    else if(Msg == _NETMSG_MAPLIST_ENTRY_REM) { str_copy(pBuf, "NETMSG_MAPLIST_ENTRY_REM", Size); }
-    else { str_copy(pBuf, "unknown", Size); }
+    if(Msg == _NETMSG_NULL) { return "NETMSG_NULL"; }
+    else if(Msg == NETMSG_INFO) { return "NETMSG_INFO"; }
+    else if(Msg == NETMSG_MAP_CHANGE) { return "NETMSG_MAP_CHANGE"; }
+    else if(Msg == NETMSG_MAP_DATA) { return "NETMSG_MAP_DATA"; }
+    else if(Msg == _NETMSG_SERVERINFO) { return "NETMSG_SERVERINFO"; }
+    else if(Msg == NETMSG_CON_READY) { return "NETMSG_CON_READY"; }
+    else if(Msg == NETMSG_SNAP) { return "NETMSG_SNAP"; }
+    else if(Msg == NETMSG_SNAPEMPTY) { return "NETMSG_SNAPEMPTY"; }
+    else if(Msg == NETMSG_SNAPSINGLE) { return "NETMSG_SNAPSINGLE"; }
+    else if(Msg == NETMSG_SNAPSMALL) { return "NETMSG_SNAPSMALL"; }
+    else if(Msg == NETMSG_INPUTTIMING) { return "NETMSG_INPUTTIMING"; }
+    else if(Msg == _NETMSG_RCON_AUTH_ON) { return "NETMSG_RCON_AUTH_ON"; }
+    else if(Msg == _NETMSG_RCON_AUTH_OFF) { return "NETMSG_RCON_AUTH_OFF"; }
+    else if(Msg == NETMSG_RCON_LINE) { return "NETMSG_RCON_LINE"; }
+    else if(Msg == NETMSG_RCON_CMD_ADD) { return "NETMSG_RCON_CMD_ADD"; }
+    else if(Msg == NETMSG_RCON_CMD_REM) { return "NETMSG_RCON_CMD_REM"; }
+    else if(Msg == NETMSG_AUTH_CHALLENGE) { return "NETMSG_AUTH_CHALLENGE"; }
+    else if(Msg == NETMSG_AUTH_RESULT) { return "NETMSG_AUTH_RESULT"; }
+    else if(Msg == NETMSG_READY) { return "NETMSG_READY"; }
+    else if(Msg == NETMSG_ENTERGAME) { return "NETMSG_ENTERGAME"; }
+    else if(Msg == NETMSG_INPUT) { return "NETMSG_INPUT"; }
+    else if(Msg == NETMSG_RCON_CMD) { return "NETMSG_RCON_CMD"; }
+    else if(Msg == NETMSG_RCON_AUTH) { return "NETMSG_RCON_AUTH"; }
+    else if(Msg == NETMSG_REQUEST_MAP_DATA) { return "NETMSG_REQUEST_MAP_DATA"; }
+    else if(Msg == NETMSG_AUTH_START) { return "NETMSG_AUTH_START"; }
+    else if(Msg == NETMSG_AUTH_RESPONSE) { return "NETMSG_AUTH_RESPONSE"; }
+    else if(Msg == NETMSG_PING) { return "NETMSG_PING"; }
+    else if(Msg == NETMSG_PING_REPLY) { return "NETMSG_PING_REPLY"; }
+    else if(Msg == NETMSG_ERROR) { return "NETMSG_ERROR"; }
+    else if(Msg == _NETMSG_MAPLIST_ENTRY_ADD) { return "NETMSG_MAPLIST_ENTRY_ADD"; }
+    else if(Msg == _NETMSG_MAPLIST_ENTRY_REM) { return "NETMSG_MAPLIST_ENTRY_REM"; }
+    else { return "unknown"; }
 }
-
 
 void print_state(const char *type, const char *note, int State)
 {

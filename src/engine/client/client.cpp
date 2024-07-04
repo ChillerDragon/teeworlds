@@ -42,6 +42,7 @@
 
 #include <engine/shared/config.h>
 
+#include "base/dissector/dissector.h"
 #include "contacts.h"
 #include "serverbrowser.h"
 #include "client.h"
@@ -1170,9 +1171,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 
 	if(m_pConfig->m_Debug == 1) // TODO: remove? this is kinda redundant with print_packet
 	{
-		char aMsg[512];
-		netmsg_to_s(Unpacker.Type(), aMsg, sizeof(aMsg));
-		dbg_msg("network_in", "server packet sys=%d msg=%d (%s)", Unpacker.System(), Unpacker.Type(), aMsg);
+		dbg_msg("network_in", "server packet sys=%d msg=%d (%s)", Unpacker.System(), Unpacker.Type(), netmsg_to_s(Unpacker.Type()));
 	}
 
 	if(Unpacker.System())
