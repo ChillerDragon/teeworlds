@@ -810,7 +810,6 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		dbg_msg("network_in", "unpacker error: %s", Unpacker.ErrorMsg());
 		return;
 	}
-
 	int Msg = Unpacker.Type();
 	if(m_pConfig->m_Debug > 2 || Msg != NETMSG_INPUT)
 	{
@@ -995,6 +994,8 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		}
 		else if(Unpacker.Type() == NETMSG_INPUT)
 		{
+			if((pPacket->m_Flags & NET_CHUNKFLAG_VITAL) != 0)
+				dbg_msg("network_in", "the client send NETMSG_INPUT with flag vital! it should not have that flag");
 			CClient::CInput *pInput;
 			int64 TagTime;
 			int64 Now = time_get();
