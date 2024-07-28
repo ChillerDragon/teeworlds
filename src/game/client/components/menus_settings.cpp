@@ -9,8 +9,9 @@
 #include <engine/serverbrowser.h>
 #include <engine/storage.h>
 #include <engine/textrender.h>
-#include <engine/external/json-parser/json.h>
+
 #include <engine/shared/config.h>
+#include <engine/shared/jsonparser.h>
 
 #include <generated/protocol.h>
 #include <generated/client_data.h>
@@ -393,13 +394,12 @@ void CMenus::RenderSkinSelection(CUIRect MainView)
 		}
 		m_SkinModified = true;
 	}
-	OldSelected = NewSelected;
 }
 
 void CMenus::RenderSkinPartSelection(CUIRect MainView)
 {
 	static bool s_InitSkinPartList = true;
-	static sorted_array<const CSkins::CSkinPart *> s_paList[6];
+	static sorted_array<const CSkins::CSkinPart *> s_paList[NUM_SKINPARTS];
 	static CListBox s_ListBox;
 	if(s_InitSkinPartList)
 	{
@@ -644,33 +644,14 @@ int CMenus::ThemeIconScan(const char *pName, int IsDir, int DirType, void *pUser
 
 void LoadLanguageIndexfile(IStorage *pStorage, IConsole *pConsole, sorted_array<CLanguage> *pLanguages)
 {
-	// read file data into buffer
-	const char *pFilename = "languages/index.json";
-	IOHANDLE File = pStorage->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL);
-	if(!File)
-	{
-		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", "couldn't open index file");
-		return;
-	}
-	int FileSize = (int)io_length(File);
-	char *pFileData = (char *)mem_alloc(FileSize);
-	io_read(File, pFileData, FileSize);
-	io_close(File);
-
-	// parse json data
-	json_settings JsonSettings;
-	mem_zero(&JsonSettings, sizeof(JsonSettings));
-	char aError[256];
-	json_value *pJsonData = json_parse_ex(&JsonSettings, pFileData, FileSize, aError);
-	mem_free(pFileData);
-
+	CJsonParser JsonParser;
+	const json_value *pJsonData = JsonParser.ParseFile("languages/index.json", pStorage);
 	if(pJsonData == 0)
 	{
-		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, pFilename, aError);
+		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", JsonParser.Error());
 		return;
 	}
 
-	// extract data
 	const json_value &rStart = (*pJsonData)["language indices"];
 	if(rStart.type == json_array)
 	{
@@ -681,9 +662,6 @@ void LoadLanguageIndexfile(IStorage *pStorage, IConsole *pConsole, sorted_array<
 			pLanguages->add(CLanguage((const char *)rStart[i]["name"], aFileName, (json_int_t)rStart[i]["code"]));
 		}
 	}
-
-	// clean up
-	json_value_free(pJsonData);
 }
 
 void CMenus::RenderLanguageSelection(CUIRect MainView, bool Header)
@@ -999,7 +977,7 @@ void CMenus::RenderSettingsGeneral(CUIRect MainView)
 		Config()->m_ClAutoDemoRecord ^= 1;
 
 	if(Config()->m_ClAutoDemoRecord)
-		UI()->DoScrollbarOption(&Config()->m_ClAutoDemoMax, &Config()->m_ClAutoDemoMax, &ClientRight, Localize("Max"), 0, 1000, &CUI::ms_LogarithmicScrollbarScale, true);
+		UI()->DoScrollbarOption(&Config()->m_ClAutoDemoMax, &Config()->m_ClAutoDemoMax, &ClientRight, Localize("Max"), 0, 1000, &CUI::ms_LogarithmicScrollbarScale, CUI::SCROLLBAR_OPTION_INFINITE);
 
 	Client.HSplitTop(Spacing, 0, &Client);
 	Client.HSplitTop(ButtonHeight, &ClientLeft, &Client);
@@ -1008,7 +986,7 @@ void CMenus::RenderSettingsGeneral(CUIRect MainView)
 		Config()->m_ClAutoScreenshot ^= 1;
 
 	if(Config()->m_ClAutoScreenshot)
-		UI()->DoScrollbarOption(&Config()->m_ClAutoScreenshotMax, &Config()->m_ClAutoScreenshotMax, &ClientRight, Localize("Max"), 0, 1000, &CUI::ms_LogarithmicScrollbarScale, true);
+		UI()->DoScrollbarOption(&Config()->m_ClAutoScreenshotMax, &Config()->m_ClAutoScreenshotMax, &ClientRight, Localize("Max"), 0, 1000, &CUI::ms_LogarithmicScrollbarScale, CUI::SCROLLBAR_OPTION_INFINITE);
 
 	MainView.HSplitTop(10.0f, 0, &MainView);
 
@@ -1061,7 +1039,7 @@ void CMenus::RenderSettingsTeeCustom(CUIRect MainView)
 
 	float ButtonWidth = (Patterns.w/6.0f)-(SpacingW*5.0)/6.0f;
 
-	static CButtonContainer s_aPatternButtons[6];
+	static CButtonContainer s_aPatternButtons[NUM_SKINPARTS];
 	for(int i = 0; i < NUM_SKINPARTS; i++)
 	{
 		Patterns.VSplitLeft(ButtonWidth, &Button, &Patterns);

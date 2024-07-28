@@ -64,16 +64,44 @@ IOHANDLE io_stdin() { return (IOHANDLE)stdin; }
 IOHANDLE io_stdout() { return (IOHANDLE)stdout; }
 IOHANDLE io_stderr() { return (IOHANDLE)stderr; }
 
-static DBG_LOGGER loggers[16];
+typedef struct
+{
+	DBG_LOGGER logger;
+	DBG_LOGGER_FINISH finish;
+	void *user;
+} DBG_LOGGER_DATA;
+
+static DBG_LOGGER_DATA loggers[16];
 static int num_loggers = 0;
 
 static NETSTATS network_stats = {0};
 
 static NETSOCKET invalid_socket = {NETTYPE_INVALID, -1, -1};
 
-void dbg_logger(DBG_LOGGER logger)
+static void dbg_logger_finish(void)
 {
-	loggers[num_loggers++] = logger;
+	int i;
+	for(i = 0; i < num_loggers; i++)
+	{
+		if(loggers[i].finish)
+		{
+			loggers[i].finish(loggers[i].user);
+		}
+	}
+}
+
+void dbg_logger(DBG_LOGGER logger, DBG_LOGGER_FINISH finish, void *user)
+{
+	DBG_LOGGER_DATA data;
+	if(num_loggers == 0)
+	{
+		atexit(dbg_logger_finish);
+	}
+	data.logger = logger;
+	data.finish = finish;
+	data.user = user;
+	loggers[num_loggers] = data;
+	num_loggers++;
 }
 
 void dbg_assert_imp(const char *filename, int line, int test, const char *msg)
@@ -87,7 +115,11 @@ void dbg_assert_imp(const char *filename, int line, int test, const char *msg)
 
 void dbg_break()
 {
-	*((volatile unsigned*)0) = 0x0;
+#ifdef __GNUC__
+	__builtin_trap();
+#else
+	abort();
+#endif
 }
 
 void dbg_msg(const char *sys, const char *fmt, ...)
@@ -114,26 +146,26 @@ void dbg_msg(const char *sys, const char *fmt, ...)
 	va_end(args);
 
 	for(i = 0; i < num_loggers; i++)
-		loggers[i](str);
+		loggers[i].logger(str, loggers[i].user);
 }
 
 #if defined(CONF_FAMILY_WINDOWS)
-static void logger_win_console(const char *line)
+static void logger_win_console(const char *line, void *user)
 {
-	#define _MAX_LENGTH 1024
-	#define _MAX_LENGTH_ERROR (_MAX_LENGTH+32)
+	#define MAX_LENGTH 1024
+	#define MAX_LENGTH_ERROR (MAX_LENGTH+32)
 
 	static const int UNICODE_REPLACEMENT_CHAR = 0xfffd;
 
 	static const char *STR_TOO_LONG = "(str too long)";
 	static const char *INVALID_UTF8 = "(invalid utf8)";
 
-	wchar_t wline[_MAX_LENGTH_ERROR];
+	wchar_t wline[MAX_LENGTH_ERROR];
 	size_t len = 0;
 
 	const char *read = line;
 	const char *error = STR_TOO_LONG;
-	while(len < _MAX_LENGTH)
+	while(len < MAX_LENGTH)
 	{
 		// Read a character. This also advances the read pointer
 		int glyph = str_utf8_decode(&read);
@@ -185,34 +217,34 @@ static void logger_win_console(const char *line)
 			if(character == 0)
 				break;
 
-			dbg_assert(len < _MAX_LENGTH_ERROR, "str too short for error");
-			wline[len++] = character;
+			dbg_assert(len < MAX_LENGTH_ERROR, "str too short for error");
+			wline[len++] = (unsigned char)character;
 			read++;
 		}
 	}
 
 	// Terminate the line
-	dbg_assert(len < _MAX_LENGTH_ERROR, "str too short for \\r");
+	dbg_assert(len < MAX_LENGTH_ERROR, "str too short for \\r");
 	wline[len++] = '\r';
-	dbg_assert(len < _MAX_LENGTH_ERROR, "str too short for \\n");
+	dbg_assert(len < MAX_LENGTH_ERROR, "str too short for \\n");
 	wline[len++] = '\n';
 
 	// Ignore any error that might occur
 	WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), wline, len, 0, 0);
 
-	#undef _MAX_LENGTH
-	#undef _MAX_LENGTH_ERROR
+	#undef MAX_LENGTH
+	#undef MAX_LENGTH_ERROR
 }
 #endif
 
-static void logger_stdout(const char *line)
+static void logger_stdout(const char *line, void *user)
 {
 	printf("%s\n", line);
 	fflush(stdout);
 }
 
 #if defined(CONF_FAMILY_WINDOWS)
-static void logger_win_debugger(const char *line)
+static void logger_win_debugger(const char *line, void *user)
 {
 	WCHAR wBuffer[512];
 	MultiByteToWideChar(CP_UTF8, 0, line, -1, wBuffer, sizeof(wBuffer) / sizeof(WCHAR));
@@ -221,12 +253,27 @@ static void logger_win_debugger(const char *line)
 }
 #endif
 
-static IOHANDLE logfile = 0;
-static void logger_file(const char *line)
+static void logger_file(const char *line, void *user)
 {
-	io_write(logfile, line, str_length(line));
-	io_write_newline(logfile);
-	io_flush(logfile);
+	ASYNCIO *logfile = (ASYNCIO *)user;
+	aio_lock(logfile);
+	aio_write_unlocked(logfile, line, strlen(line));
+	aio_write_newline_unlocked(logfile);
+	aio_unlock(logfile);
+}
+
+static void logger_stdout_finish(void *user)
+{
+	ASYNCIO *logfile = (ASYNCIO *)user;
+	aio_wait(logfile);
+	aio_free(logfile);
+}
+
+static void logger_file_finish(void *user)
+{
+	ASYNCIO *logfile = (ASYNCIO *)user;
+	aio_close(logfile);
+	logger_stdout_finish(user);
 }
 
 void dbg_logger_stdout()
@@ -234,34 +281,23 @@ void dbg_logger_stdout()
 #if defined(CONF_FAMILY_WINDOWS)
 	if(GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)) == FILE_TYPE_CHAR)
 	{
-		dbg_logger(logger_win_console);
+		dbg_logger(logger_win_console, 0, 0);
 		return;
 	}
 #endif
-	dbg_logger(logger_stdout);
+	dbg_logger(logger_stdout, 0, 0);
 }
 
 void dbg_logger_debugger()
 {
 #if defined(CONF_FAMILY_WINDOWS)
-	dbg_logger(logger_win_debugger);
+	dbg_logger(logger_win_debugger, 0, 0);
 #endif
 }
 
-void dbg_logger_file(const char *filename)
+void dbg_logger_file(IOHANDLE logfile)
 {
-	IOHANDLE handle = io_open(filename, IOFLAG_WRITE);
-	if(handle)
-		dbg_logger_filehandle(handle);
-	else
-		dbg_msg("dbg/logger", "failed to open '%s' for logging", filename);
-}
-
-void dbg_logger_filehandle(IOHANDLE handle)
-{
-	logfile = handle;
-	if(logfile)
-		dbg_logger(logger_file);
+	dbg_logger(logger_file, logger_file_finish, aio_new(logfile));
 }
 
 #if defined(CONF_FAMILY_WINDOWS)
@@ -388,28 +424,30 @@ unsigned io_read(IOHANDLE io, void *buffer, unsigned size)
 
 void io_read_all(IOHANDLE io, void **result, unsigned *result_len)
 {
-	unsigned char *buffer = malloc(1024);
-	unsigned len = 0;
-	unsigned cap = 1024;
-	unsigned read;
-
-	*result = 0;
-	*result_len = 0;
-
-	while((read = io_read(io, buffer + len, cap - len)) != 0)
+	unsigned len = (unsigned)io_length(io);
+	char *buffer = mem_alloc(len + 1);
+	unsigned read = io_read(io, buffer, len + 1); // +1 to check if the file size is larger than expected
+	if(read < len)
 	{
-		len += read;
-		if(len == cap)
+		buffer = realloc(buffer, read + 1);
+		len = read;
+	}
+	else if(read > len)
+	{
+		unsigned cap = 2 * read;
+		len = read;
+		buffer = realloc(buffer, cap);
+		while((read = io_read(io, buffer + len, cap - len)) != 0)
 		{
-			cap *= 2;
-			buffer = realloc(buffer, cap);
+			len += read;
+			if(len == cap)
+			{
+				cap *= 2;
+				buffer = realloc(buffer, cap);
+			}
 		}
+		buffer = realloc(buffer, len + 1);
 	}
-	if(len == cap)
-	{
-		buffer = realloc(buffer, cap + 1);
-	}
-	// ensure null termination
 	buffer[len] = 0;
 	*result = buffer;
 	*result_len = len;
@@ -419,12 +457,11 @@ char *io_read_all_str(IOHANDLE io)
 {
 	void *buffer;
 	unsigned len;
-
 	io_read_all(io, &buffer, &len);
 	if(mem_has_null(buffer, len))
 	{
-		free(buffer);
-		return 0;
+		mem_free(buffer);
+		return 0x0;
 	}
 	return buffer;
 }
@@ -500,6 +537,326 @@ int io_flush(IOHANDLE io)
 {
 	fflush((FILE*)io);
 	return 0;
+}
+
+int io_error(IOHANDLE io)
+{
+	return ferror((FILE*)io);
+}
+
+#define ASYNC_BUFSIZE 8 * 1024
+#define ASYNC_LOCAL_BUFSIZE 64 * 1024
+
+struct ASYNCIO
+{
+	LOCK lock;
+	IOHANDLE io;
+	SEMAPHORE sphore;
+	void *thread;
+
+	unsigned char *buffer;
+	unsigned int buffer_size;
+	unsigned int read_pos;
+	unsigned int write_pos;
+
+	int error;
+	unsigned char finish;
+	unsigned char refcount;
+};
+
+enum
+{
+	ASYNCIO_RUNNING,
+	ASYNCIO_CLOSE,
+	ASYNCIO_EXIT,
+};
+
+struct BUFFERS
+{
+	unsigned char *buf1;
+	unsigned int len1;
+	unsigned char *buf2;
+	unsigned int len2;
+};
+
+static void buffer_ptrs(ASYNCIO *aio, struct BUFFERS *buffers)
+{
+	mem_zero(buffers, sizeof(*buffers));
+	if(aio->read_pos < aio->write_pos)
+	{
+		buffers->buf1 = aio->buffer + aio->read_pos;
+		buffers->len1 = aio->write_pos - aio->read_pos;
+	}
+	else if(aio->read_pos > aio->write_pos)
+	{
+		buffers->buf1 = aio->buffer + aio->read_pos;
+		buffers->len1 = aio->buffer_size - aio->read_pos;
+		buffers->buf2 = aio->buffer;
+		buffers->len2 = aio->write_pos;
+	}
+}
+
+static void aio_handle_free_and_unlock(ASYNCIO *aio)
+{
+	int do_free;
+	aio->refcount--;
+
+	do_free = aio->refcount == 0;
+	lock_unlock(aio->lock);
+	if(do_free)
+	{
+		free(aio->buffer);
+		sphore_destroy(&aio->sphore);
+		lock_destroy(aio->lock);
+		free(aio);
+	}
+}
+
+static void aio_thread(void *user)
+{
+	ASYNCIO *aio = user;
+
+	lock_wait(aio->lock);
+	while(1)
+	{
+		struct BUFFERS buffers;
+		int result_io_error;
+		unsigned char local_buffer[ASYNC_LOCAL_BUFSIZE];
+		unsigned int local_buffer_len = 0;
+
+		if(aio->read_pos == aio->write_pos)
+		{
+			if(aio->finish != ASYNCIO_RUNNING)
+			{
+				if(aio->finish == ASYNCIO_CLOSE)
+				{
+					io_close(aio->io);
+				}
+				aio_handle_free_and_unlock(aio);
+				break;
+			}
+			lock_unlock(aio->lock);
+			sphore_wait(&aio->sphore);
+			lock_wait(aio->lock);
+			continue;
+		}
+
+		buffer_ptrs(aio, &buffers);
+		if(buffers.buf1)
+		{
+			if(buffers.len1 > sizeof(local_buffer) - local_buffer_len)
+			{
+				buffers.len1 = sizeof(local_buffer) - local_buffer_len;
+			}
+			mem_copy(local_buffer + local_buffer_len, buffers.buf1, buffers.len1);
+			local_buffer_len += buffers.len1;
+			if(buffers.buf2)
+			{
+				if(buffers.len2 > sizeof(local_buffer) - local_buffer_len)
+				{
+					buffers.len2 = sizeof(local_buffer) - local_buffer_len;
+				}
+				mem_copy(local_buffer + local_buffer_len, buffers.buf2, buffers.len2);
+				local_buffer_len += buffers.len2;
+			}
+		}
+		aio->read_pos = (aio->read_pos + buffers.len1 + buffers.len2) % aio->buffer_size;
+		lock_unlock(aio->lock);
+
+		io_write(aio->io, local_buffer, local_buffer_len);
+		io_flush(aio->io);
+		result_io_error = io_error(aio->io);
+
+		lock_wait(aio->lock);
+		aio->error = result_io_error;
+	}
+}
+
+ASYNCIO *aio_new(IOHANDLE io)
+{
+	ASYNCIO *aio = malloc(sizeof(*aio));
+	if(!aio)
+	{
+		return 0;
+	}
+	aio->io = io;
+	aio->lock = lock_create();
+	sphore_init(&aio->sphore);
+	aio->thread = 0;
+
+	aio->buffer = malloc(ASYNC_BUFSIZE);
+	if(!aio->buffer)
+	{
+		sphore_destroy(&aio->sphore);
+		lock_destroy(aio->lock);
+		free(aio);
+		return 0;
+	}
+	aio->buffer_size = ASYNC_BUFSIZE;
+	aio->read_pos = 0;
+	aio->write_pos = 0;
+	aio->error = 0;
+	aio->finish = ASYNCIO_RUNNING;
+	aio->refcount = 2;
+
+	aio->thread = thread_init(aio_thread, aio);
+	if(!aio->thread)
+	{
+		free(aio->buffer);
+		sphore_destroy(&aio->sphore);
+		lock_destroy(aio->lock);
+		free(aio);
+		return 0;
+	}
+	return aio;
+}
+
+static unsigned int buffer_len(ASYNCIO *aio)
+{
+	if(aio->write_pos >= aio->read_pos)
+	{
+		return aio->write_pos - aio->read_pos;
+	}
+	else
+	{
+		return aio->buffer_size + aio->write_pos - aio->read_pos;
+	}
+}
+
+static unsigned int next_buffer_size(unsigned int cur_size, unsigned int need_size)
+{
+	while(cur_size < need_size)
+	{
+		cur_size *= 2;
+	}
+	return cur_size;
+}
+
+void aio_lock(ASYNCIO *aio)
+{
+	lock_wait(aio->lock);
+}
+
+void aio_unlock(ASYNCIO *aio)
+{
+	lock_unlock(aio->lock);
+	sphore_signal(&aio->sphore);
+}
+
+void aio_write_unlocked(ASYNCIO *aio, const void *buffer, unsigned size)
+{
+	unsigned int remaining;
+	remaining = aio->buffer_size - buffer_len(aio);
+
+	// Don't allow full queue to distinguish between empty and full queue.
+	if(size < remaining)
+	{
+		unsigned int remaining_contiguous = aio->buffer_size - aio->write_pos;
+		if(size > remaining_contiguous)
+		{
+			mem_copy(aio->buffer + aio->write_pos, buffer, remaining_contiguous);
+			size -= remaining_contiguous;
+			buffer = ((unsigned char *)buffer) + remaining_contiguous;
+			aio->write_pos = 0;
+		}
+		mem_copy(aio->buffer + aio->write_pos, buffer, size);
+		aio->write_pos = (aio->write_pos + size) % aio->buffer_size;
+	}
+	else
+	{
+		// Add 1 so the new buffer isn't completely filled.
+		unsigned int new_written = buffer_len(aio) + size + 1;
+		unsigned int next_size = next_buffer_size(aio->buffer_size, new_written);
+		unsigned int next_len = 0;
+		unsigned char *next_buffer = malloc(next_size);
+
+		struct BUFFERS buffers;
+		buffer_ptrs(aio, &buffers);
+		if(buffers.buf1)
+		{
+			mem_copy(next_buffer + next_len, buffers.buf1, buffers.len1);
+			next_len += buffers.len1;
+			if(buffers.buf2)
+			{
+				mem_copy(next_buffer + next_len, buffers.buf2, buffers.len2);
+				next_len += buffers.len2;
+			}
+		}
+		mem_copy(next_buffer + next_len, buffer, size);
+		next_len += size;
+
+		free(aio->buffer);
+		aio->buffer = next_buffer;
+		aio->buffer_size = next_size;
+		aio->read_pos = 0;
+		aio->write_pos = next_len;
+	}
+}
+
+void aio_write(ASYNCIO *aio, const void *buffer, unsigned size)
+{
+	aio_lock(aio);
+	aio_write_unlocked(aio, buffer, size);
+	aio_unlock(aio);
+}
+
+void aio_write_newline_unlocked(ASYNCIO *aio)
+{
+#if defined(CONF_FAMILY_WINDOWS)
+	aio_write_unlocked(aio, "\r\n", 2);
+#else
+	aio_write_unlocked(aio, "\n", 1);
+#endif
+}
+
+void aio_write_newline(ASYNCIO *aio)
+{
+	aio_lock(aio);
+	aio_write_newline_unlocked(aio);
+	aio_unlock(aio);
+}
+
+int aio_error(ASYNCIO *aio)
+{
+	int result;
+	lock_wait(aio->lock);
+	result = aio->error;
+	lock_unlock(aio->lock);
+	return result;
+}
+
+void aio_free(ASYNCIO *aio)
+{
+	lock_wait(aio->lock);
+	if(aio->thread)
+	{
+		thread_detach(aio->thread);
+		aio->thread = 0;
+	}
+	aio_handle_free_and_unlock(aio);
+}
+
+void aio_close(ASYNCIO *aio)
+{
+	lock_wait(aio->lock);
+	aio->finish = ASYNCIO_CLOSE;
+	lock_unlock(aio->lock);
+	sphore_signal(&aio->sphore);
+}
+
+void aio_wait(ASYNCIO *aio)
+{
+	void *thread;
+	lock_wait(aio->lock);
+	thread = aio->thread;
+	aio->thread = 0;
+	if(aio->finish == ASYNCIO_RUNNING)
+	{
+		aio->finish = ASYNCIO_EXIT;
+	}
+	lock_unlock(aio->lock);
+	sphore_signal(&aio->sphore);
+	thread_wait(thread);
 }
 
 struct THREAD_RUN
@@ -679,20 +1036,72 @@ void lock_unlock(LOCK lock)
 #endif
 }
 
-#if !defined(CONF_PLATFORM_MACOS)
-	#if defined(CONF_FAMILY_UNIX)
-	void semaphore_init(SEMAPHORE *sem) { sem_init(sem, 0, 0); }
-	void semaphore_wait(SEMAPHORE *sem) { sem_wait(sem); }
-	void semaphore_signal(SEMAPHORE *sem) { sem_post(sem); }
-	void semaphore_destroy(SEMAPHORE *sem) { sem_destroy(sem); }
-	#elif defined(CONF_FAMILY_WINDOWS)
-	void semaphore_init(SEMAPHORE *sem) { *sem = CreateSemaphore(0, 0, 10000, 0); }
-	void semaphore_wait(SEMAPHORE *sem) { WaitForSingleObject((HANDLE)*sem, INFINITE); }
-	void semaphore_signal(SEMAPHORE *sem) { ReleaseSemaphore((HANDLE)*sem, 1, NULL); }
-	void semaphore_destroy(SEMAPHORE *sem) { CloseHandle((HANDLE)*sem); }
-	#else
-		#error not implemented on this platform
-	#endif
+#if defined(CONF_FAMILY_UNIX) && !defined(CONF_PLATFORM_MACOS) // this should be CONF_POSIX_SEM but bam can't run C programs
+void sphore_init(SEMAPHORE *sem) { sem_init(sem, 0, 0); }
+void sphore_wait(SEMAPHORE *sem) { sem_wait(sem); }
+void sphore_signal(SEMAPHORE *sem) { sem_post(sem); }
+void sphore_destroy(SEMAPHORE *sem) { sem_destroy(sem); }
+#elif defined(CONF_FAMILY_WINDOWS)
+void sphore_init(SEMAPHORE *sem) { *sem = CreateSemaphore(0, 0, 10000, 0); }
+void sphore_wait(SEMAPHORE *sem) { WaitForSingleObject((HANDLE)*sem, INFINITE); }
+void sphore_signal(SEMAPHORE *sem) { ReleaseSemaphore((HANDLE)*sem, 1, NULL); }
+void sphore_destroy(SEMAPHORE *sem) { CloseHandle((HANDLE)*sem); }
+#else
+typedef struct SEMINTERNAL
+{
+	int count;
+	int waiters;
+	LOCK c_lock;
+	pthread_cond_t c_nzcond;
+} SEMINTERNAL;
+
+void sphore_init(SEMAPHORE *sem)
+{
+	*sem = mem_alloc(sizeof(**sem));
+
+	(*sem)->count = 0;
+	(*sem)->waiters = 0;
+
+	(*sem)->c_lock = lock_create();
+	pthread_cond_init(&(*sem)->c_nzcond, 0);
+}
+
+void sphore_wait(SEMAPHORE *sem)
+{
+	int result = 0;
+
+	lock_wait((*sem)->c_lock);
+
+	(*sem)->waiters++;
+	while((*sem)->count == 0)
+		result = pthread_cond_wait(&(*sem)->c_nzcond, (LOCKINTERNAL *)(*sem)->c_lock);
+
+	(*sem)->waiters--;
+
+	if(!result)
+		(*sem)->count--;
+
+	lock_unlock((*sem)->c_lock);
+}
+
+void sphore_signal(SEMAPHORE *sem)
+{
+	lock_wait((*sem)->c_lock);
+
+	if((*sem)->waiters)
+		pthread_cond_signal(&(*sem)->c_nzcond);
+
+	(*sem)->count++;
+	lock_unlock((*sem)->c_lock);
+}
+
+void sphore_destroy(SEMAPHORE *sem)
+{
+	pthread_cond_destroy(&(*sem)->c_nzcond);
+	lock_destroy((*sem)->c_lock);
+	mem_free(*sem);
+}
+
 #endif
 
 
@@ -749,7 +1158,7 @@ static void netaddr_to_sockaddr_in6(const NETADDR *src, struct sockaddr_in6 *des
 	mem_zero(dest, sizeof(struct sockaddr_in6));
 	if(src->type != NETTYPE_IPV6)
 	{
-		dbg_msg("system", "couldn't not convert NETADDR of type %d to ipv6", src->type);
+		dbg_msg("system", "couldn't convert NETADDR of type %d to ipv6", src->type);
 		return;
 	}
 
@@ -2233,7 +2642,7 @@ char* str_sanitize_filename(char* aName)
 	{
 		// replace forbidden characters with a whispace
 		if(*str == '/' || *str == '<' || *str == '>' || *str == ':' || *str == '"'
-			|| *str == '/' || *str == '\\' || *str == '|' || *str == '?' || *str == '*')
+			|| *str == '\\' || *str == '|' || *str == '?' || *str == '*')
  			*str = ' ';
 		str++;
 	}
@@ -2375,22 +2784,23 @@ int str_comp_filenames(const char *a, const char *b)
 			{
 				if(!result)
 					result = *a - *b;
-				++a; ++b;
-			}
-			while(*a >= '0' && *a <= '9' && *b >= '0' && *b <= '9');
+				++a;
+				++b;
+			} while(*a >= '0' && *a <= '9' && *b >= '0' && *b <= '9');
 
 			if(*a >= '0' && *a <= '9')
 				return 1;
 			else if(*b >= '0' && *b <= '9')
 				return -1;
-			else if(result)
+			else if(result || *a == '\0' || *b == '\0')
 				return result;
 		}
 
-		if(tolower(*a) != tolower(*b))
-			break;
+		result = tolower(*a) - tolower(*b);
+		if(result)
+			return result;
 	}
-	return tolower(*a) - tolower(*b);
+	return *a - *b;
 }
 
 const char *str_startswith_nocase(const char *str, const char *prefix)
@@ -2501,15 +2911,16 @@ const char *str_find(const char *haystack, const char *needle)
 void str_hex(char *dst, int dst_size, const void *data, int data_size)
 {
 	static const char hex[] = "0123456789ABCDEF";
-	int b;
-
-	for(b = 0; b < data_size && b < dst_size/4-4; b++)
+	int data_index;
+	int dst_index;
+	for(data_index = 0, dst_index = 0; data_index < data_size && dst_index < dst_size - 3; data_index++)
 	{
-		dst[b*3] = hex[((const unsigned char *)data)[b]>>4];
-		dst[b*3+1] = hex[((const unsigned char *)data)[b]&0xf];
-		dst[b*3+2] = ' ';
-		dst[b*3+3] = 0;
+		dst[data_index * 3] = hex[((const unsigned char *)data)[data_index] >> 4];
+		dst[data_index * 3 + 1] = hex[((const unsigned char *)data)[data_index] & 0xf];
+		dst[data_index * 3 + 2] = ' ';
+		dst_index += 3;
 	}
+	dst[dst_index] = '\0';
 }
 
 int str_is_number(const char *str)
@@ -2563,7 +2974,7 @@ int mem_comp(const void *a, const void *b, int size)
 int mem_has_null(const void *block, unsigned size)
 {
 	const unsigned char *bytes = block;
-	unsigned i;        
+	unsigned i;
 	for(i = 0; i < size; i++)
 	{
 		if(bytes[i] == 0)
@@ -2729,7 +3140,7 @@ int str_utf8_decode(const char **ptr)
 	{
 		if((*buf&0x80) == 0x0)  /* 0xxxxxxx */
 		{
-			ch = *buf;
+			ch = (unsigned char)*buf;
 			buf++;
 		}
 		else if((*buf&0xE0) == 0xC0) /* 110xxxxx */

@@ -133,7 +133,7 @@ float CScoreboard::RenderSpectators(float x, float y, float w)
 		s_SpectatorCursors[i].Reset();
 		s_SpectatorCursors[i].m_FontSize = FontSize;
 
-		const CNetObj_PlayerInfo *pInfo = m_pClient->m_Snap.m_paPlayerInfos[0];
+		const CNetObj_PlayerInfo *pInfo = m_pClient->m_Snap.m_apPlayerInfos[0];
 		if(!pInfo || m_pClient->m_aClients[i].m_Team != TEAM_SPECTATORS || Lines > MaxLines)
 			continue;
 
@@ -258,9 +258,9 @@ float CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const c
 	// render title
 	if(NoTitle)
 	{
-		if(m_pClient->m_Snap.m_pGameData->m_GameStateFlags&GAMESTATEFLAG_GAMEOVER)
+		if(Snap.m_pGameData && Snap.m_pGameData->m_GameStateFlags&GAMESTATEFLAG_GAMEOVER)
 			pTitle = Localize("Game over");
-		else if(m_pClient->m_Snap.m_pGameData->m_GameStateFlags&GAMESTATEFLAG_ROUNDOVER)
+		else if(Snap.m_pGameData && Snap.m_pGameData->m_GameStateFlags&GAMESTATEFLAG_ROUNDOVER)
 			pTitle = Localize("Round over");
 		else
 			pTitle = Localize("Scoreboard");
@@ -342,9 +342,9 @@ float CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const c
 		else
 		{
 			if(m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_Snap.m_SpecInfo.m_SpectatorID >= 0 &&
-				m_pClient->m_Snap.m_paPlayerInfos[m_pClient->m_Snap.m_SpecInfo.m_SpectatorID])
+				m_pClient->m_Snap.m_apPlayerInfos[m_pClient->m_Snap.m_SpecInfo.m_SpectatorID])
 			{
-				int Score = m_pClient->m_Snap.m_paPlayerInfos[m_pClient->m_Snap.m_SpecInfo.m_SpectatorID]->m_Score;
+				int Score = m_pClient->m_Snap.m_apPlayerInfos[m_pClient->m_Snap.m_SpecInfo.m_SpectatorID]->m_Score;
 				str_format(aBuf, sizeof(aBuf), "%d", Score);
 			}
 			else if(m_pClient->m_Snap.m_pLocalInfo)

@@ -75,8 +75,6 @@ CGameConsole::CInstance::CInstance(int Type)
 	Reset();
 
 	m_IsCommand = false;
-	m_aInputBuf[0] = '\0';
-	m_Input.SetBuffer(m_aInputBuf, sizeof(m_aInputBuf));
 }
 
 void CGameConsole::CInstance::Init(CGameConsole *pGameConsole)
@@ -103,9 +101,9 @@ void CGameConsole::CInstance::ExecuteLine(const char *pLine)
 	else
 	{
 		if(m_pGameConsole->Client()->RconAuthed())
-			m_pGameConsole->Client()->Rcon(pLine);
+			m_pGameConsole->Client()->SendRcon(pLine);
 		else
-			m_pGameConsole->Client()->RconAuth("", pLine);
+			m_pGameConsole->Client()->SendRconAuth("", pLine);
 	}
 }
 

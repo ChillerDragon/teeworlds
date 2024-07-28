@@ -365,7 +365,7 @@ void CClient::SendReady()
 	SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH);
 }
 
-void CClient::RconAuth(const char *pName, const char *pPassword)
+void CClient::SendRconAuth(const char *pName, const char *pPassword)
 {
 	if(RconAuthed())
 		return;
@@ -375,21 +375,11 @@ void CClient::RconAuth(const char *pName, const char *pPassword)
 	SendMsg(&Msg, MSGFLAG_VITAL);
 }
 
-void CClient::Rcon(const char *pCmd)
+void CClient::SendRcon(const char *pCmd)
 {
 	CMsgPacker Msg(NETMSG_RCON_CMD, true);
 	Msg.AddString(pCmd, 256);
 	SendMsg(&Msg, MSGFLAG_VITAL);
-}
-
-bool CClient::ConnectionProblems() const
-{
-	return m_NetClient.GotProblems() != 0;
-}
-
-int CClient::GetInputtimeMarginStabilityScore()
-{
-	return m_PredictedTime.GetStabilityScore();
 }
 
 void CClient::SendInput()
@@ -434,6 +424,16 @@ void CClient::SendInput()
 const char *CClient::LatestVersion() const
 {
 	return m_aVersionStr;
+}
+
+bool CClient::ConnectionProblems() const
+{
+	return m_NetClient.GotProblems() != 0;
+}
+
+int CClient::GetInputtimeMarginStabilityScore()
+{
+	return m_PredictedTime.GetStabilityScore();
 }
 
 // TODO: OPT: do this alot smarter!
@@ -1040,13 +1040,15 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 			}
 
 			// request the map version list now
+			unsigned char aData[sizeof(VERSIONSRV_GETMAPLIST) + sizeof(unsigned)];
+			mem_copy(aData, VERSIONSRV_GETMAPLIST, sizeof(VERSIONSRV_GETMAPLIST));
+			uint_to_bytes_be(aData + sizeof(VERSIONSRV_GETMAPLIST), CLIENT_VERSION);
 			CNetChunk Packet;
-			mem_zero(&Packet, sizeof(Packet));
 			Packet.m_ClientID = -1;
 			Packet.m_Address = m_VersionInfo.m_VersionServeraddr.m_Addr;
-			Packet.m_pData = VERSIONSRV_GETMAPLIST;
-			Packet.m_DataSize = sizeof(VERSIONSRV_GETMAPLIST);
 			Packet.m_Flags = NETSENDFLAG_CONNLESS;
+			Packet.m_pData = aData;
+			Packet.m_DataSize = sizeof(aData);
 			m_ContactClient.Send(&Packet);
 		}
 
@@ -1054,10 +1056,10 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 		if(pPacket->m_DataSize >= (int)sizeof(VERSIONSRV_MAPLIST) &&
 			mem_comp(pPacket->m_pData, VERSIONSRV_MAPLIST, sizeof(VERSIONSRV_MAPLIST)) == 0)
 		{
-			int Size = pPacket->m_DataSize-sizeof(VERSIONSRV_MAPLIST);
-			int Num = Size/sizeof(CMapVersion);
-			m_pMapChecker->AddMaplist((CMapVersion *)((char*)pPacket->m_pData+sizeof(VERSIONSRV_MAPLIST)), Num);
 			pConnlessPacket = "VERSIONSRV_MAPLIST";
+			m_pMapChecker->AddMaplist(
+				(const CMapVersion *)((char *)pPacket->m_pData + sizeof(VERSIONSRV_MAPLIST)),
+				unsigned(pPacket->m_DataSize - sizeof(VERSIONSRV_MAPLIST)) / sizeof(CMapVersion));
 		}
 	}
 
@@ -2346,13 +2348,13 @@ void CClient::Con_Screenshot(IConsole::IResult *pResult, void *pUserData)
 void CClient::Con_Rcon(IConsole::IResult *pResult, void *pUserData)
 {
 	CClient *pSelf = (CClient *)pUserData;
-	pSelf->Rcon(pResult->GetString(0));
+	pSelf->SendRcon(pResult->GetString(0));
 }
 
 void CClient::Con_RconAuth(IConsole::IResult *pResult, void *pUserData)
 {
 	CClient *pSelf = (CClient *)pUserData;
-	pSelf->RconAuth("", pResult->GetString(0));
+	pSelf->SendRconAuth("", pResult->GetString(0));
 }
 
 const char *CClient::DemoPlayer_Play(const char *pFilename, int StorageType)

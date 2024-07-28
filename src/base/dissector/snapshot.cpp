@@ -248,11 +248,7 @@ int CSnapshotDelta_UnpackDelta(const CSnapshot *pFrom, CSnapshot *pTo, const voi
 
 	CSnapshotBuilder Builder;
 	const CSnapshotDelta::CData *pDelta = (const CSnapshotDelta::CData *)pSrcData;
-#ifdef _PROTOCOL_VERSION_7
-	const int *pData = (const int *)pDelta->m_pData;
-#else
 	const int *pData = (const int *)pDelta->m_aData;
-#endif
 	const int *pEnd = (const int *)(((const char *)pSrcData + DataSize));
 
 	const CSnapshotItem *pFromItem;

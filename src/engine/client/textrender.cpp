@@ -2,9 +2,11 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/system.h>
 #include <base/math.h>
-#include <engine/external/json-parser/json.h>
+
 #include <engine/graphics.h>
 #include <engine/textrender.h>
+
+#include <engine/shared/jsonparser.h>
 
 #include "textrender.h"
 
@@ -480,6 +482,7 @@ CGlyph *CGlyphMap::GetGlyph(int Chr, int FontSizeIndex, bool Render)
 			m_Glyphs.add(Index);
 			return Index.m_pGlyph;
 		}
+		delete Index.m_pGlyph;
 		return NULL;
 	}
 
@@ -669,11 +672,11 @@ void CTextRender::TextRefreshGlyphs(CTextCursor *pCursor)
 	}
 }
 
-int CTextRender::LoadFontCollection(const void *pFilename, const void *pBuf, long FileSize)
+int CTextRender::LoadFontCollection(const char *pFilename, const void *pBuf, unsigned FileSize)
 {
 	FT_Face FtFace;
 
-	if(FT_New_Memory_Face(m_FTLibrary, (FT_Byte *)pBuf, FileSize, -1, &FtFace))
+	if(FT_New_Memory_Face(m_FTLibrary, (FT_Byte *)pBuf, (FT_Long)FileSize, -1, &FtFace))
 		return -1;
 
 	int NumFaces = FtFace->num_faces;
@@ -682,7 +685,7 @@ int CTextRender::LoadFontCollection(const void *pFilename, const void *pBuf, lon
 	int i;
 	for(i = 0; i < NumFaces; ++i)
 	{
-		if(FT_New_Memory_Face(m_FTLibrary, (FT_Byte *)pBuf, FileSize, i, &FtFace))
+		if(FT_New_Memory_Face(m_FTLibrary, (FT_Byte *)pBuf, (FT_Long)FileSize, i, &FtFace))
 		{
 			FT_Done_Face(FtFace);
 			break;
@@ -710,7 +713,7 @@ CTextRender::CTextRender()
 	m_pGlyphMap = 0;
 	m_NumVariants = 0;
 	m_CurrentVariant = -1;
-	m_paVariants = 0;
+	m_pVariants = 0;
 
 	mem_zero(m_apFontData, sizeof(m_apFontData));
 }
@@ -734,8 +737,8 @@ void CTextRender::Shutdown()
 
 	FT_Done_FreeType(m_FTLibrary);
 
-	if(m_paVariants)
-		mem_free(m_paVariants);
+	if(m_pVariants)
+		mem_free(m_pVariants);
 
 	for(int i = 0; i < MAX_FACES; ++i)
 		if(m_apFontData[i])
@@ -744,30 +747,11 @@ void CTextRender::Shutdown()
 
 void CTextRender::LoadFonts(IStorage *pStorage, IConsole *pConsole)
 {
-	// read file data into buffer
-	const char *pFilename = "fonts/index.json";
-
-	IOHANDLE File = pStorage->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL);
-	if(!File)
-	{
-		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "textrender", "couldn't open fonts index file");
-		return;
-	}
-	int FileSize = (int)io_length(File);
-	char *pFileData = (char *)mem_alloc(FileSize);
-	io_read(File, pFileData, FileSize);
-	io_close(File);
-
-	// parse json data
-	json_settings JsonSettings;
-	mem_zero(&JsonSettings, sizeof(JsonSettings));
-	char aError[256];
-	json_value *pJsonData = json_parse_ex(&JsonSettings, pFileData, FileSize, aError);
-	mem_free(pFileData);
-
+	CJsonParser JsonParser;
+	const json_value *pJsonData = JsonParser.ParseFile("fonts/index.json", pStorage);
 	if(pJsonData == 0)
 	{
-		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, pFilename, aError);
+		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "textrender", JsonParser.Error());
 		return;
 	}
 
@@ -779,15 +763,10 @@ void CTextRender::LoadFonts(IStorage *pStorage, IConsole *pConsole)
 		{
 			char aFontName[IO_MAX_PATH_LENGTH];
 			str_format(aFontName, sizeof(aFontName), "fonts/%s", (const char *)rFiles[i]);
-			char aFilename[IO_MAX_PATH_LENGTH];
-			IOHANDLE File = pStorage->OpenFile(aFontName, IOFLAG_READ, IStorage::TYPE_ALL, aFilename, sizeof(aFilename));
-			if(File)
+			unsigned FileSize;
+			if(pStorage->ReadFile(aFontName, IStorage::TYPE_ALL, &m_apFontData[i], &FileSize))
 			{
-				long FileSize = io_length(File);
-				m_apFontData[i] = mem_alloc(FileSize);
-				io_read(File, m_apFontData[i], FileSize);
-				io_close(File);
-				if(LoadFontCollection(aFilename, m_apFontData[i], FileSize))
+				if(LoadFontCollection(aFontName, m_apFontData[i], FileSize))
 				{
 					char aBuf[256];
 					str_format(aBuf, sizeof(aBuf), "failed to load font. filename='%s'", aFontName);
@@ -820,22 +799,20 @@ void CTextRender::LoadFonts(IStorage *pStorage, IConsole *pConsole)
 	{
 		m_NumVariants = rVariant.u.object.length;
 		json_object_entry *Entries = rVariant.u.object.values;
-		m_paVariants = (CFontLanguageVariant *)mem_alloc(sizeof(CFontLanguageVariant)*m_NumVariants);
+		m_pVariants = (CFontLanguageVariant *)mem_alloc(sizeof(CFontLanguageVariant)*m_NumVariants);
 		for(int i = 0; i < m_NumVariants; ++i)
 		{
 			char aFileName[128];
 			str_format(aFileName, sizeof(aFileName), "languages/%s.json", (const char *)Entries[i].name);
-			str_copy(m_paVariants[i].m_aLanguageFile, aFileName, sizeof(m_paVariants[i].m_aLanguageFile));
+			str_copy(m_pVariants[i].m_aLanguageFile, aFileName, sizeof(m_pVariants[i].m_aLanguageFile));
 
 			json_value *pFamilyName = rVariant.u.object.values[i].value;
 			if(pFamilyName->type == json_string)
-				str_copy(m_paVariants[i].m_aFamilyName, pFamilyName->u.string.ptr, sizeof(m_paVariants[i].m_aFamilyName));
+				str_copy(m_pVariants[i].m_aFamilyName, pFamilyName->u.string.ptr, sizeof(m_pVariants[i].m_aFamilyName));
 			else
-				m_paVariants[i].m_aFamilyName[0] = 0;
+				m_pVariants[i].m_aFamilyName[0] = 0;
 		}
 	}
-
-	json_value_free(pJsonData);
 }
 
 void CTextRender::SetFontLanguageVariant(const char *pLanguageFile)
@@ -845,13 +822,13 @@ void CTextRender::SetFontLanguageVariant(const char *pLanguageFile)
 
 	char *pFamilyName = NULL;
 
-	if(m_paVariants)
+	if(m_pVariants)
 	{
 		for(int i = 0; i < m_NumVariants; ++i)
 		{
-			if(str_comp_filenames(pLanguageFile, m_paVariants[i].m_aLanguageFile) == 0)
+			if(str_comp_filenames(pLanguageFile, m_pVariants[i].m_aLanguageFile) == 0)
 			{
-				pFamilyName = m_paVariants[i].m_aFamilyName;
+				pFamilyName = m_pVariants[i].m_aFamilyName;
 				m_CurrentVariant = i;
 				break;
 			}
@@ -1056,10 +1033,6 @@ void CTextRender::TextNewline(CTextCursor *pCursor)
 	}
 
 	vec2 ScreenScale = vec2(ScreenWidth/(ScreenX1-ScreenX0), ScreenHeight/(ScreenY1-ScreenY0));
-	float Size = pCursor->m_FontSize;
-	int PixelSize = (int)(Size * ScreenScale.y);
-	Size = PixelSize / ScreenScale.y;
-
 	pCursor->m_LineCount++;
 	pCursor->m_Advance.y = pCursor->m_LineSpacing + pCursor->m_NextLineAdvanceY;
 	pCursor->m_Advance.x = 0;

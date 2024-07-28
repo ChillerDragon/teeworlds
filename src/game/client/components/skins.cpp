@@ -6,8 +6,9 @@
 
 #include <engine/graphics.h>
 #include <engine/storage.h>
-#include <engine/external/json-parser/json.h>
+
 #include <engine/shared/config.h>
+#include <engine/shared/jsonparser.h>
 #include <engine/shared/jsonwriter.h>
 
 #include "menus.h"
@@ -131,34 +132,20 @@ int CSkins::SkinScan(const char *pName, int IsDir, int DirType, void *pUser)
 		return 0;
 	}
 
-	// read file data into buffer
-	char aBuf[IO_MAX_PATH_LENGTH];
-	str_format(aBuf, sizeof(aBuf), "skins/%s", pName);
-	IOHANDLE File = pSelf->Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
-	if(!File)
-		return 0;
-	int FileSize = (int)io_length(File);
-	char *pFileData = (char *)mem_alloc(FileSize);
-	io_read(File, pFileData, FileSize);
-	io_close(File);
-
-	// init
 	CSkin Skin = pSelf->m_DummySkin;
 	str_copy(Skin.m_aName, pName, minimum<int>(SkinNameSize + 1, sizeof(Skin.m_aName)));
 	if(pSelf->Find(Skin.m_aName, true) != -1)
 		return 0;
 	bool SpecialSkin = pName[0] == 'x' && pName[1] == '_';
 
-	// parse json data
-	json_settings JsonSettings;
-	mem_zero(&JsonSettings, sizeof(JsonSettings));
-	char aError[256];
-	json_value *pJsonData = json_parse_ex(&JsonSettings, pFileData, FileSize, aError);
-	mem_free(pFileData);
-
+	char aBuf[IO_MAX_PATH_LENGTH];
+	str_format(aBuf, sizeof(aBuf), "skins/%s", pName);
+	CJsonParser JsonParser;
+	const json_value *pJsonData = JsonParser.ParseFile(aBuf, pSelf->Storage());
 	if(pJsonData == 0)
 	{
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, aBuf, aError);
+		str_format(aBuf, sizeof(aBuf), "failed to load skin '%s': %s", pName, JsonParser.Error());
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "skins", aBuf);
 		return 0;
 	}
 
@@ -213,9 +200,6 @@ int CSkins::SkinScan(const char *pName, int IsDir, int DirType, void *pUser)
 			}
 		}
 	}
-
-	// clean up
-	json_value_free(pJsonData);
 
 	// set skin data
 	Skin.m_Flags = SpecialSkin ? SKINFLAG_SPECIAL : 0;
@@ -325,13 +309,13 @@ void CSkins::OnInit()
 		{
 			char aBuf[128];
 			str_format(aBuf, sizeof(aBuf), "failed to load xmas hat '%s'", pFileName);
-			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
+			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "skins", aBuf);
 		}
 		else
 		{
 			char aBuf[128];
 			str_format(aBuf, sizeof(aBuf), "loaded xmas hat '%s'", pFileName);
-			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
+			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "skins", aBuf);
 			m_XmasHatTexture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
 			mem_free(Info.m_pData);
 		}
@@ -346,13 +330,13 @@ void CSkins::OnInit()
 		{
 			char aBuf[128];
 			str_format(aBuf, sizeof(aBuf), "failed to load bot '%s'", pFileName);
-			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
+			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "skins", aBuf);
 		}
 		else
 		{
 			char aBuf[128];
 			str_format(aBuf, sizeof(aBuf), "loaded bot '%s'", pFileName);
-			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
+			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "skins", aBuf);
 			m_BotTexture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
 			mem_free(Info.m_pData);
 		}

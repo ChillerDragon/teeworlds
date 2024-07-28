@@ -76,7 +76,7 @@ const char *enum_chat_to_str(int Value)
 const char *enum_gamemsg_to_str(int Value)
 {
 	if(Value == GAMEMSG_TEAM_SWAP) { return "GAMEMSG_TEAM_SWAP"; }
-	if(Value == GAMEMSG_SPEC_INVALIDID) { return "GAMEMSG_SPEC_INVALIDID"; }
+	if(Value == GAMEMSG_SPEC_INVALID_ID) { return "GAMEMSG_SPEC_INVALID_ID"; }
 	if(Value == GAMEMSG_TEAM_SHUFFLE) { return "GAMEMSG_TEAM_SHUFFLE"; }
 	if(Value == GAMEMSG_TEAM_BALANCE) { return "GAMEMSG_TEAM_BALANCE"; }
 	if(Value == GAMEMSG_CTF_DROP) { return "GAMEMSG_CTF_DROP"; }

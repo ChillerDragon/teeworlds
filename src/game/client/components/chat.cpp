@@ -21,12 +21,6 @@
 #include "chat.h"
 #include "binds.h"
 
-CChat::CChat()
-{
-	m_aInputBuf[0] = '\0';
-	m_Input.SetBuffer(m_aInputBuf, sizeof(m_aInputBuf));
-}
-
 void CChat::OnReset()
 {
 	if(Client()->State() == IClient::STATE_OFFLINE || Client()->State() == IClient::STATE_DEMOPLAYBACK)
@@ -126,12 +120,12 @@ void CChat::OnStateChange(int NewState, int OldState)
 
 void CChat::ConSay(IConsole::IResult *pResult, void *pUserData)
 {
-	((CChat*)pUserData)->Say(CHAT_ALL, pResult->GetString(0));
+	((CChat*)pUserData)->SendChat(CHAT_ALL, pResult->GetString(0));
 }
 
 void CChat::ConSayTeam(IConsole::IResult *pResult, void *pUserData)
 {
-	((CChat*)pUserData)->Say(CHAT_TEAM, pResult->GetString(0));
+	((CChat*)pUserData)->SendChat(CHAT_TEAM, pResult->GetString(0));
 }
 
 void CChat::ConSaySelf(IConsole::IResult *pResult, void *pUserData)
@@ -149,7 +143,7 @@ void CChat::ConWhisper(IConsole::IResult *pResult, void *pUserData)
 	else
 	{
 		pChat->m_WhisperTarget = Target;
-		pChat->Say(CHAT_WHISPER, pResult->GetString(1));
+		pChat->SendChat(CHAT_WHISPER, pResult->GetString(1));
 	}
 }
 
@@ -282,7 +276,7 @@ bool CChat::OnInput(IInput::CEvent Event)
 			{
 				if(m_PendingChatCounter == 0 && m_LastChatSend+time_freq() < time_get())
 				{
-					Say(m_Mode, m_Input.GetString());
+					SendChat(m_Mode, m_Input.GetString());
 					AddEntry = true;
 				}
 				else if(m_PendingChatCounter < 3)
@@ -695,13 +689,26 @@ void CChat::AddLine(const char *pLine, int ClientID, int Mode, int TargetID)
 					pCurLine->m_NameColor = TEAM_BLUE;
 			}
 
-			str_format(pCurLine->m_aName, sizeof(pCurLine->m_aName), "%s", m_pClient->m_aClients[NameCID].m_aName);
-			str_format(pCurLine->m_aText, sizeof(pCurLine->m_aText), "%s", pLine);
+			str_copy(pCurLine->m_aName, m_pClient->m_aClients[NameCID].m_aName, sizeof(pCurLine->m_aName));
+			str_copy(pCurLine->m_aText, pLine, sizeof(pCurLine->m_aText));
 		}
 
 		char aBuf[1024];
-		str_format(aBuf, sizeof(aBuf), "%2d: %s: %s", NameCID, pCurLine->m_aName, pCurLine->m_aText);
-		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, GetModeName(Mode), aBuf, Highlighted || Mode == CHAT_WHISPER);
+		if(NameCID >= 0)
+			str_format(aBuf, sizeof(aBuf), "%d: ", NameCID);
+		else
+			aBuf[0] = '\0';
+		if(pCurLine->m_aName[0])
+		{
+			str_append(aBuf, pCurLine->m_aName, sizeof(aBuf));
+			str_append(aBuf, ": ", sizeof(aBuf));
+		}
+		str_append(aBuf, pCurLine->m_aText, sizeof(aBuf));
+
+		char aMode[16];
+		str_copy(aMode, "chat/", sizeof(aMode));
+		str_append(aMode, GetModeName(Mode, ClientID), sizeof(aMode));
+		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, aMode, aBuf, Highlighted || Mode == CHAT_WHISPER);
 	}
 
 	if(Mode == CHAT_WHISPER && m_pClient->m_LocalClientID != ClientID)
@@ -738,10 +745,16 @@ int CChat::GetChatSound(int ChatType)
 	}
 }
 
-const char *CChat::GetModeName(int Mode) const
+const char *CChat::GetModeName(int Mode, int ClientID) const
 {
+	switch(ClientID)
+	{
+		case CLIENT_MSG: return "client";
+		case SERVER_MSG: return "server";
+	}
 	switch(Mode)
 	{
+		case CHAT_NONE:
 		case CHAT_ALL: return "all";
 		case CHAT_WHISPER: return "whisper";
 		case CHAT_TEAM: return "team";
@@ -753,7 +766,7 @@ void CChat::OnRender()
 {
 	if(Client()->State() < IClient::STATE_ONLINE)
 		return;
-	
+
 	if(!Config()->m_ClShowChat)
 		return;
 
@@ -765,7 +778,7 @@ void CChat::OnRender()
 		{
 			if(i == 0)
 			{
-				Say(pEntry->m_Mode, pEntry->m_aText);
+				SendChat(pEntry->m_Mode, pEntry->m_aText);
 				break;
 			}
 		}
@@ -1311,7 +1324,7 @@ void CChat::OnRender()
 	HandleCommands(x+CategoryWidth, Height - 24.f, 200.0f-CategoryWidth);
 }
 
-void CChat::Say(int Mode, const char *pLine)
+void CChat::SendChat(int Mode, const char *pLine)
 {
 	m_LastChatSend = time_get();
 
@@ -1569,8 +1582,8 @@ void CChat::Com_Mute(IConsole::IResult *pResult, void *pContext)
 	int TargetID = pChatData->m_pClient->GetClientID(pResult->GetString(0));
 	if(TargetID != -1)
 	{
-		bool isMuted = pChatData->m_pClient->m_aClients[TargetID].m_ChatIgnore;
-		if(isMuted)
+		bool IsMuted = pChatData->m_pClient->m_aClients[TargetID].m_ChatIgnore;
+		if(IsMuted)
 			pChatData->m_pClient->Blacklist()->RemoveIgnoredPlayer(pChatData->m_pClient->m_aClients[TargetID].m_aName, pChatData->m_pClient->m_aClients[TargetID].m_aClan);
 		else
 			pChatData->m_pClient->Blacklist()->AddIgnoredPlayer(pChatData->m_pClient->m_aClients[TargetID].m_aName, pChatData->m_pClient->m_aClients[TargetID].m_aClan);
@@ -1579,7 +1592,7 @@ void CChat::Com_Mute(IConsole::IResult *pResult, void *pContext)
 		pChatData->ClearInput();
 
 		char aMsg[128];
-		str_format(aMsg, sizeof(aMsg), !isMuted ? Localize("'%s' was muted") : Localize("'%s' was unmuted"), pChatData->m_pClient->m_aClients[TargetID].m_aName);
+		str_format(aMsg, sizeof(aMsg), !IsMuted ? Localize("'%s' was muted") : Localize("'%s' was unmuted"), pChatData->m_pClient->m_aClients[TargetID].m_aName);
 		pChatData->AddLine(aMsg, CLIENT_MSG, CHAT_ALL);
 	}
 	pChatData->Disable();

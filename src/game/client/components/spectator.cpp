@@ -31,7 +31,7 @@ void CSpectator::ConSpectate(IConsole::IResult *pResult, void *pUserData)
 {
 	CSpectator *pSelf = (CSpectator *)pUserData;
 	if(pSelf->CanSpectate())
-		pSelf->Spectate(pResult->GetInteger(0), pResult->GetInteger(1));
+		pSelf->SendSpectate(pResult->GetInteger(0), pResult->GetInteger(1));
 }
 
 bool CSpectator::SpecModePossible(int SpecMode, int SpectatorID)
@@ -47,7 +47,7 @@ bool CSpectator::SpecModePossible(int SpecMode, int SpectatorID)
 			&& m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS
 			&& (SpectatorID == m_pClient->m_LocalClientID
 				|| m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != m_pClient->m_aClients[SpectatorID].m_Team
-				|| (m_pClient->m_Snap.m_paPlayerInfos[SpectatorID] && (m_pClient->m_Snap.m_paPlayerInfos[SpectatorID]->m_PlayerFlags&PLAYERFLAG_DEAD))))
+				|| (m_pClient->m_Snap.m_apPlayerInfos[SpectatorID] && (m_pClient->m_Snap.m_apPlayerInfos[SpectatorID]->m_PlayerFlags&PLAYERFLAG_DEAD))))
 		{
 			return false;
 		}
@@ -104,7 +104,7 @@ void CSpectator::HandleSpectateNextPrev(int Direction)
 		IterateSpecMode(Direction, &NewSpecMode, &NewSpectatorID);
 		if(SpecModePossible(NewSpecMode, NewSpectatorID))
 		{
-			Spectate(NewSpecMode, NewSpectatorID);
+			SendSpectate(NewSpecMode, NewSpectatorID);
 			return;
 		}
 	}
@@ -155,7 +155,7 @@ void CSpectator::OnRender()
 		if(m_WasActive)
 		{
 			if(m_SelectedSpecMode != NO_SELECTION)
-				Spectate(m_SelectedSpecMode, m_SelectedSpectatorID);
+				SendSpectate(m_SelectedSpecMode, m_SelectedSpectatorID);
 			m_WasActive = false;
 		}
 		return;
@@ -351,7 +351,7 @@ void CSpectator::OnReset()
 	m_SelectedSpectatorID = -1;
 }
 
-void CSpectator::Spectate(int SpecMode, int SpectatorID)
+void CSpectator::SendSpectate(int SpecMode, int SpectatorID)
 {
 	if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
 	{

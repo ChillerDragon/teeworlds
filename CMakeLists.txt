@@ -137,9 +137,6 @@ if(NOT MSVC)
   # Protect the stack pointer.
   add_c_compiler_flag_if_supported(OUR_FLAGS -fstack-protector-all)
 
-  # Protect the stack from clashing.
-  add_c_compiler_flag_if_supported(OUR_FLAGS -fstack-clash-protection)
-
   # Control-flow protection. Should protect against ROP.
   add_c_compiler_flag_if_supported(OUR_FLAGS -fcf-protection)
 
@@ -1336,6 +1333,8 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   huffman.h
   jobs.cpp
   jobs.h
+  jsonparser.cpp
+  jsonparser.h
   jsonwriter.cpp
   jsonwriter.h
   kernel.cpp
@@ -1734,6 +1733,7 @@ add_custom_target(everything DEPENDS ${TARGETS_OWN})
 
 if(GTEST_FOUND OR DOWNLOAD_GTEST)
   set_src(TESTS GLOB src/test
+    aio.cpp
     bytes_be.cpp
     compression.cpp
     datafile.cpp
@@ -1741,6 +1741,7 @@ if(GTEST_FOUND OR DOWNLOAD_GTEST)
     git_revision.cpp
     hash.cpp
     io.cpp
+    jsonparser.cpp
     jsonwriter.cpp
     packer.cpp
     sorted_array.cpp

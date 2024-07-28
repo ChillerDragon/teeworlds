@@ -170,41 +170,33 @@ int CLayerGroup::SwapLayers(int Index0, int Index1)
 
 void CEditorImage::AnalyzeTileFlags()
 {
-	if(m_Format == CImageInfo::FORMAT_RGB)
-	{
-		for(int i = 0; i < 256; ++i)
-			m_aTileFlags[i] = TILEFLAG_OPAQUE;
-	}
-	else
-	{
-		mem_zero(m_aTileFlags, sizeof(m_aTileFlags));
+	mem_zero(m_aTileFlags, sizeof(m_aTileFlags));
 
-		int tw = m_Width/16; // tilesizes
-		int th = m_Height/16;
-		if(tw == th)
-		{
-			unsigned char *pPixelData = (unsigned char *)m_pData;
+	int tw = m_Width/16; // tilesizes
+	int th = m_Height/16;
+	if(tw == th)
+	{
+		unsigned char *pPixelData = (unsigned char *)m_pData;
 
-			int TileID = 0;
-			for(int ty = 0; ty < 16; ty++)
-				for(int tx = 0; tx < 16; tx++, TileID++)
-				{
-					bool Opaque = true;
-					for(int x = 0; x < tw; x++)
-						for(int y = 0; y < th; y++)
+		int TileID = 0;
+		for(int ty = 0; ty < 16; ty++)
+			for(int tx = 0; tx < 16; tx++, TileID++)
+			{
+				bool Opaque = true;
+				for(int x = 0; x < tw; x++)
+					for(int y = 0; y < th; y++)
+					{
+						int p = (ty*tw+y)*m_Width + tx*tw+x;
+						if(pPixelData[p*4+3] < 250)
 						{
-							int p = (ty*tw+y)*m_Width + tx*tw+x;
-							if(pPixelData[p*4+3] < 250)
-							{
-								Opaque = false;
-								break;
-							}
+							Opaque = false;
+							break;
 						}
+					}
 
-					if(Opaque)
-						m_aTileFlags[TileID] |= TILEFLAG_OPAQUE;
-				}
-		}
+				if(Opaque)
+					m_aTileFlags[TileID] |= TILEFLAG_OPAQUE;
+			}
 	}
 }
 
@@ -213,27 +205,13 @@ void CEditorImage::LoadAutoMapper()
 	if(m_pAutoMapper)
 		return;
 
-	// read file data into buffer
 	char aBuf[IO_MAX_PATH_LENGTH];
 	str_format(aBuf, sizeof(aBuf), "editor/automap/%s.json", m_aName);
-	IOHANDLE File = m_pEditor->Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
-	if(!File)
-		return;
-	int FileSize = (int)io_length(File);
-	char *pFileData = (char *)mem_alloc(FileSize);
-	io_read(File, pFileData, FileSize);
-	io_close(File);
-
-	// parse json data
-	json_settings JsonSettings;
-	mem_zero(&JsonSettings, sizeof(JsonSettings));
-	char aError[256];
-	json_value *pJsonData = json_parse_ex(&JsonSettings, pFileData, FileSize, aError);
-	mem_free(pFileData);
-
+	CJsonParser JsonParser;
+	const json_value *pJsonData = JsonParser.ParseFile(aBuf, m_pEditor->Storage());
 	if(pJsonData == 0)
 	{
-		m_pEditor->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, aBuf, aError);
+		m_pEditor->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "editor", JsonParser.Error());
 		return;
 	}
 
@@ -254,11 +232,9 @@ void CEditorImage::LoadAutoMapper()
 		}
 	}
 
-	// clean up
-	json_value_free(pJsonData);
 	if(m_pAutoMapper && m_pEditor->Config()->m_Debug)
 	{
-		str_format(aBuf, sizeof(aBuf),"loaded %s.json (%s)", m_aName, IAutoMapper::GetTypeName(m_pAutoMapper->GetType()));
+		str_format(aBuf, sizeof(aBuf), "loaded %s.json (%s)", m_aName, IAutoMapper::GetTypeName(m_pAutoMapper->GetType()));
 		m_pEditor->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "editor", aBuf);
 	}
 }
@@ -1305,9 +1281,9 @@ void CEditor::DoQuadEnvelopes(const array<CQuad> &lQuads, IGraphics::CTextureHan
 {
 	int Num = lQuads.size();
 	CEnvelope **apEnvelope = new CEnvelope*[Num];
-	mem_zero(apEnvelope, sizeof(CEnvelope*)*Num);
 	for(int i = 0; i < Num; i++)
 	{
+		apEnvelope[i] = 0;
 		if((m_ShowEnvelopePreview == SHOWENV_SELECTED && lQuads[i].m_PosEnv == m_SelectedEnvelope) || m_ShowEnvelopePreview == SHOWENV_ALL)
 			if(lQuads[i].m_PosEnv >= 0 && lQuads[i].m_PosEnv < m_Map.m_lEnvelopes.size())
 				apEnvelope[i] = m_Map.m_lEnvelopes[lQuads[i].m_PosEnv];
@@ -2757,7 +2733,7 @@ void CEditor::RenderFileDialog()
 	// GUI coordsys
 	CUIRect View = *UI()->Screen();
 	Graphics()->MapScreen(View.x, View.y, View.w, View.h);
-	CUIRect Preview;
+	CUIRect Preview = {0, 0, 0, 0};
 	float Width = View.w, Height = View.h;
 
 	View.Draw(vec4(0,0,0,0.25f), 0.0f, CUIRect::CORNER_NONE);
@@ -2803,18 +2779,20 @@ void CEditor::RenderFileDialog()
 		if(DoEditBox(&m_FileDialogFileNameInput, &FileBox, 10.0f))
 		{
 			// remove '/' and '\'
-			char aTempFileName[sizeof(m_aFileDialogFileName)];
-			str_copy(aTempFileName, m_aFileDialogFileName, sizeof(aTempFileName));
-			for(int i = 0; aTempFileName[i]; ++i)
-				if(aTempFileName[i] == '/' || aTempFileName[i] == '\\')
-					str_copy(&aTempFileName[i], &aTempFileName[i+1], (int)(sizeof(aTempFileName))-i);
-			m_FileDialogFileNameInput.Set(aTempFileName);
+			for(int i = 0; m_FileDialogFileNameInput.GetString()[i]; ++i)
+			{
+				if(m_FileDialogFileNameInput.GetString()[i] == '/' || m_FileDialogFileNameInput.GetString()[i] == '\\')
+				{
+					m_FileDialogFileNameInput.SetRange(m_FileDialogFileNameInput.GetString() + i + 1, i, m_FileDialogFileNameInput.GetLength());
+					--i;
+				}
+			}
 			m_FilesSelectedIndex = -1;
 			m_aFilesSelectedName[0] = '\0';
 			// find first valid entry, if it exists
 			for(int i = 0; i < m_FilteredFileList.size(); i++)
 			{
-				if(str_comp_nocase(m_FilteredFileList[i]->m_aName, m_aFileDialogFileName) == 0)
+				if(str_comp_nocase(m_FilteredFileList[i]->m_aName, m_FileDialogFileNameInput.GetString()) == 0)
 				{
 					m_FilesSelectedIndex = i;
 					str_copy(m_aFilesSelectedName, m_FilteredFileList[i]->m_aName, sizeof(m_aFilesSelectedName));
@@ -2836,13 +2814,13 @@ void CEditor::RenderFileDialog()
 			{
 				m_FilesSelectedIndex = -1;
 			}
-			else if(m_FilesSelectedIndex == -1 || (m_aFileDialogFilterString[0] && !str_find_nocase(m_FilteredFileList[m_FilesSelectedIndex]->m_aName, m_aFileDialogFilterString)))
+			else if(m_FilesSelectedIndex == -1 || (m_FileDialogFilterInput.GetLength() && !str_find_nocase(m_FilteredFileList[m_FilesSelectedIndex]->m_aName, m_FileDialogFilterInput.GetString())))
 			{
 				// we need to refresh selection
 				m_FilesSelectedIndex = -1;
 				for(int i = 0; i < m_FilteredFileList.size(); i++)
 				{
-					if(str_find_nocase(m_FilteredFileList[i]->m_aName, m_aFileDialogFilterString))
+					if(str_find_nocase(m_FilteredFileList[i]->m_aName, m_FileDialogFilterInput.GetString()))
 					{
 						m_FilesSelectedIndex = i;
 						break;
@@ -2866,9 +2844,9 @@ void CEditor::RenderFileDialog()
 		}
 	}
 
-	if(m_FilesSelectedIndex >= 0 && m_FilesSelectedIndex < m_FilteredFileList.size())
+	if(m_FilesSelectedIndex >= 0 && m_FilesSelectedIndex < m_FilteredFileList.size() && m_FileDialogFileType == CEditor::FILETYPE_IMG)
 	{
-		if(m_FileDialogFileType == CEditor::FILETYPE_IMG && !m_PreviewImageIsLoaded)
+		if(!m_PreviewImageIsLoaded)
 		{
 			int Length = str_length(m_FilteredFileList[m_FilesSelectedIndex]->m_aFilename);
 			if(Length >= str_length(".png") && str_endswith_nocase(m_FilteredFileList[m_FilesSelectedIndex]->m_aFilename, ".png"))
@@ -2980,7 +2958,7 @@ void CEditor::RenderFileDialog()
 		}
 		else // file
 		{
-			str_format(m_aFileSaveName, sizeof(m_aFileSaveName), "%s/%s", m_pFileDialogPath, m_aFileDialogFileName);
+			str_format(m_aFileSaveName, sizeof(m_aFileSaveName), "%s/%s", m_pFileDialogPath, m_FileDialogFileNameInput.GetString());
 			if(!str_comp(m_pFileDialogButtonText, "Save"))
 			{
 				IOHANDLE File = Storage()->OpenFile(m_aFileSaveName, IOFLAG_READ, IStorage::TYPE_SAVE);
@@ -3012,10 +2990,10 @@ void CEditor::RenderFileDialog()
 		static int s_NewFolderButton = 0;
 		if(DoButton_Editor(&s_NewFolderButton, "New folder", 0, &Button, 0, 0))
 		{
-			m_aFileDialogNewFolderName[0] = 0;
+			m_FileDialogNewFolderNameInput.Clear();
 			m_aFileDialogErrString[0] = 0;
 			UI()->DoPopupMenu(Width/2.0f-200.0f, Height/2.0f-100.0f, 400.0f, 200.0f, this, PopupNewFolder);
-			UI()->SetActiveItem(0);
+			UI()->SetActiveItem(&m_FileDialogNewFolderNameInput);
 		}
 
 		ButtonBar.VSplitLeft(40.0f, 0, &ButtonBar);
@@ -3038,7 +3016,7 @@ void CEditor::RefreshFilteredFileList()
 	m_FilteredFileList.clear();
 	for(int i = 0; i < m_CompleteFileList.size(); i++)
 	{
-		if(!m_aFileDialogFilterString[0] || str_find_nocase(m_CompleteFileList[i].m_aName, m_aFileDialogFilterString))
+		if(!m_FileDialogFilterInput.GetLength() || str_find_nocase(m_CompleteFileList[i].m_aName, m_FileDialogFilterInput.GetString()))
 		{
 			m_FilteredFileList.add(&m_CompleteFileList[i]);
 		}

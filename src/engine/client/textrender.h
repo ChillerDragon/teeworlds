@@ -162,11 +162,11 @@ class CTextRender : public IEngineTextRender
 	// support regional variant fonts
 	int m_NumVariants;
 	int m_CurrentVariant;
-	CFontLanguageVariant *m_paVariants;
+	CFontLanguageVariant *m_pVariants;
 
 	FT_Library m_FTLibrary;
 
-	int LoadFontCollection(const void *pFilename, const void *pBuf, long FileSize);
+	int LoadFontCollection(const char *pFilename, const void *pBuf, unsigned FileSize);
 
 	static bool IsWestern(int Chr)
 	{

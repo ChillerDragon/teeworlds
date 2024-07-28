@@ -109,11 +109,7 @@ void print_snap_int(int Index, const char *pDescription, int Value, int ItemNum,
 int snapshot_delta_intdump(const CSnapshot *pFrom, CSnapshot *pTo, const void *pSrcData, int DataSize, const short *ppItemSizes, bool Sixup)
 {
 	const CSnapshotDelta::CData *pDelta = (const CSnapshotDelta::CData *)pSrcData;
-#ifdef _PROTOCOL_VERSION_7
-	const int *pData = (const int *)pDelta->m_pData;
-#else
 	const int *pData = (const int *)pDelta->m_aData;
-#endif
 	const int *pEnd = (const int *)(((const char *)pSrcData + DataSize));
 
 	int ItemSize;
