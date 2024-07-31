@@ -318,8 +318,7 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 	{
 		if(Size - NET_PACKETHEADERSIZE > NET_MAX_PAYLOAD)
 		{
-			if(m_pConfig->m_Debug)
-				dbg_msg("network", "packet payload too big, size=%d", Size);
+			dbg_msg("network", "packet payload too big, size=%d", Size);
 			return -1;
 		}
 
@@ -327,11 +326,6 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 			// xxxxxxAA AAAAAAAA
 		pPacket->m_NumChunks = pBuffer[2];
 			// NNNNNNNN
-
-		if(pPacket->m_NumChunks && pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
-		{
-			dbg_msg("network_in", "ERROR: got control packet with num chunks set to %d expected 0", pPacket->m_NumChunks);
-		}
 
 		pPacket->m_DataSize = Size - NET_PACKETHEADERSIZE;
 		pPacket->m_Token = (pBuffer[3] << 24) | (pBuffer[4] << 16) | (pBuffer[5] << 8) | pBuffer[6];
@@ -342,13 +336,26 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 			pPacket->m_DataSize = m_Huffman.Decompress(&pBuffer[NET_PACKETHEADERSIZE], pPacket->m_DataSize, pPacket->m_aChunkData, sizeof(pPacket->m_aChunkData));
 		else
 			mem_copy(pPacket->m_aChunkData, &pBuffer[NET_PACKETHEADERSIZE], pPacket->m_DataSize);
+
+
+		if(pPacket->m_NumChunks && pPacket->m_Flags&NET_PACKETFLAG_CONTROL)
+		{
+			dbg_msg("network_in", "ERROR: got control packet with num chunks set to %d expected 0", pPacket->m_NumChunks);
+		}
+		if(pPacket->m_NumChunks == 0 && (pPacket->m_Flags&NET_PACKETFLAG_CONTROL) == 0 && (pPacket->m_Flags&NET_PACKETFLAG_RESEND) == 0)
+		{
+			// empty payload resend requests do exist they basically only happen in weird bugged edge cases
+			// but they get send by official implementations
+			// num chunks should only be zero of its a control message
+			// if num chunks is zero for a non control message and there is a payload size thats for sure an error
+			dbg_msg("network_in", "ERROR: got control=false resend=false num_chunks=0 data_size=%d", pPacket->m_DataSize);
+		}
 	}
 
 	// check for errors
 	if(pPacket->m_DataSize < 0)
 	{
-		if(m_pConfig->m_Debug)
-			dbg_msg("network", "error during packet decoding");
+		dbg_msg("network", "error during packet decoding");
 		return -1;
 	}
 
