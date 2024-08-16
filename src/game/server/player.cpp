@@ -255,6 +255,15 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 	}
 
 	m_PlayerFlags = NewInput->m_PlayerFlags;
+	// dbg_msg("player", "got flags=%d", m_PlayerFlags);
+	// dbg_msg("player", " ADMIN      = %d", (m_PlayerFlags&PLAYERFLAG_ADMIN                  )!=0);
+	// dbg_msg("player", " CHATTING   = %d", (m_PlayerFlags&PLAYERFLAG_CHATTING               )!=0);
+	// dbg_msg("player", " SCOREBOARD = %d", (m_PlayerFlags&PLAYERFLAG_SCOREBOARD             )!=0);
+	// dbg_msg("player", " READY      = %d", (m_PlayerFlags&PLAYERFLAG_READY                  )!=0);
+	// dbg_msg("player", " DEAD       = %d", (m_PlayerFlags&PLAYERFLAG_DEAD                   )!=0);
+	// dbg_msg("player", " WATCHING   = %d", (m_PlayerFlags&PLAYERFLAG_WATCHING               )!=0);
+	// dbg_msg("player", " BOT        = %d", (m_PlayerFlags&PLAYERFLAG_BOT                    )!=0);
+	// // dbg_msg("player", " AIM        = %d", (m_PlayerFlags&PLAYERFLAG_AIM                    )!=0);
 
 	if(m_pCharacter)
 		m_pCharacter->OnDirectInput(NewInput);
