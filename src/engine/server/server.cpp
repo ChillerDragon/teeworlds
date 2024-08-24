@@ -1005,9 +1005,14 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 			int Size = Unpacker.GetInt();
 
 			// check for errors
-			if(Unpacker.Error() || Size/4 > MAX_INPUT_SIZE)
+			if(Unpacker.Error())
 			{
-				dbg_msg("network_in", "wrong input size");
+				dbg_msg("network_in", "dropping input msg because of unpack error: %s", Unpacker.ErrorMsg());
+				return;
+			}
+			if(Size/4 > MAX_INPUT_SIZE)
+			{
+				dbg_msg("network_in", "wrong input size in bytes %d > %d (max)", Size, MAX_INPUT_SIZE * 4);
 				return;
 			}
 
