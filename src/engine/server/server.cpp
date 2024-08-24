@@ -1006,7 +1006,10 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 
 			// check for errors
 			if(Unpacker.Error() || Size/4 > MAX_INPUT_SIZE)
+			{
+				dbg_msg("network_in", "wrong input size");
 				return;
+			}
 
 			if(m_aClients[ClientID].m_LastAckedSnapshot > 0)
 				m_aClients[ClientID].m_SnapRate = CClient::SNAPRATE_FULL;
