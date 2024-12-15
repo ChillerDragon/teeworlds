@@ -811,7 +811,10 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		return;
 	}
 	int Msg = Unpacker.Type();
-	if(m_pConfig->m_Debug > 2 || Msg != NETMSG_INPUT)
+	bool PrintMessage = m_pConfig->m_Debug > 2;
+	if(Msg != NETMSG_INPUT)
+		PrintMessage = m_pConfig->m_Debug > 0;
+	if(PrintMessage)
 	{
 		const char *pMsg = "unkown";
 		if (Unpacker.System())
