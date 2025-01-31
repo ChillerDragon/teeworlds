@@ -1,5 +1,4 @@
 #include <generated/protocol.h>
-#include <game/generated/protocol.h>
 
 #include <base/dissector/compat.h>
 
