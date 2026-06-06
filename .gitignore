@@ -79,3 +79,6 @@ rules.ninja
 # ChillerDragon
 build-*
 
+datasrc/languages
+datasrc/maps
+
