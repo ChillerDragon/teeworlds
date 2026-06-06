@@ -1671,7 +1671,11 @@ void CClient::Update()
 	MasterServer()->Update();
 
 	// update the server browser
-	m_ServerBrowser.Update(m_ResortServerBrowser);
+	
+	// chillerdragon: lets not spam the network and leak our ip here
+	//                also spams the logs in debug mode
+
+	// m_ServerBrowser.Update(m_ResortServerBrowser);
 	m_ResortServerBrowser = false;
 }
 
