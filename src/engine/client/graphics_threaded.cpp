@@ -327,42 +327,7 @@ int CGraphics_Threaded::LoadTextureRawSub(int TextureID, int x, int y, int Width
 
 int CGraphics_Threaded::LoadTextureRaw(int Width, int Height, int Format, const void *pData, int StoreFormat, int Flags)
 {
-	// don't waste memory on texture if we are stress testing
-	if(g_Config.m_DbgStress)
-		return m_InvalidTexture;
-
-	// grab texture
-	int Tex = m_FirstFreeTexture;
-	m_FirstFreeTexture = m_aTextureIndices[Tex];
-	m_aTextureIndices[Tex] = -1;
-
-	CCommandBuffer::SCommand_Texture_Create Cmd;
-	Cmd.m_Slot = Tex;
-	Cmd.m_Width = Width;
-	Cmd.m_Height = Height;
-	Cmd.m_PixelSize = ImageFormatToPixelSize(Format);
-	Cmd.m_Format = ImageFormatToTexFormat(Format);
-	Cmd.m_StoreFormat = ImageFormatToTexFormat(StoreFormat);
-
-	// flags
-	Cmd.m_Flags = 0;
-	if(Flags&IGraphics::TEXLOAD_NOMIPMAPS)
-		Cmd.m_Flags |= CCommandBuffer::TEXFLAG_NOMIPMAPS;
-	if(g_Config.m_GfxTextureCompression)
-		Cmd.m_Flags |= CCommandBuffer::TEXFLAG_COMPRESSED;
-	if(g_Config.m_GfxTextureQuality || Flags&TEXLOAD_NORESAMPLE)
-		Cmd.m_Flags |= CCommandBuffer::TEXFLAG_QUALITY;
-
-	// copy texture data
-	int MemSize = Width*Height*Cmd.m_PixelSize;
-	void *pTmpData = mem_alloc(MemSize, sizeof(void*));
-	mem_copy(pTmpData, pData, MemSize);
-	Cmd.m_pData = pTmpData;
-
-	//
-	m_pCommandBuffer->AddCommand(Cmd);
-
-	return Tex;
+	return 0;
 }
 
 // simple uncompressed RGBA loaders
@@ -391,50 +356,7 @@ int CGraphics_Threaded::LoadTexture(const char *pFilename, int StorageType, int 
 
 int CGraphics_Threaded::LoadPNG(CImageInfo *pImg, const char *pFilename, int StorageType)
 {
-	char aCompleteFilename[512];
-	unsigned char *pBuffer;
-	png_t Png; // ignore_convention
-
-	// open file for reading
-	png_init(0,0); // ignore_convention
-
-	IOHANDLE File = m_pStorage->OpenFile(pFilename, IOFLAG_READ, StorageType, aCompleteFilename, sizeof(aCompleteFilename));
-	if(File)
-		io_close(File);
-	else
-	{
-		dbg_msg("game/png", "failed to open file. filename='%s'", pFilename);
-		return 0;
-	}
-
-	int Error = png_open_file(&Png, aCompleteFilename); // ignore_convention
-	if(Error != PNG_NO_ERROR)
-	{
-		dbg_msg("game/png", "failed to open file. filename='%s'", aCompleteFilename);
-		if(Error != PNG_FILE_ERROR)
-			png_close_file(&Png); // ignore_convention
-		return 0;
-	}
-
-	if(Png.depth != 8 || (Png.color_type != PNG_TRUECOLOR && Png.color_type != PNG_TRUECOLOR_ALPHA)) // ignore_convention
-	{
-		dbg_msg("game/png", "invalid format. filename='%s'", aCompleteFilename);
-		png_close_file(&Png); // ignore_convention
-		return 0;
-	}
-
-	pBuffer = (unsigned char *)mem_alloc(Png.width * Png.height * Png.bpp, 1); // ignore_convention
-	png_get_data(&Png, pBuffer); // ignore_convention
-	png_close_file(&Png); // ignore_convention
-
-	pImg->m_Width = Png.width; // ignore_convention
-	pImg->m_Height = Png.height; // ignore_convention
-	if(Png.color_type == PNG_TRUECOLOR) // ignore_convention
-		pImg->m_Format = CImageInfo::FORMAT_RGB;
-	else if(Png.color_type == PNG_TRUECOLOR_ALPHA) // ignore_convention
-		pImg->m_Format = CImageInfo::FORMAT_RGBA;
-	pImg->m_pData = pBuffer;
-	return 1;
+	return 0;
 }
 
 void CGraphics_Threaded::KickCommandBuffer()

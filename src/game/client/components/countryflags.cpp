@@ -70,24 +70,6 @@ void CCountryFlags::LoadCountryflagsIndexfile()
 				continue;
 			}
 		}
-
-		// add entry
-		CCountryFlag CountryFlag;
-		CountryFlag.m_CountryCode = CountryCode;
-		str_copy(CountryFlag.m_aCountryCodeString, aOrigin, sizeof(CountryFlag.m_aCountryCodeString));
-		if(g_Config.m_ClLoadCountryFlags)
-		{
-			CountryFlag.m_Texture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
-			mem_free(Info.m_pData);
-		}
-		else
-			CountryFlag.m_Texture = -1;
-		if(g_Config.m_Debug)
-		{
-			str_format(aBuf, sizeof(aBuf), "loaded country flag '%s'", aOrigin);
-			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "countryflags", aBuf);
-		}
-		m_aCountryFlags.add_unsorted(CountryFlag);
 	}
 	io_close(File);
 	m_aCountryFlags.sort_range();

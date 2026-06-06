@@ -1,7 +1,4 @@
 
-#include "SDL.h"
-#include "SDL_opengl.h"
-
 #include "graphics_threaded.h"
 
 
@@ -105,18 +102,6 @@
 		GLXContext m_Context;
 	};
 
-	static SGLContext GL_GetCurrentContext()
-	{
-		SGLContext Context;
-		Context.m_pDisplay = glXGetCurrentDisplay();
-		Context.m_Drawable = glXGetCurrentDrawable();
-		Context.m_Context = glXGetCurrentContext();
-		return Context;
-	}
-
-	static void GL_MakeCurrent(const SGLContext &Context) { glXMakeCurrent(Context.m_pDisplay, Context.m_Drawable, Context.m_Context); }
-	static void GL_ReleaseContext(const SGLContext &Context) { glXMakeCurrent(Context.m_pDisplay, None, 0x0); }
-	static void GL_SwapBuffers(const SGLContext &Context) { glXSwapBuffers(Context.m_pDisplay, Context.m_Drawable); }
 #else
 	#error missing implementation
 #endif
@@ -255,7 +240,6 @@ class CCommandProcessor_SDL_OpenGL : public CGraphicsBackend_Threaded::ICommandP
 // graphics backend implemented with SDL and OpenGL
 class CGraphicsBackend_SDL_OpenGL : public CGraphicsBackend_Threaded
 {
-	SDL_Surface *m_pScreenSurface;
 	ICommandProcessor *m_pProcessor;
 	SGLContext m_GLContext;
 	volatile int m_TextureMemoryUsage;

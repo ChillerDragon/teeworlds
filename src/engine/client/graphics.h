@@ -52,7 +52,7 @@ protected:
 
 	struct CTexture
 	{
-		GLuint m_Tex;
+		int m_Tex;
 		int m_MemSize;
 		int m_Flags;
 		int m_Next;
@@ -126,7 +126,6 @@ public:
 
 class CGraphics_SDL : public CGraphics_OpenGL
 {
-	SDL_Surface *m_pScreenSurface;
 
 	int TryInit();
 	int InitWindow();

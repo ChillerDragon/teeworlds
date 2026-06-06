@@ -81,4 +81,4 @@ build-*
 
 datasrc/languages
 datasrc/maps
-
+.gdb_history

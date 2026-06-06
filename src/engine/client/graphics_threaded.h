@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <engine/graphics.h>
 
 class CCommandBuffer
