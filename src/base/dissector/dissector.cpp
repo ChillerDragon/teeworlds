@@ -79,7 +79,7 @@ void print_packet(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int 
 			else if(CtrlMsg == _NET_CTRLMSG_TOKEN) { pMsg = "NET_CTRLMSG_TOKEN"; }
 			char aPacketHeader[1024];
 			char aCtrlMsg[1024];
-			str_format(aPacketHeader, sizeof(aPacketHeader), "PHeader: size=%d flags=%d", PacketHeaderSize, pPacket->m_Flags);
+			str_format(aPacketHeader, sizeof(aPacketHeader), "flags=%d", pPacket->m_Flags);
 			str_format(aCtrlMsg, sizeof(aCtrlMsg), "CtrlMsg = %d (%s)", CtrlMsg, pMsg);
 			if(CtrlMsg == _NET_CTRLMSG_TOKEN || CtrlMsg == NET_CTRLMSG_CONNECT)
 			{
