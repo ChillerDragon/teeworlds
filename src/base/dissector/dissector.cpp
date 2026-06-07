@@ -38,7 +38,11 @@ void print_packet(CNetPacketConstruct *pPacket, unsigned char *pPacketData, int 
 	aFlags[0] = '\0';
 	if(aBuf[0])
 		str_format(aFlags, sizeof(aFlags), " (%s)", aBuf);
-	int PacketHeaderSize = pPacket->m_Flags&NET_PACKETFLAG_CONNLESS ? _NET_PACKETHEADERSIZE_CONNLESS : _NET_PACKETHEADERSIZE;
+	int PacketHeaderSize = NET_PACKETHEADERSIZE_WITHOUT_TOKEN;
+	if(pPacket->m_Flags&NET_PACKETFLAG_TOKEN)
+		PacketHeaderSize = NET_PACKETHEADERSIZE;
+	if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
+		PacketHeaderSize = _NET_PACKETHEADERSIZE_CONNLESS;
 	int RowLen = 12;
 	int NullBytes = maximum(pPacket->m_DataSize - RowLen, 0);
 	for(int i = RowLen; i < pPacket->m_DataSize; i++)
